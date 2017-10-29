@@ -1,0 +1,39 @@
+<div class="modal-header">
+    <h3 ng-show="customFieldAction === 'add'">Add a Custom Field</h3>
+    <h3 ng-show="customFieldAction === 'update'">Edit a Custom Field</h3>
+</div>
+<div class="modal-body">
+    <form name="customFieldForm" role="form">
+        <div  class="form-group has-feedback" ng-class="{'has-warning': customFieldForm.clientVariable.$invalid, 'has-success': customFieldForm.clientVariable.$valid}">
+            <label for="clientVariable" style="font-size:18px">Client Variable</label>
+            <input type="text" class="form-control input-large" id="clientVariable" name="clientVariable" required ng-model="customField.clientVariable">
+            <span class="glyphicon form-control-feedback" ng-class="{'glyphicon-warning-sign': customFieldForm.clientVariable.$invalid, 'glyphicon-ok': customFieldForm.clientVariable.$valid}"></span>
+        </div>
+        
+        <div  class="form-group has-feedback" ng-class="{'has-warning': customFieldForm.employeeVariable.$invalid, 'has-success': customFieldForm.employeeVariable.$valid}">
+            <label for="employeeVariable" style="font-size:18px">Employee Variable</label>
+            <input type="text" class="form-control input-large" id="employeeVariable" name="employeeVariable" required ng-model="customField.employeeVariable">
+            <span class="glyphicon form-control-feedback" ng-class="{'glyphicon-warning-sign': customFieldForm.employeeVariable.$invalid, 'glyphicon-ok': customFieldForm.employeeVariable.$valid}"></span>
+        </div>
+        
+        <div>
+            <label for="clientRequirement" style="font-size:18px">Client Requirement</label>
+            <input type="checkbox" id="clientRequirement" name="clientRequirement" style="height:20px;width:20px" ng-model="customField.clientRequirement">
+        </div>
+        
+        <div>
+            <label for="employeeRequirement" style="font-size:18px">Employee Requirement</label>
+            <input type="checkbox" id="employeeRequirement" name="employeeRequirement" style="height:20px;width:20px" ng-model="customField.employeeRequirement">
+        </div>
+        
+        <!-- <div>
+            <label for="overrideable" style="font-size:18px">Overrideable</label>
+            <input type="checkbox" id="overrideable" name="overrideable" style="height:20px;width:20px" ng-model="customField.overrideable">
+        </div>-->
+    </form>
+</div>
+
+<div class="modal-footer">
+    <button class="btn btn-primary btn-md active" ng-disabled="customFieldForm.$invalid" ng-class="{ 'disabled': customFieldform.$invalid }" ng-click="ok()" >OK</button>
+    <button class="btn btn-warning btn-md active" ng-click="cancel()">Cancel</button>
+</div>

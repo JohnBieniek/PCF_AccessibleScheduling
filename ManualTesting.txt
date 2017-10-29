@@ -1,0 +1,68 @@
+Client
+-view clients
+-Add a client
+-Update a client
+-Delete a client
+-View Schedule of client
+-View Shifts of client
+-sort by first
+-sort by initial
+-change sort direction
+
+Employees
+-View employees
+-Add employee
+-Update an employee
+-Delete an employee
+-Sort by first
+-Sort by initial
+-Swap sort direction
+-View Shifts
+-View Call offs
+-Add call off
+-Remove call off
+
+Shifts
+-Generate shifts
+-Schedule Shifts
+-View Shifts
+-Use each filter
+-Use each sort
+-Add a shift
+-Edit a shift
+-Schedule a shift
+
+Events
+-View events
+-Add event
+-Edit event
+-Delete event
+-Sort by Name
+-Sort by Start Date
+-Change directions
+
+Scheduling
+-View persons schedule
+-Add recurring Request
+-Change recurring request
+-Delete recurring request
+-Sort by each recurring request field
+-Change directions
+
+-Add single request
+-Change single request
+-Delete single request
+-Sort by each request field
+-Change directions
+
+Vacation
+-Check call offs
+-Add a call off
+-Delete a call off
+
+Settings
+-view custom fields
+-Add a custom Field
+-Edit a custom field
+-Delete a custom field
+

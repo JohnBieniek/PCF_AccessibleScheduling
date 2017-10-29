@@ -1,0 +1,665 @@
+package org.cloudfoundry.samples.music.web;
+
+import java.io.IOException;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.cloudfoundry.samples.music.domain.Client;
+import org.cloudfoundry.samples.music.domain.CompatibilityDTO;
+import org.cloudfoundry.samples.music.domain.CustomField;
+import org.cloudfoundry.samples.music.domain.Employee;
+import org.cloudfoundry.samples.music.domain.EmployeeShiftCompatibility;
+import org.cloudfoundry.samples.music.domain.EmployeeUpdateTO;
+import org.cloudfoundry.samples.music.domain.Shift;
+import org.cloudfoundry.samples.music.domain.UpdateTO;
+import org.cloudfoundry.samples.music.managers.CustomDataManager;
+import org.cloudfoundry.samples.music.managers.EmployeeShiftCompatibilityManager;
+import org.cloudfoundry.samples.music.managers.EmployeeShiftManager;
+import org.cloudfoundry.samples.music.managers.ScheduleManager;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.core.JsonParseException;
+import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.databind.DeserializationFeature;
+import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.databind.JsonMappingException;
+import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping(value = "/compatibility")
+public class CompatibilityController {
+	@Autowired
+	EmployeeShiftManager employeeShiftManager;
+	
+	@Autowired
+	ScheduleManager manager;
+	
+	@Autowired
+	CustomDataManager customDataManager;
+	
+	@Autowired
+	EmployeeShiftCompatibilityManager employeeShiftCompatibilityManager;
+	
+    public CompatibilityController() {}
+
+    @RequestMapping(method = RequestMethod.POST, value= "/shifts")
+    public @ResponseBody EmployeeUpdateTO getShiftsScheduled(HttpServletRequest request){
+    	Employee employee =null;
+    	Shift shift =null;
+
+    	String param1= request.getParameter("employee");
+    	String param2= request.getParameter("shift");
+    	ObjectMapper mapper = new ObjectMapper();
+    	
+    	try {
+			employee = mapper.readValue(param1, Employee.class);
+			shift = mapper.readValue(param2, Shift.class);
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+    	EmployeeUpdateTO to = new EmployeeUpdateTO();
+    	
+    	if(employee!=null){
+    		to.setEmployeeId(employee.getId());
+    	}
+    	
+    	to.setNumericResponse(employeeShiftManager.getAssignedShiftsForEmployeeForWeekOfMonth(employee.getId(),shift.getStartWeek(),shift.getStartMonth()).size());
+
+    	return to;
+    }
+    
+    @RequestMapping(method = RequestMethod.POST, value= "/hours")
+    public @ResponseBody EmployeeUpdateTO getHoursScheduled(HttpServletRequest request){
+    	Employee employee =null;
+    	Shift shift =null;
+
+    	String param1= request.getParameter("employee");
+    	String param2= request.getParameter("shift");
+    	ObjectMapper mapper = new ObjectMapper();
+    	
+    	try {
+			employee = mapper.readValue(param1, Employee.class);
+			shift = mapper.readValue(param2, Shift.class);
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+    	EmployeeUpdateTO to = new EmployeeUpdateTO();
+    	
+    	if(employee!=null){
+    		to.setEmployeeId(employee.getId());
+    	}
+    	
+    	to.setNumericResponse(employeeShiftManager.getHoursScheduledWeek(employee,shift.getStartWeek(),shift.getStartMonth()));
+
+    	return to;
+    }
+    @RequestMapping(method = RequestMethod.POST, value= "/hoursNeeded")
+    public @ResponseBody EmployeeUpdateTO getHoursNeeded(HttpServletRequest request){
+    	Employee employee =null;
+    	Shift shift =null;
+
+    	String param1= request.getParameter("employee");
+    	String param2= request.getParameter("shift");
+    	ObjectMapper mapper = new ObjectMapper();
+    	
+    	try {
+			employee = mapper.readValue(param1, Employee.class);
+			shift = mapper.readValue(param2, Shift.class);
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+    	EmployeeUpdateTO to = new EmployeeUpdateTO();
+    	
+    	if(employee!=null){
+    		to.setEmployeeId(employee.getId());
+    	}
+    	
+    	to.setNumericResponse(employeeShiftCompatibilityManager.hoursNeededWeekOf(employee,shift));
+
+    	return to;
+    }
+    @RequestMapping(method = RequestMethod.POST, value= "/hoursNeededAfterAssignment")
+    public @ResponseBody EmployeeUpdateTO getHoursNeededAfterAssignment(HttpServletRequest request){
+    	Employee employee =null;
+    	Shift shift =null;
+
+    	String param1= request.getParameter("employee");
+    	String param2= request.getParameter("shift");
+    	ObjectMapper mapper = new ObjectMapper();
+    	
+    	try {
+			employee = mapper.readValue(param1, Employee.class);
+			shift = mapper.readValue(param2, Shift.class);
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+    	EmployeeUpdateTO to = new EmployeeUpdateTO();
+    	
+    	if(employee!=null){
+    		to.setEmployeeId(employee.getId());
+    	}
+    	
+    	to.setNumericResponse(employeeShiftCompatibilityManager.getHoursNeededAfterAssignment(new EmployeeShiftCompatibility(employee,shift)));//.hoursNeededAfterAssignmentWeekOf(employee,shift));
+
+    	return to;
+    }
+    @RequestMapping(method = RequestMethod.POST, value= "/hoursAvailableAfterAssignment")
+    public @ResponseBody EmployeeUpdateTO getHoursAvailableAfterAssignment(HttpServletRequest request){
+    	Employee employee =null;
+    	Shift shift =null;
+
+    	String param1= request.getParameter("employee");
+    	String param2= request.getParameter("shift");
+    	ObjectMapper mapper = new ObjectMapper();
+    	
+    	try {
+			employee = mapper.readValue(param1, Employee.class);
+			shift = mapper.readValue(param2, Shift.class);
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+    	EmployeeUpdateTO to = new EmployeeUpdateTO();
+    	
+    	if(employee!=null){
+    		to.setEmployeeId(employee.getId());
+    	}
+    	
+    	to.setNumericResponse(employeeShiftCompatibilityManager.hoursAvailableAfterAssignment(employee,shift));
+
+    	return to;
+    }
+    @RequestMapping(method = RequestMethod.POST, value= "/hoursAvailable")
+    public @ResponseBody EmployeeUpdateTO getHoursAvailable(HttpServletRequest request){
+    	Employee employee =null;
+    	Shift shift =null;
+
+    	String param1= request.getParameter("employee");
+    	String param2= request.getParameter("shift");
+    	ObjectMapper mapper = new ObjectMapper();
+    	
+    	try {
+			employee = mapper.readValue(param1, Employee.class);
+			shift = mapper.readValue(param2, Shift.class);
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+    	EmployeeUpdateTO to = new EmployeeUpdateTO();
+    	
+    	if(employee!=null){
+    		to.setEmployeeId(employee.getId());
+    	}
+    	
+    	to.setNumericResponse(employeeShiftCompatibilityManager.hoursAvailable(employee,shift));
+
+    	return to;
+    }
+    @RequestMapping(method = RequestMethod.POST, value= "/unassigned")
+    public @ResponseBody EmployeeUpdateTO getUnassigned(HttpServletRequest request){
+    	Employee employee =null;
+    	Shift shift =null;
+
+    	String param1= request.getParameter("employee");
+    	String param2= request.getParameter("shift");
+    	ObjectMapper mapper = new ObjectMapper();
+    	
+    	try {
+			employee = mapper.readValue(param1, Employee.class);
+			shift = mapper.readValue(param2, Shift.class);
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+    	EmployeeUpdateTO to = new EmployeeUpdateTO();
+    	
+    	if(employee!=null){
+    		to.setEmployeeId(employee.getId());
+    	}
+    	
+    	to.setBooleanResponse(employeeShiftCompatibilityManager.isUnassignedFor(employee,shift));
+
+    	return to;
+    }
+    @RequestMapping(method = RequestMethod.POST, value= "/requestedOff")
+    public @ResponseBody EmployeeUpdateTO getRequestedOff(HttpServletRequest request){
+    	Employee employee =null;
+    	Shift shift =null;
+
+    	String param1= request.getParameter("employee");
+    	String param2= request.getParameter("shift");
+    	ObjectMapper mapper = new ObjectMapper();
+    	
+    	try {
+			employee = mapper.readValue(param1, Employee.class);
+			shift = mapper.readValue(param2, Shift.class);
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+    	EmployeeUpdateTO to = new EmployeeUpdateTO();
+    	
+    	if(employee!=null){
+    		to.setEmployeeId(employee.getId());
+    	}
+    	
+    	to.setBooleanResponse(employee.requestedOff(shift));
+
+    	return to;
+    }
+    @RequestMapping(method = RequestMethod.POST, value= "/assignmentViolatesOffAlternateWeekends")
+    public @ResponseBody EmployeeUpdateTO getAssignmentViolatesOffAlternateWeekends(HttpServletRequest request){
+    	Employee employee =null;
+    	Shift shift =null;
+
+    	String param1= request.getParameter("employee");
+    	String param2= request.getParameter("shift");
+    	ObjectMapper mapper = new ObjectMapper();
+    	
+    	try {
+			employee = mapper.readValue(param1, Employee.class);
+			shift = mapper.readValue(param2, Shift.class);
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+    	EmployeeUpdateTO to = new EmployeeUpdateTO();
+    	
+    	if(employee!=null){
+    		to.setEmployeeId(employee.getId());
+    	}
+    	
+    	to.setBooleanResponse(employeeShiftCompatibilityManager.getAssignmentWouldViolateAlternateWeekendsOff(new EmployeeShiftCompatibility(employee,shift)));
+
+    	return to;
+    }
+    @RequestMapping(method = RequestMethod.POST, value= "/assignmentIncursOvertime")
+    public @ResponseBody EmployeeUpdateTO getAssignmentIncursOvertime(HttpServletRequest request){
+    	Employee employee =null;
+    	Shift shift =null;
+
+    	String param1= request.getParameter("employee");
+    	String param2= request.getParameter("shift");
+    	ObjectMapper mapper = new ObjectMapper();
+    	
+    	try {
+			employee = mapper.readValue(param1, Employee.class);
+			shift = mapper.readValue(param2, Shift.class);
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+    	EmployeeUpdateTO to = new EmployeeUpdateTO();
+    	
+    	if(employee!=null){
+    		to.setEmployeeId(employee.getId());
+    	}
+    	
+    	to.setBooleanResponse(employeeShiftCompatibilityManager.getAssignmentWouldIncurOvertime(new EmployeeShiftCompatibility(employee,shift)));
+
+    	return to;
+    }
+    @RequestMapping(method = RequestMethod.POST, value= "/workedLastWeekend")
+    public @ResponseBody EmployeeUpdateTO getWorkedLastWeekend(HttpServletRequest request){
+    	Employee employee =null;
+    	Shift shift =null;
+
+    	String param1= request.getParameter("employee");
+    	String param2= request.getParameter("shift");
+    	ObjectMapper mapper = new ObjectMapper();
+    	
+    	try {
+			employee = mapper.readValue(param1, Employee.class);
+			shift = mapper.readValue(param2, Shift.class);
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+    	EmployeeUpdateTO to = new EmployeeUpdateTO();
+    	
+    	if(employee!=null){
+    		to.setEmployeeId(employee.getId());
+    	}
+    	
+    	to.setBooleanResponse(employeeShiftManager.getShiftsForEmployeeForWeekBefore(employee.getId(),shift).size()>0);
+
+    	return to;
+    }
+    
+    @RequestMapping(method = RequestMethod.POST, value= "/workingNextWeekend")
+    public @ResponseBody EmployeeUpdateTO getWorkingNextWeekend(HttpServletRequest request){
+    	Employee employee =null;
+    	Shift shift =null;
+
+    	String param1= request.getParameter("employee");
+    	String param2= request.getParameter("shift");
+    	ObjectMapper mapper = new ObjectMapper();
+    	
+    	try {
+			employee = mapper.readValue(param1, Employee.class);
+			shift = mapper.readValue(param2, Shift.class);
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+    	EmployeeUpdateTO to = new EmployeeUpdateTO();
+    	
+    	if(employee!=null){
+    		to.setEmployeeId(employee.getId());
+    	}
+    	
+    	to.setBooleanResponse(employeeShiftManager.getShiftsForEmployeeForWeekAfter(employee.getId(),shift).size()>0);
+
+    	return to;
+    }
+    @RequestMapping(method = RequestMethod.POST, value= "/assignability")
+    public @ResponseBody EmployeeUpdateTO getAssignability(HttpServletRequest request){
+    	Employee employee =null;
+    	Shift shift =null;
+
+    	String param1= request.getParameter("employee");
+    	String param2= request.getParameter("shift");
+    	ObjectMapper mapper = new ObjectMapper();
+    	
+    	try {
+			employee = mapper.readValue(param1, Employee.class);
+			shift = mapper.readValue(param2, Shift.class);
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+    	EmployeeUpdateTO to = new EmployeeUpdateTO();
+    	
+    	if(employee!=null){
+    		to.setEmployeeId(employee.getId());
+    	}
+    	
+    	to.setBooleanResponse(employeeShiftCompatibilityManager.isAssignableFor(employee,shift));
+
+    	return to;
+    }
+    @RequestMapping(method = RequestMethod.POST, value= "/validity")
+    public @ResponseBody EmployeeUpdateTO getValidity(HttpServletRequest request){
+    	Employee employee =null;
+    	Shift shift =null;
+
+    	String param1= request.getParameter("employee");
+    	String param2= request.getParameter("shift");
+    	ObjectMapper mapper = new ObjectMapper();
+    	
+    	try {
+			employee = mapper.readValue(param1, Employee.class);
+			shift = mapper.readValue(param2, Shift.class);
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+    	EmployeeUpdateTO to = new EmployeeUpdateTO();
+    	
+    	if(employee!=null){
+    		to.setEmployeeId(employee.getId());
+    	}
+    	
+    	to.setBooleanResponse(employeeShiftCompatibilityManager.isValidFor(employee,shift));
+
+    	return to;
+    }
+    
+    @RequestMapping(method = RequestMethod.POST, value= "/availability")
+    public @ResponseBody EmployeeUpdateTO getAvailability(HttpServletRequest request){
+    	Employee employee =null;
+    	Shift shift =null;
+
+    	String param1= request.getParameter("employee");
+    	String param2= request.getParameter("shift");
+    	ObjectMapper mapper = new ObjectMapper();
+    	
+    	try {
+			employee = mapper.readValue(param1, Employee.class);
+			shift = mapper.readValue(param2, Shift.class);
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+    	EmployeeUpdateTO to = new EmployeeUpdateTO();
+    	
+    	if(employee!=null){
+    		to.setEmployeeId(employee.getId());
+    	}
+    	
+    	to.setBooleanResponse(employeeShiftCompatibilityManager.isAvailableFor(employee,shift));
+
+    	return to;
+    }
+    
+    @RequestMapping(method = RequestMethod.POST, value= "/compatibility")
+    public @ResponseBody CompatibilityDTO getCompatibility(HttpServletRequest request){
+    	Employee employee =null;
+    	Shift shift =null;
+
+    	String param1= request.getParameter("employee");
+    	String param2= request.getParameter("shift");
+    	ObjectMapper mapper = new ObjectMapper();
+    	
+    	try {
+			employee = mapper.readValue(param1, Employee.class);
+			shift = mapper.readValue(param2, Shift.class);
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+    	CompatibilityDTO dto = new CompatibilityDTO();
+    	
+    	if(employee!=null){
+    		dto.setEmployeeId(employee.getId());
+    	}
+    	if(shift!=null){
+    		dto.setShiftId(shift.getId());
+    	}
+    	
+    	dto.setCompatible(employeeShiftCompatibilityManager.isCompatibleWith(employee,shift));
+
+    	return dto;
+    }
+    
+    @RequestMapping(method = RequestMethod.POST, value= "/customFieldData")
+    public @ResponseBody EmployeeUpdateTO getCustomFieldData(HttpServletRequest request){
+    	Employee employee =null;
+    	CustomField customField =null;
+    	int index = 0;
+    	String param1= request.getParameter("employee");
+    	String param2= request.getParameter("customField");
+    	String param3= request.getParameter("index");
+    	ObjectMapper mapper = new ObjectMapper();
+    	
+    	try {
+			employee = mapper.readValue(param1, Employee.class);
+			customField = mapper.readValue(param2, CustomField.class);
+			index = mapper.readValue(param3, Integer.class);
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+    	EmployeeUpdateTO dto = new EmployeeUpdateTO();
+    	
+    	if(employee!=null){
+    		dto.setEmployeeId(employee.getId());
+    	}
+    	
+    	dto.setBooleanResponse(customDataManager.getCustomFieldData(employee,customField));
+    	dto.setNumericResponse(index);
+    	return dto;
+    }
+    
+    @RequestMapping(method = RequestMethod.POST, value= "/clientCustomFieldData")
+    public @ResponseBody UpdateTO getClientCustomFieldData(HttpServletRequest request){
+    	Client client =null;
+    	CustomField customField =null;
+    	int index = 0;
+    	String param1= request.getParameter("client");
+    	String param2= request.getParameter("customField");
+    	String param3= request.getParameter("index");
+    	ObjectMapper mapper = new ObjectMapper();
+    	
+    	try {
+			client = mapper.readValue(param1, Client.class);
+			customField = mapper.readValue(param2, CustomField.class);
+			index = mapper.readValue(param3, Integer.class);
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+    	UpdateTO dto = new UpdateTO();
+    	
+    	if(client!=null){
+    		dto.setId(client.getId());
+    	}
+    	
+    	dto.setBooleanResponse(customDataManager.getClientCustomFieldData(client,customField));
+    	dto.setNumericResponse(index);
+    	return dto;
+    }
+    
+    @RequestMapping(method = RequestMethod.POST, value= "/setClientCustomFieldData")
+    public @ResponseBody UpdateTO setClientCustomFieldData(HttpServletRequest request){
+    	Client client =null;
+    	CustomField customField =null;
+    	boolean value = true;
+    	String param1= request.getParameter("client");
+    	String param2= request.getParameter("customField");
+    	String param3= request.getParameter("value");
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    	try {
+			client = mapper.readValue(param1, Client.class);
+			customField = mapper.readValue(param2, CustomField.class);
+			value = mapper.readValue(param3, Boolean.class);
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+    	UpdateTO dto = new UpdateTO();
+    	
+    	if(client!=null){
+    		dto.setId(client.getId());
+        	dto.setBooleanResponse(customDataManager.setClientCustomFieldData(client,customField,value));
+    	}
+    	
+
+    	return dto;
+    }
+    
+    @RequestMapping(method = RequestMethod.POST, value= "/setCustomFieldData")
+    public @ResponseBody UpdateTO setCustomFieldData(HttpServletRequest request){
+    	Employee employee =null;
+    	CustomField customField =null;
+    	boolean value = true;
+    	String param1= request.getParameter("employee");
+    	String param2= request.getParameter("customField");
+    	String param3= request.getParameter("value");
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    	try {
+			employee = mapper.readValue(param1, Employee.class);
+			customField = mapper.readValue(param2, CustomField.class);
+			value = mapper.readValue(param3, Boolean.class);
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+    	UpdateTO dto = new UpdateTO();
+    	
+    	if(employee!=null){
+    		dto.setId(employee.getId());
+        	dto.setBooleanResponse(customDataManager.setCustomFieldData(employee,customField,value));
+    	}
+    	
+
+    	return dto;
+    }
+}

@@ -1,0 +1,296 @@
+package org.cloudfoundry.samples.music.managers;
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import org.cloudfoundry.samples.music.domain.EmployeeShiftCompatibilities;
+import org.cloudfoundry.samples.music.domain.EmployeeShiftCompatibility;
+import org.cloudfoundry.samples.music.domain.Employee;
+import org.cloudfoundry.samples.music.domain.Shift;
+import org.cloudfoundry.samples.music.worker.ShiftWorker;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Component;
+
+@Component
+public class ShiftAssignmentManager {
+    private CrudRepository<Shift, String> shiftCrud;
+    
+    @Autowired
+    CustomDataManager customDataManager;
+    
+    @Autowired
+    ShiftManager shiftManager;
+    
+    @Autowired
+    EmployeeShiftMapManager employeeShiftMapManager;
+    
+    @Autowired
+    EmployeeShiftCompatibilityManager employeeShiftCompatibilityManager;
+    
+    @Autowired
+    ShiftGenerationManager shiftGenerationManager;
+    
+    @Autowired
+    public ShiftAssignmentManager(CrudRepository<Shift, String> shiftCrud) {
+        this.shiftCrud = shiftCrud;
+    }
+    
+//    public void saveAssignedUnconflictedPrestaffedRecuringShiftsToTableForMonth(int selectedMonth){
+//    	ArrayList<Shift> prestaffedRecuringShifts = shiftManager.getPrestaffedRecurringShiftsForMonth(selectedMonth);
+//
+//    	HashMap<String,ArrayList<Shift>> prestaffedRecuringShiftsPerEmployee =ShiftWorker.getEmployeeShiftMap(prestaffedRecuringShifts);
+//
+//    	HashMap<String,ArrayList<Shift>> unconflictedPrestaffedRecuringShiftsPerEmployee = ShiftWorker.getNonoverlapingShiftsPerEmployee(prestaffedRecuringShiftsPerEmployee);
+//    	
+//    	ArrayList<Shift> assignedUnconflictedPrestaffedRecuringShifts = assignRequestedStaff(unconflictedPrestaffedRecuringShiftsPerEmployee);
+//
+//    	shiftCrud.save(assignedUnconflictedPrestaffedRecuringShifts);
+//    }
+    public void saveAssignedUnconflictedPrestaffedRecuringShiftsToTableForMonth(int selectedMonth){
+    	ArrayList<Shift> prestaffedRecuringShifts = shiftManager.getPrestaffedRecurringShiftsForMonth(selectedMonth);
+//    	logger.error(prestaffedRecuringShifts.size() + " prestaffedRecuringShifts");
+    	HashMap<String,ArrayList<Shift>> prestaffedRecuringShiftsPerEmployee =ShiftWorker.getEmployeeShiftMap(prestaffedRecuringShifts);
+
+    	HashMap<String,ArrayList<Shift>> unconflictedPrestaffedRecuringShiftsPerEmployee = ShiftWorker.getNonoverlapingShiftsPerEmployee(prestaffedRecuringShiftsPerEmployee);
+    	
+    	ArrayList<Shift> assignedUnconflictedPrestaffedRecuringShifts = ShiftWorker.assignRequestedStaff(unconflictedPrestaffedRecuringShiftsPerEmployee);
+//    	logger.error(assignedUnconflictedPrestaffedRecuringShifts.size() + " assignedUnconflictedPrestaffedRecuringShifts");
+    	shiftCrud.save(assignedUnconflictedPrestaffedRecuringShifts);
+    }
+    
+//    public void saveAssignedUnconflictedPrestaffedSingleShiftsToTableForMonth(int month) {
+//    	ArrayList<Shift> prestaffedSingleShifts = shiftManager.getPrestaffedSingleShiftsForMonth(month);
+//
+//    	HashMap<String, ArrayList<Shift>> prestaffedSingleShiftsPerEmployee = ShiftWorker.getEmployeeShiftMap(prestaffedSingleShifts);
+//    	
+//    	HashMap<String, ArrayList<Shift>> unconflictedPrestaffedSingleShiftsPerEmployee=  ShiftWorker.getNonoverlapingShiftsPerEmployee(prestaffedSingleShiftsPerEmployee);
+//
+//    	unconflictedPrestaffedSingleShiftsPerEmployee=employeeShiftMapManager.getShiftsPerEmployeePerMonthUnconflictingWithAssignedShifts(unconflictedPrestaffedSingleShiftsPerEmployee,month);
+//	    //check to see if any conflicts exist in requested staff	    		
+//	    //add conflict info somewhere
+//    	//add conflicted shifts into array for later staff assignment->
+//    	ArrayList<Shift> assignedUnconflictedPrestaffedSingleShifts = ShiftWorker.assignRequestedStaff(unconflictedPrestaffedSingleShiftsPerEmployee);
+//
+//    	shiftCrud.save(assignedUnconflictedPrestaffedSingleShifts);
+//	}
+    public void saveAssignedUnconflictedPrestaffedSingleShiftsToTableForMonth(int month) {
+    	ArrayList<Shift> prestaffedSingleShifts = shiftManager.getPrestaffedSingleShiftsForMonth(month);
+    	//logger.error("prestaffedSingleShifts " +prestaffedSingleShifts.size());
+    	HashMap<String, ArrayList<Shift>> prestaffedSingleShiftsPerEmployee = ShiftWorker.getEmployeeShiftMap(prestaffedSingleShifts);
+    	
+    	HashMap<String, ArrayList<Shift>> unconflictedPrestaffedSingleShiftsPerEmployee=  ShiftWorker.getNonoverlapingShiftsPerEmployee(prestaffedSingleShiftsPerEmployee);
+//    	logger.error("nonoverlappingPRestaffedSingleShifts" +unconflictedPrestaffedSingleShiftsPerEmployee.toString());
+    	unconflictedPrestaffedSingleShiftsPerEmployee=employeeShiftMapManager.getShiftsPerEmployeePerMonthUnconflictingWithAssignedShifts(unconflictedPrestaffedSingleShiftsPerEmployee,month);
+	    //check to see if any conflicts exist in requested staff	    		
+	    //add conflict info somewhere
+    	//add conflicted shifts into array for later staff assignment->
+    	ArrayList<Shift> assignedUnconflictedPrestaffedSingleShifts = ShiftWorker.assignRequestedStaff(unconflictedPrestaffedSingleShiftsPerEmployee);
+    	//logger.error("prestaffedSingleShifts " +assignedUnconflictedPrestaffedSingleShifts.size());
+    	shiftCrud.save(assignedUnconflictedPrestaffedSingleShifts);
+	}
+    
+    public void scheduleUnassignedNonEventShiftsFor(int month) {
+		for(int week = 0; week<6;week++){
+    		scheduleShiftsForWeekOfMonth(week,month);
+    	}
+	}
+    public void scheduleShiftsForWeekOfMonth(int week, int month) {
+    	System.out.println("scheduling shifts for week " +week + " of month:"+month);
+		scheduleWeekendShiftsForWeekOfMonth(week, month);
+		scheduleWeekdayShiftsForWeekOfMonth(week, month);
+	}
+    
+//    private void scheduleWeekendShiftsForWeekOfMonth(int week, int month) {
+//		ArrayList<Shift> shifts = shiftManager.getUnassignedNonEventShiftsForMonth(month);
+//		ArrayList<Shift> unassignedShiftsForWeek = ShiftWorker.getShiftsForWeekOfMonth(shifts, week, month);
+//		ArrayList<Shift> unassignedShiftsForWeekends= ShiftWorker.getWeekendShifts(unassignedShiftsForWeek);
+//	
+//		for(Shift shift : unassignedShiftsForWeekends){
+//			EmployeeShiftCompatibilities shiftCompatibilities = employeeShiftCompatibilityManager.getValidCompatibilities(employeeShiftCompatibilityManager.getEmployeeShiftCompatibilitiesFor(shift));
+//			
+//			Employee employee = null;//getEmployeeWithMostTimeAfterAssignment(shiftCompatibilities);
+//			
+//			if(employee==null){
+//				employee=employeeShiftCompatibilityManager.getEmployeeWithMostTimeBeforeOvertimeAfterAssignment(shiftCompatibilities);
+//				shift.setAssignmentReason("Employee had the most time before overtime after assignment");
+//			}
+//			else{
+//				shift.setAssignmentReason("Employee had the most time until minimn was reached after assignment");
+//			}
+//			
+//			if(employee==null){
+//				employee=shiftCompatibilities.compatibilities.get(0).getEmployee();
+//				shift.setAssignmentReason("One of those in overtime who was available");
+//			}
+//
+//			shift.setStaffId(employee.getId());
+//			shift.setStaffName(employee.getFirst());
+//			shift.setAssigned(true);
+//			shiftCrud.save(shift);
+//		}
+//	}
+    
+    private void scheduleWeekendShiftsForWeekOfMonth(int week, int month) {
+		ArrayList<Shift> shifts = shiftManager.getUnassignedNonEventShiftsForMonth(month);
+		ArrayList<Shift> unassignedShiftsForWeek = ShiftWorker.getShiftsForWeekOfMonth(shifts, week, month);
+		ArrayList<Shift> unassignedShiftsForWeekends= ShiftWorker.getWeekendShifts(unassignedShiftsForWeek);
+		for(Shift shift : unassignedShiftsForWeekends){
+			System.out.println("Attempitng to assign " + shift.toString());
+			EmployeeShiftCompatibilities shiftCompatibilities = employeeShiftCompatibilityManager.getValidUnfixedCompatibilities(employeeShiftCompatibilityManager.getEmployeeShiftCompatibilitiesFor(shift));
+			
+			if(null==shiftCompatibilities){
+				
+			}
+			Employee employee = employeeShiftCompatibilityManager.getEmployeeWithMostTime(shiftCompatibilities);
+			
+			if(employee==null){
+				for(EmployeeShiftCompatibility compatibility :shiftCompatibilities.compatibilities){
+					if(employeeShiftCompatibilityManager.getHoursScheduledWeekOf(compatibility.getEmployee(),compatibility.getShift())<compatibility.getEmployee().getMinHours()){
+						employee=compatibility.getEmployee();
+						shift.setAssignmentReason("Min");
+					}
+				}
+			}
+			
+			if(employee==null){
+				employee=employeeShiftCompatibilityManager.getEmployeeWithMostTimeBeforeOvertimeAfterAssignment(shiftCompatibilities);
+				/*System.out.println("likely assigning " + employee.getFirst() + " to shift " +
+						" because they have "+ (hoursNeededWeekOf(employee,shift)-shift.getDuration())
+						+" left after scheduling");*/
+				shift.setAssignmentReason("Weekend shift.Employee had the most time before overtime after assignment");
+			}
+			else{
+				shift.setAssignmentReason("Weekend shift.Employee had the most time until minimn was reached after assignment");
+			}
+			
+			if(employee==null &&shiftCompatibilities!=null&&shiftCompatibilities.compatibilities!=null&&shiftCompatibilities.compatibilities.size()>0){
+				float hours = 80;
+				for(EmployeeShiftCompatibility compatibility :shiftCompatibilities.compatibilities){
+					if(compatibility.getEmployee().getRequestsExtraShifts()){
+						if(employeeShiftCompatibilityManager.getHoursScheduledWeekOf(compatibility.getEmployee(),compatibility.getShift())<hours){
+							hours=employeeShiftCompatibilityManager.getHoursScheduledWeekOf(compatibility.getEmployee(),compatibility.getShift());
+							employee=compatibility.getEmployee();
+							shift.setAssignmentReason("All in overtime, they requested it and have least hours");
+						}
+					}
+				}
+				
+				if(employee==null){
+					for(EmployeeShiftCompatibility compatibility :shiftCompatibilities.compatibilities){
+						if(compatibility.getEmployee().getRequestsExtraShifts()){
+							if(employeeShiftCompatibilityManager.getHoursScheduledWeekOf(compatibility.getEmployee(),compatibility.getShift())<compatibility.getEmployee().getMinHours()){
+								employee=compatibility.getEmployee();
+								shift.setAssignmentReason("Min");
+							}
+						}
+					}
+				}
+				if(employee==null){
+					employee=shiftCompatibilities.compatibilities.get(0).getEmployee();
+					shift.setAssignmentReason("One of those in overtime who was available");
+				}
+			}
+			if(employee!=null){
+				if(!employeeShiftCompatibilityManager.getAssignmentWouldViolateAlternateWeekendsOff(new EmployeeShiftCompatibility(employee,shift))){
+					System.out.println("assigning " + employee.getFirst() + " to " + shift.getId() + " " + shift.toString()
+					+ " beacause " + shift.getAssignmentReason());
+					shift.setStaffId(employee.getId());
+					shift.setStaffName(employee.getFirst());
+					shift.setAssigned(true);
+					shiftCrud.save(shift);
+				}
+			}
+		}
+	}
+    
+//    private void scheduleWeekdayShiftsForWeekOfMonth(int week, int month) {
+//		ArrayList<Shift> shifts = shiftManager.getUnassignedNonEventShiftsForMonth(month);
+//		
+//		ArrayList<Shift> unassignedShiftsForWeek = ShiftWorker.getShiftsForWeekOfMonth(shifts, week, month);
+//
+//		ArrayList<Shift> unassignedShiftsForWeekdays= ShiftWorker.getWeekdayShifts(unassignedShiftsForWeek);
+//
+//		for(Shift shift : unassignedShiftsForWeekdays){
+//			EmployeeShiftCompatibilities shiftCompatibilities = employeeShiftCompatibilityManager.getValidCompatibilities(employeeShiftCompatibilityManager.getEmployeeShiftCompatibilitiesFor(shift));
+//			
+//			Employee employee = null;//getEmployeeWithMostTimeAfterAssignment(shiftCompatibilities);
+//			
+//			if(employee==null){
+//				employee=employeeShiftCompatibilityManager.getEmployeeWithMostTimeBeforeOvertimeAfterAssignment(shiftCompatibilities);
+//				shift.setAssignmentReason("Employee had the most time before overtime after assignment");
+//			}
+//			else{
+//				shift.setAssignmentReason("Employee had the most time until minimn was reached after assignment");
+//			}
+//			
+//			if(employee==null){
+//				employee=shiftCompatibilities.compatibilities.get(0).getEmployee();
+//				shift.setAssignmentReason("One of those in overtime who was available");
+//			}
+//
+//			shift.setStaffId(employee.getId());
+//			shift.setStaffName(employee.getFirst());
+//			shift.setAssigned(true);
+//			shiftCrud.save(shift);
+//		}
+//	}
+    private void scheduleWeekdayShiftsForWeekOfMonth(int week, int month) {
+		ArrayList<Shift> shifts = shiftManager.getUnassignedNonEventShiftsForMonth(month);
+//		System.out.println(shifts.size()+" unassigned non event shifts for month "+month);
+		
+		ArrayList<Shift> unassignedShiftsForWeek = ShiftWorker.getShiftsForWeekOfMonth(shifts, week, month);
+	//	System.out.println(unassignedShiftsForWeek.size()+" unassigned non event shifts for week  "+week);
+
+		ArrayList<Shift> unassignedShiftsForWeekdays= ShiftWorker.getWeekdayShifts(unassignedShiftsForWeek);
+
+		//System.out.println("week "+week +" has "+unassignedShiftsForWeekdays.size()+" unassignedShiftsForWeekdays");
+		for(Shift shift : unassignedShiftsForWeekdays){
+			System.out.println("Attempitng to assign " + shift.toString());
+			EmployeeShiftCompatibilities shiftCompatibilities = employeeShiftCompatibilityManager.getValidUnfixedCompatibilities(employeeShiftCompatibilityManager.getEmployeeShiftCompatibilitiesFor(shift));
+			
+			Employee employee = null;
+			employee = employeeShiftCompatibilityManager.getEmployeeWithMostTime(shiftCompatibilities);
+			if(employee==null){
+				for(EmployeeShiftCompatibility compatibility :shiftCompatibilities.compatibilities){
+					if(employeeShiftCompatibilityManager.getHoursScheduledWeekOf(compatibility.getEmployee(),compatibility.getShift())<compatibility.getEmployee().getMinHours()){
+						employee=compatibility.getEmployee();
+						shift.setAssignmentReason("Min");
+					}
+				}
+			}
+			if(employee==null){
+				employee=employeeShiftCompatibilityManager.getEmployeeWithMostTimeBeforeOvertimeAfterAssignment(shiftCompatibilities);
+				shift.setAssignmentReason("Employee had the most time before overtime after assignment");
+			}
+			else{
+				shift.setAssignmentReason("Employee had the most time until minimn was reached after assignment");
+			}
+			
+			if(employee==null&&shiftCompatibilities!=null&&shiftCompatibilities.compatibilities!=null&&shiftCompatibilities.compatibilities.size()>0){
+				float hours = 80;
+				for(EmployeeShiftCompatibility compatibility :shiftCompatibilities.compatibilities){
+					if(compatibility.getEmployee().getRequestsExtraShifts()){
+						if(employeeShiftCompatibilityManager.getHoursScheduledWeekOf(compatibility.getEmployee(),compatibility.getShift())<hours){
+							hours=employeeShiftCompatibilityManager.getHoursScheduledWeekOf(compatibility.getEmployee(),compatibility.getShift());
+							employee=compatibility.getEmployee();
+							shift.setAssignmentReason("All in overtime, they requested it and have least hours");
+						}
+					}
+				}
+				
+				if(employee==null){
+					employee=shiftCompatibilities.compatibilities.get(0).getEmployee();
+					shift.setAssignmentReason("One of those in overtime who was available");
+				}
+			}
+			if(employee!=null){
+				System.out.println("assigning " + employee.getFirst() + " to shift " + shift.getId() + " " + shift.toString()
+				+ " beacause " + shift.getAssignmentReason());
+				shift.setStaffId(employee.getId());
+				shift.setStaffName(employee.getFirst());
+				shift.setAssigned(true);
+				shiftCrud.save(shift);
+			}
+		}
+	}
+}
