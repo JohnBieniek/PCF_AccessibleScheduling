@@ -1,12 +1,13 @@
 package org.cloudfoundry.samples.music.web;
 
-import org.cloudfoundry.samples.music.domain.Employee;
-import org.cloudfoundry.samples.music.domain.ShiftRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.web.bind.annotation.*;
+
+import accessiblesolutions.accessiblescheduling.domain.Employee;
+import accessiblesolutions.accessiblescheduling.domain.ShiftRequest;
 
 import java.util.List;
 

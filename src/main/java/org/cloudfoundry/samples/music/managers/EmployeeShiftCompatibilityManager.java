@@ -3,15 +3,17 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
-import org.cloudfoundry.samples.music.domain.EmployeeShiftCompatibilities;
-import org.cloudfoundry.samples.music.domain.EmployeeShiftCompatibility;
-import org.cloudfoundry.samples.music.domain.Client;
-import org.cloudfoundry.samples.music.domain.Employee;
-import org.cloudfoundry.samples.music.domain.Shift;
+import accessiblesolutions.accessiblescheduling.domain.EmployeeShiftCompatibilities;
+import accessiblesolutions.accessiblescheduling.domain.EmployeeShiftCompatibility;
+import accessiblesolutions.accessiblescheduling.domain.Shift;
 import org.cloudfoundry.samples.music.worker.ShiftWorker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
+
+import accessiblesolutions.accessiblescheduling.domain.Client;
+import accessiblesolutions.accessiblescheduling.domain.Employee;
+import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 
 @Component
 public class EmployeeShiftCompatibilityManager {
@@ -33,7 +35,7 @@ public class EmployeeShiftCompatibilityManager {
         this.employeeRepository = employeeRepository;
     }
     
-    public EmployeeShiftCompatibilities getValidUnfixedCompatibilities(EmployeeShiftCompatibilities compatibilities){
+    public EmployeeShiftCompatibilities getValidUnfixedCompatibilities(EmployeeShiftCompatibilities compatibilities) throws CorruptDataException{
 		ArrayList<EmployeeShiftCompatibility> validCompatibilities = new ArrayList<EmployeeShiftCompatibility>();
     	compatibilities= getValidCompatibilities(compatibilities);
     	for(EmployeeShiftCompatibility compatibility :compatibilities.compatibilities){
@@ -57,14 +59,14 @@ public class EmployeeShiftCompatibilityManager {
 		return new EmployeeShiftCompatibilities(compatibility);
 	}
 
-    public boolean getAssignable(EmployeeShiftCompatibility compatibility) {
+    public boolean getAssignable(EmployeeShiftCompatibility compatibility) throws CorruptDataException {
     	Employee employee = compatibility.getEmployee();
 		Shift shift = compatibility.getShift();
 		
 		return isAssignableFor(employee,shift);
 	}
     
-    public Employee getEmployeeWithMostTimeBeforeOvertimeAfterAssignment(EmployeeShiftCompatibilities compatibilities) {
+    public Employee getEmployeeWithMostTimeBeforeOvertimeAfterAssignment(EmployeeShiftCompatibilities compatibilities) throws CorruptDataException {
     	//System.out.println("Getting the employee with the most time for " + compatibilities.compatibilities.get(0).getShift().toString());
 		Employee employee = null;
 		float time = 0;
@@ -190,7 +192,7 @@ public class EmployeeShiftCompatibilityManager {
 		return violatesAlternateWeekendsOff;
 	}
 	
-	public boolean getResting(EmployeeShiftCompatibility compatibility){
+	public boolean getResting(EmployeeShiftCompatibility compatibility) throws CorruptDataException{
 		boolean resting = false;
 		
 		if(getAssignmentWouldViolateMaxShiftsPerDay(compatibility)){
@@ -205,7 +207,7 @@ public class EmployeeShiftCompatibilityManager {
 		
 		return resting;
 	}
-	public Employee getEmployeeWithMostTime(EmployeeShiftCompatibilities compatibilities) {
+	public Employee getEmployeeWithMostTime(EmployeeShiftCompatibilities compatibilities) throws CorruptDataException {
     	Employee employee = null;
 		float time = 0;
 		
@@ -233,7 +235,7 @@ public class EmployeeShiftCompatibilityManager {
 		return false;
 	}
 	
-	public boolean getAssignmentWouldViolateMaxWeeklyWorkDays(EmployeeShiftCompatibility compatibility){
+	public boolean getAssignmentWouldViolateMaxWeeklyWorkDays(EmployeeShiftCompatibility compatibility) throws CorruptDataException{
 		boolean violatesMaxWeeklyWorkDays = false;
 		int daysWorked = 0;
 		
@@ -273,30 +275,30 @@ public class EmployeeShiftCompatibilityManager {
 		return violatesMaxWeeklyWorkDays;
 	}
 	
-	public boolean getAssignmentWouldIncurOvertime(EmployeeShiftCompatibility compatibility) {
+	public boolean getAssignmentWouldIncurOvertime(EmployeeShiftCompatibility compatibility) throws CorruptDataException {
 		Employee employee = compatibility.getEmployee();
 		Shift shift = compatibility.getShift();
 		
 		return getHoursScheduledWeekOf(employee,shift)+shift.getDuration()>employee.getMaxHours();
 	}
 	
-	public float getHoursAfterAssignment(EmployeeShiftCompatibility compatibility) {
+	public float getHoursAfterAssignment(EmployeeShiftCompatibility compatibility) throws CorruptDataException {
 		return hoursNeededWeekOf(compatibility.getEmployee(),compatibility.getShift())-compatibility.getShift().getDuration()<0?0:hoursNeededWeekOf(compatibility.getEmployee(),compatibility.getShift())-compatibility.getShift().getDuration();
 	}
 	
-	public float getHoursNeededAfterAssignment(EmployeeShiftCompatibility compatibility) {
+	public float getHoursNeededAfterAssignment(EmployeeShiftCompatibility compatibility) throws CorruptDataException {
 		return hoursNeededWeekOf(compatibility.getEmployee(),compatibility.getShift())-compatibility.getShift().getDuration()<0?0:hoursNeededWeekOf(compatibility.getEmployee(),compatibility.getShift())-compatibility.getShift().getDuration();
 	}
 
-	public boolean getAssignmentWouldReachMinimum(EmployeeShiftCompatibility compatibility) {
+	public boolean getAssignmentWouldReachMinimum(EmployeeShiftCompatibility compatibility) throws CorruptDataException {
 		return compatibility.getShift().getDuration()>=getHoursNeeded(compatibility);
 	}
 	
-	public float getHoursNeeded(EmployeeShiftCompatibility compatibility) {
+	public float getHoursNeeded(EmployeeShiftCompatibility compatibility) throws CorruptDataException {
 		return hoursNeededWeekOf(compatibility.getEmployee(),compatibility.getShift());
 	}
 	
-	public Employee getEmployeeWithMostTimeAfterAssignment(EmployeeShiftCompatibilities compatibilties) {
+	public Employee getEmployeeWithMostTimeAfterAssignment(EmployeeShiftCompatibilities compatibilties) throws CorruptDataException {
 		Employee employee = null;
 		float time = 0;
 		
@@ -310,7 +312,7 @@ public class EmployeeShiftCompatibilityManager {
 		
 		return employee;
 	}
-	public float getEmployeeWithMostTimeAfterAssignmentsTimeAfterAssignment(EmployeeShiftCompatibilities compatibilities){
+	public float getEmployeeWithMostTimeAfterAssignmentsTimeAfterAssignment(EmployeeShiftCompatibilities compatibilities) throws CorruptDataException{
 		float time = 0;
 		
 		for(EmployeeShiftCompatibility compatibility :compatibilities.compatibilities){
@@ -353,7 +355,7 @@ public class EmployeeShiftCompatibilityManager {
 //		return new EmployeeShiftCompatibilities(validCompatibilities);
 //	}
 	
-	public EmployeeShiftCompatibilities getValidCompatibilities(EmployeeShiftCompatibilities compatibilities){
+	public EmployeeShiftCompatibilities getValidCompatibilities(EmployeeShiftCompatibilities compatibilities) throws CorruptDataException{
 		ArrayList<EmployeeShiftCompatibility> validCompatibilities = new ArrayList<EmployeeShiftCompatibility>();
 		//System.out.println("getting valid compatibilities for "+compatibilities.compatibilities.get(0).getShift().toString());
 		for(EmployeeShiftCompatibility compatibility :compatibilities.compatibilities){
@@ -383,7 +385,7 @@ public class EmployeeShiftCompatibilityManager {
 		return new EmployeeShiftCompatibilities(validCompatibilities);
 	}
 	    
-	public boolean isValidFor(Employee employee, Shift shift){
+	public boolean isValidFor(Employee employee, Shift shift) throws CorruptDataException{
 		boolean validity=false;
 		
 		if(isCompatibleWith(employee,shift)){
@@ -422,24 +424,24 @@ public class EmployeeShiftCompatibilityManager {
     	
     }
     
-	public float hoursAvailable(Employee employee,Shift shift){
+	public float hoursAvailable(Employee employee,Shift shift) throws CorruptDataException{
 		float hoursScheduled = getHoursScheduledWeekOf(employee,shift);
 		
 		return (hoursScheduled>employee.getMaxHours()) ? 0 : (employee.getMaxHours()-hoursScheduled);
 	}
-	public float hoursAvailableAfterAssignment(Employee employee,Shift shift){
+	public float hoursAvailableAfterAssignment(Employee employee,Shift shift) throws CorruptDataException{
 		float hoursScheduled = getHoursScheduledWeekOf(employee,shift);
 		
 		return (hoursScheduled+shift.getDuration()>employee.getMaxHours()) ? 0 : (employee.getMaxHours()-hoursScheduled-shift.getDuration());
 	}
 		
-	public float hoursNeededWeekOf(Employee employee,Shift shift){
+	public float hoursNeededWeekOf(Employee employee,Shift shift) throws CorruptDataException{
 		float hoursScheduled = getHoursScheduledWeekOf(employee,shift);
 		
 		return (hoursScheduled>employee.getMinHours()) ? 0 : (employee.getMinHours()-hoursScheduled);
 	}
 	
-	public boolean isAssignableFor(Employee employee,Shift shift){
+	public boolean isAssignableFor(Employee employee,Shift shift) throws CorruptDataException{
     	if(!employee.requestedOff(shift)){
     		if(isUnassignedFor(employee,shift)){
     			if(!isAvailableFor(employee,shift)){
@@ -470,7 +472,7 @@ public class EmployeeShiftCompatibilityManager {
     	return unassigned;
 	}
 	
-	public boolean isAvailableFor(Employee employee, Shift shift){
+	public boolean isAvailableFor(Employee employee, Shift shift) throws CorruptDataException{
 		LocalDate date = LocalDate.of(shift.getStartYear(), shift.getStartMonth(), shift.getStartDay());
 		DayOfWeek day = date.getDayOfWeek();
 		int dayInt = day.getValue();
@@ -479,7 +481,7 @@ public class EmployeeShiftCompatibilityManager {
 		}
 		
 		if(!shift.getOvernight()){
-			if(employee.getdaysAvailable()[dayInt]){
+			if(employee.getDaysAvailable()[dayInt]){
 				boolean[] availability = employee.getAvailabilityFor(dayInt);
 				
 				String start = shift.getStartTime();
@@ -507,7 +509,7 @@ public class EmployeeShiftCompatibilityManager {
 			}
 		}
 		else{
-			if(employee.getdaysAvailable()[dayInt]){
+			if(employee.getDaysAvailable()[dayInt]){
 				boolean[] availability = employee.getAvailabilityFor(dayInt);
 				
 				String start = shift.getStartTime();
@@ -528,7 +530,7 @@ public class EmployeeShiftCompatibilityManager {
 				int endHour = (int) Integer.parseInt(end.split(":")[0]);
 				int endMinute = (int) Integer.parseInt(end.split(":")[1]);
 				
-				if(employee.getdaysAvailable()[dayInt]){
+				if(employee.getDaysAvailable()[dayInt]){
 					for(int hourCursor =0;hourCursor<endHour;hourCursor++){
     					if(hourCursor!=endHour){
 	    					if(!availability[hourCursor]){
@@ -553,7 +555,7 @@ public class EmployeeShiftCompatibilityManager {
 		return true;
 	}
 	
-	public float getHoursScheduledWeekOf(Employee employee,Shift shift){
+	public float getHoursScheduledWeekOf(Employee employee,Shift shift) throws CorruptDataException{
 		float hours = 80;
 		if(null!=employee && null !=shift){
 			hours= 0;

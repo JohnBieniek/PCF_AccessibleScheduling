@@ -1,14 +1,15 @@
 package org.cloudfoundry.samples.music.managers;
 import java.util.List;
 
-import org.cloudfoundry.samples.music.domain.Client;
-import org.cloudfoundry.samples.music.domain.CustomField;
-import org.cloudfoundry.samples.music.domain.CustomFieldData;
-import org.cloudfoundry.samples.music.domain.Employee;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoCustomFieldDataRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
+
+import accessiblesolutions.accessiblescheduling.domain.Client;
+import accessiblesolutions.accessiblescheduling.domain.CustomField;
+import accessiblesolutions.accessiblescheduling.domain.CustomFieldData;
+import accessiblesolutions.accessiblescheduling.domain.Employee;
 
 @Component
 public class CustomDataManager {

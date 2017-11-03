@@ -1,0 +1,225 @@
+<div ng-controller="SchedulingController" ng-init="listClients()">
+  <form name="myForm">
+    <label for="mySelect" style="font-size:18px">Select a client for scheduling:</label>
+    <select name="mySelect" 
+    		id="mySelect"
+      		ng-options='client.first for client in clients | orderBy:"first" track by client.id '
+      		ng-model="selectedClient"
+      		ng-value="{{client.first}}">
+      	{{client.first}} {{client.initial}}
+     </select>
+  </form>
+  <div ng-if="selectedClient">
+  		<div ng-controller="RecurringShiftRequestsController" ng-init="list()">
+		  <h3>Scheduling needs for {{selectedClient.first}} {{selectedClient.initial}}</h3><br/>
+		  
+		  <h4>Recurring Shift Requests</h4>
+			<span> [sort by: </span>
+				<select name="sortSelect" 
+			    		id="sortSelect"
+			      		ng-model="sortRecurringField"
+			      		ng-value="{{sortRecurringField}}">
+				    <option value=day>Start Day</option>
+				    <option value=startTime>Start Time</option>
+		            <option value=endTime>End Time</option>
+		        	<option value=fixedStaff>Fixed Staff</option>
+		            <option value=staffName>Staff Name</option>
+			     </select>
+			     <a href="" ng-click="sortDescending=!sortDescending">
+			        <span class="glyphicon" ng-class="{'glyphicon-chevron-up' : !sortDescending, 'glyphicon-chevron-down' : sortDescending}"></span>
+			    </a>
+		        <span> | </span>
+		        <a href="" ng-click="addRecurringShiftRequest(selectedClient,employees)"><span class="glyphicon glyphicon-plus"></span>add recurring request</a>
+		    <span> ] </span>
+		    <table class="table table-striped">
+		        <thead>
+			        <tr>
+			        	<th></th>
+			            <th>Start Day</th>
+			            <th>Start Time</th>            
+			            <th>End Day</th>
+			            <th>End Time</th>         
+			            <th>Fixed Staff</th>
+			            <th>Staff</th>
+			        </tr>
+		        </thead>
+		        <tbody>
+			        <tr ng-if="recurringShiftNeed.clientId === selectedClient.id" ng-repeat="recurringShiftNeed in recurringShiftNeeds | orderBy:[sortRecurringField,'startTime']:sortDescending">
+			        	<div>
+			        		 <td class="dropdown">
+				                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+				                    <span class="glyphicon glyphicon-cog"></span>
+				                </a>
+				                <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+				                    <li role="presentation"><a ng-click="updateRecurringShiftRequest(selectedClient,recurringShiftNeed,employees)">edit</a></li>
+				                    <li role="presentation"><a ng-click="deleteRecurringShiftRequest(recurringShiftNeed)">delete</a></li>
+				                </ul>
+				            </td>
+				            
+				            <td>
+				            	<div ng-if="multiTableEditing">
+				                	<in-place-edit field-name='startDay' input-type='text' input-class='input-large' model=recurringShiftNeed>{{recurringShiftNeed.startDay}}</in-place-edit>
+				            	</div>
+								<div ng-if="!multiTableEditing">
+									{{recurringShiftNeed.startDay}}
+								</div>
+				            </td>
+				            <td>
+				            	<div ng-if="multiTableEditing">
+				                	<in-place-edit field-name='startTime' input-type='text' input-class='input-large' model=recurringShiftNeed>{{recurringShiftNeed.startTime}}</in-place-edit>
+				            	</div>
+								<div ng-if="!multiTableEditing">
+									{{recurringShiftNeed.startTime}}
+								</div>
+				            </td>
+				            <td>
+				            	<div ng-if="multiTableEditing">
+				                	<in-place-edit field-name='endDay' input-type='text' input-class='input-large' model=recurringShiftNeed>{{recurringShiftNeed.endDay}}</in-place-edit>
+				           		</div>
+								<div ng-if="!multiTableEditing">
+									{{recurringShiftNeed.endDay}}
+								</div>
+				            </td>
+				            <td>
+				            	<div ng-if="multiTableEditing">
+				                	<in-place-edit field-name='endTime' input-type='text' input-class='input-large' model=recurringShiftNeed>{{recurringShiftNeed.endTime}}</in-place-edit>
+				            	</div>
+								<div ng-if="!multiTableEditing">
+									{{recurringShiftNeed.endTime}}
+								</div>
+				            </td>            
+				            <td>
+				            	<div ng-if="multiTableEditing">
+				                	<in-place-edit field-name='fixedStaff' input-type='checkbox' input-class='input-large' model=recurringShiftNeed>{{recurringShiftNeed.fixedStaff}}</in-place-edit>
+				            	</div>
+								<div ng-if="!multiTableEditing">
+									{{recurringShiftNeed.fixedStaff}}
+								</div>
+				            </td>
+				            <td>
+				            	<div ng-if="multiTableEditing">
+				                	<in-place-edit field-name='staffName' input-type='text' input-class='input-large' model=recurringShiftNeed>{{recurringShiftNeed.staffName}}</in-place-edit>
+				            	</div>
+								<div ng-if="!multiTableEditing">
+									{{recurringShiftNeed.staffName}}
+								</div>
+				            </td>
+			            </div>
+			        </tr>
+		        </tbody>
+		    </table>
+  		    <script type="text/javascript" src="js/component/recurringShiftRequestTable.js"></script>
+		        <script type="text/javascript" src="js/modal/RecurringShiftNeedModalController.js"></script>
+	    </div>  
+	    </br>
+	    <div ng-if="selectedClient" ng-controller="SingleShiftRequestsController"  ng-init="list()">
+		  	<h4>Single Shift Requests</h4>
+		  	<span> [sort by: </span>
+		  		<select name="sortSingleSelect" 
+			    		id="sortSingleSelect"
+			      		ng-model="sortRequestsField"
+			      		ng-value="{{sortRequestsField}}">
+				    <option value=startDate>Start Date</option>
+				    <option value=startTime>Start Time</option>
+			        <option value=endDate>End Date</option>
+		            <option value=endTime>End Time</option>
+		            <option value=staffName>Staff Name</option>
+			    </select>
+			    <a href="" ng-click="sortDescending=!sortDescending">
+			        <span class="glyphicon" ng-class="{'glyphicon-chevron-up' : !sortDescending, 'glyphicon-chevron-down' : sortDescending}"></span>
+			    </a>
+		        <span> | </span>
+			    <form name="myForm" style="display:inline-block" >
+					<span>
+					    month:
+					</span>
+					
+		    		<select name="monthSelect" 
+		    				id="monthSelect"
+				      		ng-model="selectedMonth"
+				      		ng-value="{{selectedMonth}}">
+					    <option value='06'>06</option>
+					    <option value='07'>07</option>
+				        <option value='08'>08</option>
+			            <option value='09'>09</option>
+	           		</select>
+			  	</form>
+		        <span> | </span>
+		        <a href="" ng-click="addShiftRequest( selectedClient , employees )"><span class="glyphicon glyphicon-plus"></span>add shift request</a>
+		    <span> ] </span>
+		    <table class="table table-striped">
+		        <thead>
+			        <tr>
+			        	<th></th>
+			            <th>Start Date</th>
+			            <th>Start Time</th>            
+			            <th>End Date</th>
+			            <th>End Time</th>   
+			            <th>Requested Staff</th>       
+			        </tr>
+		        </thead>
+		        <tbody>
+			        <tr ng-if="shiftRequest.clientId === selectedClient.id" ng-repeat="shiftRequest in shiftRequests | orderBy:[sortRequestsField,'startTime']:sortDescending
+			        | filter: {startDate: selectedMonth+'-'}">
+			        	<div>
+			        		<td class="dropdown">
+				                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+				                    <span class="glyphicon glyphicon-cog"></span>
+				                </a>
+				                <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+				                    <li role="presentation"><a ng-click="updateShiftRequest(selectedClient,shiftRequest,employees)">edit</a></li>
+				                    <li role="presentation"><a ng-click="deleteShiftRequest(shiftRequest)">delete</a></li>
+				                </ul>
+				            </td>
+				            
+				            <td>
+				            	<div ng-if="multiTableEditing">
+				                	<in-place-edit field-name='startDay' input-type='text' input-class='input-large' model=shiftRequest>{{shiftRequest.startDate}}</in-place-edit>
+				                </div>
+								<div ng-if="!multiTableEditing">
+									{{shiftRequest.startDate}}
+								</div>
+				            </td>
+				            <td>
+				            	<div ng-if="multiTableEditing">
+				                	<in-place-edit field-name='startTime' input-type='text' input-class='input-large' model=shiftRequest>{{shiftRequest.startTime}}</in-place-edit>
+				                </div>
+								<div ng-if="!multiTableEditing">
+									{{shiftRequest.startTime}}
+								</div>
+				            </td>
+				            <td>
+				            	<div ng-if="multiTableEditing">
+				                	<in-place-edit field-name='endDay' input-type='text' input-class='input-large' model=shiftRequest>{{shiftRequest.endDay}}</in-place-edit>
+				                </div>
+								<div ng-if="!multiTableEditing">
+									{{shiftRequest.endDate}}
+								</div>
+				            </td>
+				            <td>
+				            	<div ng-if="multiTableEditing">
+				                	<in-place-edit field-name='endTime' input-type='text' input-class='input-large' model=shiftRequest>{{shiftRequest.endTime}}</in-place-edit>
+				                </div>
+								<div ng-if="!multiTableEditing">
+									{{shiftRequest.endTime}}
+								</div>
+				            </td>
+				            <td>
+				            	<div ng-if="multiTableEditing">
+				                	<in-place-edit field-name='staff' input-type='text' input-class='input-large' model=shiftRequest>{{shiftRequest.staffName}}</in-place-edit>
+				                </div>
+								<div ng-if="!multiTableEditing">
+									{{shiftRequest.staffName}}
+								</div>
+				            </td>               
+			            </div>
+			        </tr>
+		        </tbody>
+		    </table>
+		    <script type="text/javascript" src="js/component/singleShiftRequestTable.js"></script>
+    		<script type="text/javascript" src="js/modal/ShiftRequestModalController.js"></script>
+	    </div>  
+    </div>
+
+    <script type="text/javascript" src="js/page/schedulingPage.js"></script>
+</div>

@@ -2,7 +2,7 @@ package org.cloudfoundry.samples.music.web;//Ignore complaints
 
 import java.util.ArrayList;
 
-import org.cloudfoundry.samples.music.domain.Shift;
+import accessiblesolutions.accessiblescheduling.domain.Shift;
 import org.cloudfoundry.samples.music.managers.EmployeeShiftMapManager;
 import org.cloudfoundry.samples.music.managers.ScheduleManager;
 import org.cloudfoundry.samples.music.managers.ShiftManager;
@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 
 @RestController
 @RequestMapping(value = "/schedule")
@@ -34,7 +36,7 @@ public class ScheduleController {
     }
     
     @RequestMapping(value = "/staffShifts", method = RequestMethod.GET)
-    public String staffShifts(@RequestParam("month") String month) {
+    public String staffShifts(@RequestParam("month") String month) throws CorruptDataException {
         return manager.staffShifts(month);
     }
     

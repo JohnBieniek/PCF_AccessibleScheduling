@@ -1,0 +1,73 @@
+<div class="modal-header">
+    <h3 ng-show="recurringShiftNeedAction === 'add'">Add a Recurring Shift Request</h3>
+    <h3 ng-show="recurringShiftNeedAction === 'update'">Edit a Recurring Shift Request</h3>
+</div>
+
+<div class="modal-body">
+    <form name="recurringShiftNeedForm" role="form">
+    	<div ng-if="selectedClient">
+    	    <label for="client" style="font-size:18px">Client Name:</label>
+			<label for="clientName" style="font-size:16px">{{selectedClient.first}}</label>
+        </div>
+        
+    	<div>
+            <label for="fixedStaff" style="font-size:18px">Fixed Staff Member</label>
+            <input ng-click="selectedEmployee = null" type="checkbox" id="fixedStaff" name="fixedStaff" ng-model="recurringShiftNeed.fixedStaff">
+        </div>
+        
+        <div ng-if="recurringShiftNeed.fixedStaff" class="form-group has-feedback" ng-class="{'has-warning': recurringShiftNeedForm.staffName.$invalid, 'has-success': recurringShiftNeedForm.staffName.$valid}">
+            <label for="staffName" style="font-size:16px">Staff Name</label>
+            <select name="mySelect" 
+            		id="mySelect"
+            		ng-init = "selectedEmployee"
+      				ng-options="employee.first for employee in employees| orderBy:'first' track by employee.id"
+      				ng-model="selectedEmployee"
+      				ng-value="{{employee.first}}">
+      			{{employee.first}}
+      		</select>
+            <input type="text" ng-hide="true" id="staffId" name="staffId" ng-model="recurringShiftNeed.staffId" ng-value="recurringShiftNeed.staffId=selectedEmployee.id">
+            <input type="text" ng-hide="true" id="staffName" name="staffName" ng-model="recurringShiftNeed.staffName" ng-value="recurringShiftNeed.staffName=selectedEmployee.first">
+        </div>
+        
+        <div>
+        	<div style="display:inline-block">
+            	<label for="startDate" style="font-size:18px">Start Day</label>
+            </div>
+            <div style="display:inline-block">
+		        <label class="radio-inline">Sun<input type="radio" name="startDay" value="Sunday" ng-model="recurringShiftNeed.startDay" /></label>
+		        <label class="radio-inline">Mon<input type="radio" name="startDay" value="Monday" ng-model="recurringShiftNeed.startDay" /></label>
+				<label class="radio-inline">Tue<input type="radio" name="startDay" value="Tuesday" ng-model="recurringShiftNeed.startDay" /></label>
+        		<label class="radio-inline">Wed<input type="radio" name="startDay" value="Wednesday" ng-model="recurringShiftNeed.startDay" /></label>
+  		        <label class="radio-inline">Thu<input type="radio" name="startDay" value="Thursday" ng-model="recurringShiftNeed.startDay" /></label>
+   		        <label class="radio-inline">Fri<input type="radio" name="startDay" value="Friday" ng-model="recurringShiftNeed.startDay" /></label>
+   		        <label class="radio-inline">Sat<input type="radio" name="startDay" value="Saturday" ng-model="recurringShiftNeed.startDay" /></label>
+		    </div>
+		    </br>
+            <label for="startTime" style="font-size:18px">Start Time {{recurringShiftNeed.startDay}}</label>
+            <input type="time" ng-model="recurringShiftNeed.startTime">
+        </div>
+        </br>
+        <div>
+        	<div style="display:inline-block">
+            	<label for="endDate" style="font-size:18px">End Day</label>
+            </div>
+            <div style="display:inline-block">
+		        <label class="radio-inline">Sun<input type="radio" name="endDay" value="Sunday" ng-model="recurringShiftNeed.endDay" /></label>
+		        <label class="radio-inline">Mon<input type="radio" name="endDay" value="Monday" ng-model="recurringShiftNeed.endDay" /></label>
+				<label class="radio-inline">Tue<input type="radio" name="endDay" value="Tuesday" ng-model="recurringShiftNeed.endDay" /></label>
+        		<label class="radio-inline">Wed<input type="radio" name="endDay" value="Wednesday" ng-model="recurringShiftNeed.endDay" /></label>
+  		        <label class="radio-inline">Thu<input type="radio" name="endDay" value="Thursday" ng-model="recurringShiftNeed.endDay" /></label>
+   		        <label class="radio-inline">Fri<input type="radio" name="endDay" value="Friday" ng-model="recurringShiftNeed.endDay" /></label>
+   		        <label class="radio-inline">Sat<input type="radio" name="endDay" value="Saturday" ng-model="recurringShiftNeed.endDay" /></label>
+		    </div>
+		    </br>
+            <label for="endTime" style="font-size:18px">End Time {{recurringShiftNeed.endDay}}</label>
+            <input type="time" ng-model="recurringShiftNeed.endTime">
+        </div>
+    </form>
+</div>
+
+<div class="modal-footer">
+    <button class="btn btn-primary btn-md active" ng-click="ok()" >OK</button>
+    <button class="btn btn-warning btn-md active" ng-click="cancel()">Cancel</button>
+</div>

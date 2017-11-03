@@ -3,7 +3,9 @@ import static org.junit.Assert.*;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.cloudfoundry.samples.music.domain.Event;
+
+import accessiblesolutions.accessiblescheduling.domain.Event;
+import accessiblesolutions.accessiblescheduling.domain.Shift;
 
 public class TestB {
 

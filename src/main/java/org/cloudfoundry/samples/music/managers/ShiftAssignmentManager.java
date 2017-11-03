@@ -2,14 +2,16 @@ package org.cloudfoundry.samples.music.managers;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.cloudfoundry.samples.music.domain.EmployeeShiftCompatibilities;
-import org.cloudfoundry.samples.music.domain.EmployeeShiftCompatibility;
-import org.cloudfoundry.samples.music.domain.Employee;
-import org.cloudfoundry.samples.music.domain.Shift;
+import accessiblesolutions.accessiblescheduling.domain.EmployeeShiftCompatibilities;
+import accessiblesolutions.accessiblescheduling.domain.EmployeeShiftCompatibility;
+import accessiblesolutions.accessiblescheduling.domain.Shift;
 import org.cloudfoundry.samples.music.worker.ShiftWorker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
+
+import accessiblesolutions.accessiblescheduling.domain.Employee;
+import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 
 @Component
 public class ShiftAssignmentManager {
@@ -89,12 +91,12 @@ public class ShiftAssignmentManager {
     	shiftCrud.save(assignedUnconflictedPrestaffedSingleShifts);
 	}
     
-    public void scheduleUnassignedNonEventShiftsFor(int month) {
+    public void scheduleUnassignedNonEventShiftsFor(int month) throws CorruptDataException {
 		for(int week = 0; week<6;week++){
     		scheduleShiftsForWeekOfMonth(week,month);
     	}
 	}
-    public void scheduleShiftsForWeekOfMonth(int week, int month) {
+    public void scheduleShiftsForWeekOfMonth(int week, int month) throws CorruptDataException {
     	System.out.println("scheduling shifts for week " +week + " of month:"+month);
 		scheduleWeekendShiftsForWeekOfMonth(week, month);
 		scheduleWeekdayShiftsForWeekOfMonth(week, month);
@@ -130,7 +132,7 @@ public class ShiftAssignmentManager {
 //		}
 //	}
     
-    private void scheduleWeekendShiftsForWeekOfMonth(int week, int month) {
+    private void scheduleWeekendShiftsForWeekOfMonth(int week, int month) throws CorruptDataException {
 		ArrayList<Shift> shifts = shiftManager.getUnassignedNonEventShiftsForMonth(month);
 		ArrayList<Shift> unassignedShiftsForWeek = ShiftWorker.getShiftsForWeekOfMonth(shifts, week, month);
 		ArrayList<Shift> unassignedShiftsForWeekends= ShiftWorker.getWeekendShifts(unassignedShiftsForWeek);
@@ -234,7 +236,7 @@ public class ShiftAssignmentManager {
 //			shiftCrud.save(shift);
 //		}
 //	}
-    private void scheduleWeekdayShiftsForWeekOfMonth(int week, int month) {
+    private void scheduleWeekdayShiftsForWeekOfMonth(int week, int month) throws CorruptDataException {
 		ArrayList<Shift> shifts = shiftManager.getUnassignedNonEventShiftsForMonth(month);
 //		System.out.println(shifts.size()+" unassigned non event shifts for month "+month);
 		

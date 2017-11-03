@@ -1,6 +1,8 @@
 package org.cloudfoundry.samples.music.managers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 @Component
 public class ScheduleManager {
     @Autowired
@@ -18,7 +20,7 @@ public class ScheduleManager {
     	return eventResponse + requestResponse;
     }
     
-    public String staffShifts(String selectedMonth) {
+    public String staffShifts(String selectedMonth) throws CorruptDataException {
     	if(null!=selectedMonth){
     		int month = Integer.parseInt(selectedMonth);
 	    	

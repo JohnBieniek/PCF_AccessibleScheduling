@@ -3,8 +3,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.cloudfoundry.samples.music.domain.Shift;
 import org.springframework.stereotype.Component;
+
+import accessiblesolutions.accessiblescheduling.domain.Shift;
+import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 @Component
 public final class ShiftWorker {
     public static ArrayList<Shift> getUnassignedShifts(Iterable<Shift> shifts) {
@@ -45,7 +47,7 @@ public final class ShiftWorker {
     	return shiftsForWeek;
     }
     
-	public static ArrayList<Shift> getOvernightShifts(ArrayList<Shift> shifts){
+	public static ArrayList<Shift> getOvernightShifts(ArrayList<Shift> shifts) throws CorruptDataException{
 		ArrayList<Shift> overnightShifts = new ArrayList<Shift>();
 		
 		for(Shift shift:shifts){

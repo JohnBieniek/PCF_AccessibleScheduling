@@ -1,6 +1,6 @@
 package org.cloudfoundry.samples.music.web;
 
-import org.cloudfoundry.samples.music.domain.Shift;
+import accessiblesolutions.accessiblescheduling.domain.Shift;
 import org.cloudfoundry.samples.music.managers.ScheduleManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +10,8 @@ import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.databind.Jso
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.web.bind.annotation.*;
+
+import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 
 import java.io.IOException;
 
@@ -32,7 +34,7 @@ public class ShiftController {
     }
 
     @RequestMapping(method = RequestMethod.POST, value= "/duration")
-    public @ResponseBody float getDuration(HttpServletRequest request){
+    public @ResponseBody float getDuration(HttpServletRequest request) throws CorruptDataException{
     	Shift shift =null;
 
     	String param= request.getParameter("shift");

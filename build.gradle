@@ -36,7 +36,7 @@ repositories {
 sourceSets {
     test {
         java {
-            srcDirs = ["src/test/org/cloudfoundry/samples/music/domain"]  // Note @Peter's comment below
+            srcDirs = ["src/test/accessiblesolutions/accessiblescheduling/domain"] 
         }
     }
 }

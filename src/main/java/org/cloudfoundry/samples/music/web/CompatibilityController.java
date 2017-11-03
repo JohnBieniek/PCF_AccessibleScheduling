@@ -4,14 +4,11 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.cloudfoundry.samples.music.domain.Client;
-import org.cloudfoundry.samples.music.domain.CompatibilityDTO;
-import org.cloudfoundry.samples.music.domain.CustomField;
-import org.cloudfoundry.samples.music.domain.Employee;
-import org.cloudfoundry.samples.music.domain.EmployeeShiftCompatibility;
-import org.cloudfoundry.samples.music.domain.EmployeeUpdateTO;
-import org.cloudfoundry.samples.music.domain.Shift;
-import org.cloudfoundry.samples.music.domain.UpdateTO;
+import accessiblesolutions.accessiblescheduling.domain.CompatibilityDTO;
+import accessiblesolutions.accessiblescheduling.domain.EmployeeShiftCompatibility;
+import accessiblesolutions.accessiblescheduling.domain.EmployeeUpdateTO;
+import accessiblesolutions.accessiblescheduling.domain.Shift;
+import accessiblesolutions.accessiblescheduling.domain.UpdateTO;
 import org.cloudfoundry.samples.music.managers.CustomDataManager;
 import org.cloudfoundry.samples.music.managers.EmployeeShiftCompatibilityManager;
 import org.cloudfoundry.samples.music.managers.EmployeeShiftManager;
@@ -25,6 +22,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import accessiblesolutions.accessiblescheduling.domain.Client;
+import accessiblesolutions.accessiblescheduling.domain.CustomField;
+import accessiblesolutions.accessiblescheduling.domain.Employee;
+import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 
 @RestController
 @RequestMapping(value = "/compatibility")
@@ -75,7 +77,7 @@ public class CompatibilityController {
     }
     
     @RequestMapping(method = RequestMethod.POST, value= "/hours")
-    public @ResponseBody EmployeeUpdateTO getHoursScheduled(HttpServletRequest request){
+    public @ResponseBody EmployeeUpdateTO getHoursScheduled(HttpServletRequest request) throws CorruptDataException{
     	Employee employee =null;
     	Shift shift =null;
 
@@ -105,7 +107,7 @@ public class CompatibilityController {
     	return to;
     }
     @RequestMapping(method = RequestMethod.POST, value= "/hoursNeeded")
-    public @ResponseBody EmployeeUpdateTO getHoursNeeded(HttpServletRequest request){
+    public @ResponseBody EmployeeUpdateTO getHoursNeeded(HttpServletRequest request) throws CorruptDataException{
     	Employee employee =null;
     	Shift shift =null;
 
@@ -135,7 +137,7 @@ public class CompatibilityController {
     	return to;
     }
     @RequestMapping(method = RequestMethod.POST, value= "/hoursNeededAfterAssignment")
-    public @ResponseBody EmployeeUpdateTO getHoursNeededAfterAssignment(HttpServletRequest request){
+    public @ResponseBody EmployeeUpdateTO getHoursNeededAfterAssignment(HttpServletRequest request) throws CorruptDataException{
     	Employee employee =null;
     	Shift shift =null;
 
@@ -165,7 +167,7 @@ public class CompatibilityController {
     	return to;
     }
     @RequestMapping(method = RequestMethod.POST, value= "/hoursAvailableAfterAssignment")
-    public @ResponseBody EmployeeUpdateTO getHoursAvailableAfterAssignment(HttpServletRequest request){
+    public @ResponseBody EmployeeUpdateTO getHoursAvailableAfterAssignment(HttpServletRequest request) throws CorruptDataException{
     	Employee employee =null;
     	Shift shift =null;
 
@@ -195,7 +197,7 @@ public class CompatibilityController {
     	return to;
     }
     @RequestMapping(method = RequestMethod.POST, value= "/hoursAvailable")
-    public @ResponseBody EmployeeUpdateTO getHoursAvailable(HttpServletRequest request){
+    public @ResponseBody EmployeeUpdateTO getHoursAvailable(HttpServletRequest request) throws CorruptDataException{
     	Employee employee =null;
     	Shift shift =null;
 
@@ -315,7 +317,7 @@ public class CompatibilityController {
     	return to;
     }
     @RequestMapping(method = RequestMethod.POST, value= "/assignmentIncursOvertime")
-    public @ResponseBody EmployeeUpdateTO getAssignmentIncursOvertime(HttpServletRequest request){
+    public @ResponseBody EmployeeUpdateTO getAssignmentIncursOvertime(HttpServletRequest request) throws CorruptDataException{
     	Employee employee =null;
     	Shift shift =null;
 
@@ -406,7 +408,7 @@ public class CompatibilityController {
     	return to;
     }
     @RequestMapping(method = RequestMethod.POST, value= "/assignability")
-    public @ResponseBody EmployeeUpdateTO getAssignability(HttpServletRequest request){
+    public @ResponseBody EmployeeUpdateTO getAssignability(HttpServletRequest request) throws CorruptDataException{
     	Employee employee =null;
     	Shift shift =null;
 
@@ -436,7 +438,7 @@ public class CompatibilityController {
     	return to;
     }
     @RequestMapping(method = RequestMethod.POST, value= "/validity")
-    public @ResponseBody EmployeeUpdateTO getValidity(HttpServletRequest request){
+    public @ResponseBody EmployeeUpdateTO getValidity(HttpServletRequest request) throws CorruptDataException{
     	Employee employee =null;
     	Shift shift =null;
 
@@ -467,7 +469,7 @@ public class CompatibilityController {
     }
     
     @RequestMapping(method = RequestMethod.POST, value= "/availability")
-    public @ResponseBody EmployeeUpdateTO getAvailability(HttpServletRequest request){
+    public @ResponseBody EmployeeUpdateTO getAvailability(HttpServletRequest request) throws CorruptDataException{
     	Employee employee =null;
     	Shift shift =null;
 

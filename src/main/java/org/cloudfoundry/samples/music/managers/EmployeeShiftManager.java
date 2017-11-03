@@ -2,14 +2,16 @@ package org.cloudfoundry.samples.music.managers;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
-import org.cloudfoundry.samples.music.domain.Employee;
-import org.cloudfoundry.samples.music.domain.Shift;
+import accessiblesolutions.accessiblescheduling.domain.Shift;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoShiftRepository;
 import org.cloudfoundry.samples.music.worker.ShiftWorker;
-import org.cloudfoundry.samples.music.domain.Util;
+import accessiblesolutions.accessiblescheduling.domain.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
+
+import accessiblesolutions.accessiblescheduling.domain.Employee;
+import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 
 @Component
 public class EmployeeShiftManager {
@@ -88,7 +90,7 @@ public class EmployeeShiftManager {
 	}
   
 
-  	public ArrayList<Shift> getAssignedOvernightShiftsForEmployeForTheLastDayOfMonthBefore(String employeeId, int month){
+  	public ArrayList<Shift> getAssignedOvernightShiftsForEmployeForTheLastDayOfMonthBefore(String employeeId, int month) throws CorruptDataException{
   		ArrayList<Shift> assignedOvernightShiftsForEmployeForTheLastDayOfMonthBefore = new ArrayList<Shift>();
   		
   		if(month==1){
@@ -103,7 +105,7 @@ public class EmployeeShiftManager {
   		return assignedOvernightShiftsForEmployeForTheLastDayOfMonthBefore;
   	}
   	
-	public ArrayList<Shift> getAssignedOvernightShiftsForEmployeForTheLastDayOfMonth(String employeeId, int month){
+	public ArrayList<Shift> getAssignedOvernightShiftsForEmployeForTheLastDayOfMonth(String employeeId, int month) throws CorruptDataException{
 		ArrayList<Shift> assignedOvernightShiftsForEmployeForTheLastDayOfMonth = new ArrayList<Shift>();
 		
 		ArrayList<Shift> shifts = getAssignedOvernightShiftsForEmployeForMonth(employeeId,month);
@@ -114,7 +116,7 @@ public class EmployeeShiftManager {
 	}
 	
 
-	public ArrayList<Shift> getAssignedOvernightShiftsForEmployeForMonth(String employeeId, int month){
+	public ArrayList<Shift> getAssignedOvernightShiftsForEmployeForMonth(String employeeId, int month) throws CorruptDataException{
 		ArrayList<Shift> assignedOvernightShiftsForEmployeeForMonth = new ArrayList<Shift>();
 		
 		ArrayList<Shift> shifts = getAssignedShiftsForEmployeeForMonth(employeeId,month);
@@ -133,12 +135,12 @@ public class EmployeeShiftManager {
 		return shifts;
 	}
 
-  	public float getHoursScheduledWeek(String employeeId,int week, int month){
+  	public float getHoursScheduledWeek(String employeeId,int week, int month) throws CorruptDataException{
 		return getHoursScheduledWeek(employeeRepository.findOne(employeeId), week, month);
 	}
   	
   	
-  	public float getHoursScheduledWeek(Employee employee,int week, int month){
+  	public float getHoursScheduledWeek(Employee employee,int week, int month) throws CorruptDataException{
 		float hours = 80;
 		if(null!=employee){
 			hours= 0;

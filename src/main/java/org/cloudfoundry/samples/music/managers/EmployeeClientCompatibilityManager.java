@@ -1,10 +1,11 @@
 package org.cloudfoundry.samples.music.managers;
-import org.cloudfoundry.samples.music.domain.Client;
-import org.cloudfoundry.samples.music.domain.CustomField;
-import org.cloudfoundry.samples.music.domain.Employee;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
+
+import accessiblesolutions.accessiblescheduling.domain.Client;
+import accessiblesolutions.accessiblescheduling.domain.CustomField;
+import accessiblesolutions.accessiblescheduling.domain.Employee;
 
 @Component
 public class EmployeeClientCompatibilityManager {

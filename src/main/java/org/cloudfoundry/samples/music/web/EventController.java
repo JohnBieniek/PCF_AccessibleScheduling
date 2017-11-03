@@ -1,12 +1,13 @@
 package org.cloudfoundry.samples.music.web;
 
-import org.cloudfoundry.samples.music.domain.Event;
-import org.cloudfoundry.samples.music.domain.RecurringShiftNeed;
+import accessiblesolutions.accessiblescheduling.domain.Event;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.web.bind.annotation.*;
+
+import accessiblesolutions.accessiblescheduling.domain.RecurringShiftNeed;
 
 import java.util.List;
 

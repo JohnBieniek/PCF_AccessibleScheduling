@@ -1,0 +1,70 @@
+<div ng-controller="SettingsController" ng-init="listCustomFields()">
+  <H1>Custom Fields</H3>
+  </br>
+  <span> [ </span>
+        <a href="" ng-click="addCustomField()"><span class="glyphicon glyphicon-plus"></span>add a Custom Field</a>
+  <span> ] </span>
+   <table class="table table-striped">
+       <thead>
+	       <tr>
+	       		<th></th>
+				<th>Client Variable</th>
+				<th>Employee Variable</th>
+			    <th>Client Requirement</th>
+			    <th>Employee Requirement</th>
+			    <!--  <th>Overrideable</th> --> 
+	       </tr>
+       </thead>
+       <tbody>
+	       <tr ng-repeat="customField in customFields">
+	       		<td class="dropdown">
+	               <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+	                   <span class="glyphicon glyphicon-cog"></span>
+	               </a>
+	               <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+	                   <li role="presentation"><a ng-click="updateCustomField(customField)">edit</a></li>
+	                   <li role="presentation"><a ng-click="deleteCustomField(customField)">delete</a></li>
+	               </ul>
+	           </td>
+	           <td>
+	           	<div ng-if="multiTableEditing">
+	           	    <in-place-edit field-name='clientVariable' input-type='text' input-class='input-large' model=customField>{{customField.clientVariable}}</in-place-edit>
+				</div>
+				<div ng-if="!multiTableEditing">
+					{{customField.clientVariable}}
+				</div>
+	           </td>
+	           <td>
+	           	<div ng-if="multiTableEditing">
+	               	<in-place-edit field-name='employeeVariable' input-type='text' input-class='input-large' model=customField>{{customField.employeeVariable}}</in-place-edit>
+	           	</div>
+				<div ng-if="!multiTableEditing">
+					{{customField.employeeVariable}}
+				</div>
+	           </td>
+	           <td>
+	           	<div ng-if="multiTableEditing">
+	               	<in-place-edit field-name='clientRequirement' input-type='checkbox' input-class='input-large' model=customField>{{customField.clientRequirement}}</in-place-edit>
+	           	</div>
+	           	<div ng-if="!multiTableEditing">
+					{{customField.clientRequirement}}
+				</div>
+	           </td>
+	           <td>
+	           	<div ng-if="multiTableEditing">
+	               	<in-place-edit field-name='employeeRequirement' input-type='checkbox' input-class='input-large' model=customField>{{customField.employeeRequirement}}</in-place-edit>
+	           	</div>
+	           	<div ng-if="!multiTableEditing">
+					{{customField.employeeRequirement}}
+				</div>
+	           </td>
+	<!--            <td>
+	                <in-place-edit field-name='overrideable' input-type='checkbox' input-class='input-large' model=customField>{{customField.overrideable}}</in-place-edit>
+	            </td>--> 
+	       </tr>
+       </tbody>
+   </table>
+   
+    <script type="text/javascript" src="js/page/settingsPage.js"></script>
+   <script type="text/javascript" src="js/modal/CustomFieldModalController.js"></script>
+</div>

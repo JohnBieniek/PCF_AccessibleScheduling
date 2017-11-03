@@ -1,7 +1,7 @@
 package org.cloudfoundry.samples.music.managers;
 import java.util.ArrayList;
 
-import org.cloudfoundry.samples.music.domain.Shift;
+import accessiblesolutions.accessiblescheduling.domain.Shift;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoShiftRepository;
 import org.cloudfoundry.samples.music.worker.ShiftWorker;
 import org.springframework.beans.factory.annotation.Autowired;

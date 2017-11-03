@@ -5,16 +5,17 @@ import java.time.temporal.TemporalAdjuster;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 
-import org.cloudfoundry.samples.music.domain.Event;
-import org.cloudfoundry.samples.music.domain.RecurringShiftNeed;
-import org.cloudfoundry.samples.music.domain.Shift;
-import org.cloudfoundry.samples.music.domain.ShiftRequest;
-import org.cloudfoundry.samples.music.domain.Util;
+import accessiblesolutions.accessiblescheduling.domain.Event;
+import accessiblesolutions.accessiblescheduling.domain.Shift;
+import accessiblesolutions.accessiblescheduling.domain.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
+
+import accessiblesolutions.accessiblescheduling.domain.RecurringShiftNeed;
+import accessiblesolutions.accessiblescheduling.domain.ShiftRequest;
 
 @Component
 public class ShiftGenerationManager {

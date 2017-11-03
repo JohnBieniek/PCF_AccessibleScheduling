@@ -1,8 +1,6 @@
 package org.cloudfoundry.samples.music.web;
 
-import org.cloudfoundry.samples.music.domain.Client;
-import org.cloudfoundry.samples.music.domain.CustomField;
-import org.cloudfoundry.samples.music.domain.Event;
+import accessiblesolutions.accessiblescheduling.domain.Event;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -15,6 +13,9 @@ import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.databind.Jso
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.web.bind.annotation.*;
+
+import accessiblesolutions.accessiblescheduling.domain.Client;
+import accessiblesolutions.accessiblescheduling.domain.CustomField;
 
 import java.io.IOException;
 import java.util.List;
