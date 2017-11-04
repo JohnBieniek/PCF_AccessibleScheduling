@@ -1,8 +1,6 @@
 package accessiblesolutions.accessiblescheduling.domain;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 
@@ -20,6 +18,7 @@ public class ShiftSpec {
 
 	@Test
 	public void getDurationFailsWhenNoStartDateIsPresent(){
+		boolean exception = false;
 		Shift shift = new Shift();
 		
 		shift.setStartTime("12:00");
@@ -30,23 +29,198 @@ public class ShiftSpec {
 		try {
 			assertNull(shift.getDuration());
 		} catch (CorruptDataException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			exception=true;
 		}
+		assertTrue(exception);
 	}
 	
 	@Test
 	public void getDurationFailsWhenNoEndDateIsPresent(){
-		
-	}
-	
-	@Test
-	public void getDurationProvidesTimeBetweenStartAndEndForDayShifts(){
+		boolean exception = false;
 		Shift shift = new Shift();
 		
 		shift.setStartTime("12:00");
 		shift.setEndTime("18:00");
 		
-		//assertTrue(6.0==shift.getDuration());
+		shift.setStartDate("2017-08-15");
+		
+		try {
+			assertNull(shift.getDuration());
+		} catch (CorruptDataException e) {
+			exception=true;
+		}
+		assertTrue(exception);
 	}
+	
+	@Test
+	public void getDurationFailsWhenEndTimePreceedsStartTime(){
+		boolean exception = false;
+		Shift shift = new Shift();
+		
+		shift.setStartTime("18:00");
+		shift.setEndTime("12:00");
+		
+		shift.setStartDate("2017-08-15");
+		shift.setEndDate("2017-08-15");
+		
+		try {
+			assertNull(shift.getDuration());
+		} catch (CorruptDataException e) {
+			exception=true;
+		}
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getDurationFailsWhenEndDatePreceedsStartDate(){
+		boolean exception = false;
+		Shift shift = new Shift();
+		
+		shift.setStartTime("12:00");
+		shift.setEndTime("18:00");
+		
+		shift.setStartDate("2017-08-15");
+		shift.setEndDate("2017-08-14");
+		
+		try {
+			assertNull(shift.getDuration());
+		} catch (CorruptDataException e) {
+			exception=true;
+		}
+		assertTrue(exception);
+	}
+	
+	//Trouble?
+	@Test
+	public void getDurationFailsWhenDurationExceeds24(){
+		boolean exception = false;
+		Shift shift = new Shift();
+		
+		shift.setStartTime("12:00");
+		shift.setEndTime("13:00");
+		
+		shift.setStartDate("2017-08-15");
+		shift.setEndDate("2017-08-16");
+		
+		try {
+			float duration = shift.getDuration();
+			System.out.println(duration);
+			assertNull(duration);
+		} catch (CorruptDataException e) {
+			exception=true;
+		}
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getDurationFailsWhenDurationExceeds24Two(){
+		boolean exception = false;
+		Shift shift = new Shift();
+		
+		shift.setStartTime("12:00");
+		shift.setEndTime("22:00");
+		
+		shift.setStartDate("2017-08-15");
+		shift.setEndDate("2017-08-16");
+		
+		try {
+			float duration = shift.getDuration();
+			System.out.println(duration);
+			assertNull(duration);
+		} catch (CorruptDataException e) {
+			exception=true;
+		}
+		assertTrue(exception);
+	}
+	@Test
+	public void getDurationFailsWhenDurationExceeds24Three(){
+		boolean exception = false;
+		Shift shift = new Shift();
+		
+		shift.setStartTime("01:00");
+		shift.setEndTime("22:00");
+		
+		shift.setStartDate("2017-08-15");
+		shift.setEndDate("2017-08-16");
+		
+		try {
+			float duration = shift.getDuration();
+			System.out.println(duration);
+			assertNull(duration);
+		} catch (CorruptDataException e) {
+			exception=true;
+		}
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getDurationProvidesTimeBetweenStartAndEndForDayShifts(){
+		boolean exception = false;
+		Shift shift = new Shift();
+		
+		shift.setStartTime("12:00");
+		shift.setEndTime("18:00");
+		
+		shift.setStartDate("2017-08-15");
+		shift.setEndDate("2017-08-15");
+		
+		try {
+			assertTrue(shift.getDuration()==6);
+		} catch (CorruptDataException e) {
+			exception=true;
+		}
+		assertFalse(exception);
+	}
+	
+	//Trouble
+	@Test
+	public void getDurationProvidesTimeBetweenStartAndEndForDayOvernightShifts(){
+		boolean exception = false;
+		Shift shift = new Shift();
+		
+		shift.setStartTime("12:00");
+		shift.setEndTime("12:00");
+		
+		shift.setStartDate("2017-08-15");
+		shift.setEndDate("2017-08-16");
+		
+		try {
+			assertTrue(shift.getDuration()==24);
+		} catch (CorruptDataException e) {
+			exception=true;
+		}
+		assertFalse(exception);
+	}
+	
+	@Test
+	public void getDurationProvidesTimeBetweenStartAndEndForDayOvernightShiftsTwo(){
+		boolean exception = false;
+		Shift shift = new Shift();
+		
+		shift.setStartTime("12:00");
+		shift.setEndTime("10:00");
+		
+		shift.setStartDate("2017-08-15");
+		shift.setEndDate("2017-08-16");
+		
+		try {
+			assertTrue(shift.getDuration()==22);
+		} catch (CorruptDataException e) {
+			exception=true;
+		}
+		assertFalse(exception);
+	}
+	
+	@Test
+	public void getOvernightIsTrueForShiftsEndingTheNextDay(){
+		
+	}
+	
+	@Test
+	public void getOvernightIsFalseForShiftsEndingTheSameDay(){
+		
+	}
+	
+	//IsWeekend
+	//GetSTart and ends local time and date 
 }

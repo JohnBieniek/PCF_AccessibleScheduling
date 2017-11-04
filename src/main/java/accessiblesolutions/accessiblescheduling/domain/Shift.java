@@ -77,11 +77,11 @@ public class Shift {
 		int endMin = (int) Integer.parseInt(endTime.split(":")[1]);
 		
     	if(getOvernight()){
-    		duration= (23-startHour) - (startMin/60) + endHour + (endMin/60);
+    		duration+=24;// (23-startHour) - (startMin/60) + endHour + (endMin/60);
     	}
-    	else{
-    		duration=(endHour-startHour) + ((endMin-startMin)/60);
-    	}
+    	//else{
+    		duration+=(endHour-startHour) + ((endMin-startMin)/60);
+    	//}
     	if(duration>24||duration<0){
     		System.out.println("ERROR: shift is inappropriate duration " +toString());
     		throw new CorruptDataException(Shift.class,this);
