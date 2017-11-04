@@ -249,6 +249,117 @@ public class ShiftSpec {
 		assertFalse(exception);
 	}
 	
+	@Test
+	public void isWeekendIsTrueWhenStartDayIsSaturday(){
+		boolean exception = false;
+		Shift shift = new Shift();
+		
+		shift.setStartTime("12:00");
+		shift.setEndTime("12:00");
+		
+		shift.setStartDate("2017-11-04");
+		shift.setEndDate("2017-11-04");
+		
+		try {
+			assertTrue(shift.isWeekend());
+		} catch (CorruptDataException e) {
+			exception=true;
+		}
+		assertFalse(exception);
+	}
+	
+	@Test
+	public void isWeekendIsTrueWhenStartDayIsSunday(){
+		boolean exception = false;
+		Shift shift = new Shift();
+		
+		shift.setStartTime("12:00");
+		shift.setEndTime("12:00");
+		
+		shift.setStartDate("2017-11-05");
+		shift.setEndDate("2017-11-06");
+		
+		try {
+			assertTrue(shift.isWeekend());
+		} catch (CorruptDataException e) {
+			exception=true;
+		}
+		assertFalse(exception);
+	}
+	
+	@Test
+	public void isWeekendIsTrueWhenEndDayIsSunday(){
+		boolean exception = false;
+		Shift shift = new Shift();
+		
+		shift.setStartTime("12:00");
+		shift.setEndTime("12:00");
+		
+		shift.setStartDate("2017-11-03");
+		shift.setEndDate("2017-11-04");
+		
+		try {
+			assertTrue(shift.isWeekend());
+		} catch (CorruptDataException e) {
+			exception=true;
+		}
+		assertFalse(exception);
+	}
+	
+	@Test
+	public void isWeekendIsFalseWeekdays(){
+		boolean exception = false;
+		Shift shift = new Shift();
+		
+		shift.setStartTime("12:00");
+		shift.setEndTime("12:00");
+		
+		shift.setStartDate("2017-11-01");
+		shift.setEndDate("2017-11-02");
+		
+		try {
+			assertFalse(shift.isWeekend());
+		} catch (CorruptDataException e) {
+			exception=true;
+		}
+		assertFalse(exception);
+	}
+	
+	@Test
+	public void isWeekendFailsWithNoStartDay(){
+		boolean exception = false;
+		Shift shift = new Shift();
+		
+		shift.setStartTime("12:00");
+		shift.setEndTime("12:00");
+		
+		shift.setEndDate("2017-02-11");
+		
+		try {
+			shift.isWeekend();
+		} catch (CorruptDataException e) {
+			exception=true;
+		}
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void isWeekendFailsWithNoEndDay(){
+		boolean exception = false;
+		Shift shift = new Shift();
+		
+		shift.setStartTime("12:00");
+		shift.setEndTime("12:00");
+		
+		shift.setStartDate("2017-01-11");
+		
+		try {
+			shift.isWeekend();
+		} catch (CorruptDataException e) {
+			exception=true;
+		}
+		assertTrue(exception);
+	}
 	//IsWeekend
 	//GetSTart and ends local time and date 
 }

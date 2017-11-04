@@ -73,7 +73,7 @@ public final class ShiftWorker {
 		return shiftsForTheLastDay;
 	}
 	
-    public static ArrayList<Shift> getWeekendShifts(ArrayList<Shift> shifts){
+    public static ArrayList<Shift> getWeekendShifts(ArrayList<Shift> shifts) throws CorruptDataException{
     	ArrayList<Shift> weekendShifts = new ArrayList<Shift>();
     	
     	for(Shift shift : shifts){
@@ -85,7 +85,7 @@ public final class ShiftWorker {
     	return weekendShifts;
 	}
 	
-	public static ArrayList<Shift> getWeekdayShifts(ArrayList<Shift> shifts){
+	public static ArrayList<Shift> getWeekdayShifts(ArrayList<Shift> shifts) throws CorruptDataException{
 		ArrayList<Shift> weekdayShifts = new ArrayList<Shift>();
     	
     	for(Shift shift : shifts){

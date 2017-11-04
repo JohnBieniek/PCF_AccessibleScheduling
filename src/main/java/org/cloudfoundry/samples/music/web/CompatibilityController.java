@@ -287,7 +287,7 @@ public class CompatibilityController {
     	return to;
     }
     @RequestMapping(method = RequestMethod.POST, value= "/assignmentViolatesOffAlternateWeekends")
-    public @ResponseBody EmployeeUpdateTO getAssignmentViolatesOffAlternateWeekends(HttpServletRequest request){
+    public @ResponseBody EmployeeUpdateTO getAssignmentViolatesOffAlternateWeekends(HttpServletRequest request) throws CorruptDataException{
     	Employee employee =null;
     	Shift shift =null;
 

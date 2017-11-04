@@ -117,7 +117,7 @@ public class EmployeeShiftCompatibilityManager {
 //		return violatesAlternateWeekendsOff;
 //	}
 	
-	public boolean getAssignmentWouldViolateAlternateWeekendsOff(EmployeeShiftCompatibility compatibility) {
+	public boolean getAssignmentWouldViolateAlternateWeekendsOff(EmployeeShiftCompatibility compatibility) throws CorruptDataException {
 		Employee employee =compatibility.getEmployee();
 
 		boolean violatesAlternateWeekendsOff = false;

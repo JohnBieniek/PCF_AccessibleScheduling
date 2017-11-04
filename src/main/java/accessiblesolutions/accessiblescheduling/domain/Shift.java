@@ -110,8 +110,13 @@ public class Shift {
     public int getStartDay(){
     	return (int) Integer.parseInt(startDate.split("-")[2]);
     }
-    public boolean isWeekend(){
+    public boolean isWeekend() throws CorruptDataException{
+    	if(null==startDate || null == endDate){
+    		throw new CorruptDataException(Shift.class,this);
+    	}
+    	
     	boolean weekend = false;
+    	
     	if(getStartsLocalDate().getDayOfWeek().getValue()==DayOfWeek.SATURDAY.getValue()){
     		weekend=true;
     	}
@@ -124,6 +129,7 @@ public class Shift {
     	else if(getEndsLocalDate().getDayOfWeek().getValue()==DayOfWeek.SATURDAY.getValue()){
     		weekend=true;
     	}
+    	
     	return weekend;
     }
     public LocalDate getStartsLocalDate(){
