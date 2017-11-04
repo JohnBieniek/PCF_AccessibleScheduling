@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 import accessiblesolutions.accessiblescheduling.domain.Event;
 import accessiblesolutions.accessiblescheduling.domain.Shift;
-import accessiblesolutions.accessiblescheduling.domain.Util;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import accessiblesolutions.accessiblescheduling.domain.RecurringShiftNeed;
 import accessiblesolutions.accessiblescheduling.domain.ShiftRequest;
+import accessiblesolutions.accessiblescheduling.util.Util;
 
 @Component
 public class ShiftGenerationManager {

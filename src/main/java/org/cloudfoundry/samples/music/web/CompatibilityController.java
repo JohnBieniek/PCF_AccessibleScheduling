@@ -4,11 +4,9 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 
-import accessiblesolutions.accessiblescheduling.domain.CompatibilityDTO;
 import accessiblesolutions.accessiblescheduling.domain.EmployeeShiftCompatibility;
-import accessiblesolutions.accessiblescheduling.domain.EmployeeUpdateTO;
 import accessiblesolutions.accessiblescheduling.domain.Shift;
-import accessiblesolutions.accessiblescheduling.domain.UpdateTO;
+
 import org.cloudfoundry.samples.music.managers.CustomDataManager;
 import org.cloudfoundry.samples.music.managers.EmployeeShiftCompatibilityManager;
 import org.cloudfoundry.samples.music.managers.EmployeeShiftManager;
@@ -27,6 +25,9 @@ import accessiblesolutions.accessiblescheduling.domain.Client;
 import accessiblesolutions.accessiblescheduling.domain.CustomField;
 import accessiblesolutions.accessiblescheduling.domain.Employee;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
+import accessiblesolutions.accessiblescheduling.to.CompatibilityDTO;
+import accessiblesolutions.accessiblescheduling.to.EmployeeUpdateTO;
+import accessiblesolutions.accessiblescheduling.to.UpdateTO;
 
 @RestController
 @RequestMapping(value = "/compatibility")

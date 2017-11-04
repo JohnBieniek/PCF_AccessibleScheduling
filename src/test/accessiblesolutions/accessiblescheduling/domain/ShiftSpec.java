@@ -7,6 +7,8 @@ import java.time.LocalDate;
 import org.junit.Test;
 
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
+
+//Up to date as of 11/4
 public class ShiftSpec {
 	@Test
 	public void constructorInitializesVariables() {
