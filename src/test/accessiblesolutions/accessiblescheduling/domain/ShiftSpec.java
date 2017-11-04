@@ -213,12 +213,40 @@ public class ShiftSpec {
 	
 	@Test
 	public void getOvernightIsTrueForShiftsEndingTheNextDay(){
+		boolean exception = false;
+		Shift shift = new Shift();
 		
+		shift.setStartTime("12:00");
+		shift.setEndTime("10:00");
+		
+		shift.setStartDate("2017-08-15");
+		shift.setEndDate("2017-08-16");
+		
+		try {
+			assertTrue(shift.getOvernight());
+		} catch (CorruptDataException e) {
+			exception=true;
+		}
+		assertFalse(exception);
 	}
 	
 	@Test
 	public void getOvernightIsFalseForShiftsEndingTheSameDay(){
+		boolean exception = false;
+		Shift shift = new Shift();
 		
+		shift.setStartTime("12:00");
+		shift.setEndTime("14:00");
+		
+		shift.setStartDate("2017-08-15");
+		shift.setEndDate("2017-08-15");
+		
+		try {
+			assertFalse(shift.getOvernight());
+		} catch (CorruptDataException e) {
+			exception=true;
+		}
+		assertFalse(exception);
 	}
 	
 	//IsWeekend
