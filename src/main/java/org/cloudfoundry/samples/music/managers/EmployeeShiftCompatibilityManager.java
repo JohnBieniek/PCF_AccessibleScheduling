@@ -458,7 +458,7 @@ public class EmployeeShiftCompatibilityManager {
     	return true;//Ya ran the gauntlet
     }
 	
-	public boolean isUnassignedFor(Employee employee, Shift shift){
+	public boolean isUnassignedFor(Employee employee, Shift shift) throws CorruptDataException{
 		boolean unassigned= true;
 
 		ArrayList<Shift> shiftsForWeek = employeeShiftManager.getAssignedShiftsForEmployeeForWeekOfShift(employee.getId(), shift);

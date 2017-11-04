@@ -3,6 +3,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import accessiblesolutions.accessiblescheduling.domain.Shift;
+import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
+
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoShiftRepository;
 import org.cloudfoundry.samples.music.worker.ShiftWorker;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +40,7 @@ public class EmployeeShiftMapManager {
 //		return prestaffedRecuringShiftsPerEmployee;
 //	}
 //	
-    public HashMap<String, ArrayList<Shift>> getShiftsPerEmployeePerMonthUnconflictingWithAssignedShifts(HashMap<String, ArrayList<Shift>> shiftsPerEmployee, int month){
+    public HashMap<String, ArrayList<Shift>> getShiftsPerEmployeePerMonthUnconflictingWithAssignedShifts(HashMap<String, ArrayList<Shift>> shiftsPerEmployee, int month) throws CorruptDataException{
 		HashMap<String,ArrayList<Shift>> assignedShiftsPerEmployee = getAssignedShiftsPerEmployeeForMonth(month);
 		HashMap<String,ArrayList<Shift>> unconflictedShiftsPerEmployee = new HashMap<String, ArrayList<Shift>>();
     	for(String employeeId:shiftsPerEmployee.keySet()){

@@ -24,7 +24,7 @@ public class EmployeeShiftManager {
         this.shiftRepository = shiftRepository;
     }
     
-    public ArrayList<Shift> getShiftsForEmployeeForWeekAfter(String employeeId, Shift shift) {
+    public ArrayList<Shift> getShiftsForEmployeeForWeekAfter(String employeeId, Shift shift) throws CorruptDataException {
 		LocalDate weekAftersDate = shift.getStartsLocalDate().plusWeeks(1);
 		int weekAfter = Util.getWeekOfDate(weekAftersDate.getYear()+"-"+weekAftersDate.getMonth().getValue()+"-"+weekAftersDate.getDayOfMonth());
 		
@@ -126,7 +126,7 @@ public class EmployeeShiftManager {
 		return assignedOvernightShiftsForEmployeeForMonth;
 	}
   	
-  	public ArrayList<Shift> getShiftsForEmployeeForWeekBefore(String employeeId,Shift shift) {
+  	public ArrayList<Shift> getShiftsForEmployeeForWeekBefore(String employeeId,Shift shift) throws CorruptDataException {
 		LocalDate weekBeforesDate = shift.getStartsLocalDate().minusWeeks(1);
 		int weekBefore = Util.getWeekOfDate(weekBeforesDate.getYear()+"-"+weekBeforesDate.getMonth().getValue()+"-"+weekBeforesDate.getDayOfMonth());
 		

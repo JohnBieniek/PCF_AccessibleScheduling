@@ -16,6 +16,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Shift {
@@ -67,6 +68,22 @@ public class Shift {
     	event = false;
     }
 
+    public boolean getAssigned() {
+        return assigned;
+    }
+    
+    public String getAssignmentReason() {
+		return assignmentReason!=null?assignmentReason:"";
+	}
+
+    public String getClientId() {
+        return clientId;
+    }
+    
+    public String getClientName() {
+        return clientName;
+    }
+    
     public float getDuration() throws CorruptDataException{
     	float duration = 0;
 
@@ -77,39 +94,217 @@ public class Shift {
 		int endMin = (int) Integer.parseInt(endTime.split(":")[1]);
 		
     	if(getOvernight()){
-    		duration+=24;// (23-startHour) - (startMin/60) + endHour + (endMin/60);
+    		duration+=24;
     	}
-    	//else{
-    		duration+=(endHour-startHour) + ((endMin-startMin)/60);
-    	//}
+    		
+    	duration+=(endHour-startHour) + ((endMin-startMin)/60);
+    	
     	if(duration>24||duration<0){
     		System.out.println("ERROR: shift is inappropriate duration " +toString());
     		throw new CorruptDataException(Shift.class,this);
     	}
+    	
     	return duration;
     }
+    public String getEndDate() {
+        return endDate;
+    }
+    public LocalDate getEndsLocalDate() throws CorruptDataException{
+    	if(null==endDate){
+    		throw new CorruptDataException(Shift.class,this);
+    	}
+    	
+    	String[] parsedDate = endDate.split("-");
+    	int year = 0;
+    	int month = 0;
+    	int day = 0;
+    	
+    	if(parsedDate.length!=3){
+    		throw new CorruptDataException(Shift.class,this);
+    	}
+    	
+    	if(parsedDate[0].length()!=4 || !parsedDate[0].matches("^[0-9]{4}$")){
+    		throw new CorruptDataException(Shift.class,this);
+    	}else{
+    		year = Integer.parseInt(parsedDate[0]);
+    	}
+    	
+    	if(parsedDate[1].length()!=2 || !parsedDate[1].matches("^[0-9]{2}$") || Integer.parseInt(parsedDate[1])>12){
+    		throw new CorruptDataException(Shift.class,this);
+    	}else{
+    		month = Integer.parseInt(parsedDate[1]);
+    	}
+    	
+    	if(parsedDate[2].length()!=2 || !parsedDate[2].matches("^[0-9]{2}$")){
+    		throw new CorruptDataException(Shift.class,this);
+    	}else{
+    		day = Integer.parseInt(parsedDate[2]);
+    	}
+    	
+    	return LocalDate.of(year,month,day);
+    }
+    public LocalDateTime getEndsLocalDateTime() throws CorruptDataException{
+    	if(null==endTime){
+    		throw new CorruptDataException(Shift.class,this);
+    	}
+
+    	String[] parsedTime = endTime.split(":");
+    	int hour = -1;
+    	int minute = -1;
+    	
+    	if(parsedTime.length!=2){
+    		throw new CorruptDataException(Shift.class,this);
+    	}
+    	
+    	if(parsedTime[0].length()!=2 || !parsedTime[0].matches("^[0-9]{2}$") || Integer.parseInt(parsedTime[0])>23){
+    		throw new CorruptDataException(Shift.class,this);
+    	}else{
+    		hour = Integer.parseInt(parsedTime[0]);
+    	}
+    	
+    	if(parsedTime[1].length()!=2 || !parsedTime[1].matches("^[0-9]{2}$") || Integer.parseInt(parsedTime[0])>59){
+    		throw new CorruptDataException(Shift.class,this);
+    	}else{
+    		minute = Integer.parseInt(parsedTime[1]);
+    	}
+    	
+    	return getStartsLocalDate().atTime(hour,minute);
+    }
+    
+    public String getEndTime() {
+        return endTime;
+    }
+    
+    public boolean getEvent() {
+        return event;
+    }
+    
+    public String getEventId() {
+        return eventId;
+    }
+    
+    public String getEventName() {
+        return eventName;
+    }
+    
     public String getId() {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-    public void setStartWeek(int startWeek){
-    	this.startWeek=startWeek;
-    }
-    public int getStartWeek(){
-    	return Util.getWeekOfDate(startDate);
-    }
     public boolean getOvernight() throws CorruptDataException{
     	if(null==startDate || null == endDate){
     		throw new CorruptDataException(Shift.class,this);
     	}
     	return !startDate.equalsIgnoreCase(endDate);
     }
+    
+    public boolean getRecurring() {
+        return recurring;
+    }
+
+    public String getRequestedStaffId() {
+        return requestedStaffId;
+    }
+    
+    public String getRequestedStaffName() {
+        return requestedStaffName;
+    }
+
+    public String getStaffId() {
+        return staffId;
+    }
+
+    public String getStaffName() {
+        return staffName;
+    }
+
+    public String getStartDate() {
+        return startDate;
+    }
+    
     public int getStartDay(){
     	return (int) Integer.parseInt(startDate.split("-")[2]);
     }
+
+    public int getStartMonth() {
+        return startMonth;
+    }
+    
+    public LocalDate getStartsLocalDate() throws CorruptDataException{
+    	if(null==startDate){
+    		throw new CorruptDataException(Shift.class,this);
+    	}
+    	
+    	String[] parsedDate = startDate.split("-");
+    	int year = 0;
+    	int month = 0;
+    	int day = 0;
+    	
+    	if(parsedDate.length!=3){
+    		throw new CorruptDataException(Shift.class,this);
+    	}
+    	
+    	if(parsedDate[0].length()!=4 || !parsedDate[0].matches("^[0-9]{4}$")){
+    		throw new CorruptDataException(Shift.class,this);
+    	}else{
+    		year = Integer.parseInt(parsedDate[0]);
+    	}
+    	
+    	if(parsedDate[1].length()!=2 || !parsedDate[1].matches("^[0-9]{2}$") || Integer.parseInt(parsedDate[1])>12){
+    		throw new CorruptDataException(Shift.class,this);
+    	}else{
+    		month = Integer.parseInt(parsedDate[1]);
+    	}
+    	
+    	if(parsedDate[2].length()!=2 || !parsedDate[2].matches("^[0-9]{2}$")){
+    		throw new CorruptDataException(Shift.class,this);
+    	}else{
+    		day = Integer.parseInt(parsedDate[2]);
+    	}
+    	
+    	return LocalDate.of(year,month,day);
+    }
+
+    public LocalDateTime getStartsLocalDateTime() throws CorruptDataException{
+    	if(null==startTime){
+    		throw new CorruptDataException(Shift.class,this);
+    	}
+
+    	String[] parsedTime = startTime.split(":");
+    	int hour = -1;
+    	int minute = -1;
+    	
+    	if(parsedTime.length!=2){
+    		throw new CorruptDataException(Shift.class,this);
+    	}
+    	
+    	if(parsedTime[0].length()!=2 || !parsedTime[0].matches("^[0-9]{2}$") || Integer.parseInt(parsedTime[0])>23){
+    		throw new CorruptDataException(Shift.class,this);
+    	}else{
+    		hour = Integer.parseInt(parsedTime[0]);
+    	}
+    	
+    	if(parsedTime[1].length()!=2 || !parsedTime[1].matches("^[0-9]{2}$") || Integer.parseInt(parsedTime[0])>59){
+    		throw new CorruptDataException(Shift.class,this);
+    	}else{
+    		minute = Integer.parseInt(parsedTime[1]);
+    	}
+    	
+    	return getStartsLocalDate().atTime(hour,minute);
+    }
+    
+    public String getStartTime() {
+        return startTime;
+    }
+
+    public int getStartWeek(){
+    	return Util.getWeekOfDate(startDate);
+    }
+
+    public int getStartYear() {
+        return startYear;
+    }
+
     public boolean isWeekend() throws CorruptDataException{
     	if(null==startDate || null == endDate){
     		throw new CorruptDataException(Shift.class,this);
@@ -132,158 +327,88 @@ public class Shift {
     	
     	return weekend;
     }
-    public LocalDate getStartsLocalDate(){
-    	return LocalDate.of(Integer.parseInt(startDate.split("-")[0]),Integer.parseInt(startDate.split("-")[1]),Integer.parseInt(startDate.split("-")[2]));
-    }
     
-    public LocalDateTime getStartsLocalDateTime(){
-    	return getStartsLocalDate().atTime(Integer.parseInt(startTime.split(":")[0]), Integer.parseInt(startTime.split(":")[1]));
-    }
-    
-    public LocalDate getEndsLocalDate(){
-    	return LocalDate.of(Integer.parseInt(endDate.split("-")[0]),Integer.parseInt(endDate.split("-")[1]),Integer.parseInt(endDate.split("-")[2]));
-    }
-    
-    public LocalDateTime getEndsLocalDateTime(){
-    	return getEndsLocalDate().atTime(Integer.parseInt(endTime.split(":")[0]), Integer.parseInt(endTime.split(":")[1]));
-    }
-    public boolean getAssigned() {
-        return assigned;
-    }
-
     public void setAssigned(boolean assigned) {
         this.assigned = assigned;
     }
+
+    public void setAssignmentReason(String string) {
+		this.assignmentReason=string;
+	}
     
-    public boolean getRecurring() {
-        return recurring;
-    }
-
-    public void setRecurring(boolean recurring) {
-        this.recurring = recurring;
-    }
-    
-    public boolean getEvent() {
-        return event;
-    }
-
-    public void setEvent(boolean event) {
-        this.event = event;
-    }
-
-    public String getEventName() {
-        return eventName;
-    }
-
-    public void setEventName(String eventName) {
-        this.eventName = eventName;
-    }
-    
-    public String getEventId() {
-        return eventId;
-    }
-
-    public void setEventId(String eventId) {
-        this.eventId = eventId;
-    }
-    
-    public String getClientId() {
-        return clientId;
-    }
-
     public void setClientId(String clientId) {
         this.clientId = clientId;
-    }
-    
-    public String getClientName() {
-        return clientName;
     }
 
     public void setClientName(String clientName) {
         this.clientName = clientName;
     }
-
-    public String getRequestedStaffId() {
-        return requestedStaffId;
-    }
-
-    public void setRequestedStaffId(String requestedStaffId) {
-        this.requestedStaffId = requestedStaffId;
-    }
     
-    public String getRequestedStaffName() {
-        return requestedStaffName;
-    }
-
-    public void setRequestedStaffName(String requestedStaffName) {
-        this.requestedStaffName = requestedStaffName;
-    }
-    
-    public String getStaffId() {
-        return staffId;
-    }
-
-    public void setStaffId(String staffId) {
-        this.staffId = staffId;
-    }
-    
-    public String getStaffName() {
-        return staffName;
-    }
-
-    public void setStaffName(String staffName) {
-        this.staffName = staffName;
-    }
-    
-    public String getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(String startDate) {
-        this.startDate = startDate;
-    }
-    
-    public String getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(String startTime) {
-        this.startTime = startTime;
-    }
-    
-    public String getEndDate() {
-        return endDate;
-    }
-
     public void setEndDate(String endDate) {
         this.endDate = endDate;
-    }
-    
-    public String getEndTime() {
-        return endTime;
     }
 
     public void setEndTime(String endTime) {
         this.endTime = endTime;
     }
     
-    public int getStartMonth() {
-        return startMonth;
+    public void setEvent(boolean event) {
+        this.event = event;
     }
 
+    public void setEventId(String eventId) {
+        this.eventId = eventId;
+    }
+    
+    public void setEventName(String eventName) {
+        this.eventName = eventName;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+    
+    public void setRecurring(boolean recurring) {
+        this.recurring = recurring;
+    }
+
+    public void setRequestedStaffId(String requestedStaffId) {
+        this.requestedStaffId = requestedStaffId;
+    }
+    
+    public void setRequestedStaffName(String requestedStaffName) {
+        this.requestedStaffName = requestedStaffName;
+    }
+
+    public void setStaffId(String staffId) {
+        this.staffId = staffId;
+    }
+    
+    public void setStaffName(String staffName) {
+        this.staffName = staffName;
+    }
+
+    public void setStartDate(String startDate) {
+        this.startDate = startDate;
+    }
+    
     public void setStartMonth(int startMonth) {
         this.startMonth = startMonth;
     }
+
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
+    }
     
-    public int getStartYear() {
-        return startYear;
+    public void setStartWeek(int startWeek){
+    	this.startWeek=startWeek;
     }
 
-    public void setStartYear(int startYear) {
+	public void setStartYear(int startYear) {
         this.startYear = startYear;
     }
-    
-    @Override
+	
+	@Override
     public String toString(){
     	String string = "Shift for ";
     	if(event){
@@ -306,11 +431,4 @@ public class Shift {
     	
     	return string;
     }
-
-	public void setAssignmentReason(String string) {
-		this.assignmentReason=string;
-	}
-	public String getAssignmentReason() {
-		return assignmentReason!=null?assignmentReason:"";
-	}
 }

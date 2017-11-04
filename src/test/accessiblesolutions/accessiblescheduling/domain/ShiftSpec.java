@@ -2,6 +2,8 @@ package accessiblesolutions.accessiblescheduling.domain;
 
 import static org.junit.Assert.*;
 
+import java.time.LocalDate;
+
 import org.junit.Test;
 
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
@@ -360,6 +362,450 @@ public class ShiftSpec {
 		}
 		assertTrue(exception);
 	}
-	//IsWeekend
-	//GetSTart and ends local time and date 
+
+	@Test
+	public void getStartsLocalDateFailsWithNoStartDay(){
+		boolean exception = false;
+		Shift shift = new Shift();
+		
+		shift.setStartTime("12:00");
+		shift.setEndTime("12:00");
+		
+		shift.setEndDate("2017-02-11");
+		
+		try {
+			shift.getStartsLocalDate();
+		} catch (CorruptDataException e) {
+			exception=true;
+		}
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getStartsLocalDateFailsWithPoorlyFormatedStartDay1(){
+		boolean exception = false;
+		Shift shift = new Shift();
+		
+		shift.setStartTime("12:00");
+		shift.setEndTime("12:00");
+		shift.setStartDate("2017-02/11");		
+		shift.setEndDate("2017-02-11");
+		
+		try {
+			shift.getStartsLocalDate();
+		} catch (CorruptDataException e) {
+			exception=true;
+		}
+		assertTrue(exception);
+	}
+	@Test
+	public void getStartsLocalDateFailsWithPoorlyFormatedStartDay2(){
+		boolean exception = false;
+		Shift shift = new Shift();
+		
+		shift.setStartTime("12:00");
+		shift.setEndTime("12:00");
+		shift.setStartDate("2017/02/11");		
+		shift.setEndDate("2017-02-11");
+		
+		try {
+			shift.getStartsLocalDate();
+		} catch (CorruptDataException e) {
+			exception=true;
+		}
+		assertTrue(exception);
+	}
+	@Test
+	public void getStartsLocalDateFailsWithPoorlyFormatedStartDay3(){
+		boolean exception = false;
+		Shift shift = new Shift();
+		
+		shift.setStartTime("12:00");
+		shift.setEndTime("12:00");
+		shift.setStartDate("2017-22-11");		
+		shift.setEndDate("2017-02-11");
+		
+		try {
+			shift.getStartsLocalDate();
+		} catch (CorruptDataException e) {
+			exception=true;
+		}
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getStartsLocalDateFailsWithPoorlyFormatedStartDay4(){
+		boolean exception = false;
+		Shift shift = new Shift();
+		
+		shift.setStartTime("12:00");
+		shift.setEndTime("12:00");
+		shift.setStartDate("2017-XY-11");		
+		shift.setEndDate("2017-02-11");
+		
+		try {
+			shift.getStartsLocalDate();
+		} catch (CorruptDataException e) {
+			exception=true;
+		}
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getStartsLocalDateConvertsAGoodStartDay(){
+		boolean exception = false;
+		Shift shift = new Shift();
+		
+		shift.setStartTime("12:00");
+		shift.setEndTime("12:00");
+		shift.setStartDate("2017-03-11");		
+		shift.setEndDate("2017-02-11");
+		
+		try {
+			LocalDate date = shift.getStartsLocalDate();
+			assertTrue(date.getYear()==2017);
+			assertTrue(date.getMonthValue()==3);
+			assertTrue(date.getDayOfMonth()==11);
+		} catch (CorruptDataException e) {
+			exception=true;
+		}
+		assertFalse(exception);
+	}
+	
+	@Test
+	public void getStartsLocalDateTimeFailsWithNoStartTime(){
+		boolean exception = false;
+		Shift shift = new Shift();
+		
+		shift.setEndTime("12:00");
+		
+		shift.setStartDate("2017-02-11");		
+		shift.setEndDate("2017-02-11");
+		
+		try {
+			shift.getStartsLocalDateTime();
+		} catch (CorruptDataException e) {
+			exception=true;
+		}
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getStartsLocalDateTimeFailsWithPoorlyFormatedStartTime(){
+		boolean exception = false;
+		Shift shift = new Shift();
+		
+		shift.setStartTime("12-00");
+		shift.setEndTime("12:00");
+		
+		shift.setStartDate("2017-02-11");		
+		shift.setEndDate("2017-02-11");
+		
+		try {
+			shift.getStartsLocalDateTime();
+		} catch (CorruptDataException e) {
+			exception=true;
+		}
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getStartsLocalDateTimeFailsWithPoorlyFormatedStartTime2(){
+		boolean exception = false;
+		Shift shift = new Shift();
+		
+		shift.setStartTime("11:9");
+		shift.setEndTime("12:00");
+		
+		shift.setStartDate("2017-02-11");		
+		shift.setEndDate("2017-02-11");
+		
+		try {
+			shift.getStartsLocalDateTime();
+		} catch (CorruptDataException e) {
+			exception=true;
+		}
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getStartsLocalDateTimeFailsWithPoorlyFormatedStartTime3(){
+		boolean exception = false;
+		Shift shift = new Shift();
+		
+		shift.setStartTime("1:59");
+		shift.setEndTime("12:00");
+		
+		shift.setStartDate("2017-02-11");		
+		shift.setEndDate("2017-02-11");
+		
+		try {
+			shift.getStartsLocalDateTime();
+		} catch (CorruptDataException e) {
+			exception=true;
+		}
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getStartsLocalDateTimeFailsWithPoorlyFormatedStartTime4(){
+		boolean exception = false;
+		Shift shift = new Shift();
+		
+		shift.setStartTime(":59");
+		shift.setEndTime("12:00");
+		
+		shift.setStartDate("2017-02-11");		
+		shift.setEndDate("2017-02-11");
+		
+		try {
+			shift.getStartsLocalDateTime();
+		} catch (CorruptDataException e) {
+			exception=true;
+		}
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getStartsLocalDateTimeSucceedsWithValidStartTimeAndDate(){
+		boolean exception = false;
+		Shift shift = new Shift();
+		
+		shift.setStartTime("12:00");
+		shift.setEndTime("12:00");
+		
+		shift.setStartDate("2017-02-11");		
+		shift.setEndDate("2017-02-11");
+		
+		try {
+			shift.getStartsLocalDateTime();
+		} catch (CorruptDataException e) {
+			exception=true;
+		}
+		assertFalse(exception);
+	}
+	
+	//End
+	@Test
+	public void getEndsLocalDateFailsWithNoEndDay(){
+		boolean exception = false;
+		Shift shift = new Shift();
+		
+		shift.setStartTime("12:00");
+		shift.setEndTime("12:00");
+		
+		shift.setStartDate("2017-02-11");
+		
+		try {
+			shift.getEndsLocalDate();
+		} catch (CorruptDataException e) {
+			exception=true;
+		}
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getEndsLocalDateFailsWithPoorlyFormatedEndDay1(){
+		boolean exception = false;
+		Shift shift = new Shift();
+		
+		shift.setStartTime("12:00");
+		shift.setEndTime("12:00");
+		shift.setEndDate("2017-02/11");		
+		shift.setStartDate("2017-02-11");
+		
+		try {
+			shift.getEndsLocalDate();
+		} catch (CorruptDataException e) {
+			exception=true;
+		}
+		assertTrue(exception);
+	}
+	@Test
+	public void getEndsLocalDateFailsWithPoorlyFormatedEndDay2(){
+		boolean exception = false;
+		Shift shift = new Shift();
+		
+		shift.setStartTime("12:00");
+		shift.setEndTime("12:00");
+		shift.setEndDate("2017/02/11");		
+		shift.setStartDate("2017-02-11");
+		
+		try {
+			shift.getEndsLocalDate();
+		} catch (CorruptDataException e) {
+			exception=true;
+		}
+		assertTrue(exception);
+	}
+	@Test
+	public void getEndsLocalDateFailsWithPoorlyFormatedEndDay3(){
+		boolean exception = false;
+		Shift shift = new Shift();
+		
+		shift.setStartTime("12:00");
+		shift.setEndTime("12:00");
+		shift.setEndDate("2017-22-11");		
+		shift.setStartDate("2017-02-11");
+		
+		try {
+			shift.getEndsLocalDate();
+		} catch (CorruptDataException e) {
+			exception=true;
+		}
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getEndsLocalDateFailsWithPoorlyFormatedEndDay4(){
+		boolean exception = false;
+		Shift shift = new Shift();
+		
+		shift.setStartTime("12:00");
+		shift.setEndTime("12:00");
+		shift.setEndDate("2017-XY-11");		
+		shift.setStartDate("2017-02-11");
+		
+		try {
+			shift.getEndsLocalDate();
+		} catch (CorruptDataException e) {
+			exception=true;
+		}
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getEndsLocalDateConvertsAGoodEndDay(){
+		boolean exception = false;
+		Shift shift = new Shift();
+		
+		shift.setStartTime("12:00");
+		shift.setEndTime("12:00");
+		shift.setEndDate("2017-03-11");		
+		shift.setStartDate("2017-02-11");
+		
+		try {
+			LocalDate date = shift.getEndsLocalDate();
+			assertTrue(date.getYear()==2017);
+			assertTrue(date.getMonthValue()==3);
+			assertTrue(date.getDayOfMonth()==11);
+		} catch (CorruptDataException e) {
+			exception=true;
+		}
+		
+		assertFalse(exception);
+	}
+	
+	@Test
+	public void getEndsLocalDateTimeFailsWithNoEndTime(){
+		boolean exception = false;
+		Shift shift = new Shift();
+		
+		shift.setStartTime("12:00");
+		
+		shift.setStartDate("2017-02-11");		
+		shift.setEndDate("2017-02-11");
+		
+		try {
+			shift.getEndsLocalDateTime();
+		} catch (CorruptDataException e) {
+			exception=true;
+		}
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getEndsLocalDateTimeFailsWithPoorlyFormatedEndTime(){
+		boolean exception = false;
+		Shift shift = new Shift();
+		
+		shift.setEndTime("12-00");
+		shift.setStartTime("12:00");
+		
+		shift.setStartDate("2017-02-11");		
+		shift.setEndDate("2017-02-11");
+		
+		try {
+			shift.getEndsLocalDateTime();
+		} catch (CorruptDataException e) {
+			exception=true;
+		}
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getEndsLocalDateTimeFailsWithPoorlyFormatedEndTime2(){
+		boolean exception = false;
+		Shift shift = new Shift();
+		
+		shift.setEndTime("11:9");
+		shift.setStartTime("12:00");
+		
+		shift.setStartDate("2017-02-11");		
+		shift.setEndDate("2017-02-11");
+		
+		try {
+			shift.getEndsLocalDateTime();
+		} catch (CorruptDataException e) {
+			exception=true;
+		}
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getEndsLocalDateTimeFailsWithPoorlyFormatedEndTime3(){
+		boolean exception = false;
+		Shift shift = new Shift();
+		
+		shift.setEndTime("1:59");
+		shift.setStartTime("12:00");
+		
+		shift.setStartDate("2017-02-11");		
+		shift.setEndDate("2017-02-11");
+		
+		try {
+			shift.getEndsLocalDateTime();
+		} catch (CorruptDataException e) {
+			exception=true;
+		}
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getEndsLocalDateTimeFailsWithPoorlyFormatedEndTime4(){
+		boolean exception = false;
+		Shift shift = new Shift();
+		
+		shift.setEndTime(":59");
+		shift.setStartTime("12:00");
+		
+		shift.setStartDate("2017-02-11");		
+		shift.setEndDate("2017-02-11");
+		
+		try {
+			shift.getEndsLocalDateTime();
+		} catch (CorruptDataException e) {
+			exception=true;
+		}
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getEndsLocalDateTimeSucceedsWithValidEndTimeAndDate(){
+		boolean exception = false;
+		Shift shift = new Shift();
+		
+		shift.setStartTime("12:00");
+		shift.setEndTime("12:00");
+		
+		shift.setStartDate("2017-02-11");		
+		shift.setEndDate("2017-02-11");
+		
+		try {
+			shift.getEndsLocalDateTime();
+		} catch (CorruptDataException e) {
+			exception=true;
+		}
+		assertFalse(exception);
+	}
 }

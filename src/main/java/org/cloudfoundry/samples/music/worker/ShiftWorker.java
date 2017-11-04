@@ -59,7 +59,7 @@ public final class ShiftWorker {
 		return overnightShifts;
 	}
     
-	public static ArrayList<Shift> getShiftsStartingTheLastDayOfMonth(ArrayList<Shift> shifts, int month){
+	public static ArrayList<Shift> getShiftsStartingTheLastDayOfMonth(ArrayList<Shift> shifts, int month) throws CorruptDataException{
 		ArrayList<Shift> shiftsForTheLastDay = new ArrayList<Shift>();
 		
 		for(Shift shift:shifts){
@@ -97,7 +97,7 @@ public final class ShiftWorker {
     	return weekdayShifts;
 	}
 
-	public static boolean isOverlapping(Shift baseShift, Shift comparingShift) {
+	public static boolean isOverlapping(Shift baseShift, Shift comparingShift) throws CorruptDataException {
 		if(null==baseShift||null==comparingShift)return false;
 		
 		return isOverlapping(
@@ -114,7 +114,7 @@ public final class ShiftWorker {
 		
 		return overlapping;
 	}
-	public static boolean isAlmostOverlapping(Shift baseShift, Shift comparingShift) {
+	public static boolean isAlmostOverlapping(Shift baseShift, Shift comparingShift) throws CorruptDataException {
 		if(null==baseShift||null==comparingShift)return false;
 		if(baseShift.getClientId().equals(comparingShift.getClientId())){
 			return isOverlapping(
@@ -196,7 +196,7 @@ public final class ShiftWorker {
 		return assignedShifts;
     }
 
-	public static HashMap<String, ArrayList<Shift>> getNonoverlapingShiftsPerEmployee(HashMap<String, ArrayList<Shift>> shiftsPerEmployee) {
+	public static HashMap<String, ArrayList<Shift>> getNonoverlapingShiftsPerEmployee(HashMap<String, ArrayList<Shift>> shiftsPerEmployee) throws CorruptDataException {
     	HashMap<String,ArrayList<Shift>> unconflictedShiftsPerEmployee = new HashMap<String, ArrayList<Shift>>();
     	for(String employeeId:shiftsPerEmployee.keySet()){
     		ArrayList<Shift> shiftsForSelectedEmployee = shiftsPerEmployee.get(employeeId);

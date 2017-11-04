@@ -3,7 +3,7 @@ Accessible Scheduling
 
 This is an application using database services on [Cloud Foundry](http://cloudfoundry.org) with the [Spring Framework](http://spring.io).
 
-This application has been built to storedomain objects in a key-value stores. 
+This application has been built to store domain objects in a key-value stores. 
 
 The application use Spring Java configuration and [bean profiles](https://spring.io/blog/2011/02/14/spring-3-1-m1-introducing-profile/) to configure the application and the connection objects needed to use the persistence stores. It also uses the [Spring Cloud Connectors](http://cloud.spring.io/spring-cloud-connectors/) library to inspect the environment when running on Cloud Foundry. See the [Cloud Foundry documentation](http://docs.cloudfoundry.org/buildpacks/java/spring-service-bindings.html) for details on configuring a Spring application for Cloud Foundry.
 

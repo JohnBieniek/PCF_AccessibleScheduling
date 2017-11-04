@@ -227,7 +227,7 @@ public class CompatibilityController {
     	return to;
     }
     @RequestMapping(method = RequestMethod.POST, value= "/unassigned")
-    public @ResponseBody EmployeeUpdateTO getUnassigned(HttpServletRequest request){
+    public @ResponseBody EmployeeUpdateTO getUnassigned(HttpServletRequest request) throws CorruptDataException{
     	Employee employee =null;
     	Shift shift =null;
 
@@ -347,7 +347,7 @@ public class CompatibilityController {
     	return to;
     }
     @RequestMapping(method = RequestMethod.POST, value= "/workedLastWeekend")
-    public @ResponseBody EmployeeUpdateTO getWorkedLastWeekend(HttpServletRequest request){
+    public @ResponseBody EmployeeUpdateTO getWorkedLastWeekend(HttpServletRequest request) throws CorruptDataException{
     	Employee employee =null;
     	Shift shift =null;
 
@@ -378,7 +378,7 @@ public class CompatibilityController {
     }
     
     @RequestMapping(method = RequestMethod.POST, value= "/workingNextWeekend")
-    public @ResponseBody EmployeeUpdateTO getWorkingNextWeekend(HttpServletRequest request){
+    public @ResponseBody EmployeeUpdateTO getWorkingNextWeekend(HttpServletRequest request) throws CorruptDataException{
     	Employee employee =null;
     	Shift shift =null;
 

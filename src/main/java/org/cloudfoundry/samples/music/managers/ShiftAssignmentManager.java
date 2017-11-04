@@ -48,7 +48,7 @@ public class ShiftAssignmentManager {
 //
 //    	shiftCrud.save(assignedUnconflictedPrestaffedRecuringShifts);
 //    }
-    public void saveAssignedUnconflictedPrestaffedRecuringShiftsToTableForMonth(int selectedMonth){
+    public void saveAssignedUnconflictedPrestaffedRecuringShiftsToTableForMonth(int selectedMonth) throws CorruptDataException{
     	ArrayList<Shift> prestaffedRecuringShifts = shiftManager.getPrestaffedRecurringShiftsForMonth(selectedMonth);
 //    	logger.error(prestaffedRecuringShifts.size() + " prestaffedRecuringShifts");
     	HashMap<String,ArrayList<Shift>> prestaffedRecuringShiftsPerEmployee =ShiftWorker.getEmployeeShiftMap(prestaffedRecuringShifts);
@@ -75,7 +75,7 @@ public class ShiftAssignmentManager {
 //
 //    	shiftCrud.save(assignedUnconflictedPrestaffedSingleShifts);
 //	}
-    public void saveAssignedUnconflictedPrestaffedSingleShiftsToTableForMonth(int month) {
+    public void saveAssignedUnconflictedPrestaffedSingleShiftsToTableForMonth(int month) throws CorruptDataException {
     	ArrayList<Shift> prestaffedSingleShifts = shiftManager.getPrestaffedSingleShiftsForMonth(month);
     	//logger.error("prestaffedSingleShifts " +prestaffedSingleShifts.size());
     	HashMap<String, ArrayList<Shift>> prestaffedSingleShiftsPerEmployee = ShiftWorker.getEmployeeShiftMap(prestaffedSingleShifts);
