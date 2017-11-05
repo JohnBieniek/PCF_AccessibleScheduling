@@ -91,6 +91,4 @@ public class Event {
     public void setEndTime(String endTime) {
         this.endTime = endTime;
     }
-    
-   
 }
