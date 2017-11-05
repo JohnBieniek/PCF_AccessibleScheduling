@@ -11,18 +11,60 @@ import org.json.JSONObject;
 
 import accessiblesolutions.accessiblescheduling.domain.Event;
 
-public class Util {
+public abstract class Util {
     public static boolean eventArrayListContainsEvent(ArrayList<Event> events, String eventId){
     	boolean containsEvent = false;
     	
-    	for(Event event: events){
-    		if(event.getId().equals(eventId)){
-    			containsEvent=true;
-    		}
+    	if(null!=events && !events.isEmpty() && null!=eventId){
+    		for(Event event: events){
+        		if(event.getId().equals(eventId)){
+        			containsEvent=true;
+        		}
+        	}
     	}
     	
     	return containsEvent;
     }
+    
+	public static JSONArray getDatesForMonth(int month) {
+		JSONArray dates= new JSONArray();
+		JSONObject week = new JSONObject();
+		JSONObject day = new JSONObject();
+		
+		String period;
+		try {
+			for(int selectedWeek = 1; selectedWeek<7;selectedWeek++){
+				week = new JSONObject();
+				period = getPeriodOfWeek(month,selectedWeek);
+				if(null!=period && period!="")week.append("period", period);
+				
+				JSONArray daysOfWeek = new JSONArray();
+				for(int selectedDay=0;selectedDay<7;selectedDay++){
+					day = new JSONObject();
+					day = getDayOfWeekForMonth(month,selectedWeek,selectedDay);
+					daysOfWeek.put(selectedDay, day);
+				}
+				week.append("days", daysOfWeek);
+				if(week.length()>0 && (selectedWeek==1||getWeekInMonth(month,selectedWeek)))dates.put(selectedWeek,week);
+			}
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		JSONArray newDates = new JSONArray();
+		for(int i = 0; i<dates.length();i++){
+			if(!dates.isNull(i)){
+				try {
+					newDates.put(dates.get(i));
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		return newDates;
+	}
+	
 	public static int getDayInt(String day){
     	int dayVal=-1;
 
@@ -51,120 +93,6 @@ public class Util {
     	return dayVal;
     }
 	
-	public static int getWeekBeforeDate(String date){
-		int day = (int)Integer.parseInt(date.split("-")[2]);
-		int month =(int)Integer.parseInt(date.split("-")[1]);
-		int year = (int)Integer.parseInt(date.split("-")[0]);
-		
-		LocalDate dayCursor = LocalDate.of(year,month, day).minusWeeks(1);
-		
-		return getWeekOfDate(dayCursor.getYear()+"-"+dayCursor.getMonthValue()+"-"+dayCursor.getDayOfMonth());
-	}
-	
-	public static int getWeekAfterDate(String date){
-		int day = (int)Integer.parseInt(date.split("-")[2]);
-		int month =(int)Integer.parseInt(date.split("-")[1]);
-		int year = (int)Integer.parseInt(date.split("-")[0]);
-		
-		LocalDate dayCursor = LocalDate.of(year,month, day).plusWeeks(1);
-		
-		return getWeekOfDate(dayCursor.getYear()+"-"+dayCursor.getMonthValue()+"-"+dayCursor.getDayOfMonth());
-	}
-	
-    public static int getWeekOfDate(String date){
-		int weekCursor = 0;
-		
-		int day = (int)Integer.parseInt(date.split("-")[2]);
-		
-		int month =(int)Integer.parseInt(date.split("-")[1]);
-		int year = (int)Integer.parseInt(date.split("-")[0]);
-		
-		LocalDate dayCursor = LocalDate.of(year,month, 1);
-		
-		while(weekCursor < 6){
-			int dayCursorInt = dayCursor.getDayOfMonth();
-			
-			if(dayCursorInt==day){
-				return weekCursor;
-			}
-			
-			DayOfWeek dayOfWeekForCursor = dayCursor.getDayOfWeek();
-			
-			if(dayOfWeekForCursor.getValue()==6){//Saturday is what I'm calling the last day of the week, suck it
-				weekCursor++;
-			}
-			
-			dayCursor=dayCursor.plusDays(1);
-		}
-		
-		return weekCursor;//Unreachable
-	}
-	
-	public static boolean isOverlapping(LocalDateTime start1, LocalDateTime end1, LocalDateTime start2, LocalDateTime end2) {
-		boolean overlapping = false;
-		
-		overlapping = start1.isBefore(end2) && end1.isAfter(start2);
-		
-		return overlapping;
-	}
-	
-	public static String getPeriodOfWeek(int month, int week){
-		String period = "";
-		LocalDate startDate = LocalDate.of(2017, month, 1);
-		DayOfWeek monthStart = startDate.getDayOfWeek(); 
-		LocalDate firstSaturday = null;
-		LocalDate firstSunday = null;
-		LocalDate saturday = null;
-		LocalDate sunday = null;
-		
-		if(monthStart.getValue()==7){
-			firstSaturday = startDate.plusDays(6);
-		}
-		else{
-			firstSaturday=startDate.plusDays(6-monthStart.getValue());
-		}
-		
-		firstSunday=firstSaturday.minusDays(6);
-		
-		if(week==1){
-			saturday=firstSaturday;
-			sunday=firstSunday;
-		}
-		else{
-			saturday=firstSaturday.plusWeeks(week-1);
-			sunday=firstSunday.plusWeeks(week-1);
-		}
-		
-		period=sunday.getMonthValue()+"/"+sunday.getDayOfMonth()+ "-"+saturday.getMonthValue()+"/"+saturday.getDayOfMonth()+"/17";
-		
-		return period;
-	}
-	
-	private static boolean getWeekInMonth(int month, int selectedWeek) {
-		LocalDate startDate = LocalDate.of(2017, month, 1);
-		DayOfWeek monthStart = startDate.getDayOfWeek(); 
-		LocalDate firstSaturday = null;
-		LocalDate firstSunday = null;
-		LocalDate sunday = null;
-		
-		if(monthStart.getValue()==7){
-			firstSaturday = startDate.plusDays(6);
-		}
-		else{
-			firstSaturday=startDate.plusDays(6-monthStart.getValue());
-		}
-		
-		firstSunday=firstSaturday.minusDays(6);
-		
-		if(selectedWeek==1){
-			sunday=firstSunday;
-		}
-		else{
-			sunday=firstSunday.plusWeeks(selectedWeek-1);
-		}
-		boolean in = sunday.getMonthValue()==month;
-		return in;
-	}
 	private static JSONObject getDayOfWeekForMonth(int month, int selectedWeek, int selectedDay) {
 		JSONObject day = new JSONObject();
 		LocalDate startDate = LocalDate.of(2017, month, 1);
@@ -224,42 +152,119 @@ public class Util {
 		}
 		return day;
 	}
-	public static JSONArray getDatesForMonth(int month) {
-		JSONArray dates= new JSONArray();
-		JSONObject week = new JSONObject();
-		JSONObject day = new JSONObject();
+	
+    public static String getPeriodOfWeek(int month, int week){
+		String period = "";
+		LocalDate startDate = LocalDate.of(2017, month, 1);
+		DayOfWeek monthStart = startDate.getDayOfWeek(); 
+		LocalDate firstSaturday = null;
+		LocalDate firstSunday = null;
+		LocalDate saturday = null;
+		LocalDate sunday = null;
 		
-		String period;
-		try {
-			for(int selectedWeek = 1; selectedWeek<7;selectedWeek++){
-				week = new JSONObject();
-				period = getPeriodOfWeek(month,selectedWeek);
-				if(null!=period && period!="")week.append("period", period);
-				
-				JSONArray daysOfWeek = new JSONArray();
-				for(int selectedDay=0;selectedDay<7;selectedDay++){
-					day = new JSONObject();
-					day = getDayOfWeekForMonth(month,selectedWeek,selectedDay);
-					daysOfWeek.put(selectedDay, day);
-				}
-				week.append("days", daysOfWeek);
-				if(week.length()>0 && (selectedWeek==1||getWeekInMonth(month,selectedWeek)))dates.put(selectedWeek,week);
-			}
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		if(monthStart.getValue()==7){
+			firstSaturday = startDate.plusDays(6);
 		}
-		JSONArray newDates = new JSONArray();
-		for(int i = 0; i<dates.length();i++){
-			if(!dates.isNull(i)){
-				try {
-					newDates.put(dates.get(i));
-				} catch (JSONException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
+		else{
+			firstSaturday=startDate.plusDays(6-monthStart.getValue());
 		}
-		return newDates;
+		
+		firstSunday=firstSaturday.minusDays(6);
+		
+		if(week==1){
+			saturday=firstSaturday;
+			sunday=firstSunday;
+		}
+		else{
+			saturday=firstSaturday.plusWeeks(week-1);
+			sunday=firstSunday.plusWeeks(week-1);
+		}
+		
+		period=sunday.getMonthValue()+"/"+sunday.getDayOfMonth()+ "-"+saturday.getMonthValue()+"/"+saturday.getDayOfMonth()+"/17";
+		
+		return period;
+	}
+	
+	public static int getWeekAfterDate(String date){
+		int day = (int)Integer.parseInt(date.split("-")[2]);
+		int month =(int)Integer.parseInt(date.split("-")[1]);
+		int year = (int)Integer.parseInt(date.split("-")[0]);
+		
+		LocalDate dayCursor = LocalDate.of(year,month, day).plusWeeks(1);
+		
+		return getWeekOfDate(dayCursor.getYear()+"-"+dayCursor.getMonthValue()+"-"+dayCursor.getDayOfMonth());
+	}
+	
+	public static int getWeekBeforeDate(String date){
+		int day = (int)Integer.parseInt(date.split("-")[2]);
+		int month =(int)Integer.parseInt(date.split("-")[1]);
+		int year = (int)Integer.parseInt(date.split("-")[0]);
+		
+		LocalDate dayCursor = LocalDate.of(year,month, day).minusWeeks(1);
+		
+		return getWeekOfDate(dayCursor.getYear()+"-"+dayCursor.getMonthValue()+"-"+dayCursor.getDayOfMonth());
+	}
+	
+	private static boolean getWeekInMonth(int month, int selectedWeek) {
+		LocalDate startDate = LocalDate.of(2017, month, 1);
+		DayOfWeek monthStart = startDate.getDayOfWeek(); 
+		LocalDate firstSaturday = null;
+		LocalDate firstSunday = null;
+		LocalDate sunday = null;
+		
+		if(monthStart.getValue()==7){
+			firstSaturday = startDate.plusDays(6);
+		}
+		else{
+			firstSaturday=startDate.plusDays(6-monthStart.getValue());
+		}
+		
+		firstSunday=firstSaturday.minusDays(6);
+		
+		if(selectedWeek==1){
+			sunday=firstSunday;
+		}
+		else{
+			sunday=firstSunday.plusWeeks(selectedWeek-1);
+		}
+		boolean in = sunday.getMonthValue()==month;
+		return in;
+	}
+	
+	public static int getWeekOfDate(String date){
+		int weekCursor = 0;
+		
+		int day = (int)Integer.parseInt(date.split("-")[2]);
+		
+		int month =(int)Integer.parseInt(date.split("-")[1]);
+		int year = (int)Integer.parseInt(date.split("-")[0]);
+		
+		LocalDate dayCursor = LocalDate.of(year,month, 1);
+		
+		while(weekCursor < 6){
+			int dayCursorInt = dayCursor.getDayOfMonth();
+			
+			if(dayCursorInt==day){
+				return weekCursor;
+			}
+			
+			DayOfWeek dayOfWeekForCursor = dayCursor.getDayOfWeek();
+			
+			if(dayOfWeekForCursor.getValue()==6){//Saturday is what I'm calling the last day of the week, suck it
+				weekCursor++;
+			}
+			
+			dayCursor=dayCursor.plusDays(1);
+		}
+		
+		return weekCursor;//Unreachable
+	}
+	
+	public static boolean isOverlapping(LocalDateTime start1, LocalDateTime end1, LocalDateTime start2, LocalDateTime end2) {
+		boolean overlapping = false;
+		
+		overlapping = start1.isBefore(end2) && end1.isAfter(start2);
+		
+		return overlapping;
 	}
 }

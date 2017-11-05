@@ -36,7 +36,7 @@ repositories {
 sourceSets {
     test {
         java {
-            srcDirs = ["src/test/accessiblesolutions/accessiblescheduling/domain"] 
+            srcDirs = ["src/test/accessiblesolutions/accessiblescheduling"] 
         }
     }
 }
