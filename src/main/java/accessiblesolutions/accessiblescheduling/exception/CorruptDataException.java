@@ -1,11 +1,9 @@
 package accessiblesolutions.accessiblescheduling.exception;
 
 public class CorruptDataException extends Exception {
+	private static final long serialVersionUID = 1L;
 	private Object corruptObject = null;
 	private Class corruptClass = null;
-	
-	public CorruptDataException() {
-	}
 	
 	public CorruptDataException(Class clazz, Object object) {
 		corruptClass=clazz;
