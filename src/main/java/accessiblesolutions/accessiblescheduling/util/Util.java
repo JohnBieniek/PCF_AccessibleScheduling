@@ -32,30 +32,13 @@ public abstract class Util {
 			throw new ProccessingException(Util.class,month);
 		}
 		
-		JSONArray dates= new JSONArray();
-		JSONObject week = new JSONObject();
-		JSONObject day = new JSONObject();
+		JSONArray dates= getBaseDatesForMonth(2017, month);
+		dates= getNonNullDatesForMonth(dates,month);
 		
-		String period;
-		try {
-			for(int selectedWeek = 1; selectedWeek<7;selectedWeek++){
-				week = new JSONObject();
-				period = getPeriodOfWeek(month,selectedWeek);
-				if(null!=period && period!="")week.append("period", period);
-				
-				JSONArray daysOfWeek = new JSONArray();
-				for(int selectedDay=0;selectedDay<7;selectedDay++){
-					day = new JSONObject();
-					day = getDayOfWeekForMonth(month,selectedWeek,selectedDay);
-					daysOfWeek.put(selectedDay, day);
-				}
-				week.append("days", daysOfWeek);
-				if(week.length()>0 && (selectedWeek==1||getWeekInMonth(month,selectedWeek)))dates.put(selectedWeek,week);
-			}
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		return dates;
+	}
+	
+	private static JSONArray getNonNullDatesForMonth(JSONArray dates, int month) {
 		JSONArray newDates = new JSONArray();
 		for(int i = 0; i<dates.length();i++){
 			if(!dates.isNull(i)){
@@ -67,9 +50,50 @@ public abstract class Util {
 				}
 			}
 		}
+		
 		return newDates;
 	}
-	
+
+	private static JSONArray getBaseDatesForMonth(int i, int month) {
+		JSONArray dates= new JSONArray();
+		JSONObject week = new JSONObject();
+		
+		for(int selectedWeek = 1; selectedWeek<7;selectedWeek++){
+			if(getWeekInMonth(month,selectedWeek)){
+				week = new JSONObject();
+				
+				try {
+					week.append("period", getPeriodOfWeek(month,selectedWeek));
+					
+					week.append("days", getDaysForWeek(2017,month,selectedWeek));
+					
+					dates.put(selectedWeek,week);
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		return dates;
+	}
+
+	private static JSONArray getDaysForWeek(int i, int month, int selectedWeek) {
+		JSONArray daysOfWeek = new JSONArray();
+		
+		for(int selectedDay=0;selectedDay<7;selectedDay++){
+			JSONObject day = new JSONObject();
+			day = getDayOfWeekForMonth(month,selectedWeek,selectedDay);
+			
+			try {
+				daysOfWeek.put(selectedDay, day);
+			} catch (JSONException e) {
+				e.printStackTrace();//TODO improve
+			}
+		}
+		
+		return daysOfWeek;
+	}
+
 	public static int getDayInt(String day){
     	int dayVal=-1;
 
