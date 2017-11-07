@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import accessiblesolutions.accessiblescheduling.domain.Event;
 import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
+
 public class UtilSpec {
 	@Test
 	public void eventArrayListContainsEventReturnsTrueIfPresent() {
