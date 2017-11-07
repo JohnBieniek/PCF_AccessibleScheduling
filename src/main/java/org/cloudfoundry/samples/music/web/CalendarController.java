@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
 import accessiblesolutions.accessiblescheduling.util.Util;
 
 @RestController
@@ -13,7 +14,7 @@ public class CalendarController {
     public CalendarController() {}
 
     @RequestMapping(value = "/getDatesForMonth", method = RequestMethod.GET)
-    public String getShiftsForOfMonth(@RequestParam("month") String month) {
+    public String getShiftsForOfMonth(@RequestParam("month") String month) throws ProccessingException {
         return Util.getDatesForMonth(Integer.parseInt(month)).toString();
     }
 }

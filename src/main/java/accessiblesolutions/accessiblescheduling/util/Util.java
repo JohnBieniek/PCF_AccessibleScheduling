@@ -10,6 +10,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import accessiblesolutions.accessiblescheduling.domain.Event;
+import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
 
 public abstract class Util {
     public static boolean eventArrayListContainsEvent(ArrayList<Event> events, String eventId){
@@ -26,7 +27,11 @@ public abstract class Util {
     	return containsEvent;
     }
     
-	public static JSONArray getDatesForMonth(int month) {
+	public static JSONArray getDatesForMonth(int month) throws ProccessingException {
+		if(month<1||month>12){
+			throw new ProccessingException(Util.class,month);
+		}
+		
 		JSONArray dates= new JSONArray();
 		JSONObject week = new JSONObject();
 		JSONObject day = new JSONObject();
