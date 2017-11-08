@@ -36,6 +36,7 @@ angular.module('shifts', ['ngResource', 'ui.bootstrap']).
 function ShiftsController($scope, $filter, $modal, $http,  Shifts, Shift, Clients, Employees, Status) {
 	 $scope.multiTableEditing=false;
 	 $scope.selectedMonth=11;
+	 $scope.selectedYear=2017;
 	 $scope.sortField="startDate";
 	 $scope.dates="Something";
 	 $scope.tab = 1;
@@ -50,7 +51,7 @@ function ShiftsController($scope, $filter, $modal, $http,  Shifts, Shift, Client
       }
       if(newTab==2){
     	  $scope.sortField="startTime";
-    	  $scope.getDatesForMonth($scope.selectedMonth);
+    	  $scope.getDatesForMonth($scope.selectedYear,$scope.selectedMonth);
       }
     };
 
@@ -58,8 +59,7 @@ function ShiftsController($scope, $filter, $modal, $http,  Shifts, Shift, Client
       return $scope.tab === tabNum;
     };
 	    
-    $scope.getDatesForMonth = function(month){
-    	console.log(month);
+    $scope.getDatesForMonth = function(year,month){
     	$http({
             url: '/calendar/getDatesForMonth',
             method: 'GET',
@@ -67,7 +67,8 @@ function ShiftsController($scope, $filter, $modal, $http,  Shifts, Shift, Client
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
-                month: month,
+            	year: year,
+                month: month
             }
         })
         .then(function(response) {
@@ -144,7 +145,7 @@ function ShiftsController($scope, $filter, $modal, $http,  Shifts, Shift, Client
     	$scope.listShifts();
     	listClients();
     	listEmployees();
-    	$scope.getDatesForMonth($scope.selectedMonth);
+    	$scope.getDatesForMonth($scope.selectedYear,$scope.selectedMonth);
     }
     $scope.listShifts = function listShifts() {
         $scope.shifts = Shifts.query();

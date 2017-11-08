@@ -17,6 +17,7 @@
 	    <table class="table table-striped">
 	       <thead>
 		       <tr>
+     			       <th>Year</th>
 			       <th>Month</th>
 			       <th>Week</th>
 			       <th>Hide assigned shifts</th>
@@ -31,10 +32,23 @@
 	       </thead>
 	       <tbody>
 		       <tr>
+		       <td style="width:160px;">
+		    		<form name="myForm" style="display:inline-block" >
+			    		<select style="display:inline-block"
+			    				ng-change="getDatesForMonth(selectedYear,selectedMonth)"
+			    				name="yearSelect" 
+			    				id="yearSelect"
+					      		ng-model="selectedYear"
+					      		ng-value="{{selectedYear}}">
+				            <option value=2017>2017</option>
+				            <option value=2018>2018</option>
+		           		</select>
+				  	</form>
+		           </td>
 		       	 <td style="width:130px;">
 		    		<form name="myForm" style="display:inline-block" >
 			    		<select style="display:inline-block"
-			    				ng-change="getDatesForMonth(selectedMonth)"
+			    				ng-change="getDatesForMonth(selectedYear,selectedMonth)"
 			    				name="monthSelect" 
 			    				id="monthSelect"
 					      		ng-model="selectedMonth"

@@ -27,12 +27,12 @@ public abstract class Util {
     	return containsEvent;
     }
     
-	public static JSONArray getDatesForMonth(int month) throws ProccessingException {
+	public static JSONArray getDatesForMonth(int year,int month) throws ProccessingException {
 		if(month<1||month>12){
 			throw new ProccessingException(Util.class,month);
 		}
 		
-		JSONArray dates= getBaseDatesForMonth(2017, month);
+		JSONArray dates= getBaseDatesForMonth(year, month);
 		dates= getNonNullDatesForMonth(dates,month);
 		
 		return dates;

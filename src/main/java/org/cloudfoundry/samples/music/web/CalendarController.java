@@ -14,7 +14,7 @@ public class CalendarController {
     public CalendarController() {}
 
     @RequestMapping(value = "/getDatesForMonth", method = RequestMethod.GET)
-    public String getShiftsForOfMonth(@RequestParam("month") String month) throws ProccessingException {
-        return Util.getDatesForMonth(Integer.parseInt(month)).toString();
+    public String getShiftsForOfMonth(@RequestParam("year") String year, @RequestParam("month") String month) throws ProccessingException {
+        return Util.getDatesForMonth(Integer.parseInt(year),Integer.parseInt(month)).toString();
     }
 }

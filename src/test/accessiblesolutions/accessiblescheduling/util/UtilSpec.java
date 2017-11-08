@@ -70,7 +70,7 @@ public class UtilSpec {
 	public void getDatesForMonthFailsForInvalidMonths1(){
 		boolean exception = false;
 		try {
-			Util.getDatesForMonth(0);
+			Util.getDatesForMonth(2017,0);
 		} catch (ProccessingException e) {
 			exception=true;
 		}
@@ -82,7 +82,7 @@ public class UtilSpec {
 	public void getDatesForMonthFailsForInvalidMonths2(){
 		boolean exception = false;
 		try {
-			Util.getDatesForMonth(13);
+			Util.getDatesForMonth(2017,13);
 		} catch (ProccessingException e) {
 			exception=true;
 		}
@@ -98,7 +98,7 @@ public class UtilSpec {
 		String expected = "[{\"period\":[\"1/1-1/7/17\"],\"days\":[[{\"date\":[\"2017-01-01\"],\"day\":[\"Sunday\"]},{\"date\":[\"2017-01-02\"],\"day\":[\"Monday\"]},{\"date\":[\"2017-01-03\"],\"day\":[\"Tuesday\"]},{\"date\":[\"2017-01-04\"],\"day\":[\"Wednesday\"]},{\"date\":[\"2017-01-05\"],\"day\":[\"Thursday\"]},{\"date\":[\"2017-01-06\"],\"day\":[\"Friday\"]},{\"date\":[\"2017-01-07\"],\"day\":[\"Saturday\"]}]]},{\"period\":[\"1/8-1/14/17\"],\"days\":[[{\"date\":[\"2017-01-08\"],\"day\":[\"Sunday\"]},{\"date\":[\"2017-01-09\"],\"day\":[\"Monday\"]},{\"date\":[\"2017-01-10\"],\"day\":[\"Tuesday\"]},{\"date\":[\"2017-01-11\"],\"day\":[\"Wednesday\"]},{\"date\":[\"2017-01-12\"],\"day\":[\"Thursday\"]},{\"date\":[\"2017-01-13\"],\"day\":[\"Friday\"]},{\"date\":[\"2017-01-14\"],\"day\":[\"Saturday\"]}]]},{\"period\":[\"1/15-1/21/17\"],\"days\":[[{\"date\":[\"2017-01-15\"],\"day\":[\"Sunday\"]},{\"date\":[\"2017-01-16\"],\"day\":[\"Monday\"]},{\"date\":[\"2017-01-17\"],\"day\":[\"Tuesday\"]},{\"date\":[\"2017-01-18\"],\"day\":[\"Wednesday\"]},{\"date\":[\"2017-01-19\"],\"day\":[\"Thursday\"]},{\"date\":[\"2017-01-20\"],\"day\":[\"Friday\"]},{\"date\":[\"2017-01-21\"],\"day\":[\"Saturday\"]}]]},{\"period\":[\"1/22-1/28/17\"],\"days\":[[{\"date\":[\"2017-01-22\"],\"day\":[\"Sunday\"]},{\"date\":[\"2017-01-23\"],\"day\":[\"Monday\"]},{\"date\":[\"2017-01-24\"],\"day\":[\"Tuesday\"]},{\"date\":[\"2017-01-25\"],\"day\":[\"Wednesday\"]},{\"date\":[\"2017-01-26\"],\"day\":[\"Thursday\"]},{\"date\":[\"2017-01-27\"],\"day\":[\"Friday\"]},{\"date\":[\"2017-01-28\"],\"day\":[\"Saturday\"]}]]},{\"period\":[\"1/29-2/4/17\"],\"days\":[[{\"date\":[\"2017-01-29\"],\"day\":[\"Sunday\"]},{\"date\":[\"2017-01-30\"],\"day\":[\"Monday\"]},{\"date\":[\"2017-01-31\"],\"day\":[\"Tuesday\"]},{\"date\":[\"2017-02-01\"],\"day\":[\"Wednesday\"]},{\"date\":[\"2017-02-02\"],\"day\":[\"Thursday\"]},{\"date\":[\"2017-02-03\"],\"day\":[\"Friday\"]},{\"date\":[\"2017-02-04\"],\"day\":[\"Saturday\"]}]]}]";
 		
 		try {
-			array = Util.getDatesForMonth(1);//For 2017
+			array = Util.getDatesForMonth(2017,1);
 		} catch (ProccessingException e) {
 			exception=true;
 		}
