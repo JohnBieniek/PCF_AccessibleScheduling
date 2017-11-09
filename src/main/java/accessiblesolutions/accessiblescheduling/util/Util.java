@@ -32,48 +32,31 @@ public abstract class Util {
 			throw new ProccessingException(Util.class,month);
 		}
 		
-		JSONArray dates= getBaseDatesForMonth(year, month);
-		dates= getNonNullDatesForMonth(dates,month);
+		JSONArray dates= getDatesFor2017(month);
 		
 		return dates;
 	}
 	
-	private static JSONArray getNonNullDatesForMonth(JSONArray dates, int month) {
-		JSONArray newDates = new JSONArray();
-		for(int i = 0; i<dates.length();i++){
-			if(!dates.isNull(i)){
-				try {
-					newDates.put(dates.get(i));
-				} catch (JSONException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		}
-		
-		return newDates;
-	}
 
-	private static JSONArray getBaseDatesForMonth(int i, int month) {
+	private static JSONArray getDatesFor2017(int month) {
 		JSONArray dates= new JSONArray();
 		JSONObject week = new JSONObject();
 		
 		for(int selectedWeek = 1; selectedWeek<7;selectedWeek++){
 			if(getWeekInMonth(month,selectedWeek)){
 				week = new JSONObject();
-				
 				try {
 					week.append("period", getPeriodOfWeek(month,selectedWeek));
-					
 					week.append("days", getDaysForWeek(2017,month,selectedWeek));
 					
-					dates.put(selectedWeek,week);
+					dates.put(selectedWeek-1,week);
 				} catch (JSONException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
 		}
+		
 		return dates;
 	}
 
