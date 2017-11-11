@@ -4,6 +4,7 @@ public class CompatibilityDTO {
     private String shiftId="none";
     private String employeeId="default";    
     private boolean compatible=false;
+    
     public CompatibilityDTO() {
     }
 
