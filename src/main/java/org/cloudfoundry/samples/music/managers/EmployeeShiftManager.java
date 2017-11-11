@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import accessiblesolutions.accessiblescheduling.domain.Shift;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoShiftRepository;
-import org.cloudfoundry.samples.music.worker.ShiftWorker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
@@ -13,6 +12,7 @@ import accessiblesolutions.accessiblescheduling.domain.Employee;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
 import accessiblesolutions.accessiblescheduling.util.Util;
+import accessiblesolutions.accessiblescheduling.worker.ShiftWorker;
 
 @Component
 public class EmployeeShiftManager {
