@@ -3,6 +3,8 @@ package accessiblesolutions.accessiblescheduling.util;
 import static org.junit.Assert.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 
 import org.json.JSONArray;
@@ -240,7 +242,6 @@ public class UtilSpec {
 		assertEquals(week,1);
 		assertFalse(exception);
 	}
-	//
 	
 	@Test
 	public void getWeekOfDateFailsWithPoorlyFormatedDate1(){
@@ -304,6 +305,206 @@ public class UtilSpec {
 			exception=true;
 		}
 		assertEquals(week,2);
+		assertFalse(exception);
+	}
+	
+	@Test
+	public void isOverlappingFailsWithMissingStart1(){
+		boolean exception = false;
+		
+		LocalDateTime end1 = LocalDate.of(2017,11,15).atTime(LocalTime.of(11, 10));
+		LocalDateTime start2 = LocalDate.of(2017,11,16).atTime(LocalTime.of(10, 10));
+		LocalDateTime end2 = LocalDate.of(2017,11,16).atTime(LocalTime.of(11, 10));
+		try {
+			Util.isOverlapping(null, end1, start2, end2);
+		} catch (ProccessingException e) {
+			exception=true;
+		}
+		
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void isOverlappingFailsWithMissingEnd1(){
+		boolean exception = false;
+		
+		LocalDateTime start1 = LocalDate.of(2017,11,15).atTime(LocalTime.of(10, 10));
+		LocalDateTime start2 = LocalDate.of(2017,11,16).atTime(LocalTime.of(10, 10));
+		LocalDateTime end2 = LocalDate.of(2017,11,16).atTime(LocalTime.of(11, 10));
+		try {
+			Util.isOverlapping(start1,null, start2, end2);
+		} catch (ProccessingException e) {
+			exception=true;
+		}
+		
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void isOverlappingFailsWithMissingStart2(){
+		boolean exception = false;
+		
+		LocalDateTime start1 = LocalDate.of(2017,11,15).atTime(LocalTime.of(10, 10));
+		LocalDateTime end1 = LocalDate.of(2017,11,15).atTime(LocalTime.of(11, 10));
+		LocalDateTime end2 = LocalDate.of(2017,11,16).atTime(LocalTime.of(11, 10));
+		try {
+			Util.isOverlapping(start1, end1, null, end2);
+		} catch (ProccessingException e) {
+			exception=true;
+		}
+		
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void isOverlappingFailsWithMissingEnd2(){
+		boolean exception = false;
+		
+		LocalDateTime start1 = LocalDate.of(2017,11,15).atTime(LocalTime.of(10, 10));
+		LocalDateTime end1 = LocalDate.of(2017,11,15).atTime(LocalTime.of(11, 10));
+		LocalDateTime start2 = LocalDate.of(2017,11,16).atTime(LocalTime.of(10, 10));
+		try {
+			Util.isOverlapping(start1, end1, start2, null);
+		} catch (ProccessingException e) {
+			exception=true;
+		}
+		
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void isOverlappingFailsWithEnd1PreceedingStart(){
+		boolean exception = false;
+		
+		LocalDateTime start1 = LocalDate.of(2017,11,15).atTime(LocalTime.of(11, 10));
+		LocalDateTime end1 = LocalDate.of(2017,11,15).atTime(LocalTime.of(10, 10));
+		LocalDateTime start2 = LocalDate.of(2017,11,16).atTime(LocalTime.of(10, 10));
+		LocalDateTime end2 = LocalDate.of(2017,11,16).atTime(LocalTime.of(11, 10));
+		try {
+			Util.isOverlapping(start1, end1, start2, end2);
+		} catch (ProccessingException e) {
+			exception=true;
+		}
+		
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void isOverlappingFailsWithEnd2PreceedingStart(){
+		boolean exception = false;
+		
+		LocalDateTime start1 = LocalDate.of(2017,11,15).atTime(LocalTime.of(10, 10));
+		LocalDateTime end1 = LocalDate.of(2017,11,15).atTime(LocalTime.of(11, 10));
+		LocalDateTime start2 = LocalDate.of(2017,11,16).atTime(LocalTime.of(11, 10));
+		LocalDateTime end2 = LocalDate.of(2017,11,16).atTime(LocalTime.of(10, 10));
+		try {
+			Util.isOverlapping(start1, end1, start2, end2);
+		} catch (ProccessingException e) {
+			exception=true;
+		}
+		
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void isOverlappingFalseWith1Before2(){
+		boolean exception = false;
+		
+		LocalDateTime start1 = LocalDate.of(2017,11,15).atTime(LocalTime.of(10, 10));
+		LocalDateTime end1 = LocalDate.of(2017,11,15).atTime(LocalTime.of(11, 10));
+		LocalDateTime start2 = LocalDate.of(2017,11,16).atTime(LocalTime.of(10, 10));
+		LocalDateTime end2 = LocalDate.of(2017,11,16).atTime(LocalTime.of(11, 10));
+		try {
+			assertFalse(Util.isOverlapping(start1, end1, start2, end2));
+		} catch (ProccessingException e) {
+			exception=true;
+		}
+		
+		assertFalse(exception);
+	}
+	
+	@Test
+	public void isOverlappingFalseWith2Before1(){
+		boolean exception = false;
+		
+		LocalDateTime start1 = LocalDate.of(2017,11,16).atTime(LocalTime.of(10, 10));
+		LocalDateTime end1 = LocalDate.of(2017,11,16).atTime(LocalTime.of(11, 10));
+		LocalDateTime start2 = LocalDate.of(2017,11,15).atTime(LocalTime.of(10, 10));
+		LocalDateTime end2 = LocalDate.of(2017,11,15).atTime(LocalTime.of(11, 10));
+		try {
+			assertFalse(Util.isOverlapping(start1, end1, start2, end2));
+		} catch (ProccessingException e) {
+			exception=true;
+		}
+		
+		assertFalse(exception);
+	}
+	
+	@Test
+	public void isOverlappingTrueWith1EndingAfter2Starts(){
+		boolean exception = false;
+		
+		LocalDateTime start1 = LocalDate.of(2017,11,15).atTime(LocalTime.of(10, 10));
+		LocalDateTime end1 = LocalDate.of(2017,11,15).atTime(LocalTime.of(11, 10));
+		LocalDateTime start2 = LocalDate.of(2017,11,15).atTime(LocalTime.of(11, 0));
+		LocalDateTime end2 = LocalDate.of(2017,11,15).atTime(LocalTime.of(12, 10));
+		try {
+			assertTrue(Util.isOverlapping(start1, end1, start2, end2));
+		} catch (ProccessingException e) {
+			exception=true;
+		}
+		
+		assertFalse(exception);
+	}
+	
+	@Test
+	public void isOverlappingTrueWith2EndingAfter1Starts(){
+		boolean exception = false;
+		
+		LocalDateTime start1 = LocalDate.of(2017,11,15).atTime(LocalTime.of(11, 0));
+		LocalDateTime end1 = LocalDate.of(2017,11,15).atTime(LocalTime.of(12, 10));
+		LocalDateTime start2 = LocalDate.of(2017,11,15).atTime(LocalTime.of(10, 10));
+		LocalDateTime end2 = LocalDate.of(2017,11,15).atTime(LocalTime.of(11, 10));
+		try {
+			assertTrue(Util.isOverlapping(start1, end1, start2, end2));
+		} catch (ProccessingException e) {
+			exception=true;
+		}
+		
+		assertFalse(exception);
+	}
+	
+	@Test
+	public void isOverlappingTrueWith1Containing2(){
+		boolean exception = false;
+		
+		LocalDateTime start1 = LocalDate.of(2017,11,15).atTime(LocalTime.of(6, 0));
+		LocalDateTime end1 = LocalDate.of(2017,11,15).atTime(LocalTime.of(11, 10));
+		LocalDateTime start2 = LocalDate.of(2017,11,15).atTime(LocalTime.of(7, 10));
+		LocalDateTime end2 = LocalDate.of(2017,11,15).atTime(LocalTime.of(8, 10));
+		try {
+			assertTrue(Util.isOverlapping(start1, end1, start2, end2));
+		} catch (ProccessingException e) {
+			exception=true;
+		}
+		
+		assertFalse(exception);
+	}
+	
+	@Test
+	public void isOverlappingTrueWith2Containing1(){
+		boolean exception = false;
+		
+		LocalDateTime start1 = LocalDate.of(2017,11,15).atTime(LocalTime.of(7, 0));
+		LocalDateTime end1 = LocalDate.of(2017,11,15).atTime(LocalTime.of(8, 10));
+		LocalDateTime start2 = LocalDate.of(2017,11,15).atTime(LocalTime.of(6, 10));
+		LocalDateTime end2 = LocalDate.of(2017,11,15).atTime(LocalTime.of(11, 10));
+		try {
+			assertTrue(Util.isOverlapping(start1, end1, start2, end2));
+		} catch (ProccessingException e) {
+			exception=true;
+		}
+		
 		assertFalse(exception);
 	}
 }

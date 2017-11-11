@@ -336,7 +336,20 @@ public abstract class Util {
 		return !(year.length()!=4 || !year.matches("^[0-9]{4}$"));
 	}
 	
-	public static boolean isOverlapping(LocalDateTime start1, LocalDateTime end1, LocalDateTime start2, LocalDateTime end2) {
+	public static boolean isOverlapping(LocalDateTime start1, LocalDateTime end1, LocalDateTime start2, LocalDateTime end2) throws ProccessingException {
+		if(null==start1){
+			throw new ProccessingException(LocalDateTime.class,start1);
+		}
+		if(null==end1 || end1.isBefore(start1)){
+			throw new ProccessingException(LocalDateTime.class,end1);
+		}
+		if(null==start2){
+			throw new ProccessingException(LocalDateTime.class,start2);
+		}
+		if(null==end2 || end2.isBefore(start2)){
+			throw new ProccessingException(LocalDateTime.class,end2);
+		}
+		
 		boolean overlapping = false;
 		
 		overlapping = start1.isBefore(end2) && end1.isAfter(start2);
