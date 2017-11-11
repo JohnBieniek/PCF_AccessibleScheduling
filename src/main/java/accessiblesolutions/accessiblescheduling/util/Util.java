@@ -211,22 +211,22 @@ public abstract class Util {
     		throw new  ProccessingException(String.class,date);
     	}
     	
-    	if(parsedDate[0].length()!=4 || !parsedDate[0].matches("^[0-9]{4}$")){
-    		throw new  ProccessingException(String.class,date);
-    	}else{
+    	if(yearIsValid(parsedDate[0])){
     		year = Integer.parseInt(parsedDate[0]);
+    	}else{
+    		throw new  ProccessingException(String.class,date);
     	}
     	
-    	if(parsedDate[1].length()!=2 || !parsedDate[1].matches("^[0-9]{2}$") || Integer.parseInt(parsedDate[1])>12){
-    		throw new  ProccessingException(String.class,date);
-    	}else{
+    	if(monthIsValid(parsedDate[1])){
     		month = Integer.parseInt(parsedDate[1]);
+    	}else{
+    		throw new  ProccessingException(String.class,date);
     	}
     	
-    	if(parsedDate[2].length()!=2 || !parsedDate[2].matches("^[0-9]{2}$")){
-    		throw new  ProccessingException(String.class,date);
-    	}else{
+    	if(dayIsValid(parsedDate[2])){
     		day = Integer.parseInt(parsedDate[2]);
+    	}else{
+    		throw new  ProccessingException(String.class,date);
     	}
     	
     	return LocalDate.of(year, month, day);
@@ -280,22 +280,22 @@ public abstract class Util {
     		throw new  ProccessingException(String.class,date);
     	}
     	
-    	if(parsedDate[0].length()!=4 || !parsedDate[0].matches("^[0-9]{4}$")){
-    		throw new  ProccessingException(String.class,date);
-    	}else{
+    	if(yearIsValid(parsedDate[0])){
     		year = Integer.parseInt(parsedDate[0]);
+    	}else{
+    		throw new  ProccessingException(String.class,date);
     	}
     	
-    	if(parsedDate[1].length()!=2 || !parsedDate[1].matches("^[0-9]{2}$") || Integer.parseInt(parsedDate[1])>12){
-    		throw new  ProccessingException(String.class,date);
-    	}else{
+    	if(monthIsValid(parsedDate[1])){
     		month = Integer.parseInt(parsedDate[1]);
+    	}else{
+    		throw new  ProccessingException(String.class,date);
     	}
     	
-    	if(parsedDate[2].length()!=2 || !parsedDate[2].matches("^[0-9]{2}$")){
-    		throw new  ProccessingException(String.class,date);
-    	}else{
+    	if(dayIsValid(parsedDate[2])){
     		day = Integer.parseInt(parsedDate[2]);
+		}else{
+    		throw new  ProccessingException(String.class,date);
     	}
     	
 		int weekCursor = 0;
@@ -319,6 +319,21 @@ public abstract class Util {
 		}
 		
 		return weekCursor;//Unreachable
+	}
+	
+	//For use inside proccessingException throwing determination
+	private static boolean dayIsValid(String day) {
+		return !(day.length()!=2 || !day.matches("^[0-9]{2}$"));
+	}
+	
+	//For use inside proccessingException throwing determination
+	private static boolean monthIsValid(String month) {
+		return !(month.length()!=2 || !month.matches("^[0-9]{2}$") || Integer.parseInt(month)>12);
+	}
+
+	//For use inside proccessingException throwing determination
+	private static boolean yearIsValid(String year){
+		return !(year.length()!=4 || !year.matches("^[0-9]{4}$"));
 	}
 	
 	public static boolean isOverlapping(LocalDateTime start1, LocalDateTime end1, LocalDateTime start2, LocalDateTime end2) {
