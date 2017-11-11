@@ -266,13 +266,39 @@ public abstract class Util {
 		return in;
 	}
 	
-	public static int getWeekOfDate(String date){
+	public static int getWeekOfDate(String date) throws ProccessingException{
+		if(null==date){
+    		throw new ProccessingException(String.class,date);
+    	}
+    	
+    	String[] parsedDate = date.split("-");
+    	int year = 0;
+    	int month = 0;
+    	int day = 0;
+    	
+    	if(parsedDate.length!=3){
+    		throw new  ProccessingException(String.class,date);
+    	}
+    	
+    	if(parsedDate[0].length()!=4 || !parsedDate[0].matches("^[0-9]{4}$")){
+    		throw new  ProccessingException(String.class,date);
+    	}else{
+    		year = Integer.parseInt(parsedDate[0]);
+    	}
+    	
+    	if(parsedDate[1].length()!=2 || !parsedDate[1].matches("^[0-9]{2}$") || Integer.parseInt(parsedDate[1])>12){
+    		throw new  ProccessingException(String.class,date);
+    	}else{
+    		month = Integer.parseInt(parsedDate[1]);
+    	}
+    	
+    	if(parsedDate[2].length()!=2 || !parsedDate[2].matches("^[0-9]{2}$")){
+    		throw new  ProccessingException(String.class,date);
+    	}else{
+    		day = Integer.parseInt(parsedDate[2]);
+    	}
+    	
 		int weekCursor = 0;
-		
-		int day = (int)Integer.parseInt(date.split("-")[2]);
-		
-		int month =(int)Integer.parseInt(date.split("-")[1]);
-		int year = (int)Integer.parseInt(date.split("-")[0]);
 		
 		LocalDate dayCursor = LocalDate.of(year,month, 1);
 		

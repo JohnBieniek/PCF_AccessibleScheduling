@@ -31,7 +31,7 @@ public class ScheduleController {
     }
 
     @RequestMapping(value = "/generateShifts", method = RequestMethod.GET)
-    public String generateShifts(@RequestParam("month") String month) {
+    public String generateShifts(@RequestParam("month") String month) throws CorruptDataException {
         return manager.generateShifts(month);
     }
     

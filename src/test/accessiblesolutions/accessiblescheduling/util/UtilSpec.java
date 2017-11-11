@@ -176,7 +176,6 @@ public class UtilSpec {
 		assertFalse(exception);
 	}
 	
-
 	@Test
 	public void getWeekBeforeDateFailsWithPoorlyFormatedDate1(){
 		boolean exception = false;
@@ -239,6 +238,72 @@ public class UtilSpec {
 			exception=true;
 		}
 		assertEquals(week,1);
+		assertFalse(exception);
+	}
+	//
+	
+	@Test
+	public void getWeekOfDateFailsWithPoorlyFormatedDate1(){
+		boolean exception = false;
+		
+		try {
+			Util.getWeekOfDate("2017-02/11");	
+		} catch (ProccessingException e) {
+			exception=true;
+		}
+		
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getWeekOfDateFailsWithPoorlyFormatedDate2(){
+		boolean exception = false;
+
+		try {
+			Util.getWeekOfDate("2017/02/11");	
+		} catch (ProccessingException e) {
+			exception=true;
+		}
+		
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getWeekOfDateFailsWithPoorlyFormatedDate3(){
+		boolean exception = false;
+
+		try {
+			Util.getWeekOfDate("2017-22-11");	
+		} catch (ProccessingException e) {
+			exception=true;
+		}
+		
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getWeekOfDateFailsWithPoorlyFormatedDate4(){
+		boolean exception = false;
+
+		try {
+			Util.getWeekOfDate("2017-XY-11");	
+		} catch (ProccessingException e) {
+			exception=true;
+		}
+
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getWeekOfDateConvertsAGoodDate(){
+		boolean exception = false;
+		int week =0;
+		try {
+			week =Util.getWeekOfDate("2017-12-14");	
+		} catch (ProccessingException e) {
+			exception=true;
+		}
+		assertEquals(week,2);
 		assertFalse(exception);
 	}
 }

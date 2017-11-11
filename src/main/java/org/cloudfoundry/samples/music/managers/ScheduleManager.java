@@ -13,7 +13,7 @@ public class ScheduleManager {
     
     public ScheduleManager() {}
 
-    public String generateShifts(String selectedMonth) {
+    public String generateShifts(String selectedMonth) throws CorruptDataException {
     	String eventResponse = shiftGenerationManager.generateEventShifts(selectedMonth);
     	String requestResponse = shiftGenerationManager.generateRequestedShifts(selectedMonth);
 

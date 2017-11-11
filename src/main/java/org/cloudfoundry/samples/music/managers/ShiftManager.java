@@ -2,6 +2,8 @@ package org.cloudfoundry.samples.music.managers;
 import java.util.ArrayList;
 
 import accessiblesolutions.accessiblescheduling.domain.Shift;
+import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
+
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoShiftRepository;
 import org.cloudfoundry.samples.music.worker.ShiftWorker;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +56,7 @@ public class ShiftManager {
 	}
     
   //weeks are considered to start at 0 with a maximum possible of 5, year assumed current year
-    public ArrayList<Shift> getShiftsForWeekOfMonth(int week, int month){
+    public ArrayList<Shift> getShiftsForWeekOfMonth(int week, int month) throws CorruptDataException{
     	return ShiftWorker.getShiftsForWeekOfMonth(shiftRepository.findByStartMonth(month),week,month);
     }
 }

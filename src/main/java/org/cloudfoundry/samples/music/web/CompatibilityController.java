@@ -25,6 +25,7 @@ import accessiblesolutions.accessiblescheduling.domain.Client;
 import accessiblesolutions.accessiblescheduling.domain.CustomField;
 import accessiblesolutions.accessiblescheduling.domain.Employee;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
+import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
 import accessiblesolutions.accessiblescheduling.to.CompatibilityDTO;
 import accessiblesolutions.accessiblescheduling.to.EmployeeUpdateTO;
 import accessiblesolutions.accessiblescheduling.to.UpdateTO;
@@ -47,7 +48,7 @@ public class CompatibilityController {
     public CompatibilityController() {}
 
     @RequestMapping(method = RequestMethod.POST, value= "/shifts")
-    public @ResponseBody EmployeeUpdateTO getShiftsScheduled(HttpServletRequest request){
+    public @ResponseBody EmployeeUpdateTO getShiftsScheduled(HttpServletRequest request) throws CorruptDataException{
     	Employee employee =null;
     	Shift shift =null;
 
@@ -348,7 +349,7 @@ public class CompatibilityController {
     	return to;
     }
     @RequestMapping(method = RequestMethod.POST, value= "/workedLastWeekend")
-    public @ResponseBody EmployeeUpdateTO getWorkedLastWeekend(HttpServletRequest request) throws CorruptDataException{
+    public @ResponseBody EmployeeUpdateTO getWorkedLastWeekend(HttpServletRequest request) throws CorruptDataException, ProccessingException{
     	Employee employee =null;
     	Shift shift =null;
 
@@ -379,7 +380,7 @@ public class CompatibilityController {
     }
     
     @RequestMapping(method = RequestMethod.POST, value= "/workingNextWeekend")
-    public @ResponseBody EmployeeUpdateTO getWorkingNextWeekend(HttpServletRequest request) throws CorruptDataException{
+    public @ResponseBody EmployeeUpdateTO getWorkingNextWeekend(HttpServletRequest request) throws CorruptDataException, ProccessingException{
     	Employee employee =null;
     	Shift shift =null;
 

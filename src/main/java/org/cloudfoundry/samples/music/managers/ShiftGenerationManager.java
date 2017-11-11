@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import accessiblesolutions.accessiblescheduling.domain.RecurringShiftNeed;
 import accessiblesolutions.accessiblescheduling.domain.ShiftRequest;
+import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 import accessiblesolutions.accessiblescheduling.util.Util;
 
 @Component
@@ -35,7 +36,7 @@ public class ShiftGenerationManager {
         this.recurringShiftNeedRepository = recurringShiftNeedRepository;
     }
     
-    public String generateEventShifts(String selectedMonth) {
+    public String generateEventShifts(String selectedMonth) throws CorruptDataException {
     	String shiftResponse = "~Events~" + System.lineSeparator();
     	Iterable<Event> events = eventRepository.findAll();
     	ArrayList<Shift> shifts =new ArrayList<Shift>();
@@ -83,14 +84,14 @@ public class ShiftGenerationManager {
     	return selectedMonth+shiftResponse;
     }
 
-    public String generateRequestedShifts(String selectedMonth) {
+    public String generateRequestedShifts(String selectedMonth) throws CorruptDataException {
     	String singleResponse = generateRequestedSingleShifts(selectedMonth);
     	String recurringResponse = generateRequestedRecurringShifts(selectedMonth);
     	
     	return singleResponse+recurringResponse;
     }
     
-    public String generateRequestedSingleShifts(String selectedMonth) {
+    public String generateRequestedSingleShifts(String selectedMonth) throws CorruptDataException {
     	//Iterable<Client> clients = clientRepository.findAll();
     	Iterable<ShiftRequest> requests = shiftRequestRepository.findAll();
     	ArrayList<Shift> shifts =new ArrayList<Shift>();  
@@ -131,7 +132,7 @@ public class ShiftGenerationManager {
     	return selectedMonth + " from single shift requests";
     }
     
-    public String generateRequestedRecurringShifts(String selectedMonth) {
+    public String generateRequestedRecurringShifts(String selectedMonth) throws CorruptDataException {
     	Iterable<RecurringShiftNeed> requests = recurringShiftNeedRepository.findAll();
     	ArrayList<Shift> shifts  =new ArrayList<Shift>();  
     	if(null!=requests && null!=selectedMonth){

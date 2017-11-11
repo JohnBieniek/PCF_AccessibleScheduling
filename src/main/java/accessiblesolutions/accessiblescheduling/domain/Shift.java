@@ -5,6 +5,7 @@ import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.J
 
 import accessiblesolutions.accessiblescheduling.domain.Employee;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
+import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
 import accessiblesolutions.accessiblescheduling.util.Util;
 
 import java.time.DayOfWeek;
@@ -298,8 +299,42 @@ public class Shift {
         return startTime;
     }
 
-    public int getStartWeek(){
-    	return Util.getWeekOfDate(startDate);
+    public int getStartWeek() throws CorruptDataException{
+    	if(null==startDate){
+    		throw new CorruptDataException(Shift.class,this);
+    	}
+    	
+    	String[] parsedDate = startDate.split("-");
+    	int year = 0;
+    	int month = 0;
+    	int day = 0;
+    	
+    	if(parsedDate.length!=3){
+    		throw new CorruptDataException(Shift.class,this);
+    	}
+    	
+    	if(parsedDate[0].length()!=4 || !parsedDate[0].matches("^[0-9]{4}$")){
+    		throw new CorruptDataException(Shift.class,this);
+    	}
+    	
+    	if(parsedDate[1].length()!=2 || !parsedDate[1].matches("^[0-9]{2}$") || Integer.parseInt(parsedDate[1])>12){
+    		throw new CorruptDataException(Shift.class,this);
+    	}
+    	
+    	if(parsedDate[2].length()!=2 || !parsedDate[2].matches("^[0-9]{2}$")){
+    		throw new CorruptDataException(Shift.class,this);
+    	}
+    	
+    	int week = -1;
+    	
+    	try{
+    		week = Util.getWeekOfDate(startDate);
+    	}
+    	catch(ProccessingException e){
+    		throw new CorruptDataException(e);
+    	}
+    	
+    	return week;
     }
 
     public int getStartYear() {

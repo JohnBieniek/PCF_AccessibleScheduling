@@ -35,7 +35,7 @@ public final class ShiftWorker {
 	}
     
     //weeks are considered to start at 0 with a maximum possible of 5, year assumed current year
-    public static ArrayList<Shift> getShiftsForWeekOfMonth(Iterable<Shift> shifts, int week, int month){
+    public static ArrayList<Shift> getShiftsForWeekOfMonth(Iterable<Shift> shifts, int week, int month) throws CorruptDataException{
     	ArrayList<Shift> shiftsForWeek = new ArrayList<Shift>();
 		
     	for(Shift shift: shifts){

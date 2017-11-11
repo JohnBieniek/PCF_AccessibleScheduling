@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import accessiblesolutions.accessiblescheduling.domain.Employee;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
+import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
 import accessiblesolutions.accessiblescheduling.util.Util;
 
 @Component
@@ -24,7 +25,7 @@ public class EmployeeShiftManager {
         this.shiftRepository = shiftRepository;
     }
     
-    public ArrayList<Shift> getShiftsForEmployeeForWeekAfter(String employeeId, Shift shift) throws CorruptDataException {
+    public ArrayList<Shift> getShiftsForEmployeeForWeekAfter(String employeeId, Shift shift) throws CorruptDataException, ProccessingException {
 		LocalDate weekAftersDate = shift.getStartsLocalDate().plusWeeks(1);
 		int weekAfter = Util.getWeekOfDate(weekAftersDate.getYear()+"-"+weekAftersDate.getMonth().getValue()+"-"+weekAftersDate.getDayOfMonth());
 		
@@ -34,12 +35,11 @@ public class EmployeeShiftManager {
 	}
   	
     //If the shift in question starts saturday night and ends sunday info for the week of saturday is returned
-  	public ArrayList<Shift> getAssignedShiftsForEmployeeForWeekOfShift(String employeeId, Shift shift){
+  	public ArrayList<Shift> getAssignedShiftsForEmployeeForWeekOfShift(String employeeId, Shift shift) throws CorruptDataException{
   		return getAssignedShiftsForEmployeeForWeekOfMonth(employeeId,shift.getStartWeek(), shift.getStartMonth());
   	}
   	
-  	
-  	public ArrayList<Shift> getAssignedShiftsForEmployeeForWeekOfMonth(String employeeId, int week, int month){
+  	public ArrayList<Shift> getAssignedShiftsForEmployeeForWeekOfMonth(String employeeId, int week, int month) throws CorruptDataException{
 		ArrayList<Shift> assignedShiftsForEmployeeForMonth =getAssignedShiftsForEmployeeForMonth(employeeId,month);
 		
 		ArrayList<Shift> assignedShiftsForEmployeeForWeekOfMonth = new ArrayList<Shift>();
@@ -126,7 +126,7 @@ public class EmployeeShiftManager {
 		return assignedOvernightShiftsForEmployeeForMonth;
 	}
   	
-  	public ArrayList<Shift> getShiftsForEmployeeForWeekBefore(String employeeId,Shift shift) throws CorruptDataException {
+  	public ArrayList<Shift> getShiftsForEmployeeForWeekBefore(String employeeId,Shift shift) throws CorruptDataException, ProccessingException {
 		LocalDate weekBeforesDate = shift.getStartsLocalDate().minusWeeks(1);
 		int weekBefore = Util.getWeekOfDate(weekBeforesDate.getYear()+"-"+weekBeforesDate.getMonth().getValue()+"-"+weekBeforesDate.getDayOfMonth());
 		
