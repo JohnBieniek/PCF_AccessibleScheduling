@@ -46,8 +46,12 @@ public final class ShiftWorker {
     public static ArrayList<Shift> getAssignedShifts(Iterable<Shift> shifts){
     	ArrayList<Shift> assignedShifts = new ArrayList<Shift>();
     	
+    	if(null == shifts){
+    		return assignedShifts;
+    	}
+    	
     	for(Shift shift:shifts){
-    		if(shift.getAssigned()||shift.getStaffName()!=null){
+    		if(null!=shift && (shift.getAssigned()||shift.getStaffName()!=null)){
     			assignedShifts.add(shift);
     		}
     	}

@@ -235,6 +235,7 @@ public class ShiftWorkerSpec {
 		assertTrue(assignedShifts.size()==0);
 	}
 	
+	@Test
 	public void getAssignedShiftsReturnsEmptyForNullInput() {
 		boolean exception = false;
 		ArrayList<Shift> assignedShifts = null;
@@ -258,6 +259,7 @@ public class ShiftWorkerSpec {
 		assertTrue(assignedShifts.size()==0);
 	}
 	
+	@Test
 	public void getAssignedShiftsReturnsEmptyForArrayContainingNull() {
 		boolean exception = false;
 		ArrayList<Shift> assignedShifts = null;
@@ -281,6 +283,7 @@ public class ShiftWorkerSpec {
 		assertTrue(assignedShifts.size()==0);
 	}
 	
+	@Test
 	public void getAssignedShiftsReturnsEmptyForArrayContainingNullAndUnassignedShift() {
 		boolean exception = false;
 		ArrayList<Shift> assignedShifts = null;
@@ -305,6 +308,7 @@ public class ShiftWorkerSpec {
 		assertTrue(assignedShifts.size()==0);
 	}
 	
+	@Test
 	public void getAssignedShiftsReturns1ForArrayContainingNullAndAssignedShift() {
 		boolean exception = false;
 		ArrayList<Shift> assignedShifts = null;
@@ -328,6 +332,7 @@ public class ShiftWorkerSpec {
 		assertTrue(assignedShifts.size()==1);
 	}
 	
+	@Test
 	public void getAssignedShiftsReturnsAssignedForArrayContainingAssignedAndUnassignedShifts() {
 		boolean exception = false;
 		ArrayList<Shift> assignedShifts = null;
@@ -339,14 +344,12 @@ public class ShiftWorkerSpec {
 		Shift shift3 = new Shift();
 		
 		String name1 = "TestA";
-		String name2 = "TestB";
 		String name3 = "TestC";
 		
 		shift1.setAssigned(true);
 		shift1.setStaffName(name1);
 		
 		shift2.setAssigned(false);
-		shift2.setStaffName(name2);
 		
 		shift3.setAssigned(true);
 		shift3.setStaffName(name3);
