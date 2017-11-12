@@ -7,24 +7,39 @@ import org.springframework.stereotype.Component;
 
 import accessiblesolutions.accessiblescheduling.domain.Shift;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
+import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
 @Component
 public final class ShiftWorker {
-    public static ArrayList<Shift> assignRequestedStaff(HashMap<String, ArrayList<Shift>> unconflictedPrestaffedRecuringShiftsPerEmployee) {
-    	ArrayList<Shift> assignedUnconflictedPrestaffedRecuringShifts = new ArrayList<Shift>();
-//    	logger.error("assigned staff for " + unconflictedPrestaffedRecuringShiftsPerEmployee.keySet().size() + " employees shifts");
-    	for(String employeeId:unconflictedPrestaffedRecuringShiftsPerEmployee.keySet()){
-    		ArrayList<Shift> unconflictedPrestaffedRecuringShiftsForSelectedEmployee = unconflictedPrestaffedRecuringShiftsPerEmployee.get(employeeId);
-    		for(Shift unconflictedPrestaffedRecuringShift:unconflictedPrestaffedRecuringShiftsForSelectedEmployee){
-    			//TODO add logic to ensure they have proper qualification to work with this client on this shift
-    			unconflictedPrestaffedRecuringShift.setStaffId(unconflictedPrestaffedRecuringShift.getRequestedStaffId());
-    			unconflictedPrestaffedRecuringShift.setStaffName(unconflictedPrestaffedRecuringShift.getRequestedStaffName());
-    			unconflictedPrestaffedRecuringShift.setAssigned(true);
-    			
-    			assignedUnconflictedPrestaffedRecuringShifts.add(unconflictedPrestaffedRecuringShift);
-    		}
-			unconflictedPrestaffedRecuringShiftsPerEmployee.put(employeeId, unconflictedPrestaffedRecuringShiftsForSelectedEmployee);
+    public static ArrayList<Shift> assignRequestedStaff(HashMap<String, ArrayList<Shift>> prestaffedShiftsPerEmployee) throws ProccessingException {
+    	ArrayList<Shift> assignedPrestaffedShifts = new ArrayList<Shift>();
+    	
+    	if(null == prestaffedShiftsPerEmployee || prestaffedShiftsPerEmployee.isEmpty()){
+    		return assignedPrestaffedShifts;
     	}
-		return assignedUnconflictedPrestaffedRecuringShifts;
+    	
+    	for(String employeeId:prestaffedShiftsPerEmployee.keySet()){
+    		ArrayList<Shift> prestaffedShiftsForSelectedEmployee = prestaffedShiftsPerEmployee.get(employeeId);
+    		
+    		if(null != prestaffedShiftsForSelectedEmployee && !prestaffedShiftsForSelectedEmployee.isEmpty()){
+	    		for(Shift prestaffedShift:prestaffedShiftsForSelectedEmployee){
+	    			if( null == prestaffedShift.getRequestedStaffId() || 
+	    				null == prestaffedShift.getRequestedStaffName() || 
+	    				!prestaffedShift.getRequestedStaffId().equalsIgnoreCase(employeeId)){
+	    				throw new ProccessingException(Shift.class,prestaffedShift);//This method only for prestaffed, if here, these aren't. 
+	    			}
+	    			//TODO add logic to ensure they have proper qualification to work with this client on this shift, perhaps in a helper method
+	    			prestaffedShift.setStaffId(prestaffedShift.getRequestedStaffId());
+	    			prestaffedShift.setStaffName(prestaffedShift.getRequestedStaffName());
+	    			prestaffedShift.setAssigned(true);
+	    			
+	    			assignedPrestaffedShifts.add(prestaffedShift);
+	    		}
+	    		
+	    		prestaffedShiftsPerEmployee.put(employeeId, prestaffedShiftsForSelectedEmployee);//TODO can this go?
+    		}
+    	}
+    	
+		return assignedPrestaffedShifts;
 	}
 
     

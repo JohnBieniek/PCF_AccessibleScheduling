@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import accessiblesolutions.accessiblescheduling.domain.Employee;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
+import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
 import accessiblesolutions.accessiblescheduling.worker.ShiftWorker;
 
 @Component
@@ -49,7 +50,7 @@ public class ShiftAssignmentManager {
 //
 //    	shiftCrud.save(assignedUnconflictedPrestaffedRecuringShifts);
 //    }
-    public void saveAssignedUnconflictedPrestaffedRecuringShiftsToTableForMonth(int selectedMonth) throws CorruptDataException{
+    public void saveAssignedUnconflictedPrestaffedRecuringShiftsToTableForMonth(int selectedMonth) throws CorruptDataException, ProccessingException{
     	ArrayList<Shift> prestaffedRecuringShifts = shiftManager.getPrestaffedRecurringShiftsForMonth(selectedMonth);
 //    	logger.error(prestaffedRecuringShifts.size() + " prestaffedRecuringShifts");
     	HashMap<String,ArrayList<Shift>> prestaffedRecuringShiftsPerEmployee =ShiftWorker.getEmployeeShiftMap(prestaffedRecuringShifts);
@@ -76,7 +77,7 @@ public class ShiftAssignmentManager {
 //
 //    	shiftCrud.save(assignedUnconflictedPrestaffedSingleShifts);
 //	}
-    public void saveAssignedUnconflictedPrestaffedSingleShiftsToTableForMonth(int month) throws CorruptDataException {
+    public void saveAssignedUnconflictedPrestaffedSingleShiftsToTableForMonth(int month) throws CorruptDataException, ProccessingException {
     	ArrayList<Shift> prestaffedSingleShifts = shiftManager.getPrestaffedSingleShiftsForMonth(month);
     	//logger.error("prestaffedSingleShifts " +prestaffedSingleShifts.size());
     	HashMap<String, ArrayList<Shift>> prestaffedSingleShiftsPerEmployee = ShiftWorker.getEmployeeShiftMap(prestaffedSingleShifts);

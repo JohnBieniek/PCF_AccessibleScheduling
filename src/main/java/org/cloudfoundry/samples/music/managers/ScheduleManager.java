@@ -3,6 +3,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
+import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
 @Component
 public class ScheduleManager {
     @Autowired
@@ -20,7 +21,7 @@ public class ScheduleManager {
     	return eventResponse + requestResponse;
     }
     
-    public String staffShifts(String selectedMonth) throws CorruptDataException {
+    public String staffShifts(String selectedMonth) throws CorruptDataException, ProccessingException {
     	if(null!=selectedMonth){
     		int month = Integer.parseInt(selectedMonth);
 	    	

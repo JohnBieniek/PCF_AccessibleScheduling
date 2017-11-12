@@ -1,6 +1,9 @@
 package accessiblesolutions.accessiblescheduling.util;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -11,8 +14,6 @@ import org.json.JSONArray;
 import org.junit.Test;
 
 import accessiblesolutions.accessiblescheduling.domain.Event;
-import accessiblesolutions.accessiblescheduling.domain.Shift;
-import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
 
 public class UtilSpec {

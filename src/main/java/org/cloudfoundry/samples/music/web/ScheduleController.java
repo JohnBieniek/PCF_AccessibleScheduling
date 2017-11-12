@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
+import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
 
 @RestController
 @RequestMapping(value = "/schedule")
@@ -36,7 +37,7 @@ public class ScheduleController {
     }
     
     @RequestMapping(value = "/staffShifts", method = RequestMethod.GET)
-    public String staffShifts(@RequestParam("month") String month) throws CorruptDataException {
+    public String staffShifts(@RequestParam("month") String month) throws CorruptDataException, ProccessingException {
         return manager.staffShifts(month);
     }
     
