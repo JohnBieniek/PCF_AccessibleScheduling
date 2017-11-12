@@ -210,4 +210,156 @@ public class ShiftWorkerSpec {
 		
 		assertTrue(exception);
 	}
+	
+	@Test
+	public void getAssignedShiftsReturnsEmptyWithNothingAssigned() {
+		boolean exception = false;
+		ArrayList<Shift> assignedShifts = null;
+		
+		ArrayList<Shift> shifts = new ArrayList<Shift>();
+		
+		Shift shift1 = new Shift();
+		
+		String id1 ="employeeId1";
+		String name1 = "TestA";
+		
+		shift1.setRequestedStaffId(id1);
+		shift1.setRequestedStaffName(name1);
+		shifts.add(shift1);
+		
+		assignedShifts=ShiftWorker.getAssignedShifts(shifts);
+		
+		assertFalse(exception);
+		
+		assertNotNull(assignedShifts);
+		assertTrue(assignedShifts.size()==0);
+	}
+	
+	public void getAssignedShiftsReturnsEmptyForNullInput() {
+		boolean exception = false;
+		ArrayList<Shift> assignedShifts = null;
+		
+		ArrayList<Shift> shifts = new ArrayList<Shift>();
+		
+		Shift shift1 = new Shift();
+		
+		String id1 ="employeeId1";
+		String name1 = "TestA";
+		
+		shift1.setRequestedStaffId(id1);
+		shift1.setRequestedStaffName(name1);
+		shifts.add(shift1);
+		
+		assignedShifts=ShiftWorker.getAssignedShifts(null);
+		
+		assertFalse(exception);
+		
+		assertNotNull(assignedShifts);
+		assertTrue(assignedShifts.size()==0);
+	}
+	
+	public void getAssignedShiftsReturnsEmptyForArrayContainingNull() {
+		boolean exception = false;
+		ArrayList<Shift> assignedShifts = null;
+		
+		ArrayList<Shift> shifts = new ArrayList<Shift>();
+		
+		Shift shift1 = new Shift();
+		
+		String id1 ="employeeId1";
+		String name1 = "TestA";
+		
+		shift1.setRequestedStaffId(id1);
+		shift1.setRequestedStaffName(name1);
+		shifts.add(null);
+		
+		assignedShifts=ShiftWorker.getAssignedShifts(shifts);
+		
+		assertFalse(exception);
+		
+		assertNotNull(assignedShifts);
+		assertTrue(assignedShifts.size()==0);
+	}
+	
+	public void getAssignedShiftsReturnsEmptyForArrayContainingNullAndUnassignedShift() {
+		boolean exception = false;
+		ArrayList<Shift> assignedShifts = null;
+		
+		ArrayList<Shift> shifts = new ArrayList<Shift>();
+		
+		Shift shift1 = new Shift();
+		
+		String id1 ="employeeId1";
+		String name1 = "TestA";
+		
+		shift1.setRequestedStaffId(id1);
+		shift1.setRequestedStaffName(name1);
+		shifts.add(shift1);
+		shifts.add(null);
+		
+		assignedShifts=ShiftWorker.getAssignedShifts(shifts);
+		
+		assertFalse(exception);
+		
+		assertNotNull(assignedShifts);
+		assertTrue(assignedShifts.size()==0);
+	}
+	
+	public void getAssignedShiftsReturns1ForArrayContainingNullAndAssignedShift() {
+		boolean exception = false;
+		ArrayList<Shift> assignedShifts = null;
+		
+		ArrayList<Shift> shifts = new ArrayList<Shift>();
+		
+		Shift shift1 = new Shift();
+		
+		String name1 = "TestA";
+		
+		shift1.setAssigned(true);
+		shift1.setStaffName(name1);
+		shifts.add(shift1);
+		shifts.add(null);
+		
+		assignedShifts=ShiftWorker.getAssignedShifts(shifts);
+		
+		assertFalse(exception);
+		
+		assertNotNull(assignedShifts);
+		assertTrue(assignedShifts.size()==1);
+	}
+	
+	public void getAssignedShiftsReturnsAssignedForArrayContainingAssignedAndUnassignedShifts() {
+		boolean exception = false;
+		ArrayList<Shift> assignedShifts = null;
+		
+		ArrayList<Shift> shifts = new ArrayList<Shift>();
+		
+		Shift shift1 = new Shift();
+		Shift shift2 = new Shift();
+		Shift shift3 = new Shift();
+		
+		String name1 = "TestA";
+		String name2 = "TestB";
+		String name3 = "TestC";
+		
+		shift1.setAssigned(true);
+		shift1.setStaffName(name1);
+		
+		shift2.setAssigned(false);
+		shift2.setStaffName(name2);
+		
+		shift3.setAssigned(true);
+		shift3.setStaffName(name3);
+		
+		shifts.add(shift1);
+		shifts.add(shift2);
+		shifts.add(shift3);
+		
+		assignedShifts=ShiftWorker.getAssignedShifts(shifts);
+		
+		assertFalse(exception);
+		
+		assertNotNull(assignedShifts);
+		assertTrue(assignedShifts.size()==2);
+	}
 }

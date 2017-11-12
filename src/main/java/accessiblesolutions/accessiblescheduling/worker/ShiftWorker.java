@@ -25,7 +25,7 @@ public final class ShiftWorker {
 	    			if( null == prestaffedShift.getRequestedStaffId() || 
 	    				null == prestaffedShift.getRequestedStaffName() || 
 	    				!prestaffedShift.getRequestedStaffId().equalsIgnoreCase(employeeId)){
-	    				throw new ProccessingException(Shift.class,prestaffedShift);//This method only for prestaffed, if here, these aren't. 
+	    				throw new ProccessingException(Shift.class,prestaffedShift);//This method only for prestaffed, if here, these aren't prestaffed. 
 	    			}
 	    			//TODO add logic to ensure they have proper qualification to work with this client on this shift, perhaps in a helper method
 	    			prestaffedShift.setStaffId(prestaffedShift.getRequestedStaffId());
