@@ -47,18 +47,20 @@ public class ScheduleController {
     }
     
     @RequestMapping(value = "/getShiftsPerEmployeeForMonth", method = RequestMethod.GET)
-    public String getShiftsPerEmployeeForOfMonth(@RequestParam("month") String month) {
+    public String getShiftsPerEmployeeForOfMonth(@RequestParam("month") String month) throws ProccessingException {
         return employeeShiftMapManager.getAssignedShiftsPerEmployeeForMonth(Integer.parseInt(month)).toString();
     }
     
+    //TODO kill it
     @RequestMapping(value = "/getAssignedShiftsForEmployeeForMonth", method = RequestMethod.GET)
-    public ArrayList<Shift> getAssignedShiftsForEmployeeForMonth(@RequestParam("employee") String employee) {
+    public ArrayList<Shift> getAssignedShiftsForEmployeeForMonth(@RequestParam("employee") String employee) throws ProccessingException  {
     	return employeeShiftMapManager.getAssignedShiftsPerEmployeeForMonth(4).get(employee);
     	//return manager.getAssignedShiftsForEmployeeForMonth("584890232b3acf554ef8d88f", Integer.parseInt(month));
     }
     
+  //TODO kill it
     @RequestMapping(value = "/getAssignedShiftsForEmployeeForMonth2", method = RequestMethod.GET)
-    public String getAssignedShiftsForEmployeeForMonth2(@RequestParam("month") String month) {
+    public String getAssignedShiftsForEmployeeForMonth2(@RequestParam("month") String month) throws ProccessingException {
     	return employeeShiftMapManager.getAssignedShiftsPerEmployeeForMonth(Integer.parseInt(month)).keySet().toArray().toString();
     	//return manager.getAssignedShiftsForEmployeeForMonth("584890232b3acf554ef8d88f", Integer.parseInt(month));
     }

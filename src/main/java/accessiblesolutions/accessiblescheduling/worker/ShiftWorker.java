@@ -59,15 +59,26 @@ public final class ShiftWorker {
 		return assignedShifts;
     }
     
-    public static HashMap<String, ArrayList<Shift>> getEmployeeShiftMap(ArrayList<Shift> shifts) {
+    public static HashMap<String, ArrayList<Shift>> getPrestaffedEmployeeShiftMap(ArrayList<Shift> shifts) throws ProccessingException {
     	HashMap<String,ArrayList<Shift>> prestaffedRecuringShiftsPerEmployee = new HashMap<String,ArrayList<Shift>>();
+    	
+    	if(null==shifts){
+    		return prestaffedRecuringShiftsPerEmployee;
+    	}
+    	
     	for(Shift shift: shifts){
-    		ArrayList<Shift> prestaffedRecuringShiftsForSelectedEmployee = new ArrayList<Shift>();
-    		if(prestaffedRecuringShiftsPerEmployee.containsKey(shift.getRequestedStaffId())){
-    			prestaffedRecuringShiftsForSelectedEmployee=prestaffedRecuringShiftsPerEmployee.get(shift.getRequestedStaffId());
+    		if(shift!=null){
+    			if(shift.getRequestedStaffId()==null){
+    				throw new ProccessingException(Shift.class,shift);//This method is only for prestaffed Shifts. This shift shoudln't be here.
+    			}
+    			
+	    		ArrayList<Shift> prestaffedRecuringShiftsForSelectedEmployee = new ArrayList<Shift>();
+	    		if(prestaffedRecuringShiftsPerEmployee.containsKey(shift.getRequestedStaffId())){
+	    			prestaffedRecuringShiftsForSelectedEmployee=prestaffedRecuringShiftsPerEmployee.get(shift.getRequestedStaffId());
+	    		}
+	    		prestaffedRecuringShiftsForSelectedEmployee.add(shift);
+	    		prestaffedRecuringShiftsPerEmployee.put(shift.getRequestedStaffId(),prestaffedRecuringShiftsForSelectedEmployee);
     		}
-    		prestaffedRecuringShiftsForSelectedEmployee.add(shift);
-    		prestaffedRecuringShiftsPerEmployee.put(shift.getRequestedStaffId(),prestaffedRecuringShiftsForSelectedEmployee);
     	}
     	prestaffedRecuringShiftsPerEmployee.remove(null);
     	

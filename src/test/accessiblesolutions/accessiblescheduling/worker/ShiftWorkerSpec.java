@@ -365,4 +365,177 @@ public class ShiftWorkerSpec {
 		assertNotNull(assignedShifts);
 		assertTrue(assignedShifts.size()==2);
 	}
+	
+	@Test
+	public void getEmployeeShiftMapReturnsEmptyForNullInput(){
+		boolean exception = false;
+		HashMap<String, ArrayList<Shift>> map = null;
+
+		try {
+			map=ShiftWorker.getPrestaffedEmployeeShiftMap(null);
+		} catch (ProccessingException e) {
+			exception=true;
+		}
+		assertFalse(exception);
+		
+		assertNotNull(map);
+		assertTrue(map.isEmpty());
+	}
+	
+	@Test
+	public void getEmployeeShiftMapReturnsEmptyForArrayContainingNull(){
+		boolean exception = false;
+		ArrayList<Shift> shifts = new ArrayList<Shift>();
+		HashMap<String, ArrayList<Shift>> map = null;
+
+		shifts.add(null);
+		try {
+			map=ShiftWorker.getPrestaffedEmployeeShiftMap(shifts);
+		} catch (ProccessingException e) {
+			exception=true;
+		}
+		assertFalse(exception);
+		
+		assertNotNull(map);
+		assertTrue(map.isEmpty());
+	}
+	
+	@Test
+	public void getEmployeeShiftMapFailsWithNonPrestaffedShifts(){
+		boolean exception = false;
+		ArrayList<Shift> shifts = new ArrayList<Shift>();
+		Shift shift = new Shift();
+		
+		shifts.add(shift);
+		
+		try {
+			ShiftWorker.getPrestaffedEmployeeShiftMap(shifts);
+		} catch (ProccessingException e) {
+			exception=true;
+		}
+		
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getEmployeeShiftMapPopulatesFor1PersonAndShift(){
+		boolean exception = false;
+		ArrayList<Shift> shifts = new ArrayList<Shift>();
+		HashMap<String, ArrayList<Shift>> map = null;
+		Shift shift = new Shift();
+		String id = "testA";
+		
+		shift.setRequestedStaffId(id);
+		shifts.add(shift);
+		
+		try {
+			map = ShiftWorker.getPrestaffedEmployeeShiftMap(shifts);
+		} catch (ProccessingException e) {
+			exception=true;
+		}
+		
+		assertFalse(exception);
+		assertNotNull(map);
+		assertFalse(map.isEmpty());
+		assertTrue(map.size()==1);
+		assertTrue(map.keySet().toArray()[0].toString().equalsIgnoreCase(id));
+	}
+	
+	@Test
+	public void getEmployeeShiftMapPopulatesFor1PersonAnd2Shifts(){
+		boolean exception = false;
+		ArrayList<Shift> shifts = new ArrayList<Shift>();
+		HashMap<String, ArrayList<Shift>> map = null;
+		Shift shift1 = new Shift();
+		String id1 = "testA";
+		Shift shift2 = new Shift();
+		
+		shift1.setRequestedStaffId(id1);
+		shifts.add(shift1);
+		
+		shift2.setRequestedStaffId(id1);
+		shift2.setRecurring(true);
+		shifts.add(shift2);
+		
+		try {
+			map = ShiftWorker.getPrestaffedEmployeeShiftMap(shifts);
+		} catch (ProccessingException e) {
+			exception=true;
+		}
+		assertFalse(exception);
+		assertNotNull(map);
+		assertFalse(map.isEmpty());
+		assertTrue(map.size()==1);
+		assertTrue(map.keySet().toArray()[0].toString().equalsIgnoreCase(id1));
+		assertTrue(map.get(id1).size()==2);
+	}
+	
+	@Test
+	public void getEmployeeShiftMapPopulatesFor2PersonAnd1ShiftPer(){
+		boolean exception = false;
+		ArrayList<Shift> shifts = new ArrayList<Shift>();
+		HashMap<String, ArrayList<Shift>> map = null;
+		Shift shift1 = new Shift();
+		String id1 = "testA";
+		Shift shift2 = new Shift();
+		String id2 = "testB";
+		
+		shift1.setRequestedStaffId(id1);
+		shifts.add(shift1);
+		
+		shift2.setRequestedStaffId(id2);
+		shift2.setRecurring(true);
+		shifts.add(shift2);
+		
+		try {
+			map = ShiftWorker.getPrestaffedEmployeeShiftMap(shifts);
+		} catch (ProccessingException e) {
+			exception=true;
+		}
+		assertFalse(exception);
+		assertNotNull(map);
+		assertFalse(map.isEmpty());
+		assertTrue(map.size()==2);
+		assertTrue(map.get(id1).size()==1);
+		assertTrue(map.get(id2).size()==1);
+	}
+	
+	@Test
+	public void getEmployeeShiftMapPopulatesFor2PersonAnd2ShiftPer(){
+		boolean exception = false;
+		ArrayList<Shift> shifts = new ArrayList<Shift>();
+		HashMap<String, ArrayList<Shift>> map = null;
+		Shift shift1 = new Shift();
+		String id1 = "testA";
+		Shift shift2 = new Shift();
+		String id2 = "testB";
+		Shift shift3 = new Shift();
+		Shift shift4 = new Shift();
+		
+		shift1.setRequestedStaffId(id1);
+		shifts.add(shift1);
+		
+		shift2.setRequestedStaffId(id1);
+		shift2.setRecurring(true);
+		shifts.add(shift2);
+		
+		shift3.setRequestedStaffId(id2);
+		shifts.add(shift3);
+		
+		shift4.setRequestedStaffId(id2);
+		shift4.setRecurring(true);
+		shifts.add(shift4);
+		
+		try {
+			map = ShiftWorker.getPrestaffedEmployeeShiftMap(shifts);
+		} catch (ProccessingException e) {
+			exception=true;
+		}
+		assertFalse(exception);
+		assertNotNull(map);
+		assertFalse(map.isEmpty());
+		assertTrue(map.size()==2);
+		assertTrue(map.get(id1).size()==2);
+		assertTrue(map.get(id2).size()==2);
+	}
 }

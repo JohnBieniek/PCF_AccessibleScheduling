@@ -53,7 +53,7 @@ public class ShiftAssignmentManager {
     public void saveAssignedUnconflictedPrestaffedRecuringShiftsToTableForMonth(int selectedMonth) throws CorruptDataException, ProccessingException{
     	ArrayList<Shift> prestaffedRecuringShifts = shiftManager.getPrestaffedRecurringShiftsForMonth(selectedMonth);
 //    	logger.error(prestaffedRecuringShifts.size() + " prestaffedRecuringShifts");
-    	HashMap<String,ArrayList<Shift>> prestaffedRecuringShiftsPerEmployee =ShiftWorker.getEmployeeShiftMap(prestaffedRecuringShifts);
+    	HashMap<String,ArrayList<Shift>> prestaffedRecuringShiftsPerEmployee =ShiftWorker.getPrestaffedEmployeeShiftMap(prestaffedRecuringShifts);
 
     	HashMap<String,ArrayList<Shift>> unconflictedPrestaffedRecuringShiftsPerEmployee = ShiftWorker.getNonoverlapingShiftsPerEmployee(prestaffedRecuringShiftsPerEmployee);
     	
@@ -62,25 +62,11 @@ public class ShiftAssignmentManager {
     	shiftCrud.save(assignedUnconflictedPrestaffedRecuringShifts);
     }
     
-//    public void saveAssignedUnconflictedPrestaffedSingleShiftsToTableForMonth(int month) {
-//    	ArrayList<Shift> prestaffedSingleShifts = shiftManager.getPrestaffedSingleShiftsForMonth(month);
-//
-//    	HashMap<String, ArrayList<Shift>> prestaffedSingleShiftsPerEmployee = ShiftWorker.getEmployeeShiftMap(prestaffedSingleShifts);
-//    	
-//    	HashMap<String, ArrayList<Shift>> unconflictedPrestaffedSingleShiftsPerEmployee=  ShiftWorker.getNonoverlapingShiftsPerEmployee(prestaffedSingleShiftsPerEmployee);
-//
-//    	unconflictedPrestaffedSingleShiftsPerEmployee=employeeShiftMapManager.getShiftsPerEmployeePerMonthUnconflictingWithAssignedShifts(unconflictedPrestaffedSingleShiftsPerEmployee,month);
-//	    //check to see if any conflicts exist in requested staff	    		
-//	    //add conflict info somewhere
-//    	//add conflicted shifts into array for later staff assignment->
-//    	ArrayList<Shift> assignedUnconflictedPrestaffedSingleShifts = ShiftWorker.assignRequestedStaff(unconflictedPrestaffedSingleShiftsPerEmployee);
-//
-//    	shiftCrud.save(assignedUnconflictedPrestaffedSingleShifts);
-//	}
+
     public void saveAssignedUnconflictedPrestaffedSingleShiftsToTableForMonth(int month) throws CorruptDataException, ProccessingException {
     	ArrayList<Shift> prestaffedSingleShifts = shiftManager.getPrestaffedSingleShiftsForMonth(month);
     	//logger.error("prestaffedSingleShifts " +prestaffedSingleShifts.size());
-    	HashMap<String, ArrayList<Shift>> prestaffedSingleShiftsPerEmployee = ShiftWorker.getEmployeeShiftMap(prestaffedSingleShifts);
+    	HashMap<String, ArrayList<Shift>> prestaffedSingleShiftsPerEmployee = ShiftWorker.getPrestaffedEmployeeShiftMap(prestaffedSingleShifts);
     	
     	HashMap<String, ArrayList<Shift>> unconflictedPrestaffedSingleShiftsPerEmployee=  ShiftWorker.getNonoverlapingShiftsPerEmployee(prestaffedSingleShiftsPerEmployee);
 //    	logger.error("nonoverlappingPRestaffedSingleShifts" +unconflictedPrestaffedSingleShiftsPerEmployee.toString());
@@ -103,37 +89,7 @@ public class ShiftAssignmentManager {
 		scheduleWeekendShiftsForWeekOfMonth(week, month);
 		scheduleWeekdayShiftsForWeekOfMonth(week, month);
 	}
-    
-//    private void scheduleWeekendShiftsForWeekOfMonth(int week, int month) {
-//		ArrayList<Shift> shifts = shiftManager.getUnassignedNonEventShiftsForMonth(month);
-//		ArrayList<Shift> unassignedShiftsForWeek = ShiftWorker.getShiftsForWeekOfMonth(shifts, week, month);
-//		ArrayList<Shift> unassignedShiftsForWeekends= ShiftWorker.getWeekendShifts(unassignedShiftsForWeek);
-//	
-//		for(Shift shift : unassignedShiftsForWeekends){
-//			EmployeeShiftCompatibilities shiftCompatibilities = employeeShiftCompatibilityManager.getValidCompatibilities(employeeShiftCompatibilityManager.getEmployeeShiftCompatibilitiesFor(shift));
-//			
-//			Employee employee = null;//getEmployeeWithMostTimeAfterAssignment(shiftCompatibilities);
-//			
-//			if(employee==null){
-//				employee=employeeShiftCompatibilityManager.getEmployeeWithMostTimeBeforeOvertimeAfterAssignment(shiftCompatibilities);
-//				shift.setAssignmentReason("Employee had the most time before overtime after assignment");
-//			}
-//			else{
-//				shift.setAssignmentReason("Employee had the most time until minimn was reached after assignment");
-//			}
-//			
-//			if(employee==null){
-//				employee=shiftCompatibilities.compatibilities.get(0).getEmployee();
-//				shift.setAssignmentReason("One of those in overtime who was available");
-//			}
-//
-//			shift.setStaffId(employee.getId());
-//			shift.setStaffName(employee.getFirst());
-//			shift.setAssigned(true);
-//			shiftCrud.save(shift);
-//		}
-//	}
-    
+      
     private void scheduleWeekendShiftsForWeekOfMonth(int week, int month) throws CorruptDataException {
 		ArrayList<Shift> shifts = shiftManager.getUnassignedNonEventShiftsForMonth(month);
 		ArrayList<Shift> unassignedShiftsForWeek = ShiftWorker.getShiftsForWeekOfMonth(shifts, week, month);
@@ -206,38 +162,7 @@ public class ShiftAssignmentManager {
 			}
 		}
 	}
-    
-//    private void scheduleWeekdayShiftsForWeekOfMonth(int week, int month) {
-//		ArrayList<Shift> shifts = shiftManager.getUnassignedNonEventShiftsForMonth(month);
-//		
-//		ArrayList<Shift> unassignedShiftsForWeek = ShiftWorker.getShiftsForWeekOfMonth(shifts, week, month);
-//
-//		ArrayList<Shift> unassignedShiftsForWeekdays= ShiftWorker.getWeekdayShifts(unassignedShiftsForWeek);
-//
-//		for(Shift shift : unassignedShiftsForWeekdays){
-//			EmployeeShiftCompatibilities shiftCompatibilities = employeeShiftCompatibilityManager.getValidCompatibilities(employeeShiftCompatibilityManager.getEmployeeShiftCompatibilitiesFor(shift));
-//			
-//			Employee employee = null;//getEmployeeWithMostTimeAfterAssignment(shiftCompatibilities);
-//			
-//			if(employee==null){
-//				employee=employeeShiftCompatibilityManager.getEmployeeWithMostTimeBeforeOvertimeAfterAssignment(shiftCompatibilities);
-//				shift.setAssignmentReason("Employee had the most time before overtime after assignment");
-//			}
-//			else{
-//				shift.setAssignmentReason("Employee had the most time until minimn was reached after assignment");
-//			}
-//			
-//			if(employee==null){
-//				employee=shiftCompatibilities.compatibilities.get(0).getEmployee();
-//				shift.setAssignmentReason("One of those in overtime who was available");
-//			}
-//
-//			shift.setStaffId(employee.getId());
-//			shift.setStaffName(employee.getFirst());
-//			shift.setAssigned(true);
-//			shiftCrud.save(shift);
-//		}
-//	}
+   
     private void scheduleWeekdayShiftsForWeekOfMonth(int week, int month) throws CorruptDataException {
 		ArrayList<Shift> shifts = shiftManager.getUnassignedNonEventShiftsForMonth(month);
 //		System.out.println(shifts.size()+" unassigned non event shifts for month "+month);
