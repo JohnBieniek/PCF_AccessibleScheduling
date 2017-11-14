@@ -101,8 +101,14 @@ public final class ShiftWorker {
 		return nonEventShifts;
 	}
     
-	public static HashMap<String, ArrayList<Shift>> getNonoverlapingShiftsPerEmployee(HashMap<String, ArrayList<Shift>> shiftsPerEmployee) throws CorruptDataException {
+	//No null input, null shifts, or invalid shifts (missing start/end)
+	public static HashMap<String, ArrayList<Shift>> getNonoverlapingShiftsPerEmployee(HashMap<String, ArrayList<Shift>> shiftsPerEmployee) throws CorruptDataException, ProccessingException {
     	HashMap<String,ArrayList<Shift>> unconflictedShiftsPerEmployee = new HashMap<String, ArrayList<Shift>>();
+    	
+    	if(null==shiftsPerEmployee){
+    		return unconflictedShiftsPerEmployee;
+    	}
+    	
     	for(String employeeId:shiftsPerEmployee.keySet()){
     		ArrayList<Shift> shiftsForSelectedEmployee = shiftsPerEmployee.get(employeeId);
 	    	ArrayList<Shift> unconflictedShiftsForSelectedEmployee = new ArrayList<Shift>();
@@ -110,11 +116,22 @@ public final class ShiftWorker {
 	    	int x=-1;
     		int y;
     		
+    		if(shiftsForSelectedEmployee==null){
+				throw new ProccessingException("Null shifts");
+    		}
+    		
     		for(Shift baseShift: shiftsForSelectedEmployee){
+    			if(baseShift==null){
+    				throw new ProccessingException("Null shift present");
+        		}
+    			
     			int conflicts = 0;
     			x++;
     			y=-1;
     			for(Shift comparingShift: shiftsForSelectedEmployee){
+    				if(comparingShift==null){
+        				throw new ProccessingException(Shift.class,baseShift);
+            		}
     				y++;
     				
     				if(x!=y && ShiftWorker.isAlmostOverlapping(baseShift,comparingShift)){
@@ -286,7 +303,7 @@ public final class ShiftWorker {
     
     public static boolean isAlmostOverlapping(Shift baseShift, Shift comparingShift) throws CorruptDataException {
 		if(null==baseShift||null==comparingShift)return false;
-		if(baseShift.getClientId().equals(comparingShift.getClientId())){
+		if(null!=baseShift.getClientId() && (baseShift.getClientId().equals(comparingShift.getClientId()))){
 			return isOverlapping(
 				baseShift.getStartsLocalDateTime(),
 				baseShift.getEndsLocalDateTime(),
@@ -294,6 +311,7 @@ public final class ShiftWorker {
 				comparingShift.getEndsLocalDateTime()
 				);
 		}
+
 		return isAlmostOverlapping(
 				baseShift.getStartsLocalDateTime(),
 				baseShift.getEndsLocalDateTime(),

@@ -170,7 +170,7 @@ public class Shift {
     		minute = Integer.parseInt(parsedTime[1]);
     	}
     	
-    	return getStartsLocalDate().atTime(hour,minute);
+    	return getEndsLocalDate().atTime(hour,minute);
     }
     
     public String getEndTime() {

@@ -11,6 +11,7 @@ import java.util.HashMap;
 import org.junit.Test;
 
 import accessiblesolutions.accessiblescheduling.domain.Shift;
+import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
 
 public class ShiftWorkerSpec {
@@ -617,5 +618,356 @@ public class ShiftWorkerSpec {
 		
 		assertNotNull(nonEventShifts);
 		assertTrue(nonEventShifts.size()==1);
+	}
+	
+	@Test
+	public void getNonoverlapingShiftsPerEmployeeReturnsEmptyForNull(){
+		boolean exception = false;
+		ArrayList<Shift> shifts = new ArrayList<Shift>();
+		HashMap<String, ArrayList<Shift>> map = null;
+		Shift shift1 = new Shift();
+		String id1 = "testA";
+		Shift shift2 = new Shift();
+		String id2 = "testB";
+		Shift shift3 = new Shift();
+		Shift shift4 = new Shift();
+		
+		shift1.setRequestedStaffId(id1);
+		shifts.add(shift1);
+		
+		shift2.setRequestedStaffId(id1);
+		shift2.setRecurring(true);
+		shifts.add(shift2);
+		
+		shift3.setRequestedStaffId(id2);
+		shifts.add(shift3);
+		
+		shift4.setRequestedStaffId(id2);
+		shift4.setRecurring(true);
+		shifts.add(shift4);
+		
+		try {
+			map = ShiftWorker.getNonoverlapingShiftsPerEmployee(null);
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			exception=true;
+		}
+		
+		assertFalse(exception);
+		assertNotNull(map);
+		assertTrue(map.isEmpty());
+	}
+	
+	@Test
+	public void getNonoverlapingShiftsPerEmployeeFailsWithNullShifts(){
+		boolean exception = false;
+		ArrayList<Shift> shifts = new ArrayList<Shift>();
+		HashMap<String, ArrayList<Shift>> map = new HashMap<String, ArrayList<Shift>>();
+		Shift shift1 = new Shift();
+		String id1 = "testA";
+		Shift shift2 = new Shift();
+		String id2 = "testB";
+		Shift shift3 = new Shift();
+		Shift shift4 = new Shift();
+		
+		shift1.setRequestedStaffId(id1);
+		shifts.add(shift1);
+		
+		shift2.setRequestedStaffId(id1);
+		shift2.setRecurring(true);
+		shifts.add(shift2);
+		
+		shift3.setRequestedStaffId(id2);
+		shifts.add(shift3);
+		
+		shift4.setRequestedStaffId(id2);
+		shift4.setRecurring(true);
+		shifts.add(shift4);
+		map.put(id1, null);
+		
+		try {
+			ShiftWorker.getNonoverlapingShiftsPerEmployee(map);
+		} catch (CorruptDataException e) {
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			exception=true;
+		}
+		
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getNonoverlapingShiftsPerEmployeeFailsWithSomeNullShifts(){
+		boolean exception = false;
+		ArrayList<Shift> shifts = new ArrayList<Shift>();
+		HashMap<String, ArrayList<Shift>> map = new HashMap<String, ArrayList<Shift>>();
+		Shift shift1 = new Shift();
+		String id1 = "testA";
+		Shift shift2 = new Shift();
+		String id2 = "testB";
+		Shift shift3 = new Shift();
+		Shift shift4 = new Shift();
+		
+		shift1.setStaffId(id1);
+		shift1.setStartDate("2017-10-10");
+		shift1.setEndDate("2017-10-10");
+		shift1.setStartTime("10:10");
+		shift1.setEndTime("11:10");
+		shifts.add(shift1);
+		
+		shift2.setStaffId(id1);
+		shift2.setRecurring(true);
+		shift2.setStartDate("2017-10-10");
+		shift2.setEndDate("2017-10-10");
+		shift2.setStartTime("11:10");
+		shift2.setEndTime("12:10");
+		shifts.add(shift2);
+		
+		shift3.setStaffId(id2);
+		shift3.setStartDate("2017-10-10");
+		shift3.setEndDate("2017-10-10");
+		shift3.setStartTime("12:10");
+		shift3.setEndTime("13:10");
+		shifts.add(shift3);
+		
+		shift4.setStaffId(id2);
+		shift4.setRecurring(true);
+		shift4.setStartDate("2017-10-10");
+		shift4.setEndDate("2017-10-10");
+		shift4.setStartTime("12:10");
+		shift4.setEndTime("13:10");
+		shifts.add(shift4);
+		
+		shifts.add(null);
+		
+		map.put(id1,shifts);
+		
+		try {
+			ShiftWorker.getNonoverlapingShiftsPerEmployee(map);
+		} catch (CorruptDataException e) {
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			exception=true;
+		}
+		
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getNonoverlapingShiftsPerEmployeeFailsWithMissingStartTime(){
+		boolean exception = false;
+		ArrayList<Shift> shifts = new ArrayList<Shift>();
+		HashMap<String, ArrayList<Shift>> map = new HashMap<String, ArrayList<Shift>>();
+		Shift shift1 = new Shift();
+		String id1 = "testA";
+		Shift shift2 = new Shift();
+		String id2 = "testB";
+		Shift shift3 = new Shift();
+		Shift shift4 = new Shift();
+		
+		shift1.setStaffId(id1);
+		shift1.setStartDate("2017-10-10");
+		shift1.setEndDate("2017-10-10");
+		shift1.setEndTime("11:10");
+		shifts.add(shift1);
+		
+		shift2.setStaffId(id1);
+		shift2.setRecurring(true);
+		shift2.setStartDate("2017-10-10");
+		shift2.setEndDate("2017-10-10");
+		shift2.setStartTime("11:10");
+		shift2.setEndTime("12:10");
+		shifts.add(shift2);
+		
+		shift3.setStaffId(id2);
+		shift3.setStartDate("2017-10-10");
+		shift3.setEndDate("2017-10-10");
+		shift3.setStartTime("12:10");
+		shift3.setEndTime("13:10");
+		shifts.add(shift3);
+		
+		shift4.setStaffId(id2);
+		shift4.setRecurring(true);
+		shift4.setStartDate("2017-10-10");
+		shift4.setEndDate("2017-10-10");
+		shift4.setStartTime("12:10");
+		shift4.setEndTime("13:10");
+		shifts.add(shift4);
+		
+		map.put(id1,shifts);
+		
+		try {
+			ShiftWorker.getNonoverlapingShiftsPerEmployee(map);
+		} catch (CorruptDataException e) {
+			exception=true;
+		} catch (ProccessingException e) {
+			e.printStackTrace();
+		}
+		
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getNonoverlapingShiftsPerEmployeeFailsWithMissingStartDate(){
+		boolean exception = false;
+		ArrayList<Shift> shifts = new ArrayList<Shift>();
+		HashMap<String, ArrayList<Shift>> map = new HashMap<String, ArrayList<Shift>>();
+		Shift shift1 = new Shift();
+		String id1 = "testA";
+		Shift shift2 = new Shift();
+		String id2 = "testB";
+		Shift shift3 = new Shift();
+		Shift shift4 = new Shift();
+		
+		shift1.setStaffId(id1);
+		shift1.setEndDate("2017-10-10");
+		shift1.setStartTime("11:10");
+		shift1.setEndTime("11:10");
+		shifts.add(shift1);
+		
+		shift2.setStaffId(id1);
+		shift2.setRecurring(true);
+		shift2.setStartDate("2017-10-10");
+		shift2.setEndDate("2017-10-10");
+		shift2.setStartTime("11:10");
+		shift2.setEndTime("12:10");
+		shifts.add(shift2);
+		
+		shift3.setStaffId(id2);
+		shift3.setStartDate("2017-10-10");
+		shift3.setEndDate("2017-10-10");
+		shift3.setStartTime("12:10");
+		shift3.setEndTime("13:10");
+		shifts.add(shift3);
+		
+		shift4.setStaffId(id2);
+		shift4.setRecurring(true);
+		shift4.setStartDate("2017-10-10");
+		shift4.setEndDate("2017-10-10");
+		shift4.setStartTime("12:10");
+		shift4.setEndTime("13:10");
+		shifts.add(shift4);
+		
+		map.put(id1,shifts);
+		
+		try {
+			ShiftWorker.getNonoverlapingShiftsPerEmployee(map);
+		} catch (CorruptDataException e) {
+			exception=true;
+		} catch (ProccessingException e) {
+			e.printStackTrace();
+		}
+		
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getNonoverlapingShiftsPerEmployeeFailsWithMissingEndDate(){
+		boolean exception = false;
+		ArrayList<Shift> shifts = new ArrayList<Shift>();
+		HashMap<String, ArrayList<Shift>> map = new HashMap<String, ArrayList<Shift>>();
+		Shift shift1 = new Shift();
+		String id1 = "testA";
+		Shift shift2 = new Shift();
+		String id2 = "testB";
+		Shift shift3 = new Shift();
+		Shift shift4 = new Shift();
+		
+		shift1.setStaffId(id1);
+		shift1.setStartDate("2017-10-10");
+		shift1.setStartTime("11:10");
+		shift1.setEndTime("11:10");
+		shifts.add(shift1);
+		
+		shift2.setStaffId(id1);
+		shift2.setRecurring(true);
+		shift2.setStartDate("2017-10-10");
+		shift2.setEndDate("2017-10-10");
+		shift2.setStartTime("11:10");
+		shift2.setEndTime("12:10");
+		shifts.add(shift2);
+		
+		shift3.setStaffId(id2);
+		shift3.setStartDate("2017-10-10");
+		shift3.setEndDate("2017-10-10");
+		shift3.setStartTime("12:10");
+		shift3.setEndTime("13:10");
+		shifts.add(shift3);
+		
+		shift4.setStaffId(id2);
+		shift4.setRecurring(true);
+		shift4.setStartDate("2017-10-10");
+		shift4.setEndDate("2017-10-10");
+		shift4.setStartTime("12:10");
+		shift4.setEndTime("13:10");
+		shifts.add(shift4);
+		
+		map.put(id1,shifts);
+		
+		try {
+			ShiftWorker.getNonoverlapingShiftsPerEmployee(map);
+		} catch (CorruptDataException e) {
+			exception=true;
+		} catch (ProccessingException e) {
+			e.printStackTrace();
+		}
+		
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getNonoverlapingShiftsPerEmployeeFailsWithMissingEndTime(){
+		boolean exception = false;
+		ArrayList<Shift> shifts = new ArrayList<Shift>();
+		HashMap<String, ArrayList<Shift>> map = new HashMap<String, ArrayList<Shift>>();
+		Shift shift1 = new Shift();
+		String id1 = "testA";
+		Shift shift2 = new Shift();
+		String id2 = "testB";
+		Shift shift3 = new Shift();
+		Shift shift4 = new Shift();
+		
+		shift1.setStaffId(id1);
+		shift1.setStartDate("2017-10-10");
+		shift1.setEndDate("2017-10-10");
+		shift1.setStartTime("11:10");
+		shifts.add(shift1);
+		
+		shift2.setStaffId(id1);
+		shift2.setRecurring(true);
+		shift2.setStartDate("2017-10-10");
+		shift2.setEndDate("2017-10-10");
+		shift2.setStartTime("11:10");
+		shift2.setEndTime("12:10");
+		shifts.add(shift2);
+		
+		shift3.setStaffId(id2);
+		shift3.setStartDate("2017-10-10");
+		shift3.setEndDate("2017-10-10");
+		shift3.setStartTime("12:10");
+		shift3.setEndTime("13:10");
+		shifts.add(shift3);
+		
+		shift4.setStaffId(id2);
+		shift4.setRecurring(true);
+		shift4.setStartDate("2017-10-10");
+		shift4.setEndDate("2017-10-10");
+		shift4.setStartTime("12:10");
+		shift4.setEndTime("13:10");
+		shifts.add(shift4);
+		
+		map.put(id1,shifts);
+		
+		try {
+			ShiftWorker.getNonoverlapingShiftsPerEmployee(map);
+		} catch (CorruptDataException e) {
+			exception=true;
+		} catch (ProccessingException e) {
+			e.printStackTrace();
+		}
+		
+		assertTrue(exception);
 	}
 }
