@@ -88,8 +88,12 @@ public final class ShiftWorker {
 	public static ArrayList<Shift> getNonEventShifts(Iterable<Shift> shifts) {
     	ArrayList<Shift> nonEventShifts = new ArrayList<Shift>();
     	
+    	if(null == shifts){
+    		return nonEventShifts;
+    	}
+    	
     	for(Shift shift:shifts){
-    		if(!shift.getEvent()){
+    		if(null!=shift && !shift.getEvent()){
     			nonEventShifts.add(shift);
     		}
     	}

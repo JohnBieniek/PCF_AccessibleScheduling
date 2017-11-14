@@ -538,4 +538,84 @@ public class ShiftWorkerSpec {
 		assertTrue(map.get(id1).size()==2);
 		assertTrue(map.get(id2).size()==2);
 	}
+	
+	@Test
+	public void getNonEventShiftsReturnsEmptyWithAllEvents() {
+		boolean exception = false;
+		ArrayList<Shift> nonEventShifts = null;
+		
+		ArrayList<Shift> shifts = new ArrayList<Shift>();
+		
+		Shift shift1 = new Shift();
+		
+		shift1.setEvent(true);
+		shifts.add(shift1);
+		
+		nonEventShifts=ShiftWorker.getNonEventShifts(shifts);
+		
+		assertFalse(exception);
+		
+		assertNotNull(nonEventShifts);
+		assertTrue(nonEventShifts.size()==0);
+	}
+	
+	@Test
+	public void getNonEventShiftsReturnsEmptyForNullInput() {
+		boolean exception = false;
+		ArrayList<Shift> nonEventShifts = null;
+		
+		nonEventShifts=ShiftWorker.getNonEventShifts(null);
+		
+		assertFalse(exception);
+		
+		assertNotNull(nonEventShifts);
+		assertTrue(nonEventShifts.size()==0);
+	}
+	
+	@Test
+	public void getNonEventShiftsReturnsEmptyForArrayContainingNull() {
+		boolean exception = false;
+		ArrayList<Shift> nonEventShifts = null;
+		
+		ArrayList<Shift> shifts = new ArrayList<Shift>();
+		
+		shifts.add(null);
+		
+		nonEventShifts=ShiftWorker.getNonEventShifts(shifts);
+		
+		assertFalse(exception);
+		
+		assertNotNull(nonEventShifts);
+		assertTrue(nonEventShifts.size()==0);
+	}
+	
+	
+	@Test
+	public void getNonEventShiftsReturnsForArrayContainingEventAndNonEventShifts() {
+		boolean exception = false;
+		ArrayList<Shift> nonEventShifts = null;
+		
+		ArrayList<Shift> shifts = new ArrayList<Shift>();
+		
+		Shift shift1 = new Shift();
+		Shift shift2 = new Shift();
+		Shift shift3 = new Shift();
+		
+		shift1.setEvent(true);
+		
+		shift2.setEvent(false);
+		
+		shift3.setEvent(true);
+		
+		shifts.add(shift1);
+		shifts.add(shift2);
+		shifts.add(shift3);
+		
+		nonEventShifts=ShiftWorker.getNonEventShifts(shifts);
+		
+		assertFalse(exception);
+		
+		assertNotNull(nonEventShifts);
+		assertTrue(nonEventShifts.size()==1);
+	}
 }
