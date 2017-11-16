@@ -972,17 +972,19 @@ public class ShiftWorkerSpec {
 	}
 	
 	@Test
-	public void getNonoverlapingShiftsPerEmployeeReturnsAllForNoOverlapsForOnePerson(){
+	public void getNonoverlapingShiftsPerEmployeeReturnsAllForNoOverlapsForOneEmployeeSameClient(){
 		boolean exception = false;
 		ArrayList<Shift> shifts = new ArrayList<Shift>();
 		HashMap<String, ArrayList<Shift>> map = new HashMap<String, ArrayList<Shift>>();
 		Shift shift1 = new Shift();
 		String id1 = "testA";
+		String id2= "testB";
 		Shift shift2 = new Shift();
 		Shift shift3 = new Shift();
 		Shift shift4 = new Shift();
 		
 		shift1.setStaffId(id1);
+		shift1.setClientId(id2);
 		shift1.setStartDate("2017-10-10");
 		shift1.setEndDate("2017-10-10");
 		shift1.setStartTime("01:10");
@@ -990,26 +992,29 @@ public class ShiftWorkerSpec {
 		shifts.add(shift1);
 		
 		shift2.setStaffId(id1);
+		shift2.setClientId(id2);
 		shift2.setRecurring(true);
 		shift2.setStartDate("2017-10-10");
 		shift2.setEndDate("2017-10-10");
-		shift2.setStartTime("04:10");
-		shift2.setEndTime("05:10");
+		shift2.setStartTime("02:10");
+		shift2.setEndTime("03:10");
 		shifts.add(shift2);
 		
 		shift3.setStaffId(id1);
+		shift3.setClientId(id2);
 		shift3.setStartDate("2017-10-10");
 		shift3.setEndDate("2017-10-10");
-		shift3.setStartTime("07:10");
-		shift3.setEndTime("08:10");
+		shift3.setStartTime("03:10");
+		shift3.setEndTime("04:10");
 		shifts.add(shift3);
 		
 		shift4.setStaffId(id1);
+		shift4.setClientId(id2);
 		shift4.setRecurring(true);
 		shift4.setStartDate("2017-10-10");
 		shift4.setEndDate("2017-10-10");
-		shift4.setStartTime("10:10");
-		shift4.setEndTime("11:10");
+		shift4.setStartTime("00:10");
+		shift4.setEndTime("01:10");
 		shifts.add(shift4);
 		
 		map.put(id1,shifts);
@@ -1030,7 +1035,7 @@ public class ShiftWorkerSpec {
 	}
 	
 	@Test
-	public void getNonoverlapingShiftsPerEmployeeReturnsAllForNoOverlapsForTwoPeople(){
+	public void getNonoverlapingShiftsPerEmployeeReturnsAllForNoOverlapsForTwoEmployeesWith1ClientPer(){
 		boolean exception = false;
 		ArrayList<Shift> shifts = new ArrayList<Shift>();
 		HashMap<String, ArrayList<Shift>> map = new HashMap<String, ArrayList<Shift>>();
@@ -1042,6 +1047,7 @@ public class ShiftWorkerSpec {
 		Shift shift4 = new Shift();
 		
 		shift1.setStaffId(id1);
+		shift1.setClientId(id2);
 		shift1.setStartDate("2017-10-10");
 		shift1.setEndDate("2017-10-10");
 		shift1.setStartTime("01:10");
@@ -1049,41 +1055,48 @@ public class ShiftWorkerSpec {
 		shifts.add(shift1);
 		
 		shift2.setStaffId(id1);
+		shift2.setClientId(id2);
 		shift2.setRecurring(true);
 		shift2.setStartDate("2017-10-10");
 		shift2.setEndDate("2017-10-10");
-		shift2.setStartTime("04:10");
-		shift2.setEndTime("05:10");
+		shift2.setStartTime("02:10");
+		shift2.setEndTime("03:10");
 		shifts.add(shift2);
 		
 		shift3.setStaffId(id1);
-		shift3.setStartDate("2017-10-10");
+		shift3.setClientId(id2);
+		shift3.setStartDate("2017-10-09");
 		shift3.setEndDate("2017-10-10");
-		shift3.setStartTime("07:10");
-		shift3.setEndTime("08:10");
+		shift3.setStartTime("22:00");
+		shift3.setEndTime("00:10");
 		shifts.add(shift3);
 		
 		shift4.setStaffId(id1);
+		shift4.setClientId(id2);
 		shift4.setRecurring(true);
 		shift4.setStartDate("2017-10-10");
 		shift4.setEndDate("2017-10-10");
-		shift4.setStartTime("10:10");
-		shift4.setEndTime("11:10");
+		shift4.setStartTime("00:10");
+		shift4.setEndTime("01:10");
 		shifts.add(shift4);
 		
 		map.put(id1,shifts);
 		
 		shifts = new ArrayList<Shift>();
 		shift1.setStaffId(id2);
+		shift1.setClientId(id1);
 		shifts.add(shift1);
 		
 		shift2.setStaffId(id2);
+		shift2.setClientId(id1);
 		shifts.add(shift2);
 		
 		shift3.setStaffId(id2);
+		shift3.setClientId(id1);
 		shifts.add(shift3);
 		
 		shift4.setStaffId(id2);
+		shift4.setClientId(id1);
 		shifts.add(shift4);
 		
 		map.put(id2,shifts);
@@ -1105,4 +1118,158 @@ public class ShiftWorkerSpec {
 		assertTrue(result.get(id1).size()==4);
 		assertTrue(result.get(id2).size()==4);
 	}
+	
+//	@Test
+//	public void getNonoverlapingShiftsPerEmployeeReturnsSomeForSomeOverlapsForOneEmployeeWithMultipleClients(){
+//		boolean exception = false;
+//		ArrayList<Shift> shifts = new ArrayList<Shift>();
+//		HashMap<String, ArrayList<Shift>> map = new HashMap<String, ArrayList<Shift>>();
+//		Shift shift1 = new Shift();
+//		String id1 = "testA";
+//		String id2 = "testB";
+//		String id3 = "testC";
+//		Shift shift2 = new Shift();
+//		Shift shift3 = new Shift();
+//		Shift shift4 = new Shift();
+//		
+//		shift1.setStaffId(id1);
+//		shift1.setClientId(id2);
+//		shift1.setStartDate("2017-10-09");
+//		shift1.setEndDate("2017-10-10");
+//		shift1.setStartTime("22:10");
+//		shift1.setEndTime("01:10");
+//		shifts.add(shift1);
+//		
+//		shift2.setStaffId(id1);
+//		shift2.setClientId(id3);
+//		shift2.setRecurring(true);
+//		shift2.setStartDate("2017-10-10");
+//		shift2.setEndDate("2017-10-10");
+//		shift2.setStartTime("01:10");
+//		shift2.setEndTime("02:10");
+//		shifts.add(shift2);
+//		
+//		shift3.setStaffId(id1);
+//		shift3.setClientId(id2);
+//		shift3.setStartDate("2017-10-10");
+//		shift3.setEndDate("2017-10-10");
+//		shift3.setStartTime("02:00");
+//		shift3.setEndTime("03:10");
+//		shifts.add(shift3);
+//		
+//		shift4.setStaffId(id1);
+//		shift4.setClientId(id2);
+//		shift4.setRecurring(true);
+//		shift4.setStartDate("2017-10-10");
+//		shift4.setEndDate("2017-10-10");
+//		shift4.setStartTime("03:10");
+//		shift4.setEndTime("04:10");
+//		shifts.add(shift4);
+//		
+//		map.put(id1,shifts);
+//		
+//		
+//		HashMap<String, ArrayList<Shift>> result=null;
+//		try {
+//			result = ShiftWorker.getNonoverlapingShiftsPerEmployee(map);
+//		} catch (CorruptDataException e) {
+//			exception=true;
+//		} catch (ProccessingException e) {
+//			exception=true;
+//		}
+//		
+//		assertFalse(exception);
+//		assertNotNull(result);
+//		assertTrue(result.keySet().size()==1);
+//		assertNotNull(result.get(id1));
+//		System.out.println(result.toString());
+//		assertTrue(result.get(id1).size()==1);
+//	}
+//	
+//	@Test
+//	public void getNonoverlapingShiftsPerEmployeeReturnsAllForNoOverlapsForTwoEmployeesWithMultipleClients(){
+//		boolean exception = false;
+//		ArrayList<Shift> shifts = new ArrayList<Shift>();
+//		HashMap<String, ArrayList<Shift>> map = new HashMap<String, ArrayList<Shift>>();
+//		Shift shift1 = new Shift();
+//		String id1 = "testA";
+//		String id2 = "testB";
+//		String id3 = "testC";
+//		Shift shift2 = new Shift();
+//		Shift shift3 = new Shift();
+//		Shift shift4 = new Shift();
+//		
+//		shift1.setStaffId(id1);
+//		shift1.setClientId(id2);
+//		shift1.setStartDate("2017-10-10");
+//		shift1.setEndDate("2017-10-10");
+//		shift1.setStartTime("01:10");
+//		shift1.setEndTime("02:10");
+//		shifts.add(shift1);
+//		
+//		shift2.setStaffId(id1);
+//		shift2.setClientId(id3);
+//		shift2.setRecurring(true);
+//		shift2.setStartDate("2017-10-10");
+//		shift2.setEndDate("2017-10-10");
+//		shift2.setStartTime("02:10");
+//		shift2.setEndTime("03:10");
+//		shifts.add(shift2);
+//		
+//		shift3.setStaffId(id1);
+//		shift3.setClientId(id2);
+//		shift3.setStartDate("2017-10-09");
+//		shift3.setEndDate("2017-10-10");
+//		shift3.setStartTime("22:00");
+//		shift3.setEndTime("00:10");
+//		shifts.add(shift3);
+//		
+//		shift4.setStaffId(id1);
+//		shift4.setClientId(id2);
+//		shift4.setRecurring(true);
+//		shift4.setStartDate("2017-10-10");
+//		shift4.setEndDate("2017-10-10");
+//		shift4.setStartTime("00:10");
+//		shift4.setEndTime("01:10");
+//		shifts.add(shift4);
+//		
+//		map.put(id1,shifts);
+//		
+//		shifts = new ArrayList<Shift>();
+//		shift1.setStaffId(id2);
+//		shift1.setClientId(id1);
+//		shifts.add(shift1);
+//		
+//		shift2.setStaffId(id2);
+//		shift2.setClientId(id1);
+//		shifts.add(shift2);
+//		
+//		shift3.setStaffId(id2);
+//		shift3.setClientId(id1);
+//		shifts.add(shift3);
+//		
+//		shift4.setStaffId(id2);
+//		shift4.setClientId(id1);
+//		shifts.add(shift4);
+//		
+//		map.put(id2,shifts);
+//		
+//		HashMap<String, ArrayList<Shift>> result=null;
+//		try {
+//			result = ShiftWorker.getNonoverlapingShiftsPerEmployee(map);
+//		} catch (CorruptDataException e) {
+//			exception=true;
+//		} catch (ProccessingException e) {
+//			exception=true;
+//		}
+//		
+//		assertFalse(exception);
+//		assertNotNull(result);
+//		assertTrue(result.keySet().size()==2);
+//		assertNotNull(result.get(id1));
+//		assertNotNull(result.get(id2));
+//		System.out.println(result.toString());
+//		assertTrue(result.get(id1).size()==2);
+//		assertTrue(result.get(id2).size()==4);
+//	}
 }
