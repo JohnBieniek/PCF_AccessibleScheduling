@@ -1383,4 +1383,67 @@ public class ShiftWorkerSpec {
 		assertFalse(exception);
 		assertEquals(shifts.size(),1);
 	}
+	
+	@Test
+	public void getPrestaffedShiftsReturnsEmptyForNull(){
+		boolean exception = false;
+		ArrayList<Shift> shifts= null;
+		try {
+			shifts=ShiftWorker.getPrestaffedShifts(null);
+		} catch (ProccessingException e) {
+			exception = true;
+		}
+		
+		assertFalse(exception);
+		assertNotNull(shifts);
+		assertTrue(shifts.isEmpty());
+	}
+	
+	@Test
+	public void getPrestaffedShiftsReturnsEmptyForEmpty(){
+		boolean exception = false;
+		ArrayList<Shift> shifts= new ArrayList<Shift>();
+		try {
+			shifts=ShiftWorker.getPrestaffedShifts(shifts);
+		} catch (ProccessingException e) {
+			exception = true;
+		}
+		
+		assertFalse(exception);
+		assertNotNull(shifts);
+		assertTrue(shifts.isEmpty());
+	}
+	
+	@Test
+	public void getPrestaffedShiftsFailsForArrayContainingNull(){
+		boolean exception = false;
+		ArrayList<Shift> shifts= new ArrayList<Shift>();
+		shifts.add(null);
+		try {
+			shifts=ShiftWorker.getPrestaffedShifts(shifts);
+		} catch (ProccessingException e) {
+			exception = true;
+		}
+		
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getPrestaffedShiftsReturnsThoseWithRequestedStaffId(){
+		boolean exception = false;
+		ArrayList<Shift> shifts= new ArrayList<Shift>();
+		Shift shift = new Shift();
+		shift.setRequestedStaffId("testA");
+		shifts.add(shift);
+		shift=new Shift();
+		shifts.add(shift);
+		try {
+			shifts=ShiftWorker.getPrestaffedShifts(shifts);
+		} catch (ProccessingException e) {
+			exception = true;
+		}
+		
+		assertFalse(exception);
+		assertTrue(shifts.size()==1);
+	}
 }

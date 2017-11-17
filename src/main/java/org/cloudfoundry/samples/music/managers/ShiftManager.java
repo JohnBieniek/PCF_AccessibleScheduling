@@ -3,6 +3,7 @@ import java.util.ArrayList;
 
 import accessiblesolutions.accessiblescheduling.domain.Shift;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
+import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
 import accessiblesolutions.accessiblescheduling.worker.ShiftWorker;
 
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoShiftRepository;
@@ -22,7 +23,7 @@ public class ShiftManager {
     	return  ShiftWorker.getRecurringShifts(shiftRepository.findByStartMonth(selectedMonth));
 	}
     
-    public ArrayList<Shift> getPrestaffedSingleShiftsForMonth(int selectedMonth) {
+    public ArrayList<Shift> getPrestaffedSingleShiftsForMonth(int selectedMonth) throws ProccessingException {
     	ArrayList<Shift> singleShifts = ShiftWorker.getSingleShifts(shiftRepository.findByStartMonth(selectedMonth));
     	ArrayList<Shift> prestaffedSingleShifts = ShiftWorker.getPrestaffedShifts(singleShifts);
 
@@ -33,7 +34,7 @@ public class ShiftManager {
 		return (ArrayList<Shift>) shiftRepository.findByStartMonth(month);
 	}
     
-  	public ArrayList<Shift> getPrestaffedRecurringShiftsForMonth(int selectedMonth) {
+  	public ArrayList<Shift> getPrestaffedRecurringShiftsForMonth(int selectedMonth) throws ProccessingException {
     	Iterable<Shift> shiftsForMonth = shiftRepository.findByStartMonth(selectedMonth);
     	ArrayList<Shift> recurringShiftsForMonth = ShiftWorker.getRecurringShifts(shiftsForMonth);
 //    	logger.error(recurringShiftsForMonth.size() + " recurringShiftsPerMonth");
