@@ -90,7 +90,7 @@ public class EmployeeShiftManager {
 	}
   
 
-  	public ArrayList<Shift> getAssignedOvernightShiftsForEmployeForTheLastDayOfMonthBefore(String employeeId, int month) throws CorruptDataException{
+  	public ArrayList<Shift> getAssignedOvernightShiftsForEmployeForTheLastDayOfMonthBefore(String employeeId, int month) throws CorruptDataException, ProccessingException{
   		ArrayList<Shift> assignedOvernightShiftsForEmployeForTheLastDayOfMonthBefore = new ArrayList<Shift>();
   		
   		if(month==1){
@@ -105,7 +105,7 @@ public class EmployeeShiftManager {
   		return assignedOvernightShiftsForEmployeForTheLastDayOfMonthBefore;
   	}
   	
-	public ArrayList<Shift> getAssignedOvernightShiftsForEmployeForTheLastDayOfMonth(String employeeId, int month) throws CorruptDataException{
+	public ArrayList<Shift> getAssignedOvernightShiftsForEmployeForTheLastDayOfMonth(String employeeId, int month) throws CorruptDataException, ProccessingException{
 		ArrayList<Shift> assignedOvernightShiftsForEmployeForTheLastDayOfMonth = new ArrayList<Shift>();
 		
 		ArrayList<Shift> shifts = getAssignedOvernightShiftsForEmployeForMonth(employeeId,month);
@@ -116,7 +116,7 @@ public class EmployeeShiftManager {
 	}
 	
 
-	public ArrayList<Shift> getAssignedOvernightShiftsForEmployeForMonth(String employeeId, int month) throws CorruptDataException{
+	public ArrayList<Shift> getAssignedOvernightShiftsForEmployeForMonth(String employeeId, int month) throws CorruptDataException, ProccessingException{
 		ArrayList<Shift> assignedOvernightShiftsForEmployeeForMonth = new ArrayList<Shift>();
 		
 		ArrayList<Shift> shifts = getAssignedShiftsForEmployeeForMonth(employeeId,month);

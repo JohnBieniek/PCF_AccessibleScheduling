@@ -1272,4 +1272,115 @@ public class ShiftWorkerSpec {
 //		assertTrue(result.get(id1).size()==2);
 //		assertTrue(result.get(id2).size()==4);
 //	}
+	
+	@Test
+	public void getOvernightShiftsReturnsEmptyForNull(){
+		boolean exception = false;
+		ArrayList<Shift> shifts= null;
+		try {
+			shifts=ShiftWorker.getOvernightShifts(null);
+		} catch (CorruptDataException | ProccessingException e) {
+			exception = true;
+		}
+		
+		assertFalse(exception);
+		assertNotNull(shifts);
+		assertTrue(shifts.isEmpty());
+	}
+	
+	@Test
+	public void getOvernightShiftsReturnsEmptyForEmpty(){
+		boolean exception = false;
+		ArrayList<Shift> shifts= null;
+		try {
+			shifts=ShiftWorker.getOvernightShifts(new ArrayList<Shift>());
+		} catch (CorruptDataException | ProccessingException e) {
+			exception = true;
+		}
+		
+		assertFalse(exception);
+		assertNotNull(shifts);
+		assertTrue(shifts.isEmpty());
+	}
+	
+	@Test
+	public void getOvernightShiftsFailsForListContainingNull(){
+		boolean exception = false;
+		ArrayList<Shift> shifts= new ArrayList<Shift>();
+		shifts.add(null);
+		
+		try {
+			ShiftWorker.getOvernightShifts(shifts);
+		} catch (CorruptDataException e) {
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			exception = true;
+		}
+		
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getOvernightShiftsFailsForNoStart(){
+		boolean exception = false;
+		ArrayList<Shift> shifts= new ArrayList<Shift>();
+		Shift shift = new Shift();
+		shift.setEndDate("2017-11-10");
+		shifts.add(shift);
+		
+		try {
+			ShiftWorker.getOvernightShifts(shifts);
+		} catch (CorruptDataException e) {
+			exception = true;
+		} catch (ProccessingException e) {
+			e.printStackTrace();
+		}
+		
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getOvernightShiftsFailsForNoEnd(){
+		boolean exception = false;
+		ArrayList<Shift> shifts= new ArrayList<Shift>();
+		Shift shift = new Shift();
+		shift.setStartDate("2017-11-10");
+		shifts.add(shift);
+		
+		try {
+			ShiftWorker.getOvernightShifts(shifts);
+		} catch (CorruptDataException e) {
+			exception = true;
+		} catch (ProccessingException e) {
+			e.printStackTrace();
+		}
+		
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getOvernightShiftsFailsReturnsStartDifferentFromEnd(){
+		boolean exception = false;
+		ArrayList<Shift> shifts= new ArrayList<Shift>();
+		Shift shift = new Shift();
+		shift.setStartDate("2017-11-10");
+		shift.setEndDate("2017-11-11");
+		shifts.add(shift);
+		
+		shift = new Shift();
+		shift.setStartDate("2017-11-10");
+		shift.setEndDate("2017-11-10");
+		shifts.add(shift);
+		
+		try {
+			shifts=ShiftWorker.getOvernightShifts(shifts);
+		} catch (CorruptDataException e) {
+			exception = true;
+		} catch (ProccessingException e) {
+			exception = true;
+		}
+		
+		assertFalse(exception);
+		assertEquals(shifts.size(),1);
+	}
 }

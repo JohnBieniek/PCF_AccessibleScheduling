@@ -149,10 +149,16 @@ public final class ShiftWorker {
 		return unconflictedShiftsPerEmployee;
 	}
 	
-    public static ArrayList<Shift> getOvernightShifts(ArrayList<Shift> shifts) throws CorruptDataException{
+    public static ArrayList<Shift> getOvernightShifts(ArrayList<Shift> shifts) throws CorruptDataException, ProccessingException{
 		ArrayList<Shift> overnightShifts = new ArrayList<Shift>();
 		
+		if(null==shifts || shifts.size()==0){
+			return overnightShifts;
+		}
 		for(Shift shift:shifts){
+			if(null==shift){
+				throw new ProccessingException("Null shift present");
+			}
 			if(shift.getOvernight()){
 				overnightShifts.add(shift);
 			}
