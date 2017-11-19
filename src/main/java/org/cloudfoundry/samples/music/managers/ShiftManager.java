@@ -19,7 +19,7 @@ public class ShiftManager {
         this.shiftRepository = shiftRepository;
     }
     
-    public ArrayList<Shift> getRecurringShiftsForMonth(int selectedMonth){
+    public ArrayList<Shift> getRecurringShiftsForMonth(int selectedMonth) throws ProccessingException{
     	return  ShiftWorker.getRecurringShifts(shiftRepository.findByStartMonth(selectedMonth));
 	}
     

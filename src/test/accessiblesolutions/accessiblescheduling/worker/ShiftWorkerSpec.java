@@ -1446,4 +1446,67 @@ public class ShiftWorkerSpec {
 		assertFalse(exception);
 		assertTrue(shifts.size()==1);
 	}
+	
+	@Test
+	public void getRecurringShiftsReturnsEmptyForNull(){
+		boolean exception = false;
+		ArrayList<Shift> shifts= null;
+		try {
+			shifts=ShiftWorker.getRecurringShifts(null);
+		} catch (ProccessingException e) {
+			exception = true;
+		}
+		
+		assertFalse(exception);
+		assertNotNull(shifts);
+		assertTrue(shifts.isEmpty());
+	}
+	
+	@Test
+	public void getRecurringShiftsReturnsEmptyForEmpty(){
+		boolean exception = false;
+		ArrayList<Shift> shifts= new ArrayList<Shift>();
+		try {
+			shifts=ShiftWorker.getRecurringShifts(shifts);
+		} catch (ProccessingException e) {
+			exception = true;
+		}
+		
+		assertFalse(exception);
+		assertNotNull(shifts);
+		assertTrue(shifts.isEmpty());
+	}
+	
+	@Test
+	public void getRecurringShiftsFailsForArrayContainingNull(){
+		boolean exception = false;
+		ArrayList<Shift> shifts= new ArrayList<Shift>();
+		shifts.add(null);
+		try {
+			shifts=ShiftWorker.getRecurringShifts(shifts);
+		} catch (ProccessingException e) {
+			exception = true;
+		}
+		
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getRecurringShiftsReturnsRecurring(){
+		boolean exception = false;
+		ArrayList<Shift> shifts= new ArrayList<Shift>();
+		Shift shift = new Shift();
+		shift.setRecurring(true);
+		shifts.add(shift);
+		shift=new Shift();
+		shifts.add(shift);
+		try {
+			shifts=ShiftWorker.getRecurringShifts(shifts);
+		} catch (ProccessingException e) {
+			exception = true;
+		}
+		
+		assertFalse(exception);
+		assertTrue(shifts.size()==1);
+	}
 }

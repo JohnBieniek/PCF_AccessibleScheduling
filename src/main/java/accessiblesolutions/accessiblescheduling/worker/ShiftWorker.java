@@ -187,7 +187,7 @@ public final class ShiftWorker {
     			prestaffedShifts.add(shift);
     		}
     	}
-//    	logger.error(prestaffedShifts.size() + " prestaffedShifts found");
+
     	return prestaffedShifts;
 	}
 	public static ArrayList<Shift> getPrestaffedSingleShifts(Iterable<Shift> shifts) throws ProccessingException {
@@ -196,9 +196,18 @@ public final class ShiftWorker {
     	
 		return prestaffedSingleShifts;
 	}
-	public static ArrayList<Shift> getRecurringShifts(Iterable<Shift> shifts){
+	public static ArrayList<Shift> getRecurringShifts(Iterable<Shift> shifts) throws ProccessingException{
 		ArrayList<Shift> recurringShifts = new ArrayList<Shift>();
+		
+		if(null==shifts || ((ArrayList<Shift>)shifts).size()==0){
+			return recurringShifts;
+		}
+		
     	for(Shift shift:shifts){
+    		if(null==shift){
+    			throw new ProccessingException("Null shift present");
+    		}
+    		
     		if(shift.getRecurring()){
     			recurringShifts.add(shift);
     		}
