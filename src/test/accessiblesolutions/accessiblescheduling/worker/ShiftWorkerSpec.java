@@ -1509,4 +1509,131 @@ public class ShiftWorkerSpec {
 		assertFalse(exception);
 		assertTrue(shifts.size()==1);
 	}
+	
+	@Test
+	public void getSingleShiftsReturnsEmptyForNull(){
+		boolean exception = false;
+		ArrayList<Shift> shifts= null;
+		try {
+			shifts=ShiftWorker.getSingleShifts(null);
+		} catch (ProccessingException e) {
+			exception = true;
+		}
+		
+		assertFalse(exception);
+		assertNotNull(shifts);
+		assertTrue(shifts.isEmpty());
+	}
+	
+	@Test
+	public void getSingleShiftsReturnsEmptyForEmpty(){
+		boolean exception = false;
+		ArrayList<Shift> shifts= new ArrayList<Shift>();
+		try {
+			shifts=ShiftWorker.getSingleShifts(shifts);
+		} catch (ProccessingException e) {
+			exception = true;
+		}
+		
+		assertFalse(exception);
+		assertNotNull(shifts);
+		assertTrue(shifts.isEmpty());
+	}
+	
+	@Test
+	public void getSingleShiftsFailsForArrayContainingNull(){
+		boolean exception = false;
+		ArrayList<Shift> shifts= new ArrayList<Shift>();
+		shifts.add(null);
+		try {
+			shifts=ShiftWorker.getSingleShifts(shifts);
+		} catch (ProccessingException e) {
+			exception = true;
+		}
+		
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getSingleShiftsReturnsSingle(){
+		boolean exception = false;
+		ArrayList<Shift> shifts= new ArrayList<Shift>();
+		Shift shift = new Shift();
+		shift.setRecurring(true);
+		shifts.add(shift);
+		shift=new Shift();
+		shifts.add(shift);
+		try {
+			shifts=ShiftWorker.getSingleShifts(shifts);
+		} catch (ProccessingException e) {
+			exception = true;
+		}
+		
+		assertFalse(exception);
+		assertTrue(shifts.size()==1);
+	}
+	
+	@Test
+	public void getUnassignedShiftsReturnsEmptyForNull(){
+		boolean exception = false;
+		ArrayList<Shift> shifts= null;
+		try {
+			shifts=ShiftWorker.getUnassignedShifts(null);
+		} catch (ProccessingException e) {
+			exception = true;
+		}
+		
+		assertFalse(exception);
+		assertNotNull(shifts);
+		assertTrue(shifts.isEmpty());
+	}
+	
+	@Test
+	public void getUnassignedShiftsReturnsEmptyForEmpty(){
+		boolean exception = false;
+		ArrayList<Shift> shifts= new ArrayList<Shift>();
+		try {
+			shifts=ShiftWorker.getUnassignedShifts(shifts);
+		} catch (ProccessingException e) {
+			exception = true;
+		}
+		
+		assertFalse(exception);
+		assertNotNull(shifts);
+		assertTrue(shifts.isEmpty());
+	}
+	
+	@Test
+	public void getUnassignedShiftsFailsForArrayContainingNull(){
+		boolean exception = false;
+		ArrayList<Shift> shifts= new ArrayList<Shift>();
+		shifts.add(null);
+		try {
+			shifts=ShiftWorker.getUnassignedShifts(shifts);
+		} catch (ProccessingException e) {
+			exception = true;
+		}
+		
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getUnassignedShiftsReturnsUnassigned(){
+		boolean exception = false;
+		ArrayList<Shift> shifts= new ArrayList<Shift>();
+		Shift shift = new Shift();
+		shift.setAssigned(true);
+		shifts.add(shift);
+		shift=new Shift();
+		shifts.add(shift);
+		try {
+			shifts=ShiftWorker.getUnassignedShifts(shifts);
+		} catch (ProccessingException e) {
+			exception = true;
+		}
+		
+		assertFalse(exception);
+		assertTrue(shifts.size()==1);
+		assertFalse(shifts.get(0).getAssigned());
+	}
 }

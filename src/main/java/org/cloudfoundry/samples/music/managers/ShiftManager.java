@@ -43,13 +43,13 @@ public class ShiftManager {
 		return prestaffedRecurringShifts;
 	}
     
-    public ArrayList<Shift> getUnassignedShiftsForMonth(int selectedMonth) {
+    public ArrayList<Shift> getUnassignedShiftsForMonth(int selectedMonth) throws ProccessingException {
     	ArrayList<Shift> unassignedShifts = ShiftWorker.getUnassignedShifts(shiftRepository.findByStartMonth(selectedMonth));
 
     	return unassignedShifts;
 	}
     
-    public ArrayList<Shift> getUnassignedNonEventShiftsForMonth(int month) {
+    public ArrayList<Shift> getUnassignedNonEventShiftsForMonth(int month) throws ProccessingException {
 		ArrayList<Shift> unassignedShifts = getUnassignedShiftsForMonth(month);
 		ArrayList<Shift> unassignedNonEventShifts = ShiftWorker.getNonEventShifts(unassignedShifts);
 		

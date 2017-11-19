@@ -212,7 +212,7 @@ public final class ShiftWorker {
     			recurringShifts.add(shift);
     		}
     	}
-//    	logger.error(recurringShifts.size() + " recurringShifts found");
+
     	return recurringShifts;
 	}
 	//weeks are considered to start at 0 with a maximum possible of 5, year assumed current year
@@ -243,10 +243,18 @@ public final class ShiftWorker {
 		return shiftsForTheLastDay;
 	}
 
-    public static ArrayList<Shift> getSingleShifts(Iterable<Shift> shifts) {
+    public static ArrayList<Shift> getSingleShifts(Iterable<Shift> shifts) throws ProccessingException {
     	ArrayList<Shift> singleShifts = new ArrayList<Shift>();
     	
+    	if(null==shifts || ((ArrayList<Shift>)shifts).size()==0){
+			return singleShifts;
+		}
+    	
     	for(Shift shift:shifts){
+    		if(null==shift){
+    			throw new ProccessingException("Null shift present");
+    		}
+    		
     		if(!shift.getRecurring() && !shift.getEvent()){
     			singleShifts.add(shift);
     		}
@@ -255,10 +263,18 @@ public final class ShiftWorker {
 		return singleShifts;
 	}
     
-    public static ArrayList<Shift> getUnassignedShifts(Iterable<Shift> shifts) {
+    public static ArrayList<Shift> getUnassignedShifts(Iterable<Shift> shifts) throws ProccessingException {
     	ArrayList<Shift> unassignedShifts = new ArrayList<Shift>();
     	
+    	if(null==shifts || ((ArrayList<Shift>)shifts).size()==0){
+			return unassignedShifts;
+		}
+    	
     	for(Shift shift:shifts){
+    		if(null==shift){
+    			throw new ProccessingException("Null shift present");
+    		}
+    		
     		if(!shift.getAssigned()){
     			unassignedShifts.add(shift);
     		}
