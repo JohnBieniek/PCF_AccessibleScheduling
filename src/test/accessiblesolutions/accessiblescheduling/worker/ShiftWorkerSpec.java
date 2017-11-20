@@ -1732,6 +1732,10 @@ public class ShiftWorkerSpec {
 		shift.setStartDate("2017-11-11");
 		shift.setEndDate("2017-11-11");
 		shifts.add(shift);
+		shift=new Shift();
+		shift.setStartDate("2017-11-11");
+		shift.setEndDate("2017-11-11");
+		shifts.add(shift);
 		try {
 			shifts=ShiftWorker.getWeekdayShifts(shifts);
 		} catch (ProccessingException | CorruptDataException e) {
@@ -1740,4 +1744,113 @@ public class ShiftWorkerSpec {
 		assertFalse(exception);
 		assertTrue(shifts.size()==1);
 	}
+	
+
+	@Test
+	public void getWeekendShiftsReturnsEmptyForNull(){
+		boolean exception = false;
+		ArrayList<Shift> shifts= null;
+		try {
+			shifts=ShiftWorker.getWeekendShifts(null);
+		} catch (ProccessingException | CorruptDataException e) {
+			exception = true;
+		}
+		
+		assertFalse(exception);
+		assertNotNull(shifts);
+		assertTrue(shifts.isEmpty());
+	}
+//	
+//	@Test
+//	public void getWeekdayShiftsReturnsEmptyForEmpty(){
+//		boolean exception = false;
+//		ArrayList<Shift> shifts= new ArrayList<Shift>();
+//		try {
+//			shifts=ShiftWorker.getWeekdayShifts(shifts);
+//		} catch (ProccessingException | CorruptDataException e) {
+//			exception = true;
+//		}
+//		
+//		assertFalse(exception);
+//		assertNotNull(shifts);
+//		assertTrue(shifts.isEmpty());
+//	}
+//	
+//	@Test
+//	public void getWeekdayShiftsFailsForArrayContainingNull(){
+//		boolean exception = false;
+//		ArrayList<Shift> shifts= new ArrayList<Shift>();
+//		shifts.add(null);
+//		try {
+//			shifts=ShiftWorker.getWeekdayShifts(shifts);
+//		} catch (ProccessingException e) {
+//			exception = true;
+//		} catch (CorruptDataException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		
+//		assertTrue(exception);
+//	}
+//	
+//	@Test
+//	public void getWeekdayShiftsFailsWithNoEndDate(){
+//		boolean exception = false;
+//		ArrayList<Shift> shifts= new ArrayList<Shift>();
+//		Shift shift = new Shift();
+//		shift.setStartDate("2017-11-10");
+//		shifts.add(shift);
+//		try {
+//			shifts=ShiftWorker.getWeekdayShifts(shifts);
+//		} catch (ProccessingException e) {
+//			e.printStackTrace();
+//		} catch (CorruptDataException e) {
+//			exception = true;
+//		}
+//		
+//		assertTrue(exception);
+//	}
+//	
+//	@Test
+//	public void getWeekdayShiftsFailsWithNoStartDate(){
+//		boolean exception = false;
+//		ArrayList<Shift> shifts= new ArrayList<Shift>();
+//		Shift shift = new Shift();
+//		shift.setEndDate("2017-11-10");
+//		shifts.add(shift);
+//		try {
+//			shifts=ShiftWorker.getWeekdayShifts(shifts);
+//		} catch (ProccessingException e) {
+//			e.printStackTrace();
+//		} catch (CorruptDataException e) {
+//			exception = true;
+//		}
+//		
+//		assertTrue(exception);
+//	}
+//	
+//	@Test
+//	public void getWeekdayShiftsReturnsWeekdays(){
+//		boolean exception = false;
+//		ArrayList<Shift> shifts= new ArrayList<Shift>();
+//		Shift shift = new Shift();
+//		shift.setStartDate("2017-11-10");
+//		shift.setEndDate("2017-11-10");
+//		shifts.add(shift);
+//		shift=new Shift();
+//		shift.setStartDate("2017-11-11");
+//		shift.setEndDate("2017-11-11");
+//		shifts.add(shift);
+//		shift=new Shift();
+//		shift.setStartDate("2017-11-11");
+//		shift.setEndDate("2017-11-11");
+//		shifts.add(shift);
+//		try {
+//			shifts=ShiftWorker.getWeekdayShifts(shifts);
+//		} catch (ProccessingException | CorruptDataException e) {
+//			exception = true;
+//		}
+//		assertFalse(exception);
+//		assertTrue(shifts.size()==1);
+//	}
 }

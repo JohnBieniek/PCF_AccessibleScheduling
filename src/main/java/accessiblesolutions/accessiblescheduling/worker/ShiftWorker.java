@@ -303,10 +303,18 @@ public final class ShiftWorker {
     	return weekdayShifts;
 	}
 
-	public static ArrayList<Shift> getWeekendShifts(ArrayList<Shift> shifts) throws CorruptDataException{
+	public static ArrayList<Shift> getWeekendShifts(ArrayList<Shift> shifts) throws CorruptDataException, ProccessingException{
     	ArrayList<Shift> weekendShifts = new ArrayList<Shift>();
     	
+    	if(null==shifts || shifts.size()==0){
+			return weekendShifts;
+		}
+    	
     	for(Shift shift : shifts){
+    		if(null==shift){
+    			throw new ProccessingException("Null shift present");
+    		}
+    		
     		if(shift.isWeekend()){
     			weekendShifts.add(shift);
     		}
