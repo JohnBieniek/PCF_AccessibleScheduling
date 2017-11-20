@@ -1761,6 +1761,7 @@ public class ShiftWorkerSpec {
 		assertTrue(shifts.isEmpty());
 	}
 	
+	
 	@Test
 	public void getWeekendShiftsReturnsEmptyForEmpty(){
 		boolean exception = false;
