@@ -229,7 +229,7 @@ public class CompatibilityController {
     	return to;
     }
     @RequestMapping(method = RequestMethod.POST, value= "/unassigned")
-    public @ResponseBody EmployeeUpdateTO getUnassigned(HttpServletRequest request) throws CorruptDataException{
+    public @ResponseBody EmployeeUpdateTO getUnassigned(HttpServletRequest request) throws CorruptDataException, ProccessingException{
     	Employee employee =null;
     	Shift shift =null;
 
@@ -410,7 +410,7 @@ public class CompatibilityController {
     	return to;
     }
     @RequestMapping(method = RequestMethod.POST, value= "/assignability")
-    public @ResponseBody EmployeeUpdateTO getAssignability(HttpServletRequest request) throws CorruptDataException{
+    public @ResponseBody EmployeeUpdateTO getAssignability(HttpServletRequest request) throws CorruptDataException, ProccessingException{
     	Employee employee =null;
     	Shift shift =null;
 
@@ -440,7 +440,7 @@ public class CompatibilityController {
     	return to;
     }
     @RequestMapping(method = RequestMethod.POST, value= "/validity")
-    public @ResponseBody EmployeeUpdateTO getValidity(HttpServletRequest request) throws CorruptDataException{
+    public @ResponseBody EmployeeUpdateTO getValidity(HttpServletRequest request) throws CorruptDataException, ProccessingException{
     	Employee employee =null;
     	Shift shift =null;
 

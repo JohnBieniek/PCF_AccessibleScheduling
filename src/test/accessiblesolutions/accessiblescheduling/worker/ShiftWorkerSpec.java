@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -1854,5 +1855,199 @@ public class ShiftWorkerSpec {
 		assertTrue(shifts.size()==1);
 	}
 	
-	//A test difference
+	@Test
+	public void isOverlappingForTimesReturnsFalseFor1Before2(){
+		boolean result=true;
+		boolean exception=false;
+		
+		LocalDateTime start1 = LocalDateTime.of(2017, 11, 10, 10, 59, 0, 0);
+		LocalDateTime end1 = LocalDateTime.of(2017, 11, 10, 11, 59, 0, 0);
+		
+		LocalDateTime start2 = LocalDateTime.of(2017, 11, 11, 8, 59, 0, 0);
+		LocalDateTime end2 = LocalDateTime.of(2017, 11, 11, 10, 59, 0, 0);
+		
+		try {
+			result = ShiftWorker.isOverlapping(start1,end1,start2,end2);
+		} catch (ProccessingException e) {
+			exception=true;
+		}
+		
+		assertFalse(exception);
+		assertFalse(result);
+	}
+	
+	@Test
+	public void isOverlappingForTimesReturnsFalseFor2Before1(){
+		boolean result=true;
+		boolean exception=false;
+		
+		LocalDateTime start1 = LocalDateTime.of(2017, 11, 10, 10, 59, 0, 0);
+		LocalDateTime end1 = LocalDateTime.of(2017, 11, 10, 11, 59, 0, 0);
+		
+		LocalDateTime start2 = LocalDateTime.of(2017, 11, 10, 8, 59, 0, 0);
+		LocalDateTime end2 = LocalDateTime.of(2017, 11, 10, 10, 59, 0, 0);
+		
+		try {
+			result = ShiftWorker.isOverlapping(start2,end2,start1,end1);
+		} catch (ProccessingException e) {
+			exception=true;
+		}
+		
+		assertFalse(exception);
+		assertFalse(result);
+	}
+	
+	@Test
+	public void isOverlappingForTimesReturnsTrueFor1Contains2(){
+		boolean result=false;
+		boolean exception=false;
+		
+		LocalDateTime start1 = LocalDateTime.of(2017, 11, 10, 2, 59, 0, 0);
+		LocalDateTime end1 = LocalDateTime.of(2017, 11, 10, 10, 59, 0, 0);
+		
+		LocalDateTime start2 = LocalDateTime.of(2017, 11, 10, 3, 59, 0, 0);
+		LocalDateTime end2 = LocalDateTime.of(2017, 11, 10, 7, 59, 0, 0);
+		
+		try {
+			result = ShiftWorker.isOverlapping(start1,end1,start2,end2);
+		} catch (ProccessingException e) {
+			exception=true;
+		}
+		
+		assertFalse(exception);
+		assertTrue(result);
+	}
+	
+	@Test
+	public void isOverlappingForTimesReturnsTrueFor2Contains1(){
+		boolean result=false;
+		boolean exception=false;
+		
+		LocalDateTime start1 = LocalDateTime.of(2017, 11, 10, 2, 59, 0, 0);
+		LocalDateTime end1 = LocalDateTime.of(2017, 11, 10, 10, 59, 0, 0);
+		
+		LocalDateTime start2 = LocalDateTime.of(2017, 11, 10, 3, 59, 0, 0);
+		LocalDateTime end2 = LocalDateTime.of(2017, 11, 10, 7, 59, 0, 0);
+		
+		try {
+			result = ShiftWorker.isOverlapping(start2,end2,start1,end1);
+		} catch (ProccessingException e) {
+			exception=true;
+		}
+		
+		assertFalse(exception);
+		assertTrue(result);
+	}
+	
+	@Test
+	public void isOverlappingForTimesReturnsTrueFor1FirstEndingAfter2Starts(){
+		boolean result=false;
+		boolean exception=false;
+		
+		LocalDateTime start1 = LocalDateTime.of(2017, 11, 10, 2, 59, 0, 0);
+		LocalDateTime end1 = LocalDateTime.of(2017, 11, 10, 6, 59, 0, 0);
+		
+		LocalDateTime start2 = LocalDateTime.of(2017, 11, 10, 6, 58, 0, 0);
+		LocalDateTime end2 = LocalDateTime.of(2017, 11, 10, 7, 59, 0, 0);
+		
+		try {
+			result = ShiftWorker.isOverlapping(start2,end2,start1,end1);
+		} catch (ProccessingException e) {
+			exception=true;
+		}
+		
+		assertFalse(exception);
+		assertTrue(result);
+	}
+	
+	@Test
+	public void isOverlappingForTimesReturnsTrueFor2FirstEndingAfter1Starts(){
+		boolean result=false;
+		boolean exception=false;
+		
+		LocalDateTime start1 = LocalDateTime.of(2017, 11, 10, 2, 59, 0, 0);
+		LocalDateTime end1 = LocalDateTime.of(2017, 11, 10, 6, 59, 0, 0);
+		
+		LocalDateTime start2 = LocalDateTime.of(2017, 11, 10, 6, 58, 0, 0);
+		LocalDateTime end2 = LocalDateTime.of(2017, 11, 10, 7, 59, 0, 0);
+		
+		try {
+			result = ShiftWorker.isOverlapping(start1,end1,start2,end2);
+		} catch (ProccessingException e) {
+			exception=true;
+		}
+		
+		assertFalse(exception);
+		assertTrue(result);
+	}
+	
+	@Test
+	public void isOverlappingForTimesFailsForNullStart1(){
+		boolean exception=false;
+		
+		LocalDateTime end1 = LocalDateTime.of(2017, 11, 10, 6, 59, 0, 0);
+		
+		LocalDateTime start2 = LocalDateTime.of(2017, 11, 10, 6, 58, 0, 0);
+		LocalDateTime end2 = LocalDateTime.of(2017, 11, 10, 7, 59, 0, 0);
+		
+		try {
+			ShiftWorker.isOverlapping(null,end1,start2,end2);
+		} catch (ProccessingException e) {
+			exception=true;
+		}
+		
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void isOverlappingForTimesFailsForNullEnd1(){
+		boolean exception=false;
+		
+		LocalDateTime start1 = LocalDateTime.of(2017, 11, 10, 2, 59, 0, 0);
+		
+		LocalDateTime start2 = LocalDateTime.of(2017, 11, 10, 6, 58, 0, 0);
+		LocalDateTime end2 = LocalDateTime.of(2017, 11, 10, 7, 59, 0, 0);
+		
+		try {
+			ShiftWorker.isOverlapping(start1,null,start2,end2);
+		} catch (ProccessingException e) {
+			exception=true;
+		}
+		
+		assertTrue(exception);
+	}
+	@Test
+	public void isOverlappingForTimesFailsForNullStart2(){
+		boolean exception=false;
+		
+		LocalDateTime start1 = LocalDateTime.of(2017, 11, 10, 2, 59, 0, 0);
+		LocalDateTime end1 = LocalDateTime.of(2017, 11, 10, 6, 59, 0, 0);
+		
+		LocalDateTime end2 = LocalDateTime.of(2017, 11, 10, 7, 59, 0, 0);
+		
+		try {
+			ShiftWorker.isOverlapping(start1,end1,null,end2);
+		} catch (ProccessingException e) {
+			exception=true;
+		}
+		
+		assertTrue(exception);
+	}
+	@Test
+	public void isOverlappingForTimesFailsForNullEnd2(){
+		boolean exception=false;
+		
+		LocalDateTime start1 = LocalDateTime.of(2017, 11, 10, 2, 59, 0, 0);
+		LocalDateTime end1 = LocalDateTime.of(2017, 11, 10, 6, 59, 0, 0);
+		
+		LocalDateTime start2 = LocalDateTime.of(2017, 11, 10, 6, 58, 0, 0);
+		
+		try {
+			ShiftWorker.isOverlapping(start1,end1,start2,null);
+		} catch (ProccessingException e) {
+			exception=true;
+		}
+		
+		assertTrue(exception);
+	}
 }

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import accessiblesolutions.accessiblescheduling.domain.Client;
 import accessiblesolutions.accessiblescheduling.domain.Employee;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
+import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
 import accessiblesolutions.accessiblescheduling.worker.ShiftWorker;
 
 @Component
@@ -36,7 +37,7 @@ public class EmployeeShiftCompatibilityManager {
         this.employeeRepository = employeeRepository;
     }
     
-    public EmployeeShiftCompatibilities getValidUnfixedCompatibilities(EmployeeShiftCompatibilities compatibilities) throws CorruptDataException{
+    public EmployeeShiftCompatibilities getValidUnfixedCompatibilities(EmployeeShiftCompatibilities compatibilities) throws CorruptDataException, ProccessingException{
 		ArrayList<EmployeeShiftCompatibility> validCompatibilities = new ArrayList<EmployeeShiftCompatibility>();
     	compatibilities= getValidCompatibilities(compatibilities);
     	for(EmployeeShiftCompatibility compatibility :compatibilities.compatibilities){
@@ -60,7 +61,7 @@ public class EmployeeShiftCompatibilityManager {
 		return new EmployeeShiftCompatibilities(compatibility);
 	}
 
-    public boolean getAssignable(EmployeeShiftCompatibility compatibility) throws CorruptDataException {
+    public boolean getAssignable(EmployeeShiftCompatibility compatibility) throws CorruptDataException, ProccessingException {
     	Employee employee = compatibility.getEmployee();
 		Shift shift = compatibility.getShift();
 		
@@ -356,7 +357,7 @@ public class EmployeeShiftCompatibilityManager {
 //		return new EmployeeShiftCompatibilities(validCompatibilities);
 //	}
 	
-	public EmployeeShiftCompatibilities getValidCompatibilities(EmployeeShiftCompatibilities compatibilities) throws CorruptDataException{
+	public EmployeeShiftCompatibilities getValidCompatibilities(EmployeeShiftCompatibilities compatibilities) throws CorruptDataException, ProccessingException{
 		ArrayList<EmployeeShiftCompatibility> validCompatibilities = new ArrayList<EmployeeShiftCompatibility>();
 		//System.out.println("getting valid compatibilities for "+compatibilities.compatibilities.get(0).getShift().toString());
 		for(EmployeeShiftCompatibility compatibility :compatibilities.compatibilities){
@@ -386,7 +387,7 @@ public class EmployeeShiftCompatibilityManager {
 		return new EmployeeShiftCompatibilities(validCompatibilities);
 	}
 	    
-	public boolean isValidFor(Employee employee, Shift shift) throws CorruptDataException{
+	public boolean isValidFor(Employee employee, Shift shift) throws CorruptDataException, ProccessingException{
 		boolean validity=false;
 		
 		if(isCompatibleWith(employee,shift)){
@@ -442,7 +443,7 @@ public class EmployeeShiftCompatibilityManager {
 		return (hoursScheduled>employee.getMinHours()) ? 0 : (employee.getMinHours()-hoursScheduled);
 	}
 	
-	public boolean isAssignableFor(Employee employee,Shift shift) throws CorruptDataException{
+	public boolean isAssignableFor(Employee employee,Shift shift) throws CorruptDataException, ProccessingException{
     	if(!employee.requestedOff(shift)){
     		if(isUnassignedFor(employee,shift)){
     			if(!isAvailableFor(employee,shift)){
@@ -459,7 +460,7 @@ public class EmployeeShiftCompatibilityManager {
     	return true;//Ya ran the gauntlet
     }
 	
-	public boolean isUnassignedFor(Employee employee, Shift shift) throws CorruptDataException{
+	public boolean isUnassignedFor(Employee employee, Shift shift) throws CorruptDataException, ProccessingException{
 		boolean unassigned= true;
 
 		ArrayList<Shift> shiftsForWeek = employeeShiftManager.getAssignedShiftsForEmployeeForWeekOfShift(employee.getId(), shift);

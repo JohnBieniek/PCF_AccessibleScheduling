@@ -357,7 +357,7 @@ public final class ShiftWorker {
 	}
 
     
-    public static boolean isAlmostOverlapping(Shift baseShift, Shift comparingShift) throws CorruptDataException {
+    public static boolean isAlmostOverlapping(Shift baseShift, Shift comparingShift) throws CorruptDataException, ProccessingException {
 		if(null==baseShift||null==comparingShift)return false;
 		if(null!=baseShift.getClientId() && (baseShift.getClientId().equals(comparingShift.getClientId()))){
 			return isOverlapping(
@@ -376,8 +376,12 @@ public final class ShiftWorker {
 				);
 	}
     
-	public static boolean isOverlapping(LocalDateTime start1, LocalDateTime end1, LocalDateTime start2, LocalDateTime end2) {
+	public static boolean isOverlapping(LocalDateTime start1, LocalDateTime end1, LocalDateTime start2, LocalDateTime end2) throws ProccessingException {
 		boolean overlapping = false;
+		
+		if(null==start1 || null==end1 || null == start2 || null ==end2){
+			throw new ProccessingException("Null time present");
+		}
 		
 		overlapping = start1.isBefore(end2) && end1.isAfter(start2);
 		
@@ -385,7 +389,7 @@ public final class ShiftWorker {
 	}
 	
 	
-	public static boolean isOverlapping(Shift baseShift, Shift comparingShift) throws CorruptDataException {
+	public static boolean isOverlapping(Shift baseShift, Shift comparingShift) throws CorruptDataException, ProccessingException {
 		if(null==baseShift||null==comparingShift)return false;
 		
 		return isOverlapping(
