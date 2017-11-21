@@ -2050,4 +2050,6 @@ public class ShiftWorkerSpec {
 		
 		assertTrue(exception);
 	}
+	
+	//Sample
 }
