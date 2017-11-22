@@ -1856,19 +1856,27 @@ public class ShiftWorkerSpec {
 	}
 	
 	@Test
-	public void isOverlappingForTimesReturnsFalseFor1Before2(){
+	public void isOverlappingForShiftsReturnsFalseFor1Before2(){
 		boolean result=true;
 		boolean exception=false;
 		
-		LocalDateTime start1 = LocalDateTime.of(2017, 11, 10, 10, 59, 0, 0);
-		LocalDateTime end1 = LocalDateTime.of(2017, 11, 10, 11, 59, 0, 0);
+		Shift shift1 = new Shift();
 		
-		LocalDateTime start2 = LocalDateTime.of(2017, 11, 11, 8, 59, 0, 0);
-		LocalDateTime end2 = LocalDateTime.of(2017, 11, 11, 10, 59, 0, 0);
+		shift1.setStartDate("2017-11-10");
+		shift1.setEndDate("2017-11-10");
+		shift1.setStartTime("10:59");
+		shift1.setEndTime("11:59");
+		
+		Shift shift2 = new Shift();
+		
+		shift2.setStartDate("2017-11-10");
+		shift2.setEndDate("2017-11-10");
+		shift2.setStartTime("08:59");
+		shift2.setEndTime("10:59");
 		
 		try {
-			result = ShiftWorker.isOverlapping(start1,end1,start2,end2);
-		} catch (ProccessingException e) {
+			result = ShiftWorker.isOverlapping(shift2,shift1);
+		} catch (ProccessingException | CorruptDataException e) {
 			exception=true;
 		}
 		
@@ -1877,19 +1885,27 @@ public class ShiftWorkerSpec {
 	}
 	
 	@Test
-	public void isOverlappingForTimesReturnsFalseFor2Before1(){
+	public void isOverlappingForShiftsReturnsFalseFor2Before1(){
 		boolean result=true;
 		boolean exception=false;
 		
-		LocalDateTime start1 = LocalDateTime.of(2017, 11, 10, 10, 59, 0, 0);
-		LocalDateTime end1 = LocalDateTime.of(2017, 11, 10, 11, 59, 0, 0);
+		Shift shift1 = new Shift();
 		
-		LocalDateTime start2 = LocalDateTime.of(2017, 11, 10, 8, 59, 0, 0);
-		LocalDateTime end2 = LocalDateTime.of(2017, 11, 10, 10, 59, 0, 0);
+		shift1.setStartDate("2017-11-10");
+		shift1.setEndDate("2017-11-10");
+		shift1.setStartTime("10:59");
+		shift1.setEndTime("11:59");
+		
+		Shift shift2 = new Shift();
+		
+		shift2.setStartDate("2017-11-10");
+		shift2.setEndDate("2017-11-10");
+		shift2.setStartTime("08:59");
+		shift2.setEndTime("10:59");
 		
 		try {
-			result = ShiftWorker.isOverlapping(start2,end2,start1,end1);
-		} catch (ProccessingException e) {
+			result = ShiftWorker.isOverlapping(shift1,shift2);
+		} catch (ProccessingException | CorruptDataException e) {
 			exception=true;
 		}
 		
@@ -1898,19 +1914,27 @@ public class ShiftWorkerSpec {
 	}
 	
 	@Test
-	public void isOverlappingForTimesReturnsTrueFor1Contains2(){
-		boolean result=false;
+	public void isOverlappingForShiftsReturnsTrueFor1Contains2(){
+		boolean result=true;
 		boolean exception=false;
 		
-		LocalDateTime start1 = LocalDateTime.of(2017, 11, 10, 2, 59, 0, 0);
-		LocalDateTime end1 = LocalDateTime.of(2017, 11, 10, 10, 59, 0, 0);
+		Shift shift1 = new Shift();
 		
-		LocalDateTime start2 = LocalDateTime.of(2017, 11, 10, 3, 59, 0, 0);
-		LocalDateTime end2 = LocalDateTime.of(2017, 11, 10, 7, 59, 0, 0);
+		shift1.setStartDate("2017-11-10");
+		shift1.setEndDate("2017-11-10");
+		shift1.setStartTime("01:59");
+		shift1.setEndTime("11:59");
+		
+		Shift shift2 = new Shift();
+		
+		shift2.setStartDate("2017-11-10");
+		shift2.setEndDate("2017-11-10");
+		shift2.setStartTime("02:59");
+		shift2.setEndTime("05:59");
 		
 		try {
-			result = ShiftWorker.isOverlapping(start1,end1,start2,end2);
-		} catch (ProccessingException e) {
+			result = ShiftWorker.isOverlapping(shift1,shift2);
+		} catch (ProccessingException | CorruptDataException e) {
 			exception=true;
 		}
 		
@@ -1919,19 +1943,27 @@ public class ShiftWorkerSpec {
 	}
 	
 	@Test
-	public void isOverlappingForTimesReturnsTrueFor2Contains1(){
-		boolean result=false;
+	public void isOverlappingForShiftsReturnsTrueFor2Contains1(){
+		boolean result=true;
 		boolean exception=false;
 		
-		LocalDateTime start1 = LocalDateTime.of(2017, 11, 10, 2, 59, 0, 0);
-		LocalDateTime end1 = LocalDateTime.of(2017, 11, 10, 10, 59, 0, 0);
+		Shift shift1 = new Shift();
 		
-		LocalDateTime start2 = LocalDateTime.of(2017, 11, 10, 3, 59, 0, 0);
-		LocalDateTime end2 = LocalDateTime.of(2017, 11, 10, 7, 59, 0, 0);
+		shift1.setStartDate("2017-11-10");
+		shift1.setEndDate("2017-11-10");
+		shift1.setStartTime("01:59");
+		shift1.setEndTime("11:59");
+		
+		Shift shift2 = new Shift();
+		
+		shift2.setStartDate("2017-11-10");
+		shift2.setEndDate("2017-11-10");
+		shift2.setStartTime("02:59");
+		shift2.setEndTime("05:59");
 		
 		try {
-			result = ShiftWorker.isOverlapping(start2,end2,start1,end1);
-		} catch (ProccessingException e) {
+			result = ShiftWorker.isOverlapping(shift2,shift1);
+		} catch (ProccessingException | CorruptDataException e) {
 			exception=true;
 		}
 		
@@ -1940,19 +1972,27 @@ public class ShiftWorkerSpec {
 	}
 	
 	@Test
-	public void isOverlappingForTimesReturnsTrueFor1FirstEndingAfter2Starts(){
-		boolean result=false;
+	public void isOverlappingForShiftsReturnsTrueFor1FirstEndingAfter2Starts(){
+		boolean result=true;
 		boolean exception=false;
 		
-		LocalDateTime start1 = LocalDateTime.of(2017, 11, 10, 2, 59, 0, 0);
-		LocalDateTime end1 = LocalDateTime.of(2017, 11, 10, 6, 59, 0, 0);
+		Shift shift1 = new Shift();
 		
-		LocalDateTime start2 = LocalDateTime.of(2017, 11, 10, 6, 58, 0, 0);
-		LocalDateTime end2 = LocalDateTime.of(2017, 11, 10, 7, 59, 0, 0);
+		shift1.setStartDate("2017-11-10");
+		shift1.setEndDate("2017-11-10");
+		shift1.setStartTime("01:59");
+		shift1.setEndTime("06:59");
+		
+		Shift shift2 = new Shift();
+		
+		shift2.setStartDate("2017-11-10");
+		shift2.setEndDate("2017-11-10");
+		shift2.setStartTime("06:58");
+		shift2.setEndTime("08:59");
 		
 		try {
-			result = ShiftWorker.isOverlapping(start2,end2,start1,end1);
-		} catch (ProccessingException e) {
+			result = ShiftWorker.isOverlapping(shift2,shift1);
+		} catch (ProccessingException | CorruptDataException e) {
 			exception=true;
 		}
 		
@@ -1961,19 +2001,27 @@ public class ShiftWorkerSpec {
 	}
 	
 	@Test
-	public void isOverlappingForTimesReturnsTrueFor2FirstEndingAfter1Starts(){
-		boolean result=false;
+	public void isOverlappingForShiftsReturnsTrueFor2FirstEndingAfter1Starts(){
+		boolean result=true;
 		boolean exception=false;
 		
-		LocalDateTime start1 = LocalDateTime.of(2017, 11, 10, 2, 59, 0, 0);
-		LocalDateTime end1 = LocalDateTime.of(2017, 11, 10, 6, 59, 0, 0);
+		Shift shift1 = new Shift();
 		
-		LocalDateTime start2 = LocalDateTime.of(2017, 11, 10, 6, 58, 0, 0);
-		LocalDateTime end2 = LocalDateTime.of(2017, 11, 10, 7, 59, 0, 0);
+		shift1.setStartDate("2017-11-10");
+		shift1.setEndDate("2017-11-10");
+		shift1.setStartTime("01:59");
+		shift1.setEndTime("06:59");
+		
+		Shift shift2 = new Shift();
+		
+		shift2.setStartDate("2017-11-10");
+		shift2.setEndDate("2017-11-10");
+		shift2.setStartTime("06:58");
+		shift2.setEndTime("08:59");
 		
 		try {
-			result = ShiftWorker.isOverlapping(start1,end1,start2,end2);
-		} catch (ProccessingException e) {
+			ShiftWorker.isOverlapping(shift1,shift2);
+		} catch (ProccessingException | CorruptDataException e) {
 			exception=true;
 		}
 		
@@ -1982,17 +2030,26 @@ public class ShiftWorkerSpec {
 	}
 	
 	@Test
-	public void isOverlappingForTimesFailsForNullStart1(){
+	public void isOverlappingForShiftFailsForNull1(){
 		boolean exception=false;
 		
-		LocalDateTime end1 = LocalDateTime.of(2017, 11, 10, 6, 59, 0, 0);
+		Shift shift1 = new Shift();
 		
-		LocalDateTime start2 = LocalDateTime.of(2017, 11, 10, 6, 58, 0, 0);
-		LocalDateTime end2 = LocalDateTime.of(2017, 11, 10, 7, 59, 0, 0);
+		shift1.setStartDate("2017-11-10");
+		shift1.setEndDate("2017-11-10");
+		shift1.setStartTime("01:59");
+		shift1.setEndTime("06:59");
+		
+		Shift shift2 = new Shift();
+		
+		shift2.setStartDate("2017-11-10");
+		shift2.setEndDate("2017-11-10");
+		shift2.setStartTime("06:58");
+		shift2.setEndTime("08:59");
 		
 		try {
-			ShiftWorker.isOverlapping(null,end1,start2,end2);
-		} catch (ProccessingException e) {
+			ShiftWorker.isOverlapping(null,shift2);
+		} catch (ProccessingException | CorruptDataException e) {
 			exception=true;
 		}
 		
@@ -2000,56 +2057,244 @@ public class ShiftWorkerSpec {
 	}
 	
 	@Test
-	public void isOverlappingForTimesFailsForNullEnd1(){
+	public void isOverlappingForShiftFailsForNull2(){
 		boolean exception=false;
 		
-		LocalDateTime start1 = LocalDateTime.of(2017, 11, 10, 2, 59, 0, 0);
+		Shift shift1 = new Shift();
 		
-		LocalDateTime start2 = LocalDateTime.of(2017, 11, 10, 6, 58, 0, 0);
-		LocalDateTime end2 = LocalDateTime.of(2017, 11, 10, 7, 59, 0, 0);
+		shift1.setStartDate("2017-11-10");
+		shift1.setEndDate("2017-11-10");
+		shift1.setStartTime("01:59");
+		shift1.setEndTime("06:59");
 		
-		try {
-			ShiftWorker.isOverlapping(start1,null,start2,end2);
-		} catch (ProccessingException e) {
-			exception=true;
-		}
+		Shift shift2 = new Shift();
 		
-		assertTrue(exception);
-	}
-	@Test
-	public void isOverlappingForTimesFailsForNullStart2(){
-		boolean exception=false;
-		
-		LocalDateTime start1 = LocalDateTime.of(2017, 11, 10, 2, 59, 0, 0);
-		LocalDateTime end1 = LocalDateTime.of(2017, 11, 10, 6, 59, 0, 0);
-		
-		LocalDateTime end2 = LocalDateTime.of(2017, 11, 10, 7, 59, 0, 0);
+		shift2.setStartDate("2017-11-10");
+		shift2.setEndDate("2017-11-10");
+		shift2.setStartTime("06:58");
+		shift2.setEndTime("08:59");
 		
 		try {
-			ShiftWorker.isOverlapping(start1,end1,null,end2);
-		} catch (ProccessingException e) {
-			exception=true;
-		}
-		
-		assertTrue(exception);
-	}
-	@Test
-	public void isOverlappingForTimesFailsForNullEnd2(){
-		boolean exception=false;
-		
-		LocalDateTime start1 = LocalDateTime.of(2017, 11, 10, 2, 59, 0, 0);
-		LocalDateTime end1 = LocalDateTime.of(2017, 11, 10, 6, 59, 0, 0);
-		
-		LocalDateTime start2 = LocalDateTime.of(2017, 11, 10, 6, 58, 0, 0);
-		
-		try {
-			ShiftWorker.isOverlapping(start1,end1,start2,null);
-		} catch (ProccessingException e) {
+			ShiftWorker.isOverlapping(shift1,null);
+		} catch (ProccessingException | CorruptDataException e) {
 			exception=true;
 		}
 		
 		assertTrue(exception);
 	}
 	
-	//Sample
+	@Test
+	public void isOverlappingForShiftFailsForNullStartDate1(){
+		boolean exception=false;
+		
+		Shift shift1 = new Shift();
+		
+		shift1.setStartDate(null);
+		shift1.setEndDate("2017-11-10");
+		shift1.setStartTime("01:59");
+		shift1.setEndTime("06:59");
+		
+		Shift shift2 = new Shift();
+		
+		shift2.setStartDate("2017-11-10");
+		shift2.setEndDate("2017-11-10");
+		shift2.setStartTime("06:58");
+		shift2.setEndTime("08:59");
+		
+		try {
+			ShiftWorker.isOverlapping(shift1,shift2);
+		} catch (ProccessingException | CorruptDataException e) {
+			exception=true;
+		}
+		
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void isOverlappingForShiftFailsForNullEndDate1(){
+		boolean exception=false;
+		
+		Shift shift1 = new Shift();
+		
+		shift1.setStartDate("2017-11-10");
+		shift1.setEndDate(null);
+		shift1.setStartTime("01:59");
+		shift1.setEndTime("06:59");
+		
+		Shift shift2 = new Shift();
+		
+		shift2.setStartDate("2017-11-10");
+		shift2.setEndDate("2017-11-10");
+		shift2.setStartTime("06:58");
+		shift2.setEndTime("08:59");
+		
+		try {
+			ShiftWorker.isOverlapping(shift1,shift2);
+		} catch (ProccessingException | CorruptDataException e) {
+			exception=true;
+		}
+		
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void isOverlappingForShiftFailsForNullStartTime1(){
+		boolean exception=false;
+		
+		Shift shift1 = new Shift();
+		
+		shift1.setStartDate("2017-11-10");
+		shift1.setEndDate("2017-11-10");
+		shift1.setStartTime(null);
+		shift1.setEndTime("06:59");
+		
+		Shift shift2 = new Shift();
+		
+		shift2.setStartDate("2017-11-10");
+		shift2.setEndDate("2017-11-10");
+		shift2.setStartTime("06:58");
+		shift2.setEndTime("08:59");
+		
+		try {
+			ShiftWorker.isOverlapping(shift1,shift2);
+		} catch (ProccessingException | CorruptDataException e) {
+			exception=true;
+		}
+		
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void isOverlappingForShiftFailsForNullEndTime1(){
+		boolean exception=false;
+		
+		Shift shift1 = new Shift();
+		
+		shift1.setStartDate("2017-11-10");
+		shift1.setEndDate("2017-11-10");
+		shift1.setStartTime("01:59");
+		shift1.setEndTime(null);
+		
+		Shift shift2 = new Shift();
+		
+		shift2.setStartDate("2017-11-10");
+		shift2.setEndDate("2017-11-10");
+		shift2.setStartTime("06:58");
+		shift2.setEndTime("08:59");
+		
+		try {
+			ShiftWorker.isOverlapping(shift1,shift2);
+		} catch (ProccessingException | CorruptDataException e) {
+			exception=true;
+		}
+		
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void isOverlappingForShiftFailsForNullStartDate2(){
+		boolean exception=false;
+		
+		Shift shift1 = new Shift();
+		
+		shift1.setStartDate("2017-11-10");
+		shift1.setEndDate("2017-11-10");
+		shift1.setStartTime("01:59");
+		shift1.setEndTime("06:59");
+		
+		Shift shift2 = new Shift();
+		
+		shift2.setStartDate(null);
+		shift2.setEndDate("2017-11-10");
+		shift2.setStartTime("06:58");
+		shift2.setEndTime("08:59");
+		
+		try {
+			ShiftWorker.isOverlapping(shift1,shift2);
+		} catch (ProccessingException | CorruptDataException e) {
+			exception=true;
+		}
+		
+		assertTrue(exception);
+	}
+	@Test
+	public void isOverlappingForShiftFailsForNullEndDate2(){
+		boolean exception=false;
+		
+		Shift shift1 = new Shift();
+		
+		shift1.setStartDate("2017-11-10");
+		shift1.setEndDate("2017-11-10");
+		shift1.setStartTime("01:59");
+		shift1.setEndTime("06:59");
+		
+		Shift shift2 = new Shift();
+		
+		shift2.setStartDate("2017-11-10");
+		shift2.setEndDate(null);
+		shift2.setStartTime("06:58");
+		shift2.setEndTime("08:59");
+		
+		try {
+			ShiftWorker.isOverlapping(shift1,shift2);
+		} catch (ProccessingException | CorruptDataException e) {
+			exception=true;
+		}
+		
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void isOverlappingForShiftFailsForNullStartTime2(){
+		boolean exception=false;
+		
+		Shift shift1 = new Shift();
+		
+		shift1.setStartDate("2017-11-10");
+		shift1.setEndDate("2017-11-10");
+		shift1.setStartTime("01:59");
+		shift1.setEndTime("06:59");
+		
+		Shift shift2 = new Shift();
+		
+		shift2.setStartDate("2017-11-10");
+		shift2.setEndDate("2017-11-10");
+		shift2.setStartTime(null);
+		shift2.setEndTime("08:59");
+		
+		try {
+			ShiftWorker.isOverlapping(shift1,shift2);
+		} catch (ProccessingException | CorruptDataException e) {
+			exception=true;
+		}
+		
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void isOverlappingForShiftFailsForNullEndTime2(){
+		boolean exception=false;
+		
+		Shift shift1 = new Shift();
+		
+		shift1.setStartDate("2017-11-10");
+		shift1.setEndDate("2017-11-10");
+		shift1.setStartTime("01:59");
+		shift1.setEndTime("06:59");
+		
+		Shift shift2 = new Shift();
+		
+		shift2.setStartDate("2017-11-10");
+		shift2.setEndDate("2017-11-10");
+		shift2.setStartTime("06:58");
+		shift2.setEndTime(null);
+		
+		try {
+			ShiftWorker.isOverlapping(shift1,shift2);
+		} catch (ProccessingException | CorruptDataException e) {
+			exception=true;
+		}
+		
+		assertTrue(exception);
+	}
 }

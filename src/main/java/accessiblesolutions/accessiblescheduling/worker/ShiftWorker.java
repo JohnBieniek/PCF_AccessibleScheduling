@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import accessiblesolutions.accessiblescheduling.domain.Shift;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
+import accessiblesolutions.accessiblescheduling.util.Util;
 @Component
 public final class ShiftWorker {
     public static ArrayList<Shift> assignRequestedStaff(HashMap<String, ArrayList<Shift>> prestaffedShiftsPerEmployee) throws ProccessingException {
@@ -360,7 +361,7 @@ public final class ShiftWorker {
     public static boolean isAlmostOverlapping(Shift baseShift, Shift comparingShift) throws CorruptDataException, ProccessingException {
 		if(null==baseShift||null==comparingShift)return false;
 		if(null!=baseShift.getClientId() && (baseShift.getClientId().equals(comparingShift.getClientId()))){
-			return isOverlapping(
+			return Util.isOverlapping(
 				baseShift.getStartsLocalDateTime(),
 				baseShift.getEndsLocalDateTime(),
 				comparingShift.getStartsLocalDateTime(),
@@ -375,24 +376,13 @@ public final class ShiftWorker {
 				comparingShift.getEndsLocalDateTime()
 				);
 	}
-    
-	public static boolean isOverlapping(LocalDateTime start1, LocalDateTime end1, LocalDateTime start2, LocalDateTime end2) throws ProccessingException {
-		boolean overlapping = false;
-		
-		if(null==start1 || null==end1 || null == start2 || null ==end2){
-			throw new ProccessingException("Null time present");
-		}
-		
-		overlapping = start1.isBefore(end2) && end1.isAfter(start2);
-		
-		return overlapping;
-	}
-	
 	
 	public static boolean isOverlapping(Shift baseShift, Shift comparingShift) throws CorruptDataException, ProccessingException {
-		if(null==baseShift||null==comparingShift)return false;
+		if(null==baseShift||null==comparingShift){
+			throw new ProccessingException("Null shift present");
+		}
 		
-		return isOverlapping(
+		return Util.isOverlapping(
 				baseShift.getStartsLocalDateTime(),
 				baseShift.getEndsLocalDateTime(),
 				comparingShift.getStartsLocalDateTime(),
