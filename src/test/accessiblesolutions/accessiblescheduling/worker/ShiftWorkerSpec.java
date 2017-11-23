@@ -2297,4 +2297,50 @@ public class ShiftWorkerSpec {
 		
 		assertTrue(exception);
 	}
+	
+	@Test
+	public void getShiftsStartingTheLastDayOfMonthReturnsEmptyForOtherDays(){
+		boolean exception =false;
+		ArrayList<Shift> shifts = new ArrayList<Shift>();
+		Shift shift = new Shift();
+		shift.setStartDate("2017-11-10");
+		shifts.add(shift);
+		try {
+			shifts=ShiftWorker.getShiftsStartingTheLastDayOfMonth(shifts,11);
+		} catch (CorruptDataException e) {
+			exception=true;
+		}
+		
+		assertFalse(exception);
+		assertTrue(shifts.isEmpty());
+	}
+	
+	@Test
+	public void getShiftsStartingTheLastDayOfMonthReturnsMultiple(){
+		boolean exception =false;
+		ArrayList<Shift> shifts = new ArrayList<Shift>();
+		Shift shift = new Shift();
+		shift.setStartDate("2017-11-30");
+		shift.setAssignmentReason("butts");
+		shifts.add(shift);
+		shift = new Shift();
+		shift.setStartDate("2017-11-30");
+		shifts.add(shift);
+		shift = new Shift();
+		shift.setAssigned(true);
+		shift.setStartDate("2017-11-29");
+		shifts.add(shift);
+		
+		ArrayList<Shift> result = null;
+		try {
+			result=ShiftWorker.getShiftsStartingTheLastDayOfMonth(shifts,11);
+		} catch (CorruptDataException e) {
+			exception=true;
+		}
+		
+		assertFalse(exception);
+		assertNotNull(result);
+		System.out.println(result.size());
+		assertTrue(result.size()==2);
+	}
 }
