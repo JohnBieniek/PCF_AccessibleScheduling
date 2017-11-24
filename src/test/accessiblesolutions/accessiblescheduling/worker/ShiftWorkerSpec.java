@@ -2307,7 +2307,7 @@ public class ShiftWorkerSpec {
 		shifts.add(shift);
 		try {
 			shifts=ShiftWorker.getShiftsStartingTheLastDayOfMonth(shifts,11);
-		} catch (CorruptDataException e) {
+		} catch (CorruptDataException | ProccessingException e) {
 			exception=true;
 		}
 		
@@ -2334,7 +2334,7 @@ public class ShiftWorkerSpec {
 		ArrayList<Shift> result = null;
 		try {
 			result=ShiftWorker.getShiftsStartingTheLastDayOfMonth(shifts,11);
-		} catch (CorruptDataException e) {
+		} catch (CorruptDataException | ProccessingException e) {
 			exception=true;
 		}
 		
@@ -2342,5 +2342,121 @@ public class ShiftWorkerSpec {
 		assertNotNull(result);
 		System.out.println(result.size());
 		assertTrue(result.size()==2);
+	}
+	
+	@Test
+	public void getShiftsStartingTheLastDayOfMonthFailsForInvalidMonth(){
+		boolean exception =false;
+		ArrayList<Shift> shifts = new ArrayList<Shift>();
+		Shift shift = new Shift();
+		shift.setStartDate("2017-11-30");
+		shift.setAssignmentReason("butts");
+		shifts.add(shift);
+		shift = new Shift();
+		shift.setStartDate("2017-11-30");
+		shifts.add(shift);
+		shift = new Shift();
+		shift.setAssigned(true);
+		shift.setStartDate("2017-11-29");
+		shifts.add(shift);
+		try {
+			ShiftWorker.getShiftsStartingTheLastDayOfMonth(shifts,13);
+		} catch (CorruptDataException e) {
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			exception=true;
+		}
+		
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getShiftsStartingTheLastDayOfMonthReturnsEmptyForNullArray(){
+		boolean exception =false;
+		ArrayList<Shift> shifts = new ArrayList<Shift>();
+		Shift shift = new Shift();
+		shift.setStartDate("2017-11-30");
+		shift.setAssignmentReason("butts");
+		shifts.add(shift);
+		shift = new Shift();
+		shift.setStartDate("2017-11-30");
+		shifts.add(shift);
+		shift = new Shift();
+		shift.setAssigned(true);
+		shift.setStartDate("2017-11-29");
+		shifts.add(shift);
+		ArrayList<Shift> result = null;
+		try {
+			result = ShiftWorker.getShiftsStartingTheLastDayOfMonth(null,11);
+		} catch (CorruptDataException e) {
+			exception=true;
+		} catch (ProccessingException e) {
+			exception=true;
+		}
+		
+		assertFalse(exception);
+		assertNotNull(result);
+		assertTrue(result.isEmpty());
+	}
+	
+	@Test
+	public void getShiftsStartingTheLastDayOfMonthReturnsEmptyForEmptyArray(){
+		boolean exception =false;
+		ArrayList<Shift> shifts = new ArrayList<Shift>();
+		ArrayList<Shift> result = null;
+		try {
+			result = ShiftWorker.getShiftsStartingTheLastDayOfMonth(shifts,11);
+		} catch (CorruptDataException e) {
+			exception=true;
+		} catch (ProccessingException e) {
+			exception=true;
+		}
+		
+		assertFalse(exception);
+		assertNotNull(result);
+		assertTrue(result.isEmpty());
+	}
+	
+	@Test
+	public void getShiftsStartingTheLastDayOfMonthFailsForNullShifts(){
+		boolean exception =false;
+		ArrayList<Shift> shifts = new ArrayList<Shift>();
+		shifts.add(null);
+		try {
+			ShiftWorker.getShiftsStartingTheLastDayOfMonth(shifts,11);
+		} catch (CorruptDataException e) {
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			exception=true;
+		}
+		
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getShiftsStartingTheLastDayOfMonthFailsForMissingStartDate(){
+		boolean exception =false;
+		ArrayList<Shift> shifts = new ArrayList<Shift>();
+		Shift shift = new Shift();
+		shift.setStartDate("2017-11-30");
+		shift.setAssignmentReason("butts");
+		shifts.add(shift);
+		shift = new Shift();
+		shifts.add(shift);
+		shift = new Shift();
+		shift.setAssigned(true);
+		shift.setStartDate("2017-11-29");
+		shifts.add(shift);
+		
+		try {
+			ShiftWorker.getShiftsStartingTheLastDayOfMonth(shifts,11);
+		} catch (ProccessingException e) {
+			e.printStackTrace();
+		}
+		catch(CorruptDataException e){
+			exception= true;
+		}
+		
+		assertTrue(exception);
 	}
 }

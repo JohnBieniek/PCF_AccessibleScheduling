@@ -231,10 +231,22 @@ public final class ShiftWorker {
     }
 
 
-    public static ArrayList<Shift> getShiftsStartingTheLastDayOfMonth(ArrayList<Shift> shifts, int month) throws CorruptDataException{
+    public static ArrayList<Shift> getShiftsStartingTheLastDayOfMonth(ArrayList<Shift> shifts, int month) throws CorruptDataException, ProccessingException{
 		ArrayList<Shift> shiftsForTheLastDay = new ArrayList<Shift>();
 		
+		if(null==shifts|| shifts.size()==0){
+			return shiftsForTheLastDay;
+		}
+		
+		if(month<1||month>12){
+			throw new ProccessingException(month+ " isn't a valid month");
+		}
+		
 		for(Shift shift:shifts){
+			if(null==shift){
+				throw new ProccessingException("Null shift present");
+			}
+			
 			if(shift.getStartsLocalDate().getMonth().getValue()==month){
 				if(shift.getStartsLocalDate().plusDays(1).getMonthValue()!=month){
 					shiftsForTheLastDay.add(shift);
