@@ -2340,7 +2340,6 @@ public class ShiftWorkerSpec {
 		
 		assertFalse(exception);
 		assertNotNull(result);
-		System.out.println(result.size());
 		assertTrue(result.size()==2);
 	}
 	
@@ -2458,5 +2457,59 @@ public class ShiftWorkerSpec {
 		}
 		
 		assertTrue(exception);
+	}
+	
+	@Test
+	public void getShiftsForWeekOfMonthReturnsMultiple(){
+		boolean exception =false;
+		ArrayList<Shift> shifts = new ArrayList<Shift>();
+		Shift shift = new Shift();
+		shift.setStartDate("2017-11-03");
+		shifts.add(shift);
+		shift = new Shift();
+		shift.setStartDate("2017-11-02");
+		shifts.add(shift);
+		shift = new Shift();
+		shift.setStartDate("2017-11-10");
+		shifts.add(shift);
+		
+		ArrayList<Shift> result = null;
+		
+		try {
+			result= ShiftWorker.getShiftsForWeekOfMonth(shifts, 0, 11);
+		} catch (CorruptDataException e) {
+			exception=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(exception);
+		assertTrue(result.size()==2);
+	}
+	
+	@Test
+	public void getShiftsForWeekOfMonthReturnsEmptyForInvalid(){
+		boolean exception =false;
+		ArrayList<Shift> shifts = new ArrayList<Shift>();
+		Shift shift = new Shift();
+		shift.setStartDate("2017-11-13");
+		shifts.add(shift);
+		shift = new Shift();
+		shift.setStartDate("2017-11-12");
+		shifts.add(shift);
+		shift = new Shift();
+		shift.setStartDate("2017-11-10");
+		shifts.add(shift);
+		
+		ArrayList<Shift> result = null;
+		
+		try {
+			result= ShiftWorker.getShiftsForWeekOfMonth(shifts, 0, 11);
+		} catch (CorruptDataException e) {
+			exception=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(exception);
+		assertTrue(result.size()==0);
 	}
 }
