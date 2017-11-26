@@ -217,12 +217,23 @@ public final class ShiftWorker {
     	return recurringShifts;
 	}
 	
-	//weeks are considered to start at 0 with a maximum possible of 5, year assumed current year
-    public static ArrayList<Shift> getShiftsForWeekOfMonth(Iterable<Shift> shifts, int week, int month) throws CorruptDataException{
+    public static ArrayList<Shift> getShiftsStartingWeekOfMonth(Iterable<Shift> shifts, int week, int month, int year) throws CorruptDataException, ProccessingException{
     	ArrayList<Shift> shiftsForWeek = new ArrayList<Shift>();
 		
+    	if(month<1||month>12){
+			throw new ProccessingException(month+ " isn't a valid month");
+		}
+    	
+    	if(week<0||week>5){
+			throw new ProccessingException(week+ " isn't a valid week");
+		}
+    	
     	for(Shift shift: shifts){
-    		if(shift.getStartWeek()==week){
+    		if(null==shift){
+				throw new ProccessingException("Null shift present");
+			}
+    		
+    		if(shift.getStartWeek()==week && shift.getStartsLocalDate().getMonthValue()==month && shift.getStartsLocalDate().getYear()==year){
     			shiftsForWeek.add(shift);
     		}
     	}

@@ -57,7 +57,7 @@ public class ShiftManager {
 	}
     
   //weeks are considered to start at 0 with a maximum possible of 5, year assumed current year
-    public ArrayList<Shift> getShiftsForWeekOfMonth(int week, int month) throws CorruptDataException{
-    	return ShiftWorker.getShiftsForWeekOfMonth(shiftRepository.findByStartMonth(month),week,month);
+    public ArrayList<Shift> getShiftsStartingWeekOfMonth(int week, int month, int year) throws CorruptDataException, ProccessingException{
+    	return ShiftWorker.getShiftsStartingWeekOfMonth(shiftRepository.findByStartMonth(month),week,month,year);
     }
 }

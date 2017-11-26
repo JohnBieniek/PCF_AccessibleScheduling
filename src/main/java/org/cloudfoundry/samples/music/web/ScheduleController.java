@@ -37,8 +37,8 @@ public class ScheduleController {
     }
     
     @RequestMapping(value = "/staffShifts", method = RequestMethod.GET)
-    public String staffShifts(@RequestParam("month") String month) throws CorruptDataException, ProccessingException {
-        return manager.staffShifts(month);
+    public String staffShifts(@RequestParam("month") String month,@RequestParam("year") String year) throws CorruptDataException, ProccessingException {
+        return manager.staffShifts(month,year);
     }
     
     @RequestMapping(value = "/getShiftsForMonth", method = RequestMethod.GET)

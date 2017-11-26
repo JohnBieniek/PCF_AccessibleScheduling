@@ -79,20 +79,20 @@ public class ShiftAssignmentManager {
     	shiftCrud.save(assignedUnconflictedPrestaffedSingleShifts);
 	}
     
-    public void scheduleUnassignedNonEventShiftsFor(int month) throws CorruptDataException, ProccessingException {
+    public void scheduleUnassignedNonEventShiftsFor(int month,int year) throws CorruptDataException, ProccessingException {
 		for(int week = 0; week<6;week++){
-    		scheduleShiftsForWeekOfMonth(week,month);
+    		scheduleShiftsStartingWeekOfMonth(week,month,year);
     	}
 	}
-    public void scheduleShiftsForWeekOfMonth(int week, int month) throws CorruptDataException, ProccessingException {
+    public void scheduleShiftsStartingWeekOfMonth(int week, int month, int year) throws CorruptDataException, ProccessingException {
     	System.out.println("scheduling shifts for week " +week + " of month:"+month);
-		scheduleWeekendShiftsForWeekOfMonth(week, month);
-		scheduleWeekdayShiftsForWeekOfMonth(week, month);
+		scheduleWeekendShiftsStartingWeekOfMonth(week, month,year);
+		scheduleWeekdayShiftsStartingWeekOfMonth(week, month,year);
 	}
       
-    private void scheduleWeekendShiftsForWeekOfMonth(int week, int month) throws CorruptDataException, ProccessingException {
+    private void scheduleWeekendShiftsStartingWeekOfMonth(int week, int month,int year) throws CorruptDataException, ProccessingException {
 		ArrayList<Shift> shifts = shiftManager.getUnassignedNonEventShiftsForMonth(month);
-		ArrayList<Shift> unassignedShiftsForWeek = ShiftWorker.getShiftsForWeekOfMonth(shifts, week, month);
+		ArrayList<Shift> unassignedShiftsForWeek = ShiftWorker.getShiftsStartingWeekOfMonth(shifts, week, month,year);
 		ArrayList<Shift> unassignedShiftsForWeekends= ShiftWorker.getWeekendShifts(unassignedShiftsForWeek);
 		for(Shift shift : unassignedShiftsForWeekends){
 			System.out.println("Attempitng to assign " + shift.toString());
@@ -163,11 +163,11 @@ public class ShiftAssignmentManager {
 		}
 	}
    
-    private void scheduleWeekdayShiftsForWeekOfMonth(int week, int month) throws CorruptDataException, ProccessingException {
+    private void scheduleWeekdayShiftsStartingWeekOfMonth(int week, int month,int year) throws CorruptDataException, ProccessingException {
 		ArrayList<Shift> shifts = shiftManager.getUnassignedNonEventShiftsForMonth(month);
 //		System.out.println(shifts.size()+" unassigned non event shifts for month "+month);
 		
-		ArrayList<Shift> unassignedShiftsForWeek = ShiftWorker.getShiftsForWeekOfMonth(shifts, week, month);
+		ArrayList<Shift> unassignedShiftsForWeek = ShiftWorker.getShiftsStartingWeekOfMonth(shifts, week, month,year);
 	//	System.out.println(unassignedShiftsForWeek.size()+" unassigned non event shifts for week  "+week);
 
 		ArrayList<Shift> unassignedShiftsForWeekdays= ShiftWorker.getWeekdayShifts(unassignedShiftsForWeek);
