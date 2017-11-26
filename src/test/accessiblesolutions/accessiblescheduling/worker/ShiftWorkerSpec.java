@@ -2695,7 +2695,7 @@ public class ShiftWorkerSpec {
 		boolean exception = false;
 		ArrayList<Shift> shifts= new ArrayList<Shift>();
 		try {
-			shifts=ShiftWorker.getPrestaffedShifts(shifts);
+			shifts=ShiftWorker.getPrestaffedRecurringShifts(shifts);
 		} catch (ProccessingException e) {
 			exception = true;
 		}
@@ -2735,6 +2735,75 @@ public class ShiftWorkerSpec {
 		shifts.add(shift);
 		try {
 			shifts=ShiftWorker.getPrestaffedRecurringShifts(shifts);
+		} catch (ProccessingException e) {
+			exception = true;
+		}
+		
+		assertFalse(exception);
+		assertTrue(shifts.size()==1);
+	}
+	
+	@Test
+	public void getPrestaffedSingleShiftsReturnsEmptyForNull(){
+		boolean exception = false;
+		ArrayList<Shift> shifts= null;
+		try {
+			shifts=ShiftWorker.getPrestaffedSingleShifts(null);
+		} catch (ProccessingException e) {
+			exception = true;
+		}
+		
+		assertFalse(exception);
+		assertNotNull(shifts);
+		assertTrue(shifts.isEmpty());
+	}
+	
+	
+	@Test
+	public void getPrestaffedSingleShiftsReturnsEmptyForEmpty(){
+		boolean exception = false;
+		ArrayList<Shift> shifts= new ArrayList<Shift>();
+		try {
+			shifts=ShiftWorker.getPrestaffedSingleShifts(shifts);
+		} catch (ProccessingException e) {
+			exception = true;
+		}
+		
+		assertFalse(exception);
+		assertNotNull(shifts);
+		assertTrue(shifts.isEmpty());
+	}
+	
+	@Test
+	public void getPrestaffedSingleShiftsFailsForArrayContainingNull(){
+		boolean exception = false;
+		ArrayList<Shift> shifts= new ArrayList<Shift>();
+		shifts.add(null);
+		try {
+			shifts=ShiftWorker.getPrestaffedSingleShifts(shifts);
+		} catch (ProccessingException e) {
+			exception = true;
+		}
+		
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getPrestaffedSingleShiftsReturnsThoseWithRequestedStaffId(){
+		boolean exception = false;
+		ArrayList<Shift> shifts= new ArrayList<Shift>();
+		Shift shift = new Shift();
+		shift.setRequestedStaffId("testA");
+		shift.setRecurring(true);
+		shifts.add(shift);
+		shift=new Shift();
+		shift.setRequestedStaffId("testA");
+		shifts.add(shift);
+		shift=new Shift();
+		shift.setRecurring(true);
+		shifts.add(shift);
+		try {
+			shifts=ShiftWorker.getPrestaffedSingleShifts(shifts);
 		} catch (ProccessingException e) {
 			exception = true;
 		}
