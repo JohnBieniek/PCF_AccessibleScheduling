@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import accessiblesolutions.accessiblescheduling.domain.Employee;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
+import accessiblesolutions.accessiblescheduling.manager.ShiftManager;
 import accessiblesolutions.accessiblescheduling.worker.ShiftWorker;
 
 @Component

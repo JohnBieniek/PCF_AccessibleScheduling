@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import accessiblesolutions.accessiblescheduling.domain.Shift;
 import org.cloudfoundry.samples.music.managers.EmployeeShiftMapManager;
 import org.cloudfoundry.samples.music.managers.ScheduleManager;
-import org.cloudfoundry.samples.music.managers.ShiftManager;
+import accessiblesolutions.accessiblescheduling.manager.ShiftManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;

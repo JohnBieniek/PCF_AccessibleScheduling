@@ -348,6 +348,7 @@ public final class ShiftWorker {
     	return weekendShifts;
 	}
 
+	//TODO write tests and validate
 	public static boolean isAlmostOverlapping(LocalDateTime start1, LocalDateTime end1, LocalDateTime start2, LocalDateTime end2) {
 		boolean overlapping = false;
 		
@@ -381,7 +382,7 @@ public final class ShiftWorker {
 		return overlapping;
 	}
 
-    
+    //TODO write tests and validate
     public static boolean isAlmostOverlapping(Shift baseShift, Shift comparingShift) throws CorruptDataException, ProccessingException {
 		if(null==baseShift||null==comparingShift)return false;
 		if(null!=baseShift.getClientId() && (baseShift.getClientId().equals(comparingShift.getClientId()))){

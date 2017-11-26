@@ -1,4 +1,4 @@
-package org.cloudfoundry.samples.music.managers;
+package accessiblesolutions.accessiblescheduling.manager;
 import java.util.ArrayList;
 
 import accessiblesolutions.accessiblescheduling.domain.Shift;
