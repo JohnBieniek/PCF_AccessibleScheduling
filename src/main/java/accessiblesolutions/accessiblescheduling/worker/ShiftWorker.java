@@ -94,7 +94,7 @@ public final class ShiftWorker {
     	}
     	
     	for(Shift shift:shifts){
-    		if(null!=shift && !shift.getEvent()){
+    		if(null!=shift && !shift.getEvent()){//TODO consider changing to throw exception on null shifts like the others
     			nonEventShifts.add(shift);
     		}
     	}

@@ -2673,4 +2673,74 @@ public class ShiftWorkerSpec {
 		
 		assertTrue(exception);
 	}
+	
+	@Test
+	public void getPrestaffedRecurringShiftsReturnsEmptyForNull(){
+		boolean exception = false;
+		ArrayList<Shift> shifts= null;
+		try {
+			shifts=ShiftWorker.getPrestaffedRecurringShifts(null);
+		} catch (ProccessingException e) {
+			exception = true;
+		}
+		
+		assertFalse(exception);
+		assertNotNull(shifts);
+		assertTrue(shifts.isEmpty());
+	}
+	
+	
+	@Test
+	public void getPrestaffedRecurringShiftsReturnsEmptyForEmpty(){
+		boolean exception = false;
+		ArrayList<Shift> shifts= new ArrayList<Shift>();
+		try {
+			shifts=ShiftWorker.getPrestaffedShifts(shifts);
+		} catch (ProccessingException e) {
+			exception = true;
+		}
+		
+		assertFalse(exception);
+		assertNotNull(shifts);
+		assertTrue(shifts.isEmpty());
+	}
+	
+	@Test
+	public void getPrestaffedRecurringShiftsFailsForArrayContainingNull(){
+		boolean exception = false;
+		ArrayList<Shift> shifts= new ArrayList<Shift>();
+		shifts.add(null);
+		try {
+			shifts=ShiftWorker.getPrestaffedRecurringShifts(shifts);
+		} catch (ProccessingException e) {
+			exception = true;
+		}
+		
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getPrestaffedRecurringShiftsReturnsThoseWithRequestedStaffId(){
+		boolean exception = false;
+		ArrayList<Shift> shifts= new ArrayList<Shift>();
+		Shift shift = new Shift();
+		shift.setRequestedStaffId("testA");
+		shift.setRecurring(true);
+		shifts.add(shift);
+		shift=new Shift();
+		shift.setRequestedStaffId("testA");
+		shifts.add(shift);
+		shift=new Shift();
+		shift.setRecurring(true);
+		shifts.add(shift);
+		try {
+			shifts=ShiftWorker.getPrestaffedRecurringShifts(shifts);
+		} catch (ProccessingException e) {
+			exception = true;
+		}
+		
+		assertFalse(exception);
+		assertTrue(shifts.size()==1);
+	}
+
 }
