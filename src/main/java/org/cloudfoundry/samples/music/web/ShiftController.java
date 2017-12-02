@@ -32,6 +32,28 @@ public class ShiftController {
     public ShiftController(CrudRepository<Shift, String> repository) {
         this.repository = repository;
     }
+    
+    @RequestMapping(method = RequestMethod.POST, value= "/validity")
+    public @ResponseBody boolean getValidity(HttpServletRequest request) throws CorruptDataException{
+    	Shift shift =null;
+
+    	String param= request.getParameter("shift");
+    	ObjectMapper mapper = new ObjectMapper();
+    	
+    	try {
+			shift = mapper.readValue(param, Shift.class);
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+    	boolean validity = shift.isValid();
+
+    	return validity;
+    }
 
     @RequestMapping(method = RequestMethod.POST, value= "/duration")
     public @ResponseBody float getDuration(HttpServletRequest request) throws CorruptDataException{

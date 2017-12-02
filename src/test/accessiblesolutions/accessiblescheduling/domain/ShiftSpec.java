@@ -810,4 +810,16 @@ public class ShiftSpec {
 		}
 		assertFalse(exception);
 	}
+	
+	@Test
+	public void isValidFalseWithNoStartTime(){
+		Shift shift = new Shift();
+		
+		shift.setEndTime("12:00");
+		
+		shift.setStartDate("2017-02-11");		
+		shift.setEndDate("2017-02-11");
+		
+		assertFalse(shift.isValid());
+	}
 }

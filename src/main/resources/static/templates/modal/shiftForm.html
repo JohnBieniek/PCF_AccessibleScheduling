@@ -19,6 +19,7 @@
             <label for="staffName" style="font-size:16px">Client Name</label>
             
             <select name="mySelect" 
+            		ng-change="isValid(shift)"
             		id="mySelect"
             		ng-init = "selectedClient"
       				ng-options="client.first for client in clients | orderBy:'first' track by client.id"
@@ -38,18 +39,18 @@
         
         <div>
             <label for="startDate" style="font-size:18px">Start Date/Time</label>
-            <input type="date" ng-model="shift.startDate" placeholder="Date" required/>
-            <input type="time" ng-model="shift.startTime" required>
+            <input id="start" ng-change="isValid(shift)" type="date" ng-model="shift.startDate" placeholder="Date" required/>
+            <input type="time" ng-change="isValid(shift)" ng-model="shift.startTime" required>
         </div>
         
         <div>
             <label for="endDate" style="font-size:18px">End Date/Time</label>
-            <input type="date" ng-model="shift.endDate" placeholder="Date" required/>
-            <input type="time" ng-model="shift.endTime" required>
+            <input id="end" ng-change="isValid(shift)" type="date" ng-model="shift.endDate" placeholder="Date" required/>
+            <input type="time"  ng-change="isValid(shift)" ng-model="shift.endTime" required>
         </div>
     </form>
 </div>
 <div class="modal-footer">
-    <button class="btn btn-primary btn-md active" ng-disabled="shiftForm.$invalid" ng-click="ok()" ng-class="{ 'disabled': shiftform.$invalid }"  >OK</button>
+    <button class="btn btn-primary btn-md active" ng-disabled="shiftForm.$invalid ||!valid" ng-click="ok()" ng-class="{ 'disabled': shiftform.$invalid }"  >OK</button>
     <button class="btn btn-warning btn-md active" ng-click="cancel()">Cancel</button>
 </div>

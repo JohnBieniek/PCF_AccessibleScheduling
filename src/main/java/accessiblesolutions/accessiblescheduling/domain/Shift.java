@@ -69,7 +69,23 @@ public class Shift {
     	recurring=false;
     	event = false;
     }
-
+    
+    public boolean isValid(){
+    	boolean valid=true;
+    	
+    	if( null == startDate ||
+    		null == startTime ||
+    		null == endDate   ||
+    		null == endTime)
+    	{
+    		valid=false;
+    	}
+//    	if((isAssigned() && staffId==null) || (isAssigned() && staffName==Null)){//TODO
+//    		valid=false;
+//    	}
+    	return valid;
+    }
+    
     public boolean getAssigned() {
         return assigned;
     }
