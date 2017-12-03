@@ -1,12 +1,25 @@
 package accessiblesolutions.accessiblescheduling.domain;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import accessiblesolutions.accessiblescheduling.domain.Employee;
+import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
+import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
+import accessiblesolutions.accessiblescheduling.util.Util;
+
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.TemporalAdjuster;
+import java.time.temporal.TemporalAdjusters;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 @Entity
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ShiftRequest {
   	@Id
     @Column(length=40)
@@ -33,6 +46,193 @@ public class ShiftRequest {
         this.staffName = staff;
     }
 
+    public boolean isValid(){
+    	boolean valid = true;
+    	float duration = 0;
+    	System.out.println("requstEmployee:"+requestEmployee + " staffId:"+staffId);
+    	if(requestEmployee && (null==staffId ||staffId.length()==0)){
+    		valid=false;
+    	}
+    	System.out.println("valid:"+valid);
+    	
+    	try{
+    		duration = getDuration();
+    	}
+    	catch(CorruptDataException e){
+    		valid=false;
+    	}
+    	System.out.println("valid:"+valid + " duration:"+duration);
+    	return valid;
+    }
+    
+    public float getDuration() throws CorruptDataException{
+    	if(null==startTime || null==endTime){
+    		throw new CorruptDataException(Shift.class,this);
+    	}
+    	float duration = 0;
+
+		int startHour = (int) Integer.parseInt(startTime.split(":")[0]);
+		int startMin = (int) Integer.parseInt(startTime.split(":")[1]);
+		
+		int endHour = (int) Integer.parseInt(endTime.split(":")[0]);
+		int endMin = (int) Integer.parseInt(endTime.split(":")[1]);
+		
+		System.out.println("startHour"+startHour);
+		System.out.println("startMin"+startMin);
+				System.out.println("endHour"+endHour);
+						System.out.println("endMin"+endMin);
+    	if(getOvernight()){
+    		duration+=24;
+    	}
+    	
+    	if(getEndsLocalDateTime().isBefore(getStartsLocalDateTime())){
+    		System.out.println("ERROR: shift ends before starting " +toString() + " duration:"+duration);
+    		throw new CorruptDataException(Shift.class,this);
+    	}
+    	System.out.println("Getting duration");
+    	duration+=(endHour-startHour) + ((endMin-startMin)/60.0);
+    	System.out.println("Got duration:"+duration);
+    	if(duration>24||duration<=0){
+    		System.out.println("ERROR: shift is inappropriate duration " +toString() + " duration:"+duration);
+    		throw new CorruptDataException(Shift.class,this);
+    	}
+    	
+    	return duration;
+    }
+    
+    public boolean getOvernight() throws CorruptDataException{
+    	if(null==startDate || null == endDate){
+    		throw new CorruptDataException(Shift.class,this);
+    	}
+    	return !startDate.equalsIgnoreCase(endDate);
+    }
+    
+    public LocalDateTime getEndsLocalDateTime() throws CorruptDataException{
+    	if(null==endTime){
+    		throw new CorruptDataException(Shift.class,this);
+    	}
+
+    	String[] parsedTime = endTime.split(":");
+    	int hour = -1;
+    	int minute = -1;
+    	
+    	if(parsedTime.length!=2){
+    		throw new CorruptDataException(Shift.class,this);
+    	}
+    	
+    	if(parsedTime[0].length()!=2 || !parsedTime[0].matches("^[0-9]{2}$") || Integer.parseInt(parsedTime[0])>23){
+    		throw new CorruptDataException(Shift.class,this);
+    	}else{
+    		hour = Integer.parseInt(parsedTime[0]);
+    	}
+    	
+    	if(parsedTime[1].length()!=2 || !parsedTime[1].matches("^[0-9]{2}$") || Integer.parseInt(parsedTime[0])>59){
+    		throw new CorruptDataException(Shift.class,this);
+    	}else{
+    		minute = Integer.parseInt(parsedTime[1]);
+    	}
+    	
+    	return getEndsLocalDate().atTime(hour,minute);
+    }
+    
+    public LocalDateTime getStartsLocalDateTime() throws CorruptDataException{
+    	if(null==startTime){
+    		throw new CorruptDataException(Shift.class,this);
+    	}
+
+    	String[] parsedTime = startTime.split(":");
+    	int hour = -1;
+    	int minute = -1;
+    	
+    	if(parsedTime.length!=2){
+    		throw new CorruptDataException(Shift.class,this);
+    	}
+    	
+    	if(parsedTime[0].length()!=2 || !parsedTime[0].matches("^[0-9]{2}$") || Integer.parseInt(parsedTime[0])>23){
+    		throw new CorruptDataException(Shift.class,this);
+    	}else{
+    		hour = Integer.parseInt(parsedTime[0]);
+    	}
+    	
+    	if(parsedTime[1].length()!=2 || !parsedTime[1].matches("^[0-9]{2}$") || Integer.parseInt(parsedTime[0])>59){
+    		throw new CorruptDataException(Shift.class,this);
+    	}else{
+    		minute = Integer.parseInt(parsedTime[1]);
+    	}
+    	
+    	return getStartsLocalDate().atTime(hour,minute);
+    }
+    
+    public LocalDate getStartsLocalDate() throws CorruptDataException{
+    	if(null==startDate){
+    		throw new CorruptDataException(Shift.class,this);
+    	}
+    	
+    	String[] parsedDate = startDate.split("-");
+    	int year = 0;
+    	int month = 0;
+    	int day = 0;
+    	
+    	if(parsedDate.length!=3){
+    		throw new CorruptDataException(Shift.class,this);
+    	}
+    	
+    	if(parsedDate[0].length()!=4 || !parsedDate[0].matches("^[0-9]{4}$")){
+    		throw new CorruptDataException(Shift.class,this);
+    	}else{
+    		year = Integer.parseInt(parsedDate[0]);
+    	}
+    	
+    	if(parsedDate[1].length()!=2 || !parsedDate[1].matches("^[0-9]{2}$") || Integer.parseInt(parsedDate[1])>12){
+    		throw new CorruptDataException(Shift.class,this);
+    	}else{
+    		month = Integer.parseInt(parsedDate[1]);
+    	}
+    	
+    	if(parsedDate[2].length()!=2 || !parsedDate[2].matches("^[0-9]{2}$")){
+    		throw new CorruptDataException(Shift.class,this);
+    	}else{
+    		day = Integer.parseInt(parsedDate[2]);
+    	}
+    	
+    	return LocalDate.of(year,month,day);
+    }
+    
+    public LocalDate getEndsLocalDate() throws CorruptDataException{
+    	if(null==endDate){
+    		throw new CorruptDataException(Shift.class,this);
+    	}
+    	
+    	String[] parsedDate = endDate.split("-");
+    	int year = 0;
+    	int month = 0;
+    	int day = 0;
+    	
+    	if(parsedDate.length!=3){
+    		throw new CorruptDataException(Shift.class,this);
+    	}
+    	
+    	if(parsedDate[0].length()!=4 || !parsedDate[0].matches("^[0-9]{4}$")){
+    		throw new CorruptDataException(Shift.class,this);
+    	}else{
+    		year = Integer.parseInt(parsedDate[0]);
+    	}
+    	
+    	if(parsedDate[1].length()!=2 || !parsedDate[1].matches("^[0-9]{2}$") || Integer.parseInt(parsedDate[1])>12){
+    		throw new CorruptDataException(Shift.class,this);
+    	}else{
+    		month = Integer.parseInt(parsedDate[1]);
+    	}
+    	
+    	if(parsedDate[2].length()!=2 || !parsedDate[2].matches("^[0-9]{2}$")){
+    		throw new CorruptDataException(Shift.class,this);
+    	}else{
+    		day = Integer.parseInt(parsedDate[2]);
+    	}
+    	
+    	return LocalDate.of(year,month,day);
+    }
+    
     public String getId() {
         return id;
     }

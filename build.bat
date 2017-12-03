@@ -1,0 +1,1 @@
+call gradlew clean assemble test --rerun-tasks
