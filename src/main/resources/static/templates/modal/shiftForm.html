@@ -19,7 +19,8 @@
             <label for="staffName" style="font-size:16px">Client Name</label>
             
             <select name="mySelect" 
-            		ng-change="isValid(shift)"
+            		onselect="isValid(shift)" 
+            		ng-change="isValid(shift)" 
             		id="mySelect"
             		ng-init = "selectedClient"
       				ng-options="client.first for client in clients | orderBy:'first' track by client.id"
@@ -28,8 +29,8 @@
       			{{client.first}}
       		</select>
       				
-            <input required type="text" ng-hide="true" id="clientId" name="clientId" ng-model="shift.clientId" ng-value="shift.clientId=selectedClient.id">
-            <input required type="text" ng-hide="true" id="clientName" name="clientName" ng-model="shift.clientName" ng-value="shift.clientName=selectedClient.first">
+            <input required type="text" ng-change="isValid(shift)" ng-hide="true" id="clientId" name="clientId" ng-model="shift.clientId" ng-value="shift.clientId=selectedClient.id">
+            <input required type="text" ng-change="isValid(shift)" ng-hide="true" id="clientName" name="clientName" ng-model="shift.clientName" ng-value="shift.clientName=selectedClient.first">
         </div>
         <div ng-if="shiftAction === 'update'" class="form-group has-feedback" ng-class="{'has-warning': shiftForm.staffName.$invalid, 'has-success': shiftForm.staffName.$valid}">
             <label for="staffName" style="font-size:18px">Staff Name:</label>
@@ -37,20 +38,22 @@
             <span class="glyphicon form-control-feedback" ng-class="{'glyphicon-warning-sign': shiftForm.staffName.$invalid, 'glyphicon-ok': shiftForm.staffName.$valid}"></span>
         </div>
         
-        <div>
-            <label for="startDate" style="font-size:18px">Start Date/Time</label>
-            <input id="start" ng-change="isValid(shift)" type="date" ng-model="shift.startDate" placeholder="Date" required/>
-            <input type="time" ng-change="isValid(shift)" ng-model="shift.startTime" required>
-        </div>
-        
-        <div>
-            <label for="endDate" style="font-size:18px">End Date/Time</label>
-            <input id="end" ng-change="isValid(shift)" type="date" ng-model="shift.endDate" placeholder="Date" required/>
-            <input type="time"  ng-change="isValid(shift)" ng-model="shift.endTime" required>
+        <div ng-if="shift.clientId|| shiftAction==='update'">
+	        <div>
+	            <label for="startDate" style="font-size:18px">Start Date/Time</label>
+	            <input id="start" ng-change="isValid(shift)" type="date" ng-model="shift.startDate" placeholder="Date" required/>
+	            <input type="time" ng-change="isValid(shift)" ng-model="shift.startTime" required>
+	        </div>
+	        
+	        <div>
+	            <label for="endDate" style="font-size:18px">End Date/Time</label>
+	            <input id="end" ng-change="isValid(shift)" type="date" ng-model="shift.endDate" placeholder="Date" required/>
+	            <input type="time"  ng-change="isValid(shift)" ng-model="shift.endTime" required>
+	        </div>
         </div>
     </form>
 </div>
 <div class="modal-footer">
-    <button class="btn btn-primary btn-md active" ng-disabled="shiftForm.$invalid ||!valid" ng-click="ok()" ng-class="{ 'disabled': shiftform.$invalid }"  >OK</button>
+    <button id="ok" class="btn btn-primary btn-md" ng-show="valid" ng-click="ok()">OK</button>
     <button class="btn btn-warning btn-md active" ng-click="cancel()">Cancel</button>
 </div>

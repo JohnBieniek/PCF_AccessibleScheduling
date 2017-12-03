@@ -72,14 +72,26 @@ public class Shift {
     
     public boolean isValid(){
     	boolean valid=true;
-    	
-    	if( null == startDate ||
-    		null == startTime ||
-    		null == endDate   ||
-    		null == endTime)
-    	{
+    	float duration = 0;
+    	try{
+    		duration = getDuration();
+    	}
+    	catch(CorruptDataException e){
     		valid=false;
     	}
+    	if(!event&& null==clientId){
+    		valid=false;
+    	}
+    	System.out.println(toString());
+    	System.out.println("duration:"+duration);
+    	System.out.println("valid:"+valid);
+//    	if( null == startDate ||//Time Set
+//    		null == startTime ||
+//    		null == endDate   ||
+//    		null == endTime)
+//    	{
+//    		valid=false;
+//    	}
 //    	if((isAssigned() && staffId==null) || (isAssigned() && staffName==Null)){//TODO
 //    		valid=false;
 //    	}
@@ -103,6 +115,9 @@ public class Shift {
     }
     
     public float getDuration() throws CorruptDataException{
+    	if(null==startTime || null==endTime){
+    		throw new CorruptDataException(Shift.class,this);
+    	}
     	float duration = 0;
 
 		int startHour = (int) Integer.parseInt(startTime.split(":")[0]);
@@ -111,14 +126,23 @@ public class Shift {
 		int endHour = (int) Integer.parseInt(endTime.split(":")[0]);
 		int endMin = (int) Integer.parseInt(endTime.split(":")[1]);
 		
+		System.out.println("startHour"+startHour);
+		System.out.println("startMin"+startMin);
+				System.out.println("endHour"+endHour);
+						System.out.println("endMin"+endMin);
     	if(getOvernight()){
     		duration+=24;
     	}
-    		
-    	duration+=(endHour-startHour) + ((endMin-startMin)/60);
     	
-    	if(duration>24||duration<0){
-    		System.out.println("ERROR: shift is inappropriate duration " +toString());
+    	if(getEndsLocalDateTime().isBefore(getStartsLocalDateTime())){
+    		System.out.println("ERROR: shift ends before starting " +toString() + " duration:"+duration);
+    		throw new CorruptDataException(Shift.class,this);
+    	}
+    	System.out.println("Getting duration");
+    	duration+=(endHour-startHour) + ((endMin-startMin)/60.0);
+    	System.out.println("Got duration:"+duration);
+    	if(duration>24||duration<=0){
+    		System.out.println("ERROR: shift is inappropriate duration " +toString() + " duration:"+duration);
     		throw new CorruptDataException(Shift.class,this);
     	}
     	

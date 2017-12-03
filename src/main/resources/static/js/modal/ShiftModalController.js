@@ -1,13 +1,13 @@
-function ShiftModalController($scope, $modalInstance, shift, clients, action) {
+function ShiftModalController($scope, $modalInstance, $http, shift, clients, action) {
     $scope.shiftAction = action;
     $scope.shift = shift;
     $scope.clients = clients;
-    
     $scope.valid=false;
-    $scope.getDatesForMonth = function(year,month){
+    
+    $scope.isValid = function(shift){
     	$http({
-            url: '/shifts/getValidity',
-            method: 'GET',
+            url: '/shifts/validity',
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
