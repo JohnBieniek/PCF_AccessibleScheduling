@@ -810,4 +810,93 @@ public class ShiftSpec {
 		}
 		assertFalse(exception);
 	}
+	
+	@Test
+	public void isValidFalseWithNoStartTime(){
+		Shift shift = new Shift();
+		shift.setEvent(true);
+		shift.setEndTime("12:00");
+		
+		shift.setStartDate("2017-02-11");		
+		shift.setEndDate("2017-02-11");
+		
+		assertFalse(shift.isValid());
+	}
+	
+
+	@Test
+	public void isValidFalseWithNoEndTime(){
+		Shift shift = new Shift();
+		shift.setEvent(true);
+		shift.setStartTime("12:00");
+		
+		shift.setStartDate("2017-02-11");		
+		shift.setEndDate("2017-02-11");
+		
+		assertFalse(shift.isValid());
+	}
+	
+	@Test
+	public void isValidFalseWithNoEndDate(){
+		Shift shift = new Shift();
+		shift.setEvent(true);
+		shift.setStartTime("07:00");
+		shift.setEndTime("12:00");
+		
+		shift.setStartDate("2017-02-11");		
+		
+		assertFalse(shift.isValid());
+	}
+	
+	@Test
+	public void isValidFalseWithNoStartDate(){
+		Shift shift = new Shift();
+		shift.setEvent(true);
+		shift.setStartTime("07:00");
+		shift.setEndTime("12:00");
+		
+		shift.setEndDate("2017-02-11");		
+		
+		assertFalse(shift.isValid());
+	}
+	
+	@Test
+	public void isValidFalseWith25HourDuration(){
+		Shift shift = new Shift();
+		shift.setEvent(true);
+		shift.setStartTime("07:00");
+		shift.setEndTime("08:00");
+		
+		shift.setStartDate("2017-12-01");
+		shift.setEndDate("2017-12-02");		
+		
+		assertFalse(shift.isValid());
+	}
+	
+	@Test
+	public void isValidFalseWithNegativeHourDuration(){
+		Shift shift = new Shift();
+		shift.setEvent(true);
+		shift.setStartTime("07:00");
+		shift.setEndTime("06:00");
+		
+		shift.setStartDate("2017-12-01");
+		shift.setEndDate("2017-12-01");		
+		
+		assertFalse(shift.isValid());
+	}
+	
+	@Test
+	public void isValidTrueWithValidSetup(){
+		Shift shift = new Shift();
+		
+		shift.setEvent(true);
+		shift.setStartTime("05:00");
+		shift.setEndTime("06:00");
+		
+		shift.setStartDate("2017-12-01");
+		shift.setEndDate("2017-12-01");		
+		
+		assertTrue(shift.isValid());
+	}
 }
