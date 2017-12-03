@@ -12,7 +12,7 @@
         
         <div>
             <label for="fixedStaff" style="font-size:18px">Request Staff Member</label>
-            <input ng-click="selectedEmployee = null" type="checkbox" id="fixedStaff" name="fixedStaff" style="height:20px;width:20px"  ng-model="shiftRequest.requestEmployee">
+            <input ng-change="isValid(shiftRequest)" ng-click="selectedEmployee = null" type="checkbox" id="fixedStaff" name="fixedStaff" style="height:20px;width:20px"  ng-model="shiftRequest.requestEmployee">
         </div>
         
         <div ng-if="shiftRequest.requestEmployee" class="form-group has-feedback" ng-class="{'has-warning': recurringShiftNeedForm.staffName.$invalid, 'has-success': recurringShiftNeedForm.staffName.$valid}">
@@ -20,6 +20,7 @@
             
             <select name="mySelect" 
             		id="mySelect"
+            		ng-change="isValid(shiftRequest)"
             		ng-init = "selectedEmployee"
       				ng-options="employee.first for employee in employees | orderBy:'first' track by employee.id"
       				ng-model="selectedEmployee"
@@ -31,21 +32,23 @@
             <input type="text" ng-hide="true" id="staffName" name="staffName" ng-model="shiftRequest.staffName" ng-value="shiftRequest.staffName=selectedEmployee.first">
         </div>
         
-        <div>
-            <label for="startDate" style="font-size:18px">Start Date/Time</label>
-            <input type="date" ng-model="shiftRequest.startDate" placeholder="Date" ng-required/>
-            <input type="time" ng-model="shiftRequest.startTime">
-        </div>
-        
-        <div>
-            <label for="endDate" style="font-size:18px">End Date/Time</label>
-            <input type="date" ng-model="shiftRequest.endDate" placeholder="Date" ng-required/>
-            <input type="time" ng-model="shiftRequest.endTime">
+        <div ng-if="shiftRequest.staffId || shiftRequestAction==='update' || !shiftRequest.requestEmployee">
+	        <div>
+	            <label for="startDate" style="font-size:18px">Start Date/Time</label>
+	            <input ng-change="isValid(shiftRequest)" type="date" ng-model="shiftRequest.startDate" placeholder="Date" ng-required/>
+	            <input ng-change="isValid(shiftRequest)" type="time" ng-model="shiftRequest.startTime">
+	        </div>
+	        
+	        <div>
+	            <label for="endDate" style="font-size:18px">End Date/Time</label>
+	            <input ng-change="isValid(shiftRequest)" type="date" ng-model="shiftRequest.endDate" placeholder="Date" ng-required/>
+	            <input ng-change="isValid(shiftRequest)" type="time" ng-model="shiftRequest.endTime">
+	        </div>
         </div>
     </form>
 </div>
 
 <div class="modal-footer">
-    <button class="btn btn-primary btn-md active" ng-click="ok()" >OK</button>
+    <button class="btn btn-primary btn-md active" ng-show="valid" ng-click="ok()" >OK</button>
     <button class="btn btn-warning btn-md active" ng-click="cancel()">Cancel</button>
 </div>

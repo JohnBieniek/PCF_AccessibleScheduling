@@ -6,9 +6,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.core.JsonParseException;
+import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.databind.JsonMappingException;
+import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.databind.ObjectMapper;
+
 import accessiblesolutions.accessiblescheduling.domain.Employee;
 import accessiblesolutions.accessiblescheduling.domain.ShiftRequest;
+import javax.servlet.http.HttpServletRequest;
+import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 
+import java.io.IOException;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -27,6 +34,28 @@ public class ShiftRequestController {
     @RequestMapping(method = RequestMethod.GET)
     public Iterable<ShiftRequest> shiftRequests() {
         return repository.findAll();
+    }
+    
+    @RequestMapping(method = RequestMethod.POST, value= "/validity")
+    public @ResponseBody boolean getValidity(HttpServletRequest request) throws CorruptDataException{
+    	ShiftRequest shiftRequest =null;
+
+    	String param= request.getParameter("shiftRequest");
+    	ObjectMapper mapper = new ObjectMapper();
+    	
+    	try {
+			shiftRequest = mapper.readValue(param, ShiftRequest.class);
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+    	boolean validity = shiftRequest.isValid();
+
+    	return validity;
     }
 
     @RequestMapping(method = RequestMethod.PUT)
