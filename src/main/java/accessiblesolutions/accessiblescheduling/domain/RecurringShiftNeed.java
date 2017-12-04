@@ -39,6 +39,12 @@ public class RecurringShiftNeed {
         this.staffName = staff;
     }
     
+    public boolean isValid(){
+    	boolean valid =false;
+    	
+    	return valid;
+    }
+    
     public void setDay(int day){
     	this.day = day;
     }

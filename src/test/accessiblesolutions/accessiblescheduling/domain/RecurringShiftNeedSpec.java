@@ -1,6 +1,6 @@
 package accessiblesolutions.accessiblescheduling.domain;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import java.time.DayOfWeek;
 
@@ -19,5 +19,15 @@ public class RecurringShiftNeedSpec {
 		RecurringShiftNeed request = new RecurringShiftNeed();
 		request.setStartDay(DayOfWeek.SATURDAY.toString());
 		assertEquals(DayOfWeek.SATURDAY.getValue(),request.getDay());
+	}
+	
+	@Test
+	public void isValidFalseForMissingStartTime() {
+		RecurringShiftNeed request = new RecurringShiftNeed();
+		request.setEndTime("11:11");
+		
+		request.setStartDay(DayOfWeek.SATURDAY.toString());
+		request.setEndDay(DayOfWeek.SATURDAY.toString());
+		assertFalse(request.isValid());
 	}
 }

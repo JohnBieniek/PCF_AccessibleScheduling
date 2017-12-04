@@ -8,6 +8,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.core.JsonParseException;
+import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.databind.JsonMappingException;
+import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.databind.ObjectMapper;
+
+import accessiblesolutions.accessiblescheduling.domain.Employee;
+import accessiblesolutions.accessiblescheduling.domain.ShiftRequest;
+import javax.servlet.http.HttpServletRequest;
+import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
+
+import java.io.IOException;
 import accessiblesolutions.accessiblescheduling.domain.RecurringShiftNeed;
 
 import java.util.ArrayList;
@@ -35,6 +45,28 @@ public class RecurringShiftNeedController {
     		rVal.add(request);
     	}
         return (Iterable<RecurringShiftNeed>) rVal;
+    }
+    
+    @RequestMapping(method = RequestMethod.POST, value= "/validity")
+    public @ResponseBody boolean getValidity(HttpServletRequest request) throws CorruptDataException{
+    	RecurringShiftNeed recurringShiftNeed =null;
+
+    	String param= request.getParameter("recurringShiftNeed");
+    	ObjectMapper mapper = new ObjectMapper();
+    	
+    	try {
+			recurringShiftNeed = mapper.readValue(param, RecurringShiftNeed.class);
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+    	boolean validity = recurringShiftNeed.isValid();
+
+    	return validity;
     }
 
     @RequestMapping(method = RequestMethod.PUT)
