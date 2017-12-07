@@ -4,18 +4,17 @@ function RecurringShiftNeedModalController($scope, $modalInstance, $http, select
     $scope.employees=employees;
     $scope.recurringShiftNeed = recurringShiftNeed;
 	$scope.selectedEmployee = selectedEmployee;
-	
 	$scope.valid=false;
     
-    $scope.isValid = function(shiftRequest){
+    $scope.isValid = function(recurringShiftNeed){
     	$http({
-            url: '/reccurringShiftNeeds/validity',
+            url: '/recurringShiftNeeds/validity',
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
-            	reccurringShiftNeed: reccurringShiftNeed
+            	recurringShiftNeed: recurringShiftNeed
             }
         })
         .then(function(response) {

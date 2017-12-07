@@ -82,9 +82,6 @@ public class Shift {
     	if(!event&& null==clientId){
     		valid=false;
     	}
-    	System.out.println(toString());
-    	System.out.println("duration:"+duration);
-    	System.out.println("valid:"+valid);
 //    	if( null == startDate ||//Time Set
 //    		null == startTime ||
 //    		null == endDate   ||

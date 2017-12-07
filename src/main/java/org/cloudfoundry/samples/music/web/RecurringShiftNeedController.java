@@ -64,7 +64,11 @@ public class RecurringShiftNeedController {
 			e.printStackTrace();
 		}
 
-    	boolean validity = recurringShiftNeed.isValid();
+    	boolean validity = false;
+    	
+    	if(null!=recurringShiftNeed){
+    		validity=recurringShiftNeed.isValid();
+    	}
 
     	return validity;
     }
