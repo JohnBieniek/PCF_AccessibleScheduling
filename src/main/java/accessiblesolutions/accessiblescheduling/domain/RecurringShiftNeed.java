@@ -2,10 +2,12 @@ package accessiblesolutions.accessiblescheduling.domain;
 
 import org.hibernate.annotations.GenericGenerator;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import accessiblesolutions.accessiblescheduling.domain.Employee;
+import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import accessiblesolutions.accessiblescheduling.util.Util;
+
+import java.time.DayOfWeek;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -37,6 +39,73 @@ public class RecurringShiftNeed {
     public RecurringShiftNeed(String client, String staff) {
         this.clientName = client;
         this.staffName = staff;
+    }
+    
+    public boolean isValid(){
+    	boolean valid =true;
+    	String reason = null;
+
+    	if(null==startTime || null==endTime ||null==startDay || null==endDay){
+    		valid=false;
+    	}
+    	else{
+	    	DayOfWeek start = DayOfWeek.of(Util.getDayInt(startDay));
+	    	DayOfWeek end = DayOfWeek.of(Util.getDayInt(endDay)); 
+	    	
+	    	if(end.compareTo(start)<0||end.compareTo(start)>1){
+	    		valid=false;
+	    		reason="Ends before starting";
+	    	}
+	    	int startHour = (int) Integer.parseInt(startTime.split(":")[0]);
+			int startMin = (int) Integer.parseInt(startTime.split(":")[1]);
+			
+			int endHour = (int) Integer.parseInt(endTime.split(":")[0]);
+			int endMin = (int) Integer.parseInt(endTime.split(":")[1]);
+	    	if(valid){
+	    		System.out.println(start.compareTo(end));
+	    		if(start.compareTo(end)==-1){
+	    			if(endMin>startMin){
+	    				if(endHour>=startHour){
+	    					valid=false;
+	    					reason = "greater than 24 hours";
+	    				}
+	    			}
+	    			else{
+	    				if(endHour>startHour){
+	    					valid=false;
+	    					reason="greater than 24 hours";
+	    				}
+	    			}
+	    		}
+	    		else if(start.compareTo(end)==0){
+	    			if(endHour<startHour){
+	    				valid=false;
+	    				reason ="Negative Duration";
+	    			}
+	    			else if(endHour==startHour){
+	    				if(endMin<=startMin){
+	    					valid=false;//Negative Duration
+	    					reason ="Negative Duration";
+	    				}
+	    			}
+	    			
+	    		}
+	    	}
+    	}
+    	
+    	if(null==clientName){
+    		valid=false;
+    		reason="No Client";
+    	}
+    	
+    	if(fixedStaff&&null==staffId){
+    		valid=false;
+    		reason="No Staff when one was requested";
+    	}
+    	
+    	System.out.println(reason);
+    	
+    	return valid;
     }
     
     public void setDay(int day){
