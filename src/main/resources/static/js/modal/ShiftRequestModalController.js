@@ -5,6 +5,24 @@ function ShiftRequestModalController($scope, $modalInstance, $http, selectedClie
     $scope.employees=employees;
     $scope.shiftRequest = shiftRequest;
 
+    // Will execute myCallback every 5 seconds 
+	var intervalID = setInterval(function(){ myCallback(shiftRequest)}, 1000);
+
+	function myCallback(shiftRequest) {
+		$http({
+            url: '/shiftRequests/validity',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            params: {
+            	shiftRequest: shiftRequest
+            }
+        })
+        .then(function(response) {
+    		$scope.valid = response.data;
+        });
+	}
     $scope.valid=false;
     
     $scope.isValid = function(shiftRequest){
@@ -31,10 +49,12 @@ function ShiftRequestModalController($scope, $modalInstance, $http, selectedClie
     }
 
     $scope.ok = function () {
+    	clearInterval(intervalID);
         $modalInstance.close($scope.shiftRequest);
     };
 
     $scope.cancel = function () {
+    	clearInterval(intervalID);
         $modalInstance.dismiss('cancel');
     };
 };
