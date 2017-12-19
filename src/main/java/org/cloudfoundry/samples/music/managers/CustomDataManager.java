@@ -1,4 +1,5 @@
 package org.cloudfoundry.samples.music.managers;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoCustomFieldDataRepository;
@@ -13,6 +14,15 @@ import accessiblesolutions.accessiblescheduling.domain.Employee;
 
 @Component
 public class CustomDataManager {
+	@Autowired
+	private CrudRepository<CustomField,String> customFieldCrud;
+	
+	@Autowired
+	private CrudRepository<Employee,String> employeeCrud;
+	
+	@Autowired
+	private CrudRepository<Client,String> clientCrud;
+	
     private MongoCustomFieldDataRepository customFieldDataRepository;
     private CrudRepository<CustomFieldData, String> customFieldDataCrud;
     
@@ -21,6 +31,39 @@ public class CustomDataManager {
         this.customFieldDataCrud = customFieldDataCrud;
         this.customFieldDataRepository=customFieldDataRepository;
     }
+    
+
+    public ArrayList<CustomFieldData> getOrphanedCustomFieldData() {
+    	ArrayList<CustomFieldData> orphans = new ArrayList<CustomFieldData>();
+    	Iterable<CustomFieldData> table = customFieldDataCrud.findAll();
+    	Iterable<CustomField> fields =customFieldCrud.findAll();
+    	ArrayList<String> fieldIds = new ArrayList<String>();
+    	Iterable<Client> clients =clientCrud.findAll();
+    	ArrayList<String> clientIds = new ArrayList<String>();
+    	Iterable<Employee> employees =employeeCrud.findAll();
+    	ArrayList<String> employeeIds = new ArrayList<String>();
+    	
+    	for(CustomField field : fields){
+    		fieldIds.add(field.getId());
+    	}
+    	
+    	for(Employee employee : employees){
+    		employeeIds.add(employee.getId());
+    	}
+    	
+    	for(Client client: clients){
+    		clientIds.add(client.getId());
+    	}
+
+    	for(CustomFieldData data:table){
+    		if(!fieldIds.contains(data.getCustomFieldId()) || 
+    			(!employeeIds.contains(data.getOwnerId()) && !clientIds.contains(data.getOwnerId()))){
+    			orphans.add(data);
+    		}
+    	}
+    	
+    	return orphans;
+	}
     
     public boolean getCustomFieldData(Employee employee, CustomField customField) {
 		List<CustomFieldData> data= customFieldDataRepository.findByOwnerId(employee.getId());
