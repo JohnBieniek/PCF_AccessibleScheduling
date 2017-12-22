@@ -11,6 +11,7 @@ import accessiblesolutions.accessiblescheduling.domain.Client;
 import accessiblesolutions.accessiblescheduling.domain.CustomField;
 import accessiblesolutions.accessiblescheduling.domain.CustomFieldData;
 import accessiblesolutions.accessiblescheduling.domain.Employee;
+import accessiblesolutions.accessiblescheduling.domain.ShiftRequest;
 
 @Component
 public class CustomDataManager {
@@ -32,7 +33,12 @@ public class CustomDataManager {
         this.customFieldDataRepository=customFieldDataRepository;
     }
     
-
+    public void removeOrphanedCustomFieldData() {
+    	ArrayList<CustomFieldData> orphans = getOrphanedCustomFieldData();
+    	for(CustomFieldData request:orphans){
+    		customFieldDataCrud.delete(request);
+    	}
+	}
     public ArrayList<CustomFieldData> getOrphanedCustomFieldData() {
     	ArrayList<CustomFieldData> orphans = new ArrayList<CustomFieldData>();
     	Iterable<CustomFieldData> table = customFieldDataCrud.findAll();
