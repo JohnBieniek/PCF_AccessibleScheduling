@@ -77,4 +77,17 @@ public class CleaningManager {
     	
     	return orphans;
 	}
+    
+    public void removeOrphanedRecurringShiftRequests() {
+    	ArrayList<RecurringShiftNeed> orphanedShiftRequests = getOrphanedRecurringShiftRequests();
+    	for(RecurringShiftNeed request:orphanedShiftRequests){
+    		recurringShiftNeedCrud.delete(request);
+    	}
+	}
+    public void removeOrphanedSingleShiftRequests() {
+    	ArrayList<ShiftRequest> orphanedShiftRequests = getOrphanedShiftRequests();
+    	for(ShiftRequest request:orphanedShiftRequests){
+    		shiftRequestCrud.delete(request);
+    	}
+	}
 }
