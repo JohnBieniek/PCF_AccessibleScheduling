@@ -34,14 +34,31 @@ angular.module('shiftIssues', ['ngResource', 'ui.bootstrap']).
     });
 
 function ShiftIssueController($scope, $modal, $http, Shifts, Shift, Employees,Clients, Status) {
-	 $scope.sortShiftIssuesField="date";
+	 $scope.sortShiftIssueField="date";
 	 $scope.selectedMonth='1';
 	 $scope.shiftIssues;
 	 $scope.list= function list(){
 		 $scope.listShifts();
 		 $scope.listEmployees();
 		 $scope.listClients();
+		 $scope.listShiftIssues();
 	 }
+	 $scope.listShiftIssues = function(){
+	    	$http({
+	            url: '/cleaning/shiftNotifications',
+	            method: 'GET',
+	            headers: {
+	                'Content-Type': 'application/x-www-form-urlencoded'
+	            },
+	            params: {
+	         
+	            }
+	        })
+	        .then(function(response) {
+	    		$scope.shiftIssues = response.data;
+	    		console.log(response.data);
+	        });
+	    }
 	 $scope.listShifts = function listShifts() {
          $scope.shifts = Shifts.query();
      }
@@ -53,25 +70,27 @@ function ShiftIssueController($scope, $modal, $http, Shifts, Shift, Employees,Cl
 		 $scope.clients = Clients.query();
 	 }
 	 $scope.fixShift = function (selectedIssue,employees,clients) {
-        var shiftIssueModal = $modal.open({
-            templateUrl: 'templates/modal/shiftIssueForm.html',
-            controller: ShiftIssueModalController,
-            resolve: {
-            	selectedIssue: function(){
-            		return clone(selectedIssue);
-            	},
-            	employees: function(){
-            		return clone(employees);
-            	},
-            	clients: function(){
-            		return clone(clients);
-            	}
-            }
-        });
-
-        shiftIssueModal.result.then(function (shiftIssue) {
-            $scope.updateShiftIssue(shiftIssue);
-        });
+   	 	$scope.setSelectedShift(selectedIssue.issues[0].shift);
+   	 	$scope.setPage("shift");
+//        var shiftIssueModal = $modal.open({
+//            templateUrl: 'templates/modal/shiftIssueForm.html',
+//            controller: ShiftIssueModalController,
+//            resolve: {
+//            	selectedIssue: function(){
+//            		return clone(selectedIssue);
+//            	},
+//            	employees: function(){
+//            		return clone(employees);
+//            	},
+//            	clients: function(){
+//            		return clone(clients);
+//            	}
+//            }
+//        });
+//
+//        shiftIssueModal.result.then(function (shiftIssue) {
+//            $scope.updateShiftIssue(shiftIssue);
+//        });
     };
     
     function clone (obj) {

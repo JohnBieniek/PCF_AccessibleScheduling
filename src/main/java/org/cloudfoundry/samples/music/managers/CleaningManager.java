@@ -1,18 +1,24 @@
 package org.cloudfoundry.samples.music.managers;
 import java.util.ArrayList;
-import java.util.List;
 
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoCustomFieldDataRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
 
+import accessiblesolutions.accessiblescheduling.constants.Constants;
 import accessiblesolutions.accessiblescheduling.domain.Client;
 import accessiblesolutions.accessiblescheduling.domain.CustomField;
 import accessiblesolutions.accessiblescheduling.domain.CustomFieldData;
 import accessiblesolutions.accessiblescheduling.domain.Employee;
 import accessiblesolutions.accessiblescheduling.domain.RecurringShiftNeed;
+import accessiblesolutions.accessiblescheduling.domain.Shift;
 import accessiblesolutions.accessiblescheduling.domain.ShiftRequest;
+import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
+import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
+import accessiblesolutions.accessiblescheduling.to.ShiftIssueTO;
+import accessiblesolutions.accessiblescheduling.to.ShiftNotification;
+import accessiblesolutions.accessiblescheduling.worker.ShiftWorker;
 
 @Component
 public class CleaningManager {
@@ -31,6 +37,8 @@ public class CleaningManager {
     private MongoCustomFieldDataRepository customFieldDataRepository;
     private CrudRepository<CustomFieldData, String> customFieldDataCrud;
     
+    @Autowired
+    private CrudRepository<Shift,String> shiftCrud;
     @Autowired
     public CleaningManager(MongoCustomFieldDataRepository customFieldDataRepository, CrudRepository<CustomFieldData, String> customFieldDataCrud) {
         this.customFieldDataCrud = customFieldDataCrud;
@@ -90,4 +98,48 @@ public class CleaningManager {
     		shiftRequestCrud.delete(request);
     	}
 	}
+    
+    public ArrayList<ShiftIssueTO> getViolatesCallOffIssues() throws ProccessingException, CorruptDataException{
+    	ArrayList<ShiftIssueTO> issues = new ArrayList<ShiftIssueTO>();
+    	
+    	Iterable<Shift> shifts = shiftCrud.findAll();
+    	ArrayList<Shift> upcomingShifts = ShiftWorker.getUpcomingShifts(shifts);
+    	System.out.println(upcomingShifts);
+    	for(Shift shift :upcomingShifts){
+    		if(null!=shift.getStaffId()){
+	    		Employee employee = employeeCrud.findOne(shift.getStaffId());
+	    		System.out.println(employee);
+	    		if(employee.requestedOff(shift)){
+	    			ShiftIssueTO issue = new ShiftIssueTO();
+	    			shift.setDisplayDate();
+	    			issue.setShift(shift);
+	    			issue.setDescription(Constants.violatesCallOff);
+	    			issues.add(issue);
+	    		}
+    		}
+    	}
+    	
+    	return issues;
+    }
+    
+    public ArrayList<ShiftNotification> getShiftNotifications() throws ProccessingException, CorruptDataException{
+    	ArrayList<ShiftIssueTO> issues = new ArrayList<ShiftIssueTO>();
+    	ArrayList<ShiftNotification> notifications = new ArrayList<ShiftNotification>();
+    	
+    	issues = getViolatesCallOffIssues();
+    	
+    	for(ShiftIssueTO issue:issues){
+    		ShiftNotification notification = new ShiftNotification();
+    		
+    		notification.setDescription(Constants.reassignInvalidity);
+    		
+    		ArrayList<ShiftIssueTO> notificationIssue = new ArrayList<ShiftIssueTO>();
+    		notificationIssue.add(issue);
+    		notification.setIssues(notificationIssue);
+    		
+    		notifications.add(notification);
+    	}
+    	
+    	return notifications;
+    }
 }

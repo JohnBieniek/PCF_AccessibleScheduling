@@ -4,26 +4,27 @@
 		  <h3>Schedule Health Dashboard</h3><br/>
 		  
 		  <h4>Shift Issues</h4>
-			<span> [sort by: </span>
-				<select name="sortSelect" 
-			    		id="sortSelect"
-			      		ng-model="sortShiftIssueField"
-			      		ng-value="{{sortShiftIssueField}}">
-				    <option value=issue>Issue</option>
-				    <option value=client>Client</option>
-		            <option value=staff>Staff</option>
-		        	<option value=date>Date</option>
-		            <option value=time>Time</option>
-			     </select>
-			     <a href="" ng-click="sortDescending=!sortDescending">
-			        <span class="glyphicon" ng-class="{'glyphicon-chevron-up' : !sortDescending, 'glyphicon-chevron-down' : sortDescending}"></span>
-			    </a>
-		    <span> ] </span>
+<!-- 			<span> [sort by: </span> -->
+<!-- 				<select name="sortSelect"  -->
+<!-- 			    		id="sortSelect" -->
+<!-- 			      		ng-model="sortShiftIssueField" -->
+<!-- 			      		ng-value="{{sortShiftIssueField}}"> -->
+<!-- 				    <option value=issue>Issue</option> -->
+<!-- 				    <option value=client>Client</option> -->
+<!-- 		            <option value=staff>Staff</option> -->
+<!-- 		        	<option value=date>Date</option> -->
+<!-- 		            <option value=time>Time</option> -->
+<!-- 			     </select> -->
+<!-- 			     <a href="" ng-click="sortDescending=!sortDescending"> -->
+<!-- 			        <span class="glyphicon" ng-class="{'glyphicon-chevron-up' : !sortDescending, 'glyphicon-chevron-down' : sortDescending}"></span> -->
+<!-- 			    </a> -->
+<!-- 		    <span> ] </span> -->
 		    <table class="table table-striped">
 		        <thead>
 			        <tr>
 			        	<th></th>
 			        	<th>Issue</th>
+		        		<th>Description</th>
 			        	<th>Client</th>
 			        	<th>Staff</th>
 			            <th>Date</th>
@@ -31,7 +32,7 @@
 			        </tr>
 		        </thead>
 		        <tbody>
-			        <tr  ng-repeat="shiftIssue in shiftIssues | orderBy:[sortRecurringField,'time']:sortDescending">
+			        <tr  ng-repeat="shiftIssue in shiftIssues | orderBy:[sortShiftIssueField,'time']:sortDescending">
 			        	<div>
 			        		 <td class="dropdown">
 				                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
@@ -46,16 +47,19 @@
 								{{shiftIssue.description}}
 				            </td>
 				            <td>
-				            	{{shiftIssue.clientName}}
+				            	{{shiftIssue.issues[0].description}}
 				            </td>
 				            <td>
-				            	{{shiftIssue.employeeName}}
+				            	{{shiftIssue.issues[0].shift.clientName}}
 				            </td>
 				            <td>
-				            	{{shiftIssue.date}}
+				            	{{shiftIssue.issues[0].shift.staffName}}
 				            </td>
 				            <td>
-				            	{{shiftIssue.time}}
+				            	{{shiftIssue.issues[0].shift.date}}
+				            </td>
+				            <td>
+				            	{{shiftIssue.issues[0].shift.time}}
 				            </td>
 			            </div>
 			        </tr>

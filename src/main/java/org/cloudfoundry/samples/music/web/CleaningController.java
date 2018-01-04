@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.RestController;
 import accessiblesolutions.accessiblescheduling.domain.CustomFieldData;
 import accessiblesolutions.accessiblescheduling.domain.RecurringShiftNeed;
 import accessiblesolutions.accessiblescheduling.domain.ShiftRequest;
+import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
+import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
+import accessiblesolutions.accessiblescheduling.to.ShiftNotification;
 
 @RestController
 @RequestMapping(value = "/cleaning")
@@ -21,6 +24,10 @@ public class CleaningController {
     @Autowired
     private CleaningManager cleaningManager;
     public CleaningController() {
+    }
+    @RequestMapping(value = "/shiftNotifications", method = RequestMethod.GET)
+    public ArrayList<ShiftNotification> getShiftNotifications() throws CorruptDataException, ProccessingException{
+        return cleaningManager.getShiftNotifications();
     }
     @RequestMapping(value = "/orphanedCustomFieldData", method = RequestMethod.GET)
     public ArrayList<CustomFieldData> getOrphanedCustomFieldData() {
