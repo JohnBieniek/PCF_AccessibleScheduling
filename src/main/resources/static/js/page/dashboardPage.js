@@ -1,8 +1,20 @@
-angular.module('vacation', ['ngResource', 'ui.bootstrap']).
+angular.module('dashboard', ['ngResource', 'ui.bootstrap']).
+	factory('Shifts', function ($resource) {
+	    return $resource('shifts');
+	}).
+	factory('Shift', function ($resource) {
+	    return $resource('shifts/:id', {id: '@id'});
+	}).
 	factory('Clients', function ($resource) {
-	    return $resource('employees');
+	    return $resource('clients');
 	}).
 	factory('Client', function ($resource) {
+	    return $resource('clients/:id', {id: '@id'});
+	}).
+	factory('Employees', function ($resource) {
+	    return $resource('employees');
+	}).
+	factory('Employee', function ($resource) {
 	    return $resource('employees/:id', {id: '@id'});
 	}).
 	factory("EditorStatus", function () {
@@ -27,14 +39,20 @@ angular.module('vacation', ['ngResource', 'ui.bootstrap']).
         }
     });
 
-function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
+function DashboardController($scope, $modal, $http, Shifts, Shift, Clients, Client, Employees, Employee, Status) {
 	 $scope.multiTableEditing=false;
 	 
 	 function clone (obj) {
 	        return JSON.parse(JSON.stringify(obj));
      }
-    
+    $scope.list = function list(){
+    	$scope.listClients();
+    	$scope.listEmployees();
+    }
     $scope.listClients = function listClients() {
         $scope.clients = Clients.query();
+    }
+    $scope.listEmployees = function listEmployees() {
+        $scope.employees = Employees.query();
     }
 }

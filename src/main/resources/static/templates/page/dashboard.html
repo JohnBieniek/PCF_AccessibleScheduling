@@ -1,0 +1,74 @@
+<div ng-controller="DashboardController">
+  <div>
+  		<div ng-controller="ShiftIssueController" ng-init="list()">
+		  <h3>Schedule Health Dashboard</h3><br/>
+		  
+		  <h4>Shift Issues</h4>
+<!-- 			<span> [sort by: </span> -->
+<!-- 				<select name="sortSelect"  -->
+<!-- 			    		id="sortSelect" -->
+<!-- 			      		ng-model="sortShiftIssueField" -->
+<!-- 			      		ng-value="{{sortShiftIssueField}}"> -->
+<!-- 				    <option value=issue>Issue</option> -->
+<!-- 				    <option value=client>Client</option> -->
+<!-- 		            <option value=staff>Staff</option> -->
+<!-- 		        	<option value=date>Date</option> -->
+<!-- 		            <option value=time>Time</option> -->
+<!-- 			     </select> -->
+<!-- 			     <a href="" ng-click="sortDescending=!sortDescending"> -->
+<!-- 			        <span class="glyphicon" ng-class="{'glyphicon-chevron-up' : !sortDescending, 'glyphicon-chevron-down' : sortDescending}"></span> -->
+<!-- 			    </a> -->
+<!-- 		    <span> ] </span> -->
+		    <table class="table table-striped">
+		        <thead>
+			        <tr>
+			        	<th></th>
+			        	<th>Issue</th>
+		        		<th>Description</th>
+			        	<th>Client</th>
+			        	<th>Staff</th>
+			            <th>Date</th>
+			            <th>Time</th>            
+			        </tr>
+		        </thead>
+		        <tbody>
+			        <tr  ng-repeat="shiftIssue in shiftIssues | orderBy:[sortShiftIssueField,'time']:sortDescending">
+			        	<div>
+			        		 <td class="dropdown">
+				                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+				                    <span class="glyphicon glyphicon-cog"></span>
+				                </a>
+				                <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+				                    <li role="presentation"><a ng-click="fixShift(shiftIssue)">fix issue</a></li>
+				                </ul>
+				            </td>
+				            
+				            <td>
+								{{shiftIssue.description}}
+				            </td>
+				            <td>
+				            	{{shiftIssue.issues[0].description}}
+				            </td>
+				            <td>
+				            	{{shiftIssue.issues[0].shift.clientName}}
+				            </td>
+				            <td>
+				            	{{shiftIssue.issues[0].shift.staffName}}
+				            </td>
+				            <td>
+				            	{{shiftIssue.issues[0].shift.date}}
+				            </td>
+				            <td>
+				            	{{shiftIssue.issues[0].shift.time}}
+				            </td>
+			            </div>
+			        </tr>
+		        </tbody>
+		    </table>
+  		    <script type="text/javascript" src="js/component/shiftIssueTable.js"></script>
+		    <script type="text/javascript" src="js/modal/ShiftIssueModalController.js"></script>
+	    </div>
+    </div>
+
+    <script type="text/javascript" src="js/page/dashboardPage.js"></script>
+</div>

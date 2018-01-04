@@ -288,6 +288,26 @@ public final class ShiftWorker {
 		return singleShifts;
 	}
     
+    public static ArrayList<Shift> getUpcomingShifts(Iterable<Shift> shifts) throws ProccessingException, CorruptDataException {
+    	ArrayList<Shift> upcomingShifts = new ArrayList<Shift>();
+    	
+    	if(null==shifts || ((ArrayList<Shift>)shifts).size()==0){
+			return upcomingShifts;
+		}
+    	LocalDateTime now = LocalDateTime.now();
+    	for(Shift shift:shifts){
+    		if(null==shift){
+    			throw new ProccessingException("Null shift present");
+    		}
+    		
+    		if(shift.getStartsLocalDateTime().isAfter(now)){
+    			upcomingShifts.add(shift);
+    		}
+    	}
+    	
+		return upcomingShifts;
+	}
+    
     public static ArrayList<Shift> getUnassignedShifts(Iterable<Shift> shifts) throws ProccessingException {
     	ArrayList<Shift> unassignedShifts = new ArrayList<Shift>();
     	
