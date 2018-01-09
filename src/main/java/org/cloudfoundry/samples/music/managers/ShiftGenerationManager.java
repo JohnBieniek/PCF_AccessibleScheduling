@@ -101,13 +101,15 @@ public class ShiftGenerationManager {
 	    		//TODO check if a shift should be generated for this request
 	    		String startDate = null;
 	    		String month = null;
+	    		String year = null;
 	    		startDate = request.getStartDate();
 	    		if(null!=startDate){
 		    		String[] splitDate = startDate.split("-");
 		    		if(splitDate.length>1){
 		    			month = splitDate[1];
+		    			year=splitDate[0];
 		    		}
-		    		if(Integer.parseInt(selectedMonth)==Integer.parseInt(month)){
+		    		if(Integer.parseInt(selectedMonth)==Integer.parseInt(month) && year=="2018"){
 		    			Shift shift = new Shift();
 		    			
 		    			shift.setEvent(false);
@@ -144,7 +146,7 @@ public class ShiftGenerationManager {
 	    		int endDay = Util.getDayInt(request.getEndDay());
 	    		boolean overnight = startDay!=endDay;
 
-	    		LocalDate currentDay = LocalDate.of(2017, Integer.parseInt(selectedMonth), 01);
+	    		LocalDate currentDay = LocalDate.of(2018, Integer.parseInt(selectedMonth), 01);
 	    		DayOfWeek monthStartDay = currentDay.getDayOfWeek();
 	    		
 	            TemporalAdjuster startAdj = TemporalAdjusters.next(DayOfWeek.of(startDay));
@@ -189,7 +191,7 @@ public class ShiftGenerationManager {
 	    			shift.setEndTime(request.getEndTime());
 	    			shift.setStartWeek(shift.getStartWeek());
 	    			shift.setStartMonth(Integer.parseInt(selectedMonth));
-	    			shift.setStartYear(2017);//TODO update this to get the real value
+	    			shift.setStartYear(2018);//TODO update this to get the real value
 	    			shifts.add(shift);
 	            }
 	    	}
