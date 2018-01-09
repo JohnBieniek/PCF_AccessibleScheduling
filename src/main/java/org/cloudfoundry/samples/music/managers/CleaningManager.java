@@ -11,6 +11,7 @@ import accessiblesolutions.accessiblescheduling.domain.Client;
 import accessiblesolutions.accessiblescheduling.domain.CustomField;
 import accessiblesolutions.accessiblescheduling.domain.CustomFieldData;
 import accessiblesolutions.accessiblescheduling.domain.Employee;
+import accessiblesolutions.accessiblescheduling.domain.EmployeeShiftCompatibility;
 import accessiblesolutions.accessiblescheduling.domain.RecurringShiftNeed;
 import accessiblesolutions.accessiblescheduling.domain.Shift;
 import accessiblesolutions.accessiblescheduling.domain.ShiftRequest;
@@ -22,6 +23,9 @@ import accessiblesolutions.accessiblescheduling.worker.ShiftWorker;
 
 @Component
 public class CleaningManager {
+	@Autowired
+	private EmployeeShiftCompatibilityManager employeeShiftCompatibilityManager;
+	
 	@Autowired
 	private CrudRepository<CustomField,String> customFieldCrud;
 	
@@ -99,16 +103,35 @@ public class CleaningManager {
     	}
 	}
     
+    public ArrayList<ShiftIssueTO> getAlternateWeekendOffIssues() throws ProccessingException, CorruptDataException{
+    	ArrayList<ShiftIssueTO> issues = new ArrayList<ShiftIssueTO>();
+    	
+    	Iterable<Shift> shifts = shiftCrud.findAll();
+    	ArrayList<Shift> upcomingShifts = ShiftWorker.getUpcomingShifts(shifts);
+    	for(Shift shift :upcomingShifts){
+    		if(null!=shift.getStaffId()){
+	    		Employee employee = employeeCrud.findOne(shift.getStaffId());
+	    		if(employee.requestedOff(shift)){
+	    			ShiftIssueTO issue = new ShiftIssueTO();
+	    			shift.setDisplayDate();
+	    			issue.setShift(shift);
+	    			issue.setDescription(Constants.workedLastWeekend);
+	    			issues.add(issue);
+	    		}
+    		}
+    	}
+    	
+    	return issues;
+    }
+    
     public ArrayList<ShiftIssueTO> getViolatesCallOffIssues() throws ProccessingException, CorruptDataException{
     	ArrayList<ShiftIssueTO> issues = new ArrayList<ShiftIssueTO>();
     	
     	Iterable<Shift> shifts = shiftCrud.findAll();
     	ArrayList<Shift> upcomingShifts = ShiftWorker.getUpcomingShifts(shifts);
-    	System.out.println(upcomingShifts);
     	for(Shift shift :upcomingShifts){
     		if(null!=shift.getStaffId()){
 	    		Employee employee = employeeCrud.findOne(shift.getStaffId());
-	    		System.out.println(employee);
 	    		if(employee.requestedOff(shift)){
 	    			ShiftIssueTO issue = new ShiftIssueTO();
 	    			shift.setDisplayDate();
