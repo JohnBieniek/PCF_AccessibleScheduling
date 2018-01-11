@@ -44,6 +44,23 @@ public final class ShiftWorker {
 	}
 
     
+    //TODO test
+    public static ArrayList<Shift> getAssignedShiftsFor(Iterable<Shift> shifts, String employeeId){
+    	ArrayList<Shift> assignedShifts = new ArrayList<Shift>();
+
+    	if(null == shifts){
+    		return assignedShifts;
+    	}
+    	
+    	for(Shift shift:shifts){
+    		if(null!=shift && shift.getStaffId()==employeeId){
+    			assignedShifts.add(shift);
+    		}
+    	}
+    	
+		return assignedShifts;
+    }
+    
     public static ArrayList<Shift> getAssignedShifts(Iterable<Shift> shifts){
     	ArrayList<Shift> assignedShifts = new ArrayList<Shift>();
     	
@@ -307,6 +324,22 @@ public final class ShiftWorker {
     	
 		return upcomingShifts;
 	}
+    
+    public static ArrayList<Shift> getShiftsAssignedWeekendBefore(Shift shift, ArrayList<Shift> shifts) throws CorruptDataException, ProccessingException{
+    	ArrayList<Shift> priorShifts = new ArrayList<Shift>();
+    	
+    	ArrayList<Shift> assignedShifts=getAssignedShiftsFor(shifts,shift.getStaffId());
+    	
+    	ArrayList<Shift> assignedWeekendShifts = getWeekendShifts(assignedShifts);
+    	
+    	return priorShifts;
+    }
+    
+    public static ArrayList<Shift> getShiftsBefore(ArrayList<Shift> shifts, LocalDateTime time) throws CorruptDataException, ProccessingException{
+    	ArrayList<Shift> priorShifts = new ArrayList<Shift>();
+    	//TODO
+    	return priorShifts;
+    }
     
     public static ArrayList<Shift> getUnassignedShifts(Iterable<Shift> shifts) throws ProccessingException {
     	ArrayList<Shift> unassignedShifts = new ArrayList<Shift>();
