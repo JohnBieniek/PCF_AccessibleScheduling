@@ -124,6 +124,8 @@ public class CleaningManager {
     	return issues;
     }
     
+    
+    
     public ArrayList<ShiftIssueTO> getViolatesCallOffIssues() throws ProccessingException, CorruptDataException{
     	ArrayList<ShiftIssueTO> issues = new ArrayList<ShiftIssueTO>();
     	
