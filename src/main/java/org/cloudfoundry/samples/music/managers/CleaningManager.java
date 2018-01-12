@@ -110,8 +110,9 @@ public class CleaningManager {
     	ArrayList<Shift> upcomingShifts = ShiftWorker.getUpcomingShifts(shifts);
     	for(Shift shift :upcomingShifts){
     		if(null!=shift.getStaffId()){
-	    		Employee employee = employeeCrud.findOne(shift.getStaffId());
-	    		if(employee.requestedOff(shift)){
+	    		ArrayList<Shift> priorShifts = ShiftWorker.getShiftsAssignedWeekendBefore(shift,shifts);
+	    		
+	    		if(null != priorShifts && !priorShifts.isEmpty()){
 	    			ShiftIssueTO issue = new ShiftIssueTO();
 	    			shift.setDisplayDate();
 	    			issue.setShift(shift);
@@ -152,7 +153,7 @@ public class CleaningManager {
     	ArrayList<ShiftNotification> notifications = new ArrayList<ShiftNotification>();
     	
     	issues = getViolatesCallOffIssues();
-    	
+    	//issues.addAll(getAlternateWeekendOffIssues());
     	for(ShiftIssueTO issue:issues){
     		ShiftNotification notification = new ShiftNotification();
     		

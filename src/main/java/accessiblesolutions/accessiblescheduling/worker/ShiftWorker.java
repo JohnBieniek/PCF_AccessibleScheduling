@@ -325,19 +325,50 @@ public final class ShiftWorker {
 		return upcomingShifts;
 	}
     
-    public static ArrayList<Shift> getShiftsAssignedWeekendBefore(Shift shift, ArrayList<Shift> shifts) throws CorruptDataException, ProccessingException{
-    	ArrayList<Shift> priorShifts = new ArrayList<Shift>();
-    	
+    public static ArrayList<Shift> getShiftsAssignedWeekendBefore(Shift shift, Iterable<Shift> shifts) throws CorruptDataException, ProccessingException{
     	ArrayList<Shift> assignedShifts=getAssignedShiftsFor(shifts,shift.getStaffId());
     	
     	ArrayList<Shift> assignedWeekendShifts = getWeekendShifts(assignedShifts);
     	
-    	return priorShifts;
+    	LocalDateTime wednesdayPrior = null;
+    	if(shift.getEndsLocalDateTime().getDayOfWeek().getValue()==1){
+    		wednesdayPrior = shift.getEndsLocalDateTime().minusDays(5);
+    	}
+    	else if(shift.getEndsLocalDateTime().getDayOfWeek().getValue()==7){
+    		wednesdayPrior = shift.getEndsLocalDateTime().minusDays(4);
+    	}
+    	else if(shift.getEndsLocalDateTime().getDayOfWeek().getValue()==6){
+    		wednesdayPrior = shift.getEndsLocalDateTime().minusDays(3);
+    	}
+    	else if(shift.getEndsLocalDateTime().getDayOfWeek().getValue()==5){
+    		wednesdayPrior = shift.getEndsLocalDateTime().minusDays(2);
+    	}
+    	ArrayList<Shift> assignedPriorWeekendShifts = getShiftsBefore(assignedWeekendShifts,wednesdayPrior);
+    	
+    	ArrayList<Shift> assignedShiftsLastWeekend = getShiftsAfter(assignedPriorWeekendShifts,wednesdayPrior.minusWeeks(1));
+    	
+    	return assignedShiftsLastWeekend;
     }
-    
+    public static ArrayList<Shift> getShiftsAfter(ArrayList<Shift> shifts, LocalDateTime time) throws CorruptDataException, ProccessingException{
+    	ArrayList<Shift> laterShifts = new ArrayList<Shift>();
+
+    	for(Shift shift:shifts){
+    		if(shift.getStartsLocalDateTime().isAfter(time)){
+    			laterShifts.add(shift);
+    		}
+    	}
+    	
+    	return laterShifts;
+    }
     public static ArrayList<Shift> getShiftsBefore(ArrayList<Shift> shifts, LocalDateTime time) throws CorruptDataException, ProccessingException{
     	ArrayList<Shift> priorShifts = new ArrayList<Shift>();
-    	//TODO
+
+    	for(Shift shift:shifts){
+    		if(shift.getEndsLocalDateTime().isBefore(time)){
+    			priorShifts.add(shift);
+    		}
+    	}
+    	
     	return priorShifts;
     }
     
