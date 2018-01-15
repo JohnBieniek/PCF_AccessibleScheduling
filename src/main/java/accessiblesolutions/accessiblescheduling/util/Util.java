@@ -356,4 +356,16 @@ public abstract class Util {
 		
 		return overlapping;
 	}
+	
+	public static String getDateFromLocalDateTime(LocalDateTime time) throws ProccessingException{
+		if(null==time){
+			throw new ProccessingException("No time supplied to getDateFromLocalDateTime");
+		}
+		String date = "";
+		date+=time.getYear()+"-";
+		date+=time.getMonth()+"-";
+		date+=time.getDayOfMonth();
+		
+		return date;
+	}
 }

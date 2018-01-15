@@ -14,6 +14,7 @@ import org.junit.Test;
 import accessiblesolutions.accessiblescheduling.domain.Shift;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
+import accessiblesolutions.accessiblescheduling.util.Util;
 
 public class ShiftWorkerSpec {
 	@Test
@@ -2811,5 +2812,57 @@ public class ShiftWorkerSpec {
 		assertFalse(exception);
 		assertTrue(shifts.size()==1);
 	}
-
+	
+	@Test
+	public void getShiftsAfterFailsWithNoTime(){
+		boolean exception=false;
+		try {
+			ShiftWorker.getShiftsAfter(null,null);
+		} catch (CorruptDataException e) {
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			exception=true;
+		}
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getShiftsReturnsEmptyWithNullShifts(){
+		boolean exception=false;
+		LocalDateTime time =  LocalDateTime.now();
+		ArrayList<Shift> shifts=null;
+			try {
+				shifts=ShiftWorker.getShiftsAfter(null,time);
+			} catch (CorruptDataException | ProccessingException e) {
+				exception=true;
+			}
+		assertFalse(exception);
+		assertNotNull(shifts);
+		assertTrue(shifts.size()==0);
+	}
+//	@Test
+//	public void getShiftsReturnsEmptyWithNoShifts() throws ProccessingException{
+//		boolean exception=false;
+//		LocalDateTime time =  LocalDateTime.now();
+//		ArrayList<Shift> shifts=null;
+//		ArrayList<Shift> input = new ArrayList<Shift>();
+//		Shift shift = new Shift();
+//		
+//		LocalDateTime startTime = time.minusHours(1);
+//		shift.setStartDate(Util.getDateFromLocalDateTime(startTime));
+//		input.add(shift);
+//		
+//		startTime = time.plusHours(1);
+//		shift = new Shift();
+//		shift.setStartDate(Util.getDateFromLocalDateTime(startTime));
+//		input.add(shift);
+//			try {
+//				shifts=ShiftWorker.getShiftsAfter(input,time);
+//			} catch (CorruptDataException | ProccessingException e) {
+//				exception=true;
+//			}
+//		assertFalse(exception);
+//		assertNotNull(shifts);
+//		assertTrue(shifts.size()==1);
+//	}
 }
