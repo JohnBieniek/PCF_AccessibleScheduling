@@ -343,6 +343,8 @@ public final class ShiftWorker {
     	else if(shift.getEndsLocalDateTime().getDayOfWeek().getValue()==5){
     		wednesdayPrior = shift.getEndsLocalDateTime().minusDays(2);
     	}
+    	else return new ArrayList<Shift>();
+    	
     	ArrayList<Shift> assignedPriorWeekendShifts = getShiftsBefore(assignedWeekendShifts,wednesdayPrior);
     	
     	ArrayList<Shift> assignedShiftsLastWeekend = getShiftsAfter(assignedPriorWeekendShifts,wednesdayPrior.minusWeeks(1));
@@ -351,7 +353,15 @@ public final class ShiftWorker {
     }
     public static ArrayList<Shift> getShiftsAfter(ArrayList<Shift> shifts, LocalDateTime time) throws CorruptDataException, ProccessingException{
     	ArrayList<Shift> laterShifts = new ArrayList<Shift>();
-
+    	
+    	if(null==time){
+    		throw new ProccessingException("No time supplied to getShiftsAfter()");
+    	}
+    	
+    	if(null==shifts||shifts.size()<1){
+    		return laterShifts;
+    	}
+    	
     	for(Shift shift:shifts){
     		if(shift.getStartsLocalDateTime().isAfter(time)){
     			laterShifts.add(shift);
