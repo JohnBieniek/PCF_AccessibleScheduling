@@ -2827,7 +2827,7 @@ public class ShiftWorkerSpec {
 	}
 	
 	@Test
-	public void getShiftsReturnsEmptyWithNullShifts(){
+	public void getShiftsAfterReturnsEmptyWithNullShifts(){
 		boolean exception=false;
 		LocalDateTime time =  LocalDateTime.now();
 		ArrayList<Shift> shifts=null;
@@ -2840,29 +2840,31 @@ public class ShiftWorkerSpec {
 		assertNotNull(shifts);
 		assertTrue(shifts.size()==0);
 	}
-//	@Test
-//	public void getShiftsReturnsEmptyWithNoShifts() throws ProccessingException{
-//		boolean exception=false;
-//		LocalDateTime time =  LocalDateTime.now();
-//		ArrayList<Shift> shifts=null;
-//		ArrayList<Shift> input = new ArrayList<Shift>();
-//		Shift shift = new Shift();
-//		
-//		LocalDateTime startTime = time.minusHours(1);
-//		shift.setStartDate(Util.getDateFromLocalDateTime(startTime));
-//		input.add(shift);
-//		
-//		startTime = time.plusHours(1);
-//		shift = new Shift();
-//		shift.setStartDate(Util.getDateFromLocalDateTime(startTime));
-//		input.add(shift);
-//			try {
-//				shifts=ShiftWorker.getShiftsAfter(input,time);
-//			} catch (CorruptDataException | ProccessingException e) {
-//				exception=true;
-//			}
-//		assertFalse(exception);
-//		assertNotNull(shifts);
-//		assertTrue(shifts.size()==1);
-//	}
+	@Test
+	public void getShiftsAfterReturnsShifts() throws ProccessingException{
+		boolean exception=false;
+		LocalDateTime time =  LocalDateTime.now();
+		ArrayList<Shift> shifts=null;
+		ArrayList<Shift> input = new ArrayList<Shift>();
+		Shift shift = new Shift();
+
+		LocalDateTime startTime = time.minusHours(1);
+		shift.setStartDate(Util.getDateFromLocalDateTime(startTime));
+		shift.setStartTime(Util.getTimeFromLocalDateTime(startTime));
+		input.add(shift);
+		
+		startTime = time.plusHours(1);
+		shift = new Shift();
+		shift.setStartDate(Util.getDateFromLocalDateTime(startTime));
+		shift.setStartTime(Util.getTimeFromLocalDateTime(startTime));
+		input.add(shift);
+			try {
+				shifts=ShiftWorker.getShiftsAfter(input,time);
+			} catch (CorruptDataException | ProccessingException e) {
+				exception=true;
+			}
+		assertFalse(exception);
+		assertNotNull(shifts);
+		assertTrue(shifts.size()==1);
+	}
 }
