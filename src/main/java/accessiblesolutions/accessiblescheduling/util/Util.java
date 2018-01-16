@@ -363,9 +363,26 @@ public abstract class Util {
 		}
 		String date = "";
 		date+=time.getYear()+"-";
-		date+=time.getMonth()+"-";
+		int month = time.getMonthValue();
+		if(month<10){
+			date+="0"+month+"-";
+		}
+		else{
+			date+=month+"-";
+		}
 		date+=time.getDayOfMonth();
 		
 		return date;
+	}
+	
+	public static String getTimeFromLocalDateTime(LocalDateTime dateTime) throws ProccessingException{
+		if(null==dateTime){
+			throw new ProccessingException("No time supplied to getDateFromLocalDateTime");
+		}
+		String time = "";
+		time+=dateTime.getHour()+":";
+		time+=dateTime.getMinute();
+		
+		return time;
 	}
 }
