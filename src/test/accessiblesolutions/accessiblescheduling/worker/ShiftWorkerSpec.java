@@ -2867,4 +2867,57 @@ public class ShiftWorkerSpec {
 		assertNotNull(shifts);
 		assertTrue(shifts.size()==1);
 	}
+	@Test
+	public void getShiftsBeforeFailsWithNoTime(){
+		boolean exception=false;
+		try {
+			ShiftWorker.getShiftsBefore(null,null);
+		} catch (CorruptDataException e) {
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			exception=true;
+		}
+		assertTrue(exception);
+	}
+	@Test
+	public void getShiftsBeforeReturnsEmptyWithNullShifts(){
+		boolean exception=false;
+		LocalDateTime time =  LocalDateTime.now();
+		ArrayList<Shift> shifts=null;
+			try {
+				shifts=ShiftWorker.getShiftsBefore(null,time);
+			} catch (CorruptDataException | ProccessingException e) {
+				exception=true;
+			}
+		assertFalse(exception);
+		assertNotNull(shifts);
+		assertTrue(shifts.size()==0);
+	}
+	@Test
+	public void getShiftsBeforeReturnsShifts() throws ProccessingException{
+		boolean exception=false;
+		LocalDateTime time =  LocalDateTime.now();
+		ArrayList<Shift> shifts=null;
+		ArrayList<Shift> input = new ArrayList<Shift>();
+		Shift shift = new Shift();
+
+		LocalDateTime endTime = time.minusHours(1);
+		shift.setEndDate(Util.getDateFromLocalDateTime(endTime));
+		shift.setEndTime(Util.getTimeFromLocalDateTime(endTime));
+		input.add(shift);
+		
+		endTime = time.plusHours(1);
+		shift = new Shift();
+		shift.setEndDate(Util.getDateFromLocalDateTime(endTime));
+		shift.setEndTime(Util.getTimeFromLocalDateTime(endTime));
+		input.add(shift);
+			try {
+				shifts=ShiftWorker.getShiftsBefore(input,time);
+			} catch (CorruptDataException | ProccessingException e) {
+				exception=true;
+			}
+		assertFalse(exception);
+		assertNotNull(shifts);
+		assertTrue(shifts.size()==1);
+	}
 }

@@ -373,6 +373,14 @@ public final class ShiftWorker {
     public static ArrayList<Shift> getShiftsBefore(ArrayList<Shift> shifts, LocalDateTime time) throws CorruptDataException, ProccessingException{
     	ArrayList<Shift> priorShifts = new ArrayList<Shift>();
 
+    	if(null==time){
+    		throw new ProccessingException("No time supplied to getShiftsBefore()");
+    	}
+    	
+    	if(null==shifts||shifts.size()<1){
+    		return priorShifts;
+    	}
+    	
     	for(Shift shift:shifts){
     		if(shift.getEndsLocalDateTime().isBefore(time)){
     			priorShifts.add(shift);
