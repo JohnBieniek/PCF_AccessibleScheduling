@@ -2920,4 +2920,51 @@ public class ShiftWorkerSpec {
 		assertNotNull(shifts);
 		assertTrue(shifts.size()==1);
 	}
+	
+	@Test
+	public void  getShiftsAssignedWeekendBeforeFailsWithNoShift() throws ProccessingException{
+		boolean error=false;
+		ArrayList<Shift> shifts =  new ArrayList<Shift>();
+		try {
+			ShiftWorker.getShiftsAssignedWeekendBefore(null,shifts);
+		} catch (ProccessingException e) {
+			error=true;
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			e.printStackTrace();
+		}
+		assertTrue(error);
+	}
+	
+	@Test
+	public void  getShiftsAssignedWeekendBeforeReturnsEmptyWithNoShifts() throws ProccessingException{
+		boolean error=false;
+		ArrayList<Shift> shifts =  new ArrayList<Shift>();
+		ArrayList<Shift> result = null;
+		try {
+			result=ShiftWorker.getShiftsAssignedWeekendBefore(new Shift(),shifts);
+		} catch (ProccessingException e) {
+			error=true;
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			error=true;
+			e.printStackTrace();
+		}
+		assertFalse(error);
+		assertNotNull(result);
+		assertTrue(result.size()==0);
+	}
+	@Test
+	public void  getShiftsAssignedWeekendBeforeFailsWithNullShifts() throws ProccessingException{
+		boolean error=false;
+		try {
+			ShiftWorker.getShiftsAssignedWeekendBefore(new Shift(),null);
+		} catch (ProccessingException e) {
+			error=true;
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			e.printStackTrace();
+		}
+		assertTrue(error);
+	}
 }

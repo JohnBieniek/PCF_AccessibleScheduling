@@ -106,7 +106,7 @@ public class CleaningManager {
     public ArrayList<ShiftIssueTO> getAlternateWeekendOffIssues() throws ProccessingException, CorruptDataException{
     	ArrayList<ShiftIssueTO> issues = new ArrayList<ShiftIssueTO>();
     	
-    	Iterable<Shift> shifts = shiftCrud.findAll();
+    	ArrayList<Shift> shifts = (ArrayList<Shift>) shiftCrud.findAll();
     	ArrayList<Shift> upcomingShifts = ShiftWorker.getUpcomingShifts(shifts);
     	for(Shift shift :upcomingShifts){
     		if(null!=shift.getStaffId()){
