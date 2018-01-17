@@ -325,7 +325,20 @@ public final class ShiftWorker {
 		return upcomingShifts;
 	}
     
-    public static ArrayList<Shift> getShiftsAssignedWeekendBefore(Shift shift, Iterable<Shift> shifts) throws CorruptDataException, ProccessingException{
+    public static ArrayList<Shift> getShiftsAssignedWeekendBefore(Shift shift, ArrayList<Shift> shifts) throws CorruptDataException, ProccessingException{
+    	if(null==shift){
+    		throw new ProccessingException("No shift provided to getShiftsAssignedWeekendBefore");
+    	}
+    	if(null==shifts){
+    		throw new ProccessingException("No shifts provided to getShiftsAssignedWeekendBefore");
+    	}
+    	
+    	ArrayList<Shift> result = new ArrayList<Shift>();
+    	
+    	if(shifts.size()==0){
+    		return result;
+    	}
+    	
     	ArrayList<Shift> assignedShifts=getAssignedShiftsFor(shifts,shift.getStaffId());
     	
     	ArrayList<Shift> assignedWeekendShifts = getWeekendShifts(assignedShifts);
@@ -373,6 +386,14 @@ public final class ShiftWorker {
     public static ArrayList<Shift> getShiftsBefore(ArrayList<Shift> shifts, LocalDateTime time) throws CorruptDataException, ProccessingException{
     	ArrayList<Shift> priorShifts = new ArrayList<Shift>();
 
+    	if(null==time){
+    		throw new ProccessingException("No time supplied to getShiftsBefore()");
+    	}
+    	
+    	if(null==shifts||shifts.size()<1){
+    		return priorShifts;
+    	}
+    	
     	for(Shift shift:shifts){
     		if(shift.getEndsLocalDateTime().isBefore(time)){
     			priorShifts.add(shift);
