@@ -240,7 +240,8 @@
 	            <th>Start Date</th>
 	            <th>Start Time</th>            
 	            <th>End Date</th>
-	            <th>End Time</th>           
+	            <th>End Time</th>     
+	            <th>Creation Reason</th>      
 	        </tr>
 	        </thead>
 	        <tbody>
@@ -337,7 +338,10 @@
 					<div ng-if="!multiTableEditing">
 						{{shift.endTime}}
 					</div>
-	            </td>            
+	            </td>       
+	            <td>
+					{{shift.creationReason}}
+	            </td>     
 	        </tr>
 	        </tbody>
 	    </table>

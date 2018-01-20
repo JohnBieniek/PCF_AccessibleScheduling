@@ -164,6 +164,7 @@
 			            <th>End Date</th>
 			            <th>End Time</th>   
 			            <th>Requested Staff</th>       
+    			        <th>Shift Generated</th>  
 			        </tr>
 		        </thead>
 		        <tbody>
@@ -219,7 +220,10 @@
 								<div ng-if="!multiTableEditing">
 									{{shiftRequest.staffName}}
 								</div>
-				            </td>               
+				            </td>  
+				            <td>
+				            	{{shiftRequest.requested}}
+				            </td>             
 			            </div>
 			        </tr>
 		        </tbody>

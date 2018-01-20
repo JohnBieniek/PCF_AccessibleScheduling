@@ -135,7 +135,7 @@ public class CleaningManager {
     	for(Shift shift :upcomingShifts){
     		if(null!=shift.getStaffId()){
 	    		Employee employee = employeeCrud.findOne(shift.getStaffId());
-	    		if(employee.requestedOff(shift)){
+	    		if(null!=employee && employee.requestedOff(shift)){
 	    			ShiftIssueTO issue = new ShiftIssueTO();
 	    			shift.setDisplayDate();
 	    			issue.setShift(shift);

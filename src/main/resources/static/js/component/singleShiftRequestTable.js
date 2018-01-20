@@ -33,7 +33,7 @@ angular.module('singleShiftRequests', ['ngResource', 'ui.bootstrap']).
 function SingleShiftRequestsController($scope, $modal, $http, ShiftRequests, ShiftRequest, Employees, Status) {
 	 $scope.multiTableEditing=false;
 	 $scope.sortRequestsField="startDate";
-	 $scope.selectedMonth='11';
+	 $scope.selectedMonth='02';
 	 
 	 $scope.list= function list(){
 		 $scope.listShiftRequests();

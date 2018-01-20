@@ -30,6 +30,7 @@ public class Shift {
     
     private boolean assigned;
     private String assignmentReason;
+    private String creationReason;
     private boolean recurring;
 
     private boolean event;
@@ -530,5 +531,13 @@ public class Shift {
 
 	public void setTime(String time) {
 		this.time = time;
+	}
+
+	public String getCreationReason() {
+		return creationReason;
+	}
+
+	public void setCreationReason(String creationReason) {
+		this.creationReason = creationReason;
 	}
 }
