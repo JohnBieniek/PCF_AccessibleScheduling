@@ -3,7 +3,7 @@ function ShiftModalController($scope, $modalInstance, $http, shift, clients, act
     $scope.shift = shift;
     $scope.clients = clients;
     $scope.valid=false;
-    
+    $scope.shift.creationReason="Manual";
     $scope.isValid = function(shift){
     	$http({
             url: '/shifts/validity',

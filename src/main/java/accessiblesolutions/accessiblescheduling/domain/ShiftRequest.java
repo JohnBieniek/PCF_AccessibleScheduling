@@ -36,7 +36,7 @@ public class ShiftRequest {
     private String startTime;
     private String endDate;
     private String endTime;
-    
+    private boolean requested=false;
 
     public ShiftRequest() {
     }
@@ -318,5 +318,13 @@ public class ShiftRequest {
 		return "ShiftRequest [id=" + id + ", clientName=" + clientName + ", staffName=" + staffName + ", clientId="
 				+ clientId + ", requestEmployee=" + requestEmployee + ", staffId=" + staffId + ", startDate="
 				+ startDate + ", startTime=" + startTime + ", endDate=" + endDate + ", endTime=" + endTime + "]";
+	}
+
+	public boolean isRequested() {
+		return requested;
+	}
+
+	public void setRequested(boolean requested) {
+		this.requested = requested;
 	}
 }
