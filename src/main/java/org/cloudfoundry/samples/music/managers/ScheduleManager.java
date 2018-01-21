@@ -22,16 +22,17 @@ public class ScheduleManager {
     }
     
     public String staffShifts(String selectedMonth, String selectedYear) throws CorruptDataException, ProccessingException {
+    	String result = "";
     	if(null!=selectedMonth){
     		int month = Integer.parseInt(selectedMonth);
-    		//int year = Integer.parseInt(selectedYear);
-	    	shiftAssignmentManager.saveAssignedUnconflictedPrestaffedRecuringShiftsToTableForMonth(month);
+    		int year = Integer.parseInt(selectedYear);
+	    	//shiftAssignmentManager.saveAssignedUnconflictedPrestaffedRecuringShiftsToTableForMonth(month);
 	    	
-	    	shiftAssignmentManager.saveAssignedUnconflictedPrestaffedSingleShiftsToTableForMonth(month);
+	    	//shiftAssignmentManager.saveAssignedUnconflictedPrestaffedSingleShiftsToTableForMonth(month);
 	    	
-	    	//shiftAssignmentManager.scheduleUnassignedNonEventShiftsFor(month,year);
+	    	result =shiftAssignmentManager.scheduleUnassignedNonEventShiftsFor(month,year);
     	}
     	
-        return "Nothing too terrible happened";
+        return result;
     }
 }
