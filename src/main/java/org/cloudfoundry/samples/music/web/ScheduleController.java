@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import accessiblesolutions.accessiblescheduling.domain.Shift;
 import org.cloudfoundry.samples.music.managers.EmployeeShiftMapManager;
 import org.cloudfoundry.samples.music.managers.ScheduleManager;
+import org.cloudfoundry.samples.music.managers.ShiftAssignmentManager;
 import org.cloudfoundry.samples.music.managers.ShiftManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,6 +25,9 @@ public class ScheduleController {
     ShiftManager shiftManager;
     
     @Autowired
+    ShiftAssignmentManager assignmentManager;
+    
+    @Autowired
     EmployeeShiftMapManager employeeShiftMapManager;
     
     @Autowired
@@ -31,6 +35,11 @@ public class ScheduleController {
         this.manager=manager;
     }
 
+    @RequestMapping(value = "/staffPreassignedShifts", method = RequestMethod.GET)
+    public String staffPreassignedShifts(@RequestParam("month") String month,@RequestParam("year") String year) throws CorruptDataException, ProccessingException {
+        return assignmentManager.staffPreassignedShifts(month,year);
+    }
+    
     @RequestMapping(value = "/generateShifts", method = RequestMethod.GET)
     public String generateShifts(@RequestParam("month") String month) throws CorruptDataException {
         return manager.generateShifts(month);

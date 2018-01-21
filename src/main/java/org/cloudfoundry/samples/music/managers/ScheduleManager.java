@@ -24,12 +24,12 @@ public class ScheduleManager {
     public String staffShifts(String selectedMonth, String selectedYear) throws CorruptDataException, ProccessingException {
     	if(null!=selectedMonth){
     		int month = Integer.parseInt(selectedMonth);
-    		int year = Integer.parseInt(selectedYear);
+    		//int year = Integer.parseInt(selectedYear);
 	    	shiftAssignmentManager.saveAssignedUnconflictedPrestaffedRecuringShiftsToTableForMonth(month);
 	    	
 	    	shiftAssignmentManager.saveAssignedUnconflictedPrestaffedSingleShiftsToTableForMonth(month);
 	    	
-	    	shiftAssignmentManager.scheduleUnassignedNonEventShiftsFor(month,year);
+	    	//shiftAssignmentManager.scheduleUnassignedNonEventShiftsFor(month,year);
     	}
     	
         return "Nothing too terrible happened";

@@ -211,7 +211,7 @@ public class ShiftGenerationManager {
 	    	}
     	}
     	shiftCrud.save(shifts);
-    	 
-    	return selectedMonth + " from recurring shift requests";
+    	
+    	return " Generated " +shifts.size() + " from recurring shift requests";
     }
 }
