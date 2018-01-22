@@ -481,8 +481,11 @@ public class EmployeeShiftCompatibilityManager {
 		if(dayInt==7){
 			dayInt=0;
 		}
-		
+		if(null!=employee && null!=shift){
+			System.out.println("is "+employee.getFirst()+" available for " +shift.toString());
+		}
 		if(!shift.getOvernight()){
+			System.out.println("available on the day");
 			if(employee.getDaysAvailable()[dayInt]){
 				boolean[] availability = employee.getAvailabilityFor(dayInt);
 				
@@ -511,6 +514,7 @@ public class EmployeeShiftCompatibilityManager {
 			}
 		}
 		else{
+			System.out.println("checking availability for an overnight shift");
 			if(employee.getDaysAvailable()[dayInt]){
 				boolean[] availability = employee.getAvailabilityFor(dayInt);
 				

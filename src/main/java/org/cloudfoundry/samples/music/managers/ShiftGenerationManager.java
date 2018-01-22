@@ -133,8 +133,8 @@ public class ShiftGenerationManager {
 			    			shift.setCreationReason(creationReason);
 			    			shifts.add(shift);
 			    			
-			    			request.setRequested(true);
-			    			shiftRequestCrud.save(request);
+//			    			request.setRequested(true);
+//			    			shiftRequestCrud.save(request);
 			    		}
 		    		}
 	    		//}

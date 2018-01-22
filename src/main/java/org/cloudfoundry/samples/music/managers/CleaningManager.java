@@ -17,6 +17,7 @@ import accessiblesolutions.accessiblescheduling.domain.Shift;
 import accessiblesolutions.accessiblescheduling.domain.ShiftRequest;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
+import accessiblesolutions.accessiblescheduling.to.ScheduleNotification;
 import accessiblesolutions.accessiblescheduling.to.ShiftIssueTO;
 import accessiblesolutions.accessiblescheduling.to.ShiftNotification;
 import accessiblesolutions.accessiblescheduling.worker.ShiftWorker;
@@ -26,6 +27,8 @@ public class CleaningManager {
 	@Autowired
 	private EmployeeShiftCompatibilityManager employeeShiftCompatibilityManager;
 	
+	@Autowired
+	private ShiftManager shiftManager;
 	@Autowired
 	private CrudRepository<CustomField,String> customFieldCrud;
 	
@@ -125,7 +128,27 @@ public class CleaningManager {
     	return issues;
     }
     
-    
+    public ArrayList<ShiftIssueTO> getUnavailableDayIssues() throws ProccessingException, CorruptDataException{
+    	ArrayList<ShiftIssueTO> issues = new ArrayList<ShiftIssueTO>();
+    	
+    	Iterable<Shift> shifts = shiftCrud.findAll();
+    	ArrayList<Shift> upcomingShifts = ShiftWorker.getUpcomingShifts(shifts);
+    	upcomingShifts=ShiftWorker.getSameDayShifts(upcomingShifts);
+    	for(Shift shift :upcomingShifts){
+    		if(null!=shift.getStaffId()){
+	    		Employee employee = employeeCrud.findOne(shift.getStaffId());
+	    		if(null!=employee && !employeeShiftCompatibilityManager.isAvailableFor(employee, shift)){
+	    			ShiftIssueTO issue = new ShiftIssueTO();
+	    			shift.setDisplayDate();
+	    			issue.setShift(shift);
+	    			issue.setDescription("This employee does not work the hours of the day this shift runs through.");
+	    			issues.add(issue);
+	    		}
+    		}
+    	}
+    	
+    	return issues;
+    }
     
     public ArrayList<ShiftIssueTO> getViolatesCallOffIssues() throws ProccessingException, CorruptDataException{
     	ArrayList<ShiftIssueTO> issues = new ArrayList<ShiftIssueTO>();
@@ -148,12 +171,22 @@ public class CleaningManager {
     	return issues;
     }
     
+    public ArrayList<ScheduleNotification> getScheduleNotifications() throws ProccessingException, CorruptDataException{
+    	ArrayList<ScheduleNotification> notifications = new ArrayList<ScheduleNotification>();
+    	
+//    	for(int i =1; i <6;i++){
+//    		ArrayList<Employee>
+//    		getHoursScheduledWeek(Employee employee,int week, int month)
+//    	}
+    	
+    	return notifications;
+    }
     public ArrayList<ShiftNotification> getShiftNotifications() throws ProccessingException, CorruptDataException{
     	ArrayList<ShiftIssueTO> issues = new ArrayList<ShiftIssueTO>();
     	ArrayList<ShiftNotification> notifications = new ArrayList<ShiftNotification>();
     	
     	issues = getViolatesCallOffIssues();
-    	//issues.addAll(getAlternateWeekendOffIssues());
+    	issues.addAll(getUnavailableDayIssues());
     	for(ShiftIssueTO issue:issues){
     		ShiftNotification notification = new ShiftNotification();
     		

@@ -60,4 +60,8 @@ public class ShiftManager {
     public ArrayList<Shift> getShiftsStartingWeekOfMonth(int week, int month, int year) throws CorruptDataException, ProccessingException{
     	return ShiftWorker.getShiftsStartingWeekOfMonth(shiftRepository.findByStartMonth(month),week,month,year);
     }
+    
+    public float getDurationOfShiftsStartingWeekOfMonth(int week, int month, int year) throws CorruptDataException, ProccessingException{
+    	return ShiftWorker.getTotalShiftHours(ShiftWorker.getShiftsStartingWeekOfMonth(shiftRepository.findByStartMonth(month),week,month,year));
+    }
 }

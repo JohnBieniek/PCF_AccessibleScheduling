@@ -31,6 +31,7 @@ public final class ShiftWorker {
 	    			//TODO add logic to ensure they have proper qualification to work with this client on this shift, perhaps in a helper method
 	    			prestaffedShift.setStaffId(prestaffedShift.getRequestedStaffId());
 	    			prestaffedShift.setStaffName(prestaffedShift.getRequestedStaffName());
+	    			prestaffedShift.setAssignmentReason("Prestaffed shift with an available employee");
 	    			prestaffedShift.setAssigned(true);
 	    			
 	    			assignedPrestaffedShifts.add(prestaffedShift);
@@ -165,6 +166,24 @@ public final class ShiftWorker {
     	}
     	
 		return unconflictedShiftsPerEmployee;
+	}
+	
+	public static ArrayList<Shift> getSameDayShifts(ArrayList<Shift> shifts) throws CorruptDataException, ProccessingException{
+		ArrayList<Shift> sameDayShifts = new ArrayList<Shift>();
+		
+		if(null==shifts || shifts.size()==0){
+			return sameDayShifts;
+		}
+		for(Shift shift:shifts){
+			if(null==shift){
+				throw new ProccessingException("Null shift present");
+			}
+			if(!shift.getOvernight()){
+				sameDayShifts.add(shift);
+			}
+		}
+		
+		return sameDayShifts;
 	}
 	
     public static ArrayList<Shift> getOvernightShifts(ArrayList<Shift> shifts) throws CorruptDataException, ProccessingException{
@@ -364,6 +383,16 @@ public final class ShiftWorker {
     	
     	return assignedShiftsLastWeekend;
     }
+    
+    public static float getTotalShiftHours(ArrayList<Shift> shifts) throws CorruptDataException{
+    	float duration = 0;
+    	
+    	for(Shift shift:shifts){
+    		duration+=shift.getDuration();
+    	}
+    	return duration;
+    }
+    
     public static ArrayList<Shift> getShiftsAfter(ArrayList<Shift> shifts, LocalDateTime time) throws CorruptDataException, ProccessingException{
     	ArrayList<Shift> laterShifts = new ArrayList<Shift>();
     	
@@ -383,6 +412,7 @@ public final class ShiftWorker {
     	
     	return laterShifts;
     }
+    
     public static ArrayList<Shift> getShiftsBefore(ArrayList<Shift> shifts, LocalDateTime time) throws CorruptDataException, ProccessingException{
     	ArrayList<Shift> priorShifts = new ArrayList<Shift>();
 

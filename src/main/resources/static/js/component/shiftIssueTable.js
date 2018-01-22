@@ -35,14 +35,33 @@ angular.module('shiftIssues', ['ngResource', 'ui.bootstrap']).
 
 function ShiftIssueController($scope, $modal, $http, Shifts, Shift, Employees,Clients, Status) {
 	 $scope.sortShiftIssueField="date";
+	 $scope.sortScheduleIssueField="staff";
 	 $scope.selectedMonth='1';
 	 $scope.shiftIssues;
+	 $scope.scheduleIssues;
 	 $scope.list= function list(){
 		 $scope.listShifts();
 		 $scope.listEmployees();
 		 $scope.listClients();
+		 $scope.listScheduleIssues();
 		 $scope.listShiftIssues();
 	 }
+	 $scope.listScheduleIssues = function(){
+	    	$http({
+	            url: '/cleaning/scheduleNotifications',
+	            method: 'GET',
+	            headers: {
+	                'Content-Type': 'application/x-www-form-urlencoded'
+	            },
+	            params: {
+	         
+	            }
+	        })
+	        .then(function(response) {
+	    		$scope.scheduleIssues = response.data;
+	    		console.log(response.data);
+	        });
+	    }
 	 $scope.listShiftIssues = function(){
 	    	$http({
 	            url: '/cleaning/shiftNotifications',

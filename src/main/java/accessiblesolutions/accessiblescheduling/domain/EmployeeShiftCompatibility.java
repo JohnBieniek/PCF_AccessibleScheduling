@@ -29,4 +29,21 @@ public class EmployeeShiftCompatibility {
 	public Employee getEmployee(){
 		return employee;
 	}
+	
+	@Override
+	public String toString(){
+		String out = "";
+		
+//		if(null!=shift){
+//			out+=shift.toString();
+//		}
+//		if(null!=client){
+//			out+=client.toString();
+//		}
+		if(null!=employee){
+			out+=employee.toString();
+		}
+		
+		return out;
+	}
 }

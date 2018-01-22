@@ -26,9 +26,9 @@ public class ScheduleManager {
     	if(null!=selectedMonth){
     		int month = Integer.parseInt(selectedMonth);
     		int year = Integer.parseInt(selectedYear);
-	    	//shiftAssignmentManager.saveAssignedUnconflictedPrestaffedRecuringShiftsToTableForMonth(month);
+	    	shiftAssignmentManager.saveAssignedUnconflictedPrestaffedRecuringShiftsToTableForMonth(month);
 	    	
-	    	//shiftAssignmentManager.saveAssignedUnconflictedPrestaffedSingleShiftsToTableForMonth(month);
+	    	shiftAssignmentManager.saveAssignedUnconflictedPrestaffedSingleShiftsToTableForMonth(month);
 	    	
 	    	result =shiftAssignmentManager.scheduleUnassignedNonEventShiftsFor(month,year);
     	}
