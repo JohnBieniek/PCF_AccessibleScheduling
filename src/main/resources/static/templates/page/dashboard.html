@@ -2,37 +2,37 @@
    <div>
   		<div ng-controller="ShiftIssueController" ng-init="list()">
 		  <h3>Schedule Health Dashboard</h3><br/>
-		  <h4>Schedule Issues</h4>
-		  <table class="table table-striped">
-		        <thead>
-			        <tr>
-			        	<th></th>
-			        	<th>Issue</th>
-			        	<th>Staff</th>
-			        </tr>
-		        </thead>
-		        <tbody>
-			        <tr  ng-repeat="scheduleIssue in scheduleIssues | orderBy:[sortScheduleIssueField,'staff']:sortDescending">
-			        	<div>
-			        		 <td class="dropdown">
-				                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-				                    <span class="glyphicon glyphicon-cog"></span>
-				                </a>
+<!-- 		  <h4>Schedule Issues</h4> -->
+<!-- 		  <table class="table table-striped"> -->
+<!-- 		        <thead> -->
+<!-- 			        <tr> -->
+<!-- 			        	<th></th> -->
+<!-- 			        	<th>Issue</th> -->
+<!-- 			        	<th>Staff</th> -->
+<!-- 			        </tr> -->
+<!-- 		        </thead> -->
+<!-- 		        <tbody> -->
+<!-- 			        <tr  ng-repeat="scheduleIssue in scheduleIssues | orderBy:[sortScheduleIssueField,'staff']:sortDescending"> -->
+<!-- 			        	<div> -->
+<!-- 			        		 <td class="dropdown"> -->
+<!-- 				                <a href="#" class="dropdown-toggle" data-toggle="dropdown"> -->
+<!-- 				                    <span class="glyphicon glyphicon-cog"></span> -->
+<!-- 				                </a> -->
 <!-- 				                <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel"> -->
 <!-- 				                    <li role="presentation"><a ng-click="fixShift(shiftIssue)">fix issue</a></li> -->
 <!-- 				                </ul> -->
-				            </td>
+<!-- 				            </td> -->
 				            
-				            <td>
-								{{scheduleIssue.description}}
-				            </td>
-				            <td>
-				            	{{scheduleIssue.staff}}
-				            </td>
-			            </div>
-			        </tr>
-		        </tbody>
-		    </table>
+<!-- 				            <td> -->
+<!-- 								{{scheduleIssue.description}} -->
+<!-- 				            </td> -->
+<!-- 				            <td> -->
+<!-- 				            	{{scheduleIssue.staff}} -->
+<!-- 				            </td> -->
+<!-- 			            </div> -->
+<!-- 			        </tr> -->
+<!-- 		        </tbody> -->
+<!-- 		    </table> -->
 		  <h4>Shift Issues</h4>
 <!-- 			<span> [sort by: </span> -->
 <!-- 				<select name="sortSelect"  -->
