@@ -1,9 +1,40 @@
 <div ng-controller="DashboardController">
-  <div>
+   <div>
   		<div ng-controller="ShiftIssueController" ng-init="list()">
 		  <h3>Schedule Health Dashboard</h3><br/>
-		  
-		  <h4>Shift Issues</h4>
+		  <h4>Upcoming Schedule Issues: Missed Minimum and Maximum hours</h4>
+		  <p>Missed minimums ignore partial weeks.</p>
+		  <table class="table table-striped">
+		        <thead>
+			        <tr>
+			        	<th></th>
+			        	<th>Issue</th>
+			        	<th>Staff</th>
+			        </tr>
+		        </thead>
+		        <tbody>
+			        <tr  ng-repeat="scheduleIssue in scheduleIssues | orderBy:[sortScheduleIssueField,'staff']:sortDescending">
+			        	<div>
+			        		 <td class="dropdown">
+				                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+				                    <span class="glyphicon glyphicon-cog"></span>
+				                </a>
+				                <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+				                    <li role="presentation"><a ng-click="fixSchedule(scheduleIssue)">fix issue</a></li>
+				                </ul>
+				            </td>
+				            
+				            <td>
+								{{scheduleIssue.description}}
+				            </td>
+				            <td>
+				            	{{scheduleIssue.staff}}
+				            </td>
+			            </div>
+			        </tr>
+		        </tbody>
+		    </table>
+		  <h4>Shift Issues: Unavailable and Called Off</h4>
 <!-- 			<span> [sort by: </span> -->
 <!-- 				<select name="sortSelect"  -->
 <!-- 			    		id="sortSelect" -->

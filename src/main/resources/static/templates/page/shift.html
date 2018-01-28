@@ -46,8 +46,8 @@
 		            <th title="They can work those specific hours.">Available<input type="checkbox" ng-model="availabilityFilter"></th>
 		           <!--  <th>Shifts Scheduled</th>-->
 		            <th title="For the week of this shift.">Hours Scheduled</th>
-		   <!--         <th>Min Hours</th>
-		            <th>Max Hours</th>-->
+		            <th>Min Hours</th>
+		            <th>Max Hours</th>
 		            <th title="How many hours until min requested is met.">Hours Needed</th>
 		            <!--<th>Hours Needed After Assignment</th> -->
 		            <th title="How many hours until max requested is met. At 0 overtime is acrued.">Hours Available</th>
@@ -124,7 +124,7 @@
 	            		{{employee.hoursScheduled}}
 	            	</div>
 	            </td>
-	   <!--         <td>
+	            <td>
 	                <div>
 	            		{{employee.minHours}}
 	            	</div>
@@ -133,7 +133,7 @@
 	                <div>
 	            		{{employee.maxHours}}
 	            	</div>
-	           	</td>-->
+	           	</td>
 	            <td>
 	            	<div ng-init="getHoursNeeded(employee,selectedShift)">
 	            		{{employee.hoursNeeded}}

@@ -14,6 +14,7 @@ import accessiblesolutions.accessiblescheduling.domain.RecurringShiftNeed;
 import accessiblesolutions.accessiblescheduling.domain.ShiftRequest;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
+import accessiblesolutions.accessiblescheduling.to.ScheduleNotification;
 import accessiblesolutions.accessiblescheduling.to.ShiftNotification;
 
 @RestController
@@ -24,6 +25,10 @@ public class CleaningController {
     @Autowired
     private CleaningManager cleaningManager;
     public CleaningController() {
+    }
+    @RequestMapping(value = "/scheduleNotifications", method = RequestMethod.GET)
+    public ArrayList<ScheduleNotification> getScheduleNotifications() throws CorruptDataException, ProccessingException{
+        return cleaningManager.getScheduleNotifications();
     }
     @RequestMapping(value = "/shiftNotifications", method = RequestMethod.GET)
     public ArrayList<ShiftNotification> getShiftNotifications() throws CorruptDataException, ProccessingException{

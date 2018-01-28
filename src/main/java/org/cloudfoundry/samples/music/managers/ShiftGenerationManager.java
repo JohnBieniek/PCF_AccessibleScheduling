@@ -133,8 +133,8 @@ public class ShiftGenerationManager {
 			    			shift.setCreationReason(creationReason);
 			    			shifts.add(shift);
 			    			
-			    			request.setRequested(true);
-			    			shiftRequestCrud.save(request);
+//			    			request.setRequested(true);
+//			    			shiftRequestCrud.save(request);
 			    		}
 		    		}
 	    		//}
@@ -211,7 +211,7 @@ public class ShiftGenerationManager {
 	    	}
     	}
     	shiftCrud.save(shifts);
-    	 
-    	return selectedMonth + " from recurring shift requests";
+    	
+    	return " Generated " +shifts.size() + " from recurring shift requests";
     }
 }
