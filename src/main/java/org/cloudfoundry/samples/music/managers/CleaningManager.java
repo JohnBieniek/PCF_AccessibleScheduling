@@ -1,5 +1,10 @@
 package org.cloudfoundry.samples.music.managers;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoCustomFieldDataRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +31,9 @@ import accessiblesolutions.accessiblescheduling.worker.ShiftWorker;
 public class CleaningManager {
 	@Autowired
 	private EmployeeShiftCompatibilityManager employeeShiftCompatibilityManager;
+	
+	@Autowired
+	EmployeeShiftManager employeeShiftManager;
 	
 	@Autowired
 	private ShiftManager shiftManager;
@@ -171,13 +179,68 @@ public class CleaningManager {
     	return issues;
     }
     
+    public float getHoursScheduledWeekOfMonth(Employee employee, int week,int month) throws CorruptDataException{		
+    	float hours = 80;
+		if(null!=employee){
+			hours= 0;
+			ArrayList<Shift> shiftsForWeek = null;
+			shiftsForWeek = employeeShiftManager.getAssignedShiftsForEmployeeForWeekOfMonth(employee.getId(),week,month);
+			
+			if(null!=shiftsForWeek){
+				for(Shift scheduledShift : shiftsForWeek){
+					hours+= scheduledShift.getDuration();
+				}
+			}
+		}
+		return hours;
+	}
+    
     public ArrayList<ScheduleNotification> getScheduleNotifications() throws ProccessingException, CorruptDataException{
     	ArrayList<ScheduleNotification> notifications = new ArrayList<ScheduleNotification>();
     	
-//    	for(int i =1; i <6;i++){
-//    		ArrayList<Employee>
-//    		getHoursScheduledWeek(Employee employee,int week, int month)
-//    	}
+        ZoneId defaultZoneId = ZoneId.systemDefault();
+        //toString() append +8 automatically.
+        Date date = new Date();
+
+        //1. Convert Date -> Instant
+        Instant instant = date.toInstant();
+
+        //3. Instant + system default time zone + toLocalDateTime() = LocalDateTime
+        LocalDateTime now = instant.atZone(defaultZoneId).toLocalDateTime().plusMonths(1);//Update without +1 glitch
+
+        int month = now.getMonthValue();
+    	
+    	ArrayList<Employee> employees = (ArrayList<Employee>) employeeCrud.findAll();
+    	for(int i =0; i <6;i++){
+			for(Employee employee: employees){
+				if(!employee.getInactive()){
+        			float scheduled =getHoursScheduledWeekOfMonth(employee,i, month);
+        			
+        			LocalDate monthStart = LocalDate.of(2018,month,1);
+            		if(i>0&&monthStart.plusWeeks(i).getMonthValue()==month){
+	        			if(scheduled<employee.getMinHours()){
+	        				ScheduleNotification notification = new ScheduleNotification();
+	        				String description = "For week " +(i+1)+ " of " +now.getMonth()+ " " +employee.getFirst() + " " + employee.getInitial();
+	        				description+= " is under minimum hours with "+ scheduled + " scheduled of a required " + employee.getMinHours() +". ";
+	        				description+= (employee.getMinHours()-scheduled) + " more hours are needed this week to meet the minimum.";
+	        				notification.setDescription(description);
+	        				notification.setStaff(employee.getFirst()+ " " + employee.getInitial());
+	        				notifications.add(notification);
+	        			}
+            		}
+        			
+        			if(monthStart.plusWeeks(i-1).getMonthValue()==month && scheduled>employee.getMaxHours()){
+        				ScheduleNotification notification = new ScheduleNotification();
+        				String description = "For week " +(i+1)+ " of " +now.getMonth()+ " " +employee.getFirst() + " " + employee.getInitial();
+        				description+= " is over maximum hours with "+ scheduled + " scheduled of at most " + employee.getMaxHours() +". ";
+        				description+= (scheduled-employee.getMaxHours()) + " fewer hours are needed this week to avoid overtime.";
+        				notification.setDescription(description);
+        				notification.setStaff(employee.getFirst()+ " " + employee.getInitial());
+        				notifications.add(notification);
+        			}
+				}
+    		}
+    	}
     	
     	return notifications;
     }

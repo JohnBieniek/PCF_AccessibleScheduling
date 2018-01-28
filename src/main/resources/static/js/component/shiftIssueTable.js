@@ -88,6 +88,10 @@ function ShiftIssueController($scope, $modal, $http, Shifts, Shift, Employees,Cl
 	 $scope.listClients = function listClients(){
 		 $scope.clients = Clients.query();
 	 }
+	 $scope.fixSchedule = function (selectedIssue,employees,clients) {
+	   	 	$scope.setPage("shiftList");
+	 }
+	 
 	 $scope.fixShift = function (selectedIssue,employees,clients) {
    	 	$scope.setSelectedShift(selectedIssue.issues[0].shift);
    	 	$scope.setPage("shift");

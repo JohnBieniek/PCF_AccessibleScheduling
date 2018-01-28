@@ -1,6 +1,8 @@
 package org.cloudfoundry.samples.music.web;
 
 import accessiblesolutions.accessiblescheduling.domain.Shift;
+import accessiblesolutions.accessiblescheduling.domain.ShiftRequest;
+
 import org.cloudfoundry.samples.music.managers.ScheduleManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -31,6 +34,13 @@ public class ShiftController {
     @Autowired
     public ShiftController(CrudRepository<Shift, String> repository) {
         this.repository = repository;
+    }
+    
+    @RequestMapping(value = "/set", method = RequestMethod.POST)
+    public List<Shift> set(@RequestBody List<Shift> shifts) {
+    	repository.save(shifts);
+    	
+    	return shifts;
     }
     
     @RequestMapping(method = RequestMethod.POST, value= "/validity")
