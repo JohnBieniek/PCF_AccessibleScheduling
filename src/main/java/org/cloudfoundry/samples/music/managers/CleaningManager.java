@@ -157,7 +157,66 @@ public class CleaningManager {
     	
     	return issues;
     }
-    
+    public ArrayList<ShiftNotification> getOverDailyShiftNotifications() throws ProccessingException, CorruptDataException{
+    	ArrayList<ShiftNotification> notifications = new ArrayList<ShiftNotification>();
+    	
+    	ZoneId defaultZoneId = ZoneId.systemDefault();
+        //toString() append +8 automatically.
+        Date date = new Date();
+
+        //1. Convert Date -> Instant
+        Instant instant = date.toInstant();
+
+        //3. Instant + system default time zone + toLocalDateTime() = LocalDateTime
+        LocalDateTime now = instant.atZone(defaultZoneId).toLocalDateTime().plusMonths(1);//Update without +1 glitch
+    	int month = now.getMonthValue();
+    	
+    	ArrayList<Employee> employees = (ArrayList<Employee>) employeeCrud.findAll();
+		LocalDate monthStart = LocalDate.of(2018,month,1);
+    	
+    	LocalDate day = monthStart;
+		while(day.getMonthValue()==month){
+			System.out.println(day.toString());
+			for(Employee employee: employees){
+				System.out.println(employee.toString());
+				ArrayList<Shift> workedShifts = new ArrayList<Shift>();
+				ArrayList<Shift> shifts = new ArrayList<Shift>();
+				Iterable<Shift> shiftdb = shiftCrud.findAll();
+				if(null!=shiftdb){
+					shifts=ShiftWorker.getUpcomingShifts(shiftdb);
+					if(null!=shifts){
+						shifts=ShiftWorker.getAssignedShiftsFor(shifts, employee.getId());
+						for(Shift shift : shifts){
+							if(shift.getStartDate().equals(day.toString()) ||
+								shift.getEndDate().equals(day.toString())){
+								workedShifts.add(shift);
+							}
+						}
+						if(workedShifts.size()>2){
+							ArrayList<ShiftIssueTO> issues = new ArrayList<ShiftIssueTO>();
+							
+							for(Shift shift : shifts){
+								System.out.println(shift.toString());
+								ShiftIssueTO issue = new ShiftIssueTO();
+								issue.setDescription(Constants.shiftExceedsDailyMax);
+								issue.setShift(shift);
+								issues.add(issue);
+							}
+							ShiftNotification notification = new ShiftNotification();
+							notification.setDescription(Constants.shiftsExceedDailyMax);
+							notification.setIssues(issues);
+							System.out.println(notification.toString());
+							notifications.add(notification);
+						}
+					}
+				}
+			}
+			day=day.plusDays(1);
+		}
+		
+		return notifications;
+	}
+	
     public ArrayList<ShiftIssueTO> getViolatesCallOffIssues() throws ProccessingException, CorruptDataException{
     	ArrayList<ShiftIssueTO> issues = new ArrayList<ShiftIssueTO>();
     	
@@ -211,39 +270,47 @@ public class CleaningManager {
         int month = now.getMonthValue();
     	
     	ArrayList<Employee> employees = (ArrayList<Employee>) employeeCrud.findAll();
+		LocalDate monthStart = LocalDate.of(2018,month,1);
+		
     	for(int i =0; i <6;i++){
 			for(Employee employee: employees){
+				float scheduled =getHoursScheduledWeekOfMonth(employee,i, month);
+				
 				if(!employee.getInactive()){
-        			float scheduled =getHoursScheduledWeekOfMonth(employee,i, month);
-        			
-        			LocalDate monthStart = LocalDate.of(2018,month,1);
             		if(i>0&&monthStart.plusWeeks(i).getMonthValue()==month){
 	        			if(scheduled<employee.getMinHours()){
-	        				ScheduleNotification notification = new ScheduleNotification();
-	        				String description = "For week " +(i+1)+ " of " +now.getMonth()+ " " +employee.getFirst() + " " + employee.getInitial();
-	        				description+= " is under minimum hours with "+ scheduled + " scheduled of a required " + employee.getMinHours() +". ";
-	        				description+= (employee.getMinHours()-scheduled) + " more hours are needed this week to meet the minimum.";
-	        				notification.setDescription(description);
-	        				notification.setStaff(employee.getFirst()+ " " + employee.getInitial());
-	        				notifications.add(notification);
+	        				notifications.add(getMinNotification(employee,i,now.getMonth().name(),scheduled));
 	        			}
             		}
-        			
-        			if(monthStart.plusWeeks(i-1).getMonthValue()==month && scheduled>employee.getMaxHours()){
-        				ScheduleNotification notification = new ScheduleNotification();
-        				String description = "For week " +(i+1)+ " of " +now.getMonth()+ " " +employee.getFirst() + " " + employee.getInitial();
-        				description+= " is over maximum hours with "+ scheduled + " scheduled of at most " + employee.getMaxHours() +". ";
-        				description+= (scheduled-employee.getMaxHours()) + " fewer hours are needed this week to avoid overtime.";
-        				notification.setDescription(description);
-        				notification.setStaff(employee.getFirst()+ " " + employee.getInitial());
-        				notifications.add(notification);
-        			}
 				}
+				
+				if(monthStart.plusWeeks(i-1).getMonthValue()==month && scheduled>employee.getMaxHours()){
+    				notifications.add(getMaxNotification(employee,i,now.getMonth().name(),scheduled));
+    			}
     		}
     	}
     	
     	return notifications;
     }
+    public ScheduleNotification getMinNotification(Employee employee,int week, String month, float scheduled){
+    	ScheduleNotification notification = new ScheduleNotification();
+		String description = "For week " +(week+1)+ " of "+ month+ " " +employee.getFirst() + " " + employee.getInitial();
+		description+= " is under minimum hours with "+ scheduled + " scheduled of a required " + employee.getMinHours() +". ";
+		description+= (employee.getMinHours()-scheduled) + " more hours are needed this week to meet the minimum.";
+		notification.setDescription(description);
+		notification.setStaff(employee.getFirst()+ " " + employee.getInitial());
+    	return notification;
+    }
+    public ScheduleNotification getMaxNotification(Employee employee,int week, String month, float scheduled){
+    	ScheduleNotification notification = new ScheduleNotification();
+		String description = "For week " +(week+1)+ " of " +month+ " " +employee.getFirst() + " " + employee.getInitial();
+		description+= " is over maximum hours with "+ scheduled + " scheduled of at most " + employee.getMaxHours() +". ";
+		description+= (scheduled-employee.getMaxHours()) + " fewer hours are needed this week to avoid overtime.";
+		notification.setDescription(description);
+		notification.setStaff(employee.getFirst()+ " " + employee.getInitial());
+		
+    	return notification;
+	}
     public ArrayList<ShiftNotification> getShiftNotifications() throws ProccessingException, CorruptDataException{
     	ArrayList<ShiftIssueTO> issues = new ArrayList<ShiftIssueTO>();
     	ArrayList<ShiftNotification> notifications = new ArrayList<ShiftNotification>();
@@ -261,7 +328,7 @@ public class CleaningManager {
     		
     		notifications.add(notification);
     	}
-    	
+    	//notifications.addAll(getOverDailyShiftNotifications());
     	return notifications;
     }
 }
