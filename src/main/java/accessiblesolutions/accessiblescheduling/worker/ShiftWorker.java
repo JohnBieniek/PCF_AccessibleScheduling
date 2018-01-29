@@ -54,7 +54,7 @@ public final class ShiftWorker {
     	}
     	
     	for(Shift shift:shifts){
-    		if(null!=shift && shift.getStaffId()==employeeId){
+    		if(null!=shift && null !=shift.getStaffId() && shift.getStaffId().equalsIgnoreCase(employeeId)){
     			assignedShifts.add(shift);
     		}
     	}

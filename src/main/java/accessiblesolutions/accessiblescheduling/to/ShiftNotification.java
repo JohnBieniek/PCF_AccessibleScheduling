@@ -33,4 +33,14 @@ public class ShiftNotification {
 	public void setPriority(int priority){
 		this.priority=priority;
 	}
+	
+	
+	@Override
+	public String toString(){
+		String out = description;
+		for(ShiftIssueTO issue :issues){
+			out+=issue.toString();
+		}
+		return out;
+	}
 }
