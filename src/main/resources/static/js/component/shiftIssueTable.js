@@ -39,12 +39,14 @@ function ShiftIssueController($scope, $modal, $http, Shifts, Shift, Employees,Cl
 	 $scope.selectedMonth='1';
 	 $scope.shiftIssues;
 	 $scope.scheduleIssues;
+	 $scope.dailyNotifications;
 	 $scope.list= function list(){
 		 $scope.listShifts();
 		 $scope.listEmployees();
 		 $scope.listClients();
 		 $scope.listScheduleIssues();
 		 $scope.listShiftIssues();
+		 $scope.listDailyNotifications();
 	 }
 	 $scope.listScheduleIssues = function(){
 	    	$http({
@@ -59,6 +61,22 @@ function ShiftIssueController($scope, $modal, $http, Shifts, Shift, Employees,Cl
 	        })
 	        .then(function(response) {
 	    		$scope.scheduleIssues = response.data;
+	    		console.log(response.data);
+	        });
+	    }
+	 $scope.listDailyNotifications = function(){
+	    	$http({
+	            url: '/cleaning/dailyMaxNotifications',
+	            method: 'GET',
+	            headers: {
+	                'Content-Type': 'application/x-www-form-urlencoded'
+	            },
+	            params: {
+	         
+	            }
+	        })
+	        .then(function(response) {
+	    		$scope.dailyNotifications = response.data;
 	    		console.log(response.data);
 	        });
 	    }
@@ -92,6 +110,10 @@ function ShiftIssueController($scope, $modal, $http, Shifts, Shift, Employees,Cl
 	   	 	$scope.setPage("shiftList");
 	 }
 	 
+	 $scope.fixSingleShift = function (selectedShift,employees,clients) {
+	   	 	$scope.setSelectedShift(selectedShift);
+	   	 	$scope.setPage("shift");
+	 }
 	 $scope.fixShift = function (selectedIssue,employees,clients) {
    	 	$scope.setSelectedShift(selectedIssue.issues[0].shift);
    	 	$scope.setPage("shift");

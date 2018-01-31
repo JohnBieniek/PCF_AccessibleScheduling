@@ -189,16 +189,18 @@ public class CleaningManager {
 						for(Shift shift : shifts){
 							if(shift.getStartDate().equals(day.toString()) ||
 								shift.getEndDate().equals(day.toString())){
+								System.out.println(shift.getStartDate() +shift.getEndDate()+ " day"+day.toString());
 								workedShifts.add(shift);
 							}
 						}
 						if(workedShifts.size()>2){
 							ArrayList<ShiftIssueTO> issues = new ArrayList<ShiftIssueTO>();
 							
-							for(Shift shift : shifts){
+							for(Shift shift : workedShifts){
 								System.out.println(shift.toString());
 								ShiftIssueTO issue = new ShiftIssueTO();
 								issue.setDescription(Constants.shiftExceedsDailyMax);
+								shift.setDisplayDate();
 								issue.setShift(shift);
 								issues.add(issue);
 							}
@@ -328,7 +330,7 @@ public class CleaningManager {
     		
     		notifications.add(notification);
     	}
-    	//notifications.addAll(getOverDailyShiftNotifications());
+    	
     	return notifications;
     }
 }

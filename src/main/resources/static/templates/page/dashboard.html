@@ -3,37 +3,6 @@
   		<div ng-controller="ShiftIssueController" ng-init="list()">
 		  <h3>Schedule Health Dashboard</h3><br/>
 		  <h4>Upcoming Schedule Issues: Missed Minimum and Maximum hours</h4>
-		  <p>Missed minimums ignore partial weeks.</p>
-		  <table class="table table-striped">
-		        <thead>
-			        <tr>
-			        	<th></th>
-			        	<th>Issue</th>
-			        	<th>Staff</th>
-			        </tr>
-		        </thead>
-		        <tbody>
-			        <tr  ng-repeat="scheduleIssue in scheduleIssues | orderBy:[sortScheduleIssueField,'staff']:sortDescending">
-			        	<div>
-			        		 <td class="dropdown">
-				                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-				                    <span class="glyphicon glyphicon-cog"></span>
-				                </a>
-				                <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-				                    <li role="presentation"><a ng-click="fixSchedule(scheduleIssue)">fix issue</a></li>
-				                </ul>
-				            </td>
-				            
-				            <td>
-								{{scheduleIssue.description}}
-				            </td>
-				            <td>
-				            	{{scheduleIssue.staff}}
-				            </td>
-			            </div>
-			        </tr>
-		        </tbody>
-		    </table>
 		  <h4>Shift Issues: Unavailable and Called Off</h4>
 <!-- 			<span> [sort by: </span> -->
 <!-- 				<select name="sortSelect"  -->
@@ -91,6 +60,113 @@
 				            </td>
 				            <td>
 				            	{{shiftIssue.issues[0].shift.time}}
+				            </td>
+			            </div>
+			        </tr>
+		        </tbody>
+		    </table>
+		  <p>Missed minimums ignore partial weeks.</p>
+		  <table class="table table-striped">
+		        <thead>
+			        <tr>
+			        	<th></th>
+			        	<th>Issue</th>
+			        	<th>Staff</th>
+			        </tr>
+		        </thead>
+		        <tbody>
+			        <tr  ng-repeat="scheduleIssue in scheduleIssues | orderBy:[sortScheduleIssueField,'staff']:sortDescending">
+			        	<div>
+			        		 <td class="dropdown">
+				                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+				                    <span class="glyphicon glyphicon-cog"></span>
+				                </a>
+				                <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+				                    <li role="presentation"><a ng-click="fixSchedule(scheduleIssue)">fix issue</a></li>
+				                </ul>
+				            </td>
+				            
+				            <td>
+								{{scheduleIssue.description}}
+				            </td>
+				            <td>
+				            	{{scheduleIssue.staff}}
+				            </td>
+			            </div>
+			        </tr>
+		        </tbody>
+		    </table>
+		  
+		    <h4>Max Daily Shifts Issues</h4>
+		    <table class="table table-striped">
+		        <thead>
+			        <tr>
+			        	<th></th>
+			        	<th>Issue</th>
+		        		<th>Shifts</th>        
+			        </tr>
+		        </thead>
+		        <tbody>
+		        	 <col width="5%">
+		        	 <col width="35%">
+		        	 <col width="60%">
+			        <tr  ng-repeat="dailyNotification in dailyNotifications | orderBy:[sortDailyNotificationField,'description']:sortDescending">
+			        	<div>
+			        		 <td class="dropdown">
+				                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+				                    <span class="glyphicon glyphicon-cog"></span>
+				                </a>
+				                <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+				                    <li role="presentation"><a ng-click="fixSchedule()">fix issue</a></li>
+				                </ul>
+				            </td>
+				            
+				            <td>
+								{{dailyNotification.description}}
+				            </td>
+				            <td>
+				            	<table class="table table-striped">
+							        <thead>
+								        <tr>
+								        	<th></th>
+<!-- 								        	<th>Description</th> -->
+							        		<th>Date</th>       
+							        		<th>Time</th>
+							        		<th>Client</th>
+							        		<th>Staff</th> 
+								        </tr>
+							        </thead>
+							        <tbody>
+								        <tr  ng-repeat="dailyIssue in dailyNotification.issues | orderBy:[sortDailyIssueField,'time']:sortDescending">
+								        	<div>
+								        		 <td class="dropdown">
+									                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+									                    <span class="glyphicon glyphicon-cog"></span>
+									                </a>
+									                <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+									                    <li role="presentation"><a ng-click="fixSingleShift(dailyIssue.shift)">fix issue</a></li>
+									                </ul>
+									            </td>
+									            
+<!-- 									            <td> -->
+<!-- 													{{dailyIssue.description}} -->
+<!-- 									            </td> -->
+									            <td>
+									            	{{dailyIssue.shift.date}}
+									            </td>
+									            <td>
+									            	{{dailyIssue.shift.time}}
+									            </td>
+									            <td>
+									            	{{dailyIssue.shift.clientName}}
+									            </td>
+									            <td>
+									            	{{dailyIssue.shift.staffName}}
+									            </td>
+								            </div>
+								        </tr>
+							        </tbody>
+							    </table>
 				            </td>
 			            </div>
 			        </tr>
