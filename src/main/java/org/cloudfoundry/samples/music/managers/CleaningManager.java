@@ -168,7 +168,7 @@ public class CleaningManager {
         Instant instant = date.toInstant();
 
         //3. Instant + system default time zone + toLocalDateTime() = LocalDateTime
-        LocalDateTime now = instant.atZone(defaultZoneId).toLocalDateTime().plusMonths(1);//Update without +1 glitch
+        LocalDateTime now = instant.atZone(defaultZoneId).toLocalDateTime();//Update without +1 glitch
     	int month = now.getMonthValue();
     	
     	ArrayList<Employee> employees = (ArrayList<Employee>) employeeCrud.findAll();
@@ -267,7 +267,7 @@ public class CleaningManager {
         Instant instant = date.toInstant();
 
         //3. Instant + system default time zone + toLocalDateTime() = LocalDateTime
-        LocalDateTime now = instant.atZone(defaultZoneId).toLocalDateTime().plusMonths(1);//Update without +1 glitch
+        LocalDateTime now = instant.atZone(defaultZoneId).toLocalDateTime();//Update without +1 glitch
 
         int month = now.getMonthValue();
     	
