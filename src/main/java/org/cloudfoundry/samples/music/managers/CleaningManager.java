@@ -168,7 +168,7 @@ public class CleaningManager {
         Instant instant = date.toInstant();
 
         //3. Instant + system default time zone + toLocalDateTime() = LocalDateTime
-        LocalDateTime now = instant.atZone(defaultZoneId).toLocalDateTime().plusMonths(1);//Update without +1 glitch
+        LocalDateTime now = instant.atZone(defaultZoneId).toLocalDateTime();//Update without +1 glitch
     	int month = now.getMonthValue();
     	
     	ArrayList<Employee> employees = (ArrayList<Employee>) employeeCrud.findAll();
@@ -189,16 +189,18 @@ public class CleaningManager {
 						for(Shift shift : shifts){
 							if(shift.getStartDate().equals(day.toString()) ||
 								shift.getEndDate().equals(day.toString())){
+								System.out.println(shift.getStartDate() +shift.getEndDate()+ " day"+day.toString());
 								workedShifts.add(shift);
 							}
 						}
 						if(workedShifts.size()>2){
 							ArrayList<ShiftIssueTO> issues = new ArrayList<ShiftIssueTO>();
 							
-							for(Shift shift : shifts){
+							for(Shift shift : workedShifts){
 								System.out.println(shift.toString());
 								ShiftIssueTO issue = new ShiftIssueTO();
 								issue.setDescription(Constants.shiftExceedsDailyMax);
+								shift.setDisplayDate();
 								issue.setShift(shift);
 								issues.add(issue);
 							}
@@ -265,7 +267,7 @@ public class CleaningManager {
         Instant instant = date.toInstant();
 
         //3. Instant + system default time zone + toLocalDateTime() = LocalDateTime
-        LocalDateTime now = instant.atZone(defaultZoneId).toLocalDateTime().plusMonths(1);//Update without +1 glitch
+        LocalDateTime now = instant.atZone(defaultZoneId).toLocalDateTime();//Update without +1 glitch
 
         int month = now.getMonthValue();
     	
@@ -328,7 +330,7 @@ public class CleaningManager {
     		
     		notifications.add(notification);
     	}
-    	//notifications.addAll(getOverDailyShiftNotifications());
+    	
     	return notifications;
     }
 }

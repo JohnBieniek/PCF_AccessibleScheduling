@@ -30,6 +30,11 @@ public class CleaningController {
     public ArrayList<ScheduleNotification> getScheduleNotifications() throws CorruptDataException, ProccessingException{
         return cleaningManager.getScheduleNotifications();
     }
+    @RequestMapping(value = "/dailyMaxNotifications", method = RequestMethod.GET)
+    public ArrayList<ShiftNotification> getDailyMaxNotifications() throws CorruptDataException, ProccessingException{
+        return cleaningManager.getOverDailyShiftNotifications();
+    }
+    
     @RequestMapping(value = "/shiftNotifications", method = RequestMethod.GET)
     public ArrayList<ShiftNotification> getShiftNotifications() throws CorruptDataException, ProccessingException{
         return cleaningManager.getShiftNotifications();
