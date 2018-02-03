@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoCustomFieldDataRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ import accessiblesolutions.accessiblescheduling.domain.Shift;
 import accessiblesolutions.accessiblescheduling.domain.ShiftRequest;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
+import accessiblesolutions.accessiblescheduling.to.OverWeeklyDaysNotification;
 import accessiblesolutions.accessiblescheduling.to.ScheduleNotification;
 import accessiblesolutions.accessiblescheduling.to.ShiftIssueTO;
 import accessiblesolutions.accessiblescheduling.to.ShiftNotification;
@@ -214,6 +216,74 @@ public class CleaningManager {
 				}
 			}
 			day=day.plusDays(1);
+		}
+		
+		return notifications;
+	}
+    
+    public ArrayList<OverWeeklyDaysNotification> getOverWeeklyDaysNotifications() throws ProccessingException, CorruptDataException{
+    	ArrayList<OverWeeklyDaysNotification> notifications = new ArrayList<OverWeeklyDaysNotification>();
+    	
+    	ZoneId defaultZoneId = ZoneId.systemDefault();
+        //toString() append +8 automatically.
+        Date date = new Date();
+
+        //1. Convert Date -> Instant
+        Instant instant = date.toInstant();
+
+        //3. Instant + system default time zone + toLocalDateTime() = LocalDateTime
+        LocalDateTime now = instant.atZone(defaultZoneId).toLocalDateTime();//Update without +1 glitch
+    	int month = now.getMonthValue();
+    	
+    	ArrayList<Employee> employees = (ArrayList<Employee>) employeeCrud.findAll();
+    	
+    	Iterable<Shift> shiftdb = shiftCrud.findAll();
+		for(int week =0; week<6;week++){
+			for(Employee employee: employees){
+				System.out.println("week:"+week+" "+employee.toString());
+				ArrayList<Shift> shifts = new ArrayList<Shift>();
+				HashMap<Integer,ArrayList<Shift>> weeklyOverage = new HashMap<Integer,ArrayList<Shift>>();
+				
+				if(null!=shiftdb){
+					shifts=ShiftWorker.getUpcomingShifts(shiftdb);
+					if(null!=shifts){
+						shifts=ShiftWorker.getAssignedShiftsFor(shifts, employee.getId());
+						if(null!=shifts){
+							shifts = ShiftWorker.getShiftsStartingWeekOfMonth(shifts, week, month, 2018);
+							
+							if(shifts!=null){
+								for(int selectedDay = 1;selectedDay<8;selectedDay++){
+									System.out.println("day:"+selectedDay);
+									for(Shift shift: shifts){
+										int shiftsDay = shift.getStartsLocalDate().getDayOfWeek().getValue();
+										if(shiftsDay==selectedDay){
+											ArrayList<Shift> daysShifts =null;
+											if(weeklyOverage.containsKey(selectedDay)){
+												daysShifts = weeklyOverage.get(selectedDay);
+											}else{
+												daysShifts = new ArrayList<Shift>();
+											}
+											shift.setDisplayDate();
+											daysShifts.add(shift);
+											if(weeklyOverage.containsKey(selectedDay)){
+												weeklyOverage.replace(selectedDay, daysShifts);
+											}
+											else{
+												weeklyOverage.put(selectedDay, daysShifts);
+											}
+										}
+									}
+								}
+							}
+							
+							if(weeklyOverage.keySet().size()>5){
+								OverWeeklyDaysNotification notification = new OverWeeklyDaysNotification(weeklyOverage,employee,week+1);
+								notifications.add(notification);
+							}
+						}
+					}
+				}
+			}
 		}
 		
 		return notifications;
