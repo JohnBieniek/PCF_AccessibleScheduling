@@ -36,9 +36,11 @@ angular.module('shiftIssues', ['ngResource', 'ui.bootstrap']).
 function ShiftIssueController($scope, $modal, $http, Shifts, Shift, Employees,Clients, Status) {
 	 $scope.sortShiftIssueField="date";
 	 $scope.sortScheduleIssueField="staff";
-	 $scope.selectedMonth='1';
+	 $scope.selectedMonth='2';
 	 $scope.shiftIssues;
 	 $scope.scheduleIssues;
+	 $scope.daysOfTheWeek=[0,1,2,3,4,5,6];
+	 $scope.weeklyNotifications;
 	 $scope.dailyNotifications;
 	 $scope.list= function list(){
 		 $scope.listShifts();
@@ -46,6 +48,8 @@ function ShiftIssueController($scope, $modal, $http, Shifts, Shift, Employees,Cl
 		 $scope.listClients();
 		 $scope.listScheduleIssues();
 		 $scope.listShiftIssues();
+
+		 $scope.listWeeklyNotifications();
 		 $scope.listDailyNotifications();
 	 }
 	 $scope.listScheduleIssues = function(){
@@ -61,6 +65,22 @@ function ShiftIssueController($scope, $modal, $http, Shifts, Shift, Employees,Cl
 	        })
 	        .then(function(response) {
 	    		$scope.scheduleIssues = response.data;
+	    		console.log(response.data);
+	        });
+	    }
+	 $scope.listWeeklyNotifications = function(){
+	    	$http({
+	            url: '/cleaning/weeklyMaxNotifications',
+	            method: 'GET',
+	            headers: {
+	                'Content-Type': 'application/x-www-form-urlencoded'
+	            },
+	            params: {
+	         
+	            }
+	        })
+	        .then(function(response) {
+	    		$scope.weeklyNotifications = response.data;
 	    		console.log(response.data);
 	        });
 	    }

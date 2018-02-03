@@ -14,6 +14,7 @@ import accessiblesolutions.accessiblescheduling.domain.RecurringShiftNeed;
 import accessiblesolutions.accessiblescheduling.domain.ShiftRequest;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
+import accessiblesolutions.accessiblescheduling.to.OverWeeklyDaysNotification;
 import accessiblesolutions.accessiblescheduling.to.ScheduleNotification;
 import accessiblesolutions.accessiblescheduling.to.ShiftNotification;
 
@@ -33,6 +34,11 @@ public class CleaningController {
     @RequestMapping(value = "/dailyMaxNotifications", method = RequestMethod.GET)
     public ArrayList<ShiftNotification> getDailyMaxNotifications() throws CorruptDataException, ProccessingException{
         return cleaningManager.getOverDailyShiftNotifications();
+    }
+    
+    @RequestMapping(value = "/weeklyMaxNotifications", method = RequestMethod.GET)
+    public ArrayList<OverWeeklyDaysNotification> getOverMaxDaysWeeklyNotifications() throws CorruptDataException, ProccessingException{
+        return cleaningManager.getOverWeeklyDaysNotifications();
     }
     
     @RequestMapping(value = "/shiftNotifications", method = RequestMethod.GET)

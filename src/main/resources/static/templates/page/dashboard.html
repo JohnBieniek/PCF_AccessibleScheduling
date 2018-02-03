@@ -173,6 +173,106 @@
 			        </tr>
 		        </tbody>
 		    </table>
+		    
+		    <h4>Over Max Days Per Week Issues</h4>
+		    <table class="table table-striped">
+		        <thead>
+			        <tr>
+			        	<th></th>
+			        	<th>Issue</th>
+			        	<th>Staff</th>
+			        	<th>Week</th>
+		        		<th>Shifts</th>        
+			        </tr>
+		        </thead>
+		        <tbody>
+		        	<col width="5%">
+		        	 <col width="25%">
+		        	 <col width="13%">
+		        	 <col width="5%">
+		        	 <col width="52%">
+			        <tr  ng-repeat="weeklyNotification in weeklyNotifications | orderBy:[sortweeklyNotificationField,'staff']:sortDescending">
+			        	<div>
+			        		 <td class="dropdown">
+				                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+				                    <span class="glyphicon glyphicon-cog"></span>
+				                </a>
+				                <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+				                    <li role="presentation"><a ng-click="fixSchedule()">fix issue</a></li>
+				                </ul>
+				            </td>
+				            
+				            <td>
+								{{weeklyNotification.description}}
+				            </td>
+				            <td>
+								{{weeklyNotification.staff}}
+				            </td>
+				            <td>
+								{{weeklyNotification.week}}
+				            </td>
+				            <td>
+				            	<table class="table table-striped">
+							        <thead>
+								        <tr>
+							        		<th>Day</th>       
+							        		<th></th>
+								        </tr>
+							        </thead>
+							        <tbody>
+								        <tr  ng-repeat="selectedDay in daysOfTheWeek | orderBy:['day']:sortDescending">
+								        	<div ng-if="weeklyNotification.daysWorked[selectedDay]">
+								        		<td>
+								        		 	{{selectedDay}}
+									            </td>
+									            <td>
+									            	<table class="table table-striped">
+												        <thead>
+													        <tr>
+													        	<th></th>
+												        		<th>Date</th>       
+												        		<th>Time</th>
+												        		<th>Client</th>
+												        		<th>Staff</th> 
+													        </tr>
+												        </thead>
+												        <tbody>
+													        <tr  ng-repeat="problemShift in weeklyNotification.dailyShifts[selectedDay] | orderBy:[sortDailyIssueField,'time']:sortDescending">
+													        	<div>
+													        		 <td class="dropdown">
+														                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+														                    <span class="glyphicon glyphicon-cog"></span>
+														                </a>
+														                <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+														                    <li role="presentation"><a ng-click="fixSingleShift(problemShift)">fix issue</a></li>
+														                </ul>
+														            </td>
+														            <td>
+														            	{{problemShift.date}}
+														            </td>
+														            <td>
+														            	{{problemShift.time}}
+														            </td>
+														            <td>
+														            	{{problemShift.clientName}}
+														            </td>
+														            <td>
+														            	{{problemShift.staffName}}
+														            </td>
+													            </div>
+													        </tr>
+												        </tbody>
+												    </table>
+									            </td>
+								            </div>
+								        </tr>
+							        </tbody>
+							    </table>
+				            </td>
+			            </div>
+			        </tr>
+		        </tbody>
+		    </table>
   		    <script type="text/javascript" src="js/component/shiftIssueTable.js"></script>
 		    <script type="text/javascript" src="js/modal/ShiftIssueModalController.js"></script>
 	    </div>
