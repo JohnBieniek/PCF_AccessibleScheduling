@@ -263,6 +263,7 @@ public class CleaningManager {
 											}else{
 												daysShifts = new ArrayList<Shift>();
 											}
+											shift.setDisplayDate();
 											daysShifts.add(shift);
 											if(weeklyOverage.containsKey(selectedDay)){
 												weeklyOverage.replace(selectedDay, daysShifts);
@@ -276,7 +277,7 @@ public class CleaningManager {
 							}
 							
 							if(weeklyOverage.keySet().size()>5){
-								OverWeeklyDaysNotification notification = new OverWeeklyDaysNotification(weeklyOverage,employee,week);
+								OverWeeklyDaysNotification notification = new OverWeeklyDaysNotification(weeklyOverage,employee,week+1);
 								notifications.add(notification);
 							}
 						}

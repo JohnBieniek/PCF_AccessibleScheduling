@@ -220,10 +220,10 @@
 								        </tr>
 							        </thead>
 							        <tbody>
-								        <tr  ng-repeat="selectedDay in daysOfTheWeek | orderBy:['day']:sortDescending">
-								        	<div ng-if="weeklyNotification.daysWorked[selectedDay]">
+								        <tr ng-repeat="selectedDay in daysOfTheWeek | orderBy:['day']:sortDescending">
+								        	<div ng-if="isWorked(selectedDay)">
 								        		<td>
-								        		 	{{selectedDay}}
+								        		 	{{dayNames[selectedDay]}}
 									            </td>
 									            <td>
 									            	<table class="table table-striped">

@@ -39,9 +39,15 @@ function ShiftIssueController($scope, $modal, $http, Shifts, Shift, Employees,Cl
 	 $scope.selectedMonth='2';
 	 $scope.shiftIssues;
 	 $scope.scheduleIssues;
+	 $scope.dayNames=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
 	 $scope.daysOfTheWeek=[0,1,2,3,4,5,6];
 	 $scope.weeklyNotifications;
 	 $scope.dailyNotifications;
+	 $scope.isWorked= function(selectedDay){
+		 console.log(selectedDay)
+		 //console.log(weeklyNotification.daysWorked[selectedDay]);
+		 return true;// weeklyNotification.daysWorked[selectedDay];
+	 }
 	 $scope.list= function list(){
 		 $scope.listShifts();
 		 $scope.listEmployees();
