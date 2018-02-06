@@ -221,6 +221,11 @@ public class CleaningManager {
 		return notifications;
 	}
     
+    public ArrayList<AlternateWeekendsOffNotification> getAlternateWeekendsOffNotifications() throws ProccessingException, CorruptDataException{
+    	ArrayList<AlternateWeekendsOffNotification> notifications = new ArrayList<AlternateWeekendsOffNotification>();
+    	
+    	return notifications
+    }
     public ArrayList<OverWeeklyDaysNotification> getOverWeeklyDaysNotifications() throws ProccessingException, CorruptDataException{
     	ArrayList<OverWeeklyDaysNotification> notifications = new ArrayList<OverWeeklyDaysNotification>();
     	
