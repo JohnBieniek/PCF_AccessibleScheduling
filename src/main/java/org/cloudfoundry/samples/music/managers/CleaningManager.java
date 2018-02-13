@@ -23,10 +23,12 @@ import accessiblesolutions.accessiblescheduling.domain.Shift;
 import accessiblesolutions.accessiblescheduling.domain.ShiftRequest;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
+import accessiblesolutions.accessiblescheduling.to.AlternateWeekendsOffNotification;
 import accessiblesolutions.accessiblescheduling.to.OverWeeklyDaysNotification;
 import accessiblesolutions.accessiblescheduling.to.ScheduleNotification;
 import accessiblesolutions.accessiblescheduling.to.ShiftIssueTO;
 import accessiblesolutions.accessiblescheduling.to.ShiftNotification;
+import accessiblesolutions.accessiblescheduling.to.Weekend;
 import accessiblesolutions.accessiblescheduling.worker.ShiftWorker;
 
 @Component
@@ -221,10 +223,29 @@ public class CleaningManager {
 		return notifications;
 	}
     
+    public Weekend[] getUpcomingWeekends(){
+    	return null;
+    }
+    
     public ArrayList<AlternateWeekendsOffNotification> getAlternateWeekendsOffNotifications() throws ProccessingException, CorruptDataException{
     	ArrayList<AlternateWeekendsOffNotification> notifications = new ArrayList<AlternateWeekendsOffNotification>();
+    	Weekend[] upcomingWeekends = getUpcomingWeekends();
+    	Iterable<Employee> employees = employeeCrud.findAll();
     	
-    	return notifications
+    	for(Employee employee: employees){
+    		if(employee.getOffAlternateWeekends()){
+    			for(Weekend weekend:upcomingWeekends){
+    				AlternateWeekendsOffNotification notification = null;
+    				//if they have a shift that weekend
+        	    	//If they have a shift last weekend create a notification
+        	    	//if there is a shift next weekend add to or create notification
+        	    	//if there was a shift next weekend check recursively and add
+        	    	//add weekend to weekends covered
+    			}
+    		}
+    	}
+    	
+    	return notifications;
     }
     public ArrayList<OverWeeklyDaysNotification> getOverWeeklyDaysNotifications() throws ProccessingException, CorruptDataException{
     	ArrayList<OverWeeklyDaysNotification> notifications = new ArrayList<OverWeeklyDaysNotification>();
