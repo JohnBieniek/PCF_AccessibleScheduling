@@ -223,8 +223,68 @@ public class CleaningManager {
 		return notifications;
 	}
     
-    public Weekend[] getUpcomingWeekends(){
-    	return null;
+    public Weekend getWeekendOfShift(Shift shift) throws CorruptDataException{
+    	Weekend weekend = new Weekend();
+    	if(shift.isWeekend()){
+    		LocalDate saturday;
+    		LocalDate sunday;
+    		
+	    	if(shift.getStartsLocalDate().getDayOfWeek().getValue()==6){
+	    		saturday=shift.getStartsLocalDate();
+	    		sunday=saturday.plusDays(1);
+	    	}
+	    	else{
+	    		sunday=shift.getStartsLocalDate();
+	    		saturday=sunday.minusDays(1);
+	    	}
+	    	
+	    	weekend.setMonth(saturday.getMonth());
+	    	weekend.setSaturday(saturday);
+	    	weekend.setSunday(sunday);
+    	}
+    	return weekend;
+    }
+    
+    public Weekend[] getWeekendArray(ArrayList<Weekend> weekendList){
+    	Weekend[] weekends = null;
+    	
+    	if(weekendList!=null && weekendList.size()>0){
+    		weekends = new Weekend[weekendList.size()];
+    		int index = 0;
+    		
+    		while(!weekendList.isEmpty()){
+    			Weekend earliest = null;
+    			
+    			for(Weekend weekend : weekendList){
+    				if(null==earliest || earliest.getSaturday().isAfter(weekend.getSaturday())){
+    					earliest = weekend;
+    				}
+    			}
+    			weekendList.remove(earliest);
+    			weekends[index] = earliest;
+    		}
+    	}
+    	
+    	return weekends;
+    }
+    
+    public Weekend[] getUpcomingWeekends() throws ProccessingException, CorruptDataException{
+    	ArrayList<Weekend> weekends = new ArrayList<Weekend>();
+    	
+    	Iterable<Shift> shiftsDb = shiftCrud.findAll();
+    	ArrayList<Shift> shifts = ShiftWorker.getUpcomingShifts(shiftsDb);
+    	
+    	for(Shift shift:shifts){
+    		if(shift.isWeekend()){
+    			Weekend weekend = getWeekendOfShift(shift);
+    			
+    			if(!weekends.contains(weekend)){
+    				weekends.add(weekend);
+    			}
+    		}
+    	}
+    	
+    	return getWeekendArray(weekends);
     }
     
     public ArrayList<AlternateWeekendsOffNotification> getAlternateWeekendsOffNotifications() throws ProccessingException, CorruptDataException{
