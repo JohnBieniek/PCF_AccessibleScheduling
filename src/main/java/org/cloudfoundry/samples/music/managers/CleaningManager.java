@@ -324,9 +324,22 @@ public class CleaningManager {
     	
     	return notifications;
     }
-    private ArrayList<Shift> getShiftsLastWeekend(Weekend weekend, Employee employee) {
-		// TODO Auto-generated method stub
-		return null;
+    
+    private ArrayList<Shift> getShiftsLastWeekend(Weekend weekend, Employee employee) throws ProccessingException, CorruptDataException {
+    	Iterable<Shift> shiftsDb = shiftCrud.findAll();
+    	ArrayList<Shift> assignedShifts = ShiftWorker.getAssignedShiftsFor(shiftsDb, employee.getId());
+    	ArrayList<Shift> shiftsLastWeekend = new ArrayList<Shift>();
+    	
+    	for(Shift shift: assignedShifts){
+    		if(shift.getStartsLocalDate().isEqual(weekend.getSaturday())||
+    				shift.getStartsLocalDate().isEqual(weekend.getSunday())	||
+    				shift.getEndsLocalDate().isEqual(weekend.getSaturday())||
+    				shift.getEndsLocalDate().isEqual(weekend.getSaturday())){
+    			shiftsLastWeekend.add(shift);
+    		}
+    	}
+    	
+		return shiftsLastWeekend;
 	}
 
 
