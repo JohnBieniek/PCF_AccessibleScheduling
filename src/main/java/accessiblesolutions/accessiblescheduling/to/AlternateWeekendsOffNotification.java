@@ -10,6 +10,10 @@ public class AlternateWeekendsOffNotification {
     
     private Shift[][] weekendsWorked;
     
+    public AlternateWeekendsOffNotification() {
+    	
+    }
+    
     public AlternateWeekendsOffNotification(Employee employee, Shift[][] shifts) {
     	staff = employee.getFirst() + " " + employee.getInitial();
     	setWeekendsWorked(shifts);
