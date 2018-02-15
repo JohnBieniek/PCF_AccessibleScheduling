@@ -312,6 +312,13 @@ public class CleaningManager {
     				
     				if(worksWeekend){
     					ArrayList<Shift> shiftsLastWeekend = getShiftsLastWeekend(weekend,employee);
+    					
+    					if(shiftsLastWeekend.size()>0){
+    						notification = new AlternateWeekendsOffNotification();
+    						notification.setStaff(employee.getFirst() + " " + employee.getInitial());
+    						Shift[][] weekendsWorked = null;//TODO
+    						notification.setWeekendsWorked(weekendsWorked);
+    					}
     					//If they have a shift last weekend create a notification
     				}
         	    	
