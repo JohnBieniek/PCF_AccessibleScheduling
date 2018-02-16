@@ -1,5 +1,7 @@
 package accessiblesolutions.accessiblescheduling.to;
 
+import java.util.ArrayList;
+
 import accessiblesolutions.accessiblescheduling.domain.Employee;
 import accessiblesolutions.accessiblescheduling.domain.Shift;
 
@@ -8,13 +10,13 @@ public class AlternateWeekendsOffNotification {
     private String description="This person requested alternate weekends off but works at least two consecutive weekends due to the following shifts"; 
     private String staff = "";
     
-    private Shift[][] weekendsWorked;
+    private ArrayList<ArrayList<Shift>> weekendsWorked;
     
     public AlternateWeekendsOffNotification() {
     	
     }
     
-    public AlternateWeekendsOffNotification(Employee employee, Shift[][] shifts) {
+    public AlternateWeekendsOffNotification(Employee employee, ArrayList<ArrayList<Shift>> shifts) {
     	staff = employee.getFirst() + " " + employee.getInitial();
     	setWeekendsWorked(shifts);
     }
@@ -35,11 +37,11 @@ public class AlternateWeekendsOffNotification {
 		this.staff = staff;
 	}
 
-	public Shift[][] getWeekendsWorked() {
+	public ArrayList<ArrayList<Shift>> getWeekendsWorked() {
 		return weekendsWorked;
 	}
 
-	public void setWeekendsWorked(Shift[][] weekendsWorked) {
+	public void setWeekendsWorked(ArrayList<ArrayList<Shift>> weekendsWorked) {
 		this.weekendsWorked = weekendsWorked;
 	}
 }

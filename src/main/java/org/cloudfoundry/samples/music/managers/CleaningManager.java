@@ -314,15 +314,26 @@ public class CleaningManager {
     					ArrayList<Shift> shiftsLastWeekend = getShiftsLastWeekend(weekend,employee);
     					
     					if(shiftsLastWeekend.size()>0){
-    						notification = new AlternateWeekendsOffNotification();
-    						notification.setStaff(employee.getFirst() + " " + employee.getInitial());
-    						Shift[][] weekendsWorked = null;//TODO
-    						notification.setWeekendsWorked(weekendsWorked);
+    						notification = new AlternateWeekendsOffNotification(employee,getInitialWeekendsWorked(weekend,employee));
     					}
-    					//If they have a shift last weekend create a notification
+    					int itteration=1;
+    					Weekend selectedWeekend = weekend;
+    					while(itteration<10){
+    						selectedWeekend=getNextWeekend(selectedWeekend);
+    						ArrayList<Shift> shiftsSelectedWeekend = getShiftsForWeekend(selectedWeekend,employee);
+    						if(shiftsSelectedWeekend.size()>0){
+    							//if there is a shift next weekend add to or create notification
+        						notification = null ;//
+        					}
+    						else{
+    							itteration=10;
+    							break;
+    						}
+    						itteration++;
+    					}
     				}
         	    	
-        	    	//if there is a shift next weekend add to or create notification
+        	    	
         	    	//if there was a shift next weekend check recursively and add
         	    	//add weekend to weekends covered
     			}
@@ -332,21 +343,57 @@ public class CleaningManager {
     	return notifications;
     }
     
+    private Weekend getNextWeekend(Weekend weekend){
+    	Weekend nextWeekend = new Weekend();
+    	
+    	nextWeekend.setMonth(weekend.getSaturday().plusWeeks(1).getMonth());
+    	nextWeekend.setSaturday(weekend.getSaturday().plusWeeks(1));
+    	nextWeekend.setSunday(weekend.getSunday().plusWeeks(1));
+    	
+    	return nextWeekend;
+    }
+    private ArrayList<ArrayList<Shift>> getInitialWeekendsWorked(Weekend weekend, Employee employee) throws ProccessingException, CorruptDataException {
+		ArrayList<ArrayList<Shift>> weekendsWorked = new ArrayList<ArrayList<Shift>>();
+		Weekend lastWeekend = new Weekend();
+		LocalDate lastSaturday = weekend.getSaturday().minusWeeks(1);
+		
+		lastWeekend.setMonth(lastSaturday.getMonth());
+		lastWeekend.setSaturday(lastSaturday);
+		lastWeekend.setSunday(lastSaturday.plusDays(1));
+		
+		weekendsWorked.add(getShiftsForWeekend(lastWeekend,employee));
+		weekendsWorked.add(getShiftsForWeekend(weekend,employee));
+		
+		return weekendsWorked;
+	}
+
     private ArrayList<Shift> getShiftsLastWeekend(Weekend weekend, Employee employee) throws ProccessingException, CorruptDataException {
+    	Weekend lastWeekend = new Weekend();
+		LocalDate lastSaturday = weekend.getSaturday().minusWeeks(1);
+		
+		lastWeekend.setMonth(lastSaturday.getMonth());
+		lastWeekend.setSaturday(lastSaturday);
+		lastWeekend.setSunday(lastSaturday.plusDays(1));
+		
+    	
+		return getShiftsForWeekend(lastWeekend,employee);
+	}
+
+	private ArrayList<Shift> getShiftsForWeekend(Weekend weekend, Employee employee) throws ProccessingException, CorruptDataException {
     	Iterable<Shift> shiftsDb = shiftCrud.findAll();
     	ArrayList<Shift> assignedShifts = ShiftWorker.getAssignedShiftsFor(shiftsDb, employee.getId());
-    	ArrayList<Shift> shiftsLastWeekend = new ArrayList<Shift>();
+    	ArrayList<Shift> shiftsForWeekend = new ArrayList<Shift>();
     	
     	for(Shift shift: assignedShifts){
     		if(shift.getStartsLocalDate().isEqual(weekend.getSaturday())||
     				shift.getStartsLocalDate().isEqual(weekend.getSunday())	||
     				shift.getEndsLocalDate().isEqual(weekend.getSaturday())||
     				shift.getEndsLocalDate().isEqual(weekend.getSaturday())){
-    			shiftsLastWeekend.add(shift);
+    			shiftsForWeekend.add(shift);
     		}
     	}
     	
-		return shiftsLastWeekend;
+		return shiftsForWeekend;
 	}
 
 
