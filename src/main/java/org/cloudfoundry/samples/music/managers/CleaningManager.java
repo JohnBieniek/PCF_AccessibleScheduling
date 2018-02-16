@@ -319,10 +319,18 @@ public class CleaningManager {
     					int itteration=1;
     					Weekend selectedWeekend = weekend;
     					while(itteration<10){
-    						
+    						selectedWeekend=getNextWeekend(selectedWeekend);
+    						ArrayList<Shift> shiftsSelectedWeekend = getShiftsForWeekend(selectedWeekend,employee);
+    						if(shiftsSelectedWeekend.size()>0){
+    							//if there is a shift next weekend add to or create notification
+        						notification = null ;//
+        					}
+    						else{
+    							itteration=10;
+    							break;
+    						}
     						itteration++;
     					}
-    					//if there is a shift next weekend add to or create notification
     				}
         	    	
         	    	
@@ -333,6 +341,16 @@ public class CleaningManager {
     	}
     	
     	return notifications;
+    }
+    
+    private Weekend getNextWeekend(Weekend weekend){
+    	Weekend nextWeekend = new Weekend();
+    	
+    	nextWeekend.setMonth(weekend.getSaturday().plusWeeks(1).getMonth());
+    	nextWeekend.setSaturday(weekend.getSaturday().plusWeeks(1));
+    	nextWeekend.setSunday(weekend.getSunday().plusWeeks(1));
+    	
+    	return nextWeekend;
     }
     private ArrayList<ArrayList<Shift>> getInitialWeekendsWorked(Weekend weekend, Employee employee) throws ProccessingException, CorruptDataException {
 		ArrayList<ArrayList<Shift>> weekendsWorked = new ArrayList<ArrayList<Shift>>();
