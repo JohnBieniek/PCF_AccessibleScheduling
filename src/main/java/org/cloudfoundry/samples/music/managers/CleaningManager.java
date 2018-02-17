@@ -315,15 +315,36 @@ public class CleaningManager {
     					
     					if(shiftsLastWeekend.size()>0){
     						notification = new AlternateWeekendsOffNotification(employee,getInitialWeekendsWorked(weekend,employee));
+    						//add weekend to weekends covered
     					}
     					int itteration=1;
     					Weekend selectedWeekend = weekend;
-    					while(itteration<10){
+    					while(itteration<10){//if there was a shift next weekend check recursively and add
     						selectedWeekend=getNextWeekend(selectedWeekend);
     						ArrayList<Shift> shiftsSelectedWeekend = getShiftsForWeekend(selectedWeekend,employee);
     						if(shiftsSelectedWeekend.size()>0){
+    							if(notification==null){
+    								ArrayList<Weekend> weekends = new ArrayList<Weekend>();
+    								weekends.add(weekend);
+    								weekends.add(selectedWeekend);
+    								
+    								ArrayList<ArrayList<Shift>>  weekendsWorked = getWeekendsWorked(weekends,employee);
+    								notification = new AlternateWeekendsOffNotification(employee,weekendsWorked);
+    								//add weekend to weekends covered
+    							}else{
+//    								ArrayList<ArrayList<Shift>>  weekendsWorked = notification.getWeekendsWorked();
+//    								
+//    								notification = new AlternateWeekendsOffNotification(employee,weekendsWorked);notification.getWeekendsWorked();
+//    								weekends.add(weekend);
+//    								weekends.add(selectedWeekend);
+//    								
+//    								ArrayList<ArrayList<Shift>>  weekendsWorked = getWeekendsWorked(weekends,employee);
+//    								notification = new AlternateWeekendsOffNotification(employee,weekendsWorked);
+    								//add weekend to weekends covered
+    							}
     							//if there is a shift next weekend add to or create notification
         						notification = null ;//
+        						//add weekend to weekends covered
         					}
     						else{
     							itteration=10;
@@ -332,10 +353,6 @@ public class CleaningManager {
     						itteration++;
     					}
     				}
-        	    	
-        	    	
-        	    	//if there was a shift next weekend check recursively and add
-        	    	//add weekend to weekends covered
     			}
     		}
     	}
@@ -343,7 +360,18 @@ public class CleaningManager {
     	return notifications;
     }
     
-    private Weekend getNextWeekend(Weekend weekend){
+    private ArrayList<ArrayList<Shift>> getWeekendsWorked(ArrayList<Weekend> weekends, Employee employee) throws ProccessingException, CorruptDataException {
+    	ArrayList<ArrayList<Shift>> weekendsWorked = new ArrayList<ArrayList<Shift>>();
+    	
+    	for(Weekend weekend: weekends){
+    		weekendsWorked.add(getShiftsForWeekend(weekend,employee));
+    	}
+		
+		return weekendsWorked;
+	}
+
+
+	private Weekend getNextWeekend(Weekend weekend){
     	Weekend nextWeekend = new Weekend();
     	
     	nextWeekend.setMonth(weekend.getSaturday().plusWeeks(1).getMonth());
