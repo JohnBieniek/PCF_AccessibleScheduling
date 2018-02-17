@@ -332,19 +332,13 @@ public class CleaningManager {
     								notification = new AlternateWeekendsOffNotification(employee,weekendsWorked);
     								//add weekend to weekends covered
     							}else{
-//    								ArrayList<ArrayList<Shift>>  weekendsWorked = notification.getWeekendsWorked();
-//    								
-//    								notification = new AlternateWeekendsOffNotification(employee,weekendsWorked);notification.getWeekendsWorked();
-//    								weekends.add(weekend);
-//    								weekends.add(selectedWeekend);
-//    								
-//    								ArrayList<ArrayList<Shift>>  weekendsWorked = getWeekendsWorked(weekends,employee);
-//    								notification = new AlternateWeekendsOffNotification(employee,weekendsWorked);
+    								ArrayList<ArrayList<Shift>>  weekendsWorked = notification.getWeekendsWorked();
+    								
+    								weekendsWorked.add(getShiftsForWeekend(weekend,employee));
+    								
+    								notification.setWeekendsWorked(weekendsWorked);
     								//add weekend to weekends covered
     							}
-    							//if there is a shift next weekend add to or create notification
-        						notification = null ;//
-        						//add weekend to weekends covered
         					}
     						else{
     							itteration=10;
