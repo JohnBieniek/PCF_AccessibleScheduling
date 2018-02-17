@@ -299,13 +299,14 @@ public class CleaningManager {
     			ArrayList<Weekend> coveredWeekends = new ArrayList<Weekend>();
     			
     			for(Weekend weekend:upcomingWeekends){
-    				if(!coveredWeekends.contains(weekend)){
+    				if(null!=weekend && !coveredWeekends.contains(weekend)){
 	    				AlternateWeekendsOffNotification notification = null;
 	    				
 	    				ArrayList<Shift> assignedShifts = ShiftWorker.getAssignedShiftsFor(shifts, employee.getId());
 	    		    	boolean worksWeekend = false;
 	    				for(Shift shift :assignedShifts){
-	    					if( shift.getStartsLocalDate() == weekend.getSaturday() ||
+	    					if(null!=shift && shift.isValid() &&
+	    						shift.getStartsLocalDate() == weekend.getSaturday() ||
 								shift.getStartsLocalDate() == weekend.getSunday() ||
 								shift.getEndsLocalDate() == weekend.getSaturday() ||
 								shift.getEndsLocalDate() == weekend.getSunday()){
