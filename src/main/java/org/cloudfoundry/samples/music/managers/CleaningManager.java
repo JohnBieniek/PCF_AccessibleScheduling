@@ -296,56 +296,69 @@ public class CleaningManager {
     	
     	for(Employee employee: employees){
     		if(employee.getOffAlternateWeekends()){
+    			ArrayList<Weekend> coveredWeekends = new ArrayList<Weekend>();
+    			
     			for(Weekend weekend:upcomingWeekends){
-    				AlternateWeekendsOffNotification notification = null;
-    				
-    				ArrayList<Shift> assignedShifts = ShiftWorker.getAssignedShiftsFor(shifts, employee.getId());
-    		    	boolean worksWeekend = false;
-    				for(Shift shift :assignedShifts){
-    					if( shift.getStartsLocalDate() == weekend.getSaturday() ||
-							shift.getStartsLocalDate() == weekend.getSunday() ||
-							shift.getEndsLocalDate() == weekend.getSaturday() ||
-							shift.getEndsLocalDate() == weekend.getSunday()){
-    						worksWeekend=true;
-    					}
-    				}
-    				
-    				if(worksWeekend){
-    					ArrayList<Shift> shiftsLastWeekend = getShiftsLastWeekend(weekend,employee);
-    					
-    					if(shiftsLastWeekend.size()>0){
-    						notification = new AlternateWeekendsOffNotification(employee,getInitialWeekendsWorked(weekend,employee));
-    						//add weekend to weekends covered
-    					}
-    					int itteration=1;
-    					Weekend selectedWeekend = weekend;
-    					while(itteration<10){//if there was a shift next weekend check recursively and add
-    						selectedWeekend=getNextWeekend(selectedWeekend);
-    						ArrayList<Shift> shiftsSelectedWeekend = getShiftsForWeekend(selectedWeekend,employee);
-    						if(shiftsSelectedWeekend.size()>0){
-    							if(notification==null){
-    								ArrayList<Weekend> weekends = new ArrayList<Weekend>();
-    								weekends.add(weekend);
-    								weekends.add(selectedWeekend);
-    								
-    								ArrayList<ArrayList<Shift>>  weekendsWorked = getWeekendsWorked(weekends,employee);
-    								notification = new AlternateWeekendsOffNotification(employee,weekendsWorked);
-    								//add weekend to weekends covered
-    							}else{
-    								ArrayList<ArrayList<Shift>>  weekendsWorked = notification.getWeekendsWorked();
-    								
-    								weekendsWorked.add(getShiftsForWeekend(weekend,employee));
-    								
-    								notification.setWeekendsWorked(weekendsWorked);
-    								//add weekend to weekends covered
-    							}
-        					}
-    						else{
-    							itteration=10;
-    							break;
-    						}
-    						itteration++;
-    					}
+    				if(!coveredWeekends.contains(weekend)){
+	    				AlternateWeekendsOffNotification notification = null;
+	    				
+	    				ArrayList<Shift> assignedShifts = ShiftWorker.getAssignedShiftsFor(shifts, employee.getId());
+	    		    	boolean worksWeekend = false;
+	    				for(Shift shift :assignedShifts){
+	    					if( shift.getStartsLocalDate() == weekend.getSaturday() ||
+								shift.getStartsLocalDate() == weekend.getSunday() ||
+								shift.getEndsLocalDate() == weekend.getSaturday() ||
+								shift.getEndsLocalDate() == weekend.getSunday()){
+	    						worksWeekend=true;
+	    					}
+	    				}
+	    				
+	    				if(worksWeekend){
+	    					ArrayList<Shift> shiftsLastWeekend = getShiftsLastWeekend(weekend,employee);
+	    					
+	    					if(shiftsLastWeekend.size()>0){
+	    						notification = new AlternateWeekendsOffNotification(employee,getInitialWeekendsWorked(weekend,employee));
+	    						if(!coveredWeekends.contains(weekend)){
+	    							coveredWeekends.add(weekend);
+	    						}
+	    					}
+	    					int itteration=1;
+	    					Weekend selectedWeekend = weekend;
+	    					while(itteration<10){//if there was a shift next weekend check recursively and add
+	    						selectedWeekend=getNextWeekend(selectedWeekend);
+	    						if(!coveredWeekends.contains(weekend)){
+		    						ArrayList<Shift> shiftsSelectedWeekend = getShiftsForWeekend(selectedWeekend,employee);
+		    						if(shiftsSelectedWeekend.size()>0){
+		    							if(notification==null){
+		    								ArrayList<Weekend> weekends = new ArrayList<Weekend>();
+		    								weekends.add(weekend);
+		    								weekends.add(selectedWeekend);
+		    								
+		    								ArrayList<ArrayList<Shift>>  weekendsWorked = getWeekendsWorked(weekends,employee);
+		    								notification = new AlternateWeekendsOffNotification(employee,weekendsWorked);
+		    								if(!coveredWeekends.contains(selectedWeekend)){
+		    	    							coveredWeekends.add(selectedWeekend);
+		    	    						}
+		    							}else{
+		    								ArrayList<ArrayList<Shift>>  weekendsWorked = notification.getWeekendsWorked();
+		    								
+		    								weekendsWorked.add(getShiftsForWeekend(selectedWeekend,employee));
+		    								
+		    								notification.setWeekendsWorked(weekendsWorked);
+
+		    								if(!coveredWeekends.contains(selectedWeekend)){
+		    	    							coveredWeekends.add(selectedWeekend);
+		    	    						}
+		    							}
+		        					}
+		    						else{
+		    							itteration=10;
+		    							break;
+		    						}
+		    						itteration++;
+	    						}
+	    					}
+	    				}
     				}
     			}
     		}
