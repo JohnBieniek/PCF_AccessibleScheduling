@@ -273,6 +273,106 @@
 			        </tr>
 		        </tbody>
 		    </table>
+		    
+		     <h4>Alternate Weekends Off Issues</h4>
+		     <p>The listed employee has requested alternate weekends off. They currently are assigned shifts spanning several weeks that 
+		     	infringe on this request. It's suggested that you reassign some of these shifts to meet their request. 
+		     </p>
+		    <table class="table table-striped">
+		        <thead>
+			        <tr>
+			        	<th></th>
+			        	<th>Staff</th>
+		        		<th></th>        
+			        </tr>
+		        </thead>
+		        <tbody>
+			        <tr  ng-repeat="weekendNotification in weekendNotifications | orderBy:[sortWeekendNotificationField,'staff']:sortDescending">
+			        	<div>
+			        		 <td class="dropdown">
+				                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+				                    <span class="glyphicon glyphicon-cog"></span>
+				                </a>
+				                <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+				                    <li role="presentation"><a ng-click="fixSchedule()">fix issue</a></li>
+				                </ul>
+				            </td>
+				            <td>
+								{{weeklyNotification.staff}}
+				            </td>
+				            <td>
+				            	<table class="table table-striped">
+							        <thead>
+								        <tr>
+							        		<th>Weekend</th>       
+							        		<th></th>
+								        </tr>
+							        </thead>
+							        <tbody>
+								        <tr ng-repeat="weekend in weekends">
+								        	<div>
+								        		<td>
+								        		 	{{weekend}}
+									            </td>
+									            <td>
+									            	<table class="table table-striped">
+												        <thead>
+													        <tr>
+												        		<th>Day</th>
+												        		<th>Shifts</th>
+													        </tr>
+												        </thead>
+												        <tbody>
+													        <tr ng-repeat="day in weekend.days">
+													        	<div>
+														            <td>
+														            	{{day}}
+														            </td>
+														            <td>
+														            	<table class="table table-striped">
+																	        <thead>
+																		        <tr>
+																	        		<th></th>
+																	        		<th>Date</th>
+																	        		<th>Client</th>
+																		        </tr>
+																	        </thead>
+																	        <tbody>
+																		        <tr ng-repeat="shift in weekend.days[$index].shifts">
+																		        	<div>
+																			        	<td class="dropdown">
+																			                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+																			                    <span class="glyphicon glyphicon-cog"></span>
+																			                </a>
+																			                <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+																			                    <li role="presentation"><a ng-click="fixSingleShift(shift)">fix issue</a></li>
+																			                </ul>
+																			            </td>
+																			            <td>
+																			            	{{shift.date}}
+																			            </td>
+																			             <td>
+																			            	{{shift.client}}
+																			            </td>
+																		            </div>
+																		        </tr>
+																	        </tbody>
+																	    </table>
+														            </td>
+													            </div>
+													        </tr>
+												        </tbody>
+												    </table>
+									            </td>
+								            </div>
+								        </tr>
+							        </tbody>
+							    </table>
+				            </td>
+			            </div>
+			        </tr>
+		        </tbody>
+		    </table>
   		    <script type="text/javascript" src="js/component/shiftIssueTable.js"></script>
 		    <script type="text/javascript" src="js/modal/ShiftIssueModalController.js"></script>
 	    </div>
