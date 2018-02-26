@@ -39,6 +39,7 @@ function ShiftIssueController($scope, $modal, $http, Shifts, Shift, Employees,Cl
 	 $scope.selectedMonth='2';
 	 $scope.shiftIssues;
 	 $scope.scheduleIssues;
+	 $scope.weekendNotifications;
 	 $scope.dayNames=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
 	 $scope.daysOfTheWeek=[0,1,2,3,4,5,6];
 	 $scope.weeklyNotifications;
@@ -57,7 +58,24 @@ function ShiftIssueController($scope, $modal, $http, Shifts, Shift, Employees,Cl
 
 		 $scope.listWeeklyNotifications();
 		 $scope.listDailyNotifications();
+		 $scope.listWeekendNotifications();
 	 }
+	 $scope.listWeekendNotifications = function(){
+	    	$http({
+	            url: '/cleaning/alternateWeeekendsNotifications',
+	            method: 'GET',
+	            headers: {
+	                'Content-Type': 'application/x-www-form-urlencoded'
+	            },
+	            params: {
+	         
+	            }
+	        })
+	        .then(function(response) {
+	    		$scope.weekendNotifications = response.data;
+	    		console.log(response.data);
+	        });
+	    }
 	 $scope.listScheduleIssues = function(){
 	    	$http({
 	            url: '/cleaning/scheduleNotifications',

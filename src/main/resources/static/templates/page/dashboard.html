@@ -309,10 +309,10 @@
 								        </tr>
 							        </thead>
 							        <tbody>
-								        <tr ng-repeat="weekend in weekends">
+								        <tr ng-repeat="weekend in weeklyNotification.weekends">
 								        	<div>
 								        		<td>
-								        		 	{{weekend}}
+								        		 	{{weekend.displayInfo}}
 									            </td>
 									            <td>
 									            	<table class="table table-striped">
@@ -326,7 +326,7 @@
 													        <tr ng-repeat="day in weekend.days">
 													        	<div>
 														            <td>
-														            	{{day}}
+														            	{{day.date}}
 														            </td>
 														            <td>
 														            	<table class="table table-striped">
@@ -338,7 +338,7 @@
 																		        </tr>
 																	        </thead>
 																	        <tbody>
-																		        <tr ng-repeat="shift in weekend.days[$index].shifts">
+																		        <tr ng-repeat="shift in day.shifts">
 																		        	<div>
 																			        	<td class="dropdown">
 																			                <a href="#" class="dropdown-toggle" data-toggle="dropdown">

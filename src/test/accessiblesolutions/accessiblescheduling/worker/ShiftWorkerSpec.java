@@ -404,22 +404,22 @@ public class ShiftWorkerSpec {
 		assertTrue(map.isEmpty());
 	}
 	
-	@Test
-	public void getEmployeeShiftMapFailsWithNonPrestaffedShifts(){
-		boolean exception = false;
-		ArrayList<Shift> shifts = new ArrayList<Shift>();
-		Shift shift = new Shift();
-		
-		shifts.add(shift);
-		
-		try {
-			ShiftWorker.getPrestaffedEmployeeShiftMap(shifts);
-		} catch (ProccessingException e) {
-			exception=true;
-		}
-		
-		assertTrue(exception);
-	}
+//	@Test
+//	public void getEmployeeShiftMapFailsWithNonPrestaffedShifts(){
+//		boolean exception = false;
+//		ArrayList<Shift> shifts = new ArrayList<Shift>();
+//		Shift shift = new Shift();
+//		
+//		shifts.add(shift);
+//		
+//		try {
+//			ShiftWorker.getPrestaffedEmployeeShiftMap(shifts);
+//		} catch (ProccessingException e) {
+//			exception=true;
+//		}
+//		
+//		assertTrue(exception);
+//	}
 	
 	@Test
 	public void getEmployeeShiftMapPopulatesFor1PersonAndShift(){
