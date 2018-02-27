@@ -174,14 +174,14 @@ public class ShiftAssignmentManager {
     	String result = "";
 		Shift shift = getWeekendShiftStartingWeekOfMonth(week,month,year);
 		if(null!=shift){
-			result+=scheduleWeekendShiftStartingWeekOfMonth(shift, week, month, year);
+			result+=scheduleWeekendShiftStartingWeekOfMonth(shift, month, year);
 		}
 		else{
 			result+="No weekend shifts remain to schedule for week "+week + " of month " + month;
 		}
     	return result;
 	}
-    public String scheduleWeekendShiftStartingWeekOfMonth(Shift shift, int week, int month, int year) throws CorruptDataException, ProccessingException{
+    public String scheduleWeekendShiftStartingWeekOfMonth(Shift shift,  int month, int year) throws CorruptDataException, ProccessingException{
     	String result="";
     	if(null!=shift){
     		result+="Attempting to assign "+shift.toString();
@@ -275,7 +275,7 @@ public class ShiftAssignmentManager {
 		result+= unassignedShiftsForWeekends.size() + " weekends shifts will be assigned.";
 		for(int i= 0;i<unassignedShiftsForWeekends.size()+20;i++){
 			Shift shift = getWeekendShiftStartingWeekOfMonth(week,month,year);
-			result+=scheduleWeekendShiftStartingWeekOfMonth(shift,week,month,year);
+			result+=scheduleWeekendShiftStartingWeekOfMonth(shift,month,year);
 		}
 //		for(Shift shift : unassignedShiftsForWeekends){
 //			result+= scheduleWeekendShiftStartingWeekOfMonth(shift,week,month,year);
