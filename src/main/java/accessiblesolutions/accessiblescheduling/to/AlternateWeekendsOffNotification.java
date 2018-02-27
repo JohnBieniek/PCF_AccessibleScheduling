@@ -13,7 +13,7 @@ public class AlternateWeekendsOffNotification {
     
     private ArrayList<ArrayList<Shift>> weekendsWorked;
     
-    private WeekendsNotificationInfo[] weekends;
+    private WeekendsNotificationInfo[] weekendNotificationInfo;
     
     public AlternateWeekendsOffNotification() {
     	
@@ -38,6 +38,8 @@ public class AlternateWeekendsOffNotification {
 
 	public void setWeekendsWorked(ArrayList<ArrayList<Shift>> weekendsWorked) throws CorruptDataException {
 		this.weekendsWorked = weekendsWorked;
+		
+		ArrayList<WeekendsNotificationInfo> weekendNotificationArray = new ArrayList<WeekendsNotificationInfo>();
 		
 		for(ArrayList<Shift> weekend:weekendsWorked){
 			WeekendsNotificationInfo weekendInfo = new WeekendsNotificationInfo();
@@ -64,20 +66,39 @@ public class AlternateWeekendsOffNotification {
 			DaysNotificationInfo saturdaysInfo = new DaysNotificationInfo();
 			DaysNotificationInfo sundaysInfo = new DaysNotificationInfo();
 			
+			ArrayList<Shift> saturdaysShifts = new ArrayList<Shift>();
+			ArrayList<Shift> sundaysShifts = new ArrayList<Shift>();
+			
 			for(Shift shift :weekend){
-				//TODO add shifts to each day
+				if(shift.isWeekend()){
+					if(shift.getStartsLocalDate().getDayOfWeek().getValue()==7 || shift.getEndsLocalDate().getDayOfWeek().getValue()==7 ){
+						sundaysShifts.add(shift);
+					}
+					else if(shift.getStartsLocalDate().getDayOfWeek().getValue()==6 || shift.getEndsLocalDate().getDayOfWeek().getValue()==6){
+						saturdaysShifts.add(shift);
+					}
+				}
 			}
 			
+			saturdaysInfo.setShifts((Shift[])saturdaysShifts.toArray());
+			sundaysInfo.setShifts((Shift[])sundaysShifts.toArray());
+			
+			dayInfo.add(saturdaysInfo);
+			dayInfo.add(sundaysInfo);
+			
 			weekendInfo.setDays((DaysNotificationInfo[]) dayInfo.toArray());
+			
+			weekendNotificationArray.add(weekendInfo);
 		}
 		
+		setWeekendNotificationInfo((WeekendsNotificationInfo[])weekendNotificationArray.toArray());
 	}
 
-	public WeekendsNotificationInfo[] getWeekends() {
-		return weekends;
+	public WeekendsNotificationInfo[] getWeekendNotificationInfo() {
+		return weekendNotificationInfo;
 	}
 
-	public void setWeekends(WeekendsNotificationInfo[] weekends) {
-		this.weekends = weekends;
+	public void setWeekendNotificationInfo(WeekendsNotificationInfo[] weekendNotificationInfo) {
+		this.weekendNotificationInfo = weekendNotificationInfo;
 	}
 }
