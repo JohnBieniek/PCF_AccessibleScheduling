@@ -276,9 +276,16 @@ public class CleaningManager {
     	
     	for(Shift shift:shifts){
     		if(shift.isWeekend()){
+    			boolean present = false;
     			Weekend weekend = getWeekendOfShift(shift);
     			
-    			if(!weekends.contains(weekend)){
+    			for(Weekend selectedWeekend: weekends){
+    				if(selectedWeekend.getSaturday().getDayOfYear()==weekend.getSaturday().getDayOfYear()){
+        				present=true;
+        			}
+    			}
+    			if(!present && weekend.isValid()){
+    				System.out.println("upcoming weekend"+weekend.toString());
     				weekends.add(weekend);
     			}
     		}
@@ -295,11 +302,14 @@ public class CleaningManager {
     	ArrayList<Shift> shifts = ShiftWorker.getUpcomingShifts(shiftsDb);
     	
     	for(Employee employee: employees){
+    		System.out.println("getting notifications for " + employee.toString() + employee.getOffAlternateWeekends());
     		if(employee.getOffAlternateWeekends()){
+    			System.out.println(employee.getFirst() + " needs alternate weekends off");
     			ArrayList<Weekend> coveredWeekends = new ArrayList<Weekend>();
     			
     			for(Weekend weekend:upcomingWeekends){
     				if(null!=weekend && !coveredWeekends.contains(weekend)){
+    					System.out.println("checking notifications for weekend:"+weekend.toString());
 	    				AlternateWeekendsOffNotification notification = null;
 	    				
 	    				ArrayList<Shift> assignedShifts = ShiftWorker.getAssignedShiftsFor(shifts, employee.getId());
