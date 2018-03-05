@@ -249,20 +249,26 @@ public class CleaningManager {
     	Weekend[] weekends = null;
     	
     	if(weekendList!=null && weekendList.size()>0){
-    		weekends = new Weekend[weekendList.size()];
-    		int index = 0;
+    		weekends= new Weekend[weekendList.size()];
     		
-    		while(!weekendList.isEmpty()){
-    			Weekend earliest = null;
-    			
-    			for(Weekend weekend : weekendList){
-    				if(null==earliest || earliest.getSaturday().isAfter(weekend.getSaturday())){
-    					earliest = weekend;
-    				}
-    			}
-    			weekendList.remove(earliest);
-    			weekends[index] = earliest;
+    		for(int i = 0; i<weekendList.size();i++){
+    			weekends[i]=weekendList.get(i);
     		}
+//    		
+//    		weekends = new Weekend[weekendList.size()];
+//    		int index = 0;
+//    		
+//    		while(!weekendList.isEmpty()){
+//    			Weekend earliest = null;
+//    			
+//    			for(Weekend weekend : weekendList){
+//    				if(null==earliest || earliest.getSaturday().isAfter(weekend.getSaturday())){
+//    					earliest = weekend;
+//    				}
+//    			}
+//    			weekendList.remove(earliest);
+//    			weekends[index] = earliest;
+//    		}
     	}
     	
     	return weekends;
@@ -313,18 +319,21 @@ public class CleaningManager {
 	    				AlternateWeekendsOffNotification notification = null;
 	    				
 	    				ArrayList<Shift> assignedShifts = ShiftWorker.getAssignedShiftsFor(shifts, employee.getId());
+	    				System.out.println(employee.getFirst() + " has " + assignedShifts.size() + " shifts assigned");
 	    		    	boolean worksWeekend = false;
 	    				for(Shift shift :assignedShifts){
 	    					if(null!=shift && shift.isValid() &&
-	    						shift.getStartsLocalDate() == weekend.getSaturday() ||
-								shift.getStartsLocalDate() == weekend.getSunday() ||
-								shift.getEndsLocalDate() == weekend.getSaturday() ||
-								shift.getEndsLocalDate() == weekend.getSunday()){
+	    						shift.getStartsLocalDate().getDayOfYear() == weekend.getSaturday().getDayOfYear() ||
+								shift.getStartsLocalDate().getDayOfYear() == weekend.getSunday().getDayOfYear() ||
+								shift.getEndsLocalDate().getDayOfYear() == weekend.getSaturday().getDayOfYear() ||
+								shift.getEndsLocalDate().getDayOfYear() == weekend.getSunday().getDayOfYear()){
+	    						System.out.println(employee.getFirst() + " works the weekend of " + weekend.toString());
 	    						worksWeekend=true;
 	    					}
 	    				}
 	    				
 	    				if(worksWeekend){
+	    					System.out.println(employee.getFirst() + " works the weekend of " + weekend.toString() + ". Checking surrounding weekends");
 	    					ArrayList<Shift> shiftsLastWeekend = getShiftsLastWeekend(weekend,employee);
 	    					
 	    					if(shiftsLastWeekend.size()>0){
@@ -336,8 +345,9 @@ public class CleaningManager {
 	    					int itteration=1;
 	    					Weekend selectedWeekend = weekend;
 	    					while(itteration<10){//if there was a shift next weekend check recursively and add
+	    						System.out.println("itterating over future weekend " + itteration);
 	    						selectedWeekend=getNextWeekend(selectedWeekend);
-	    						if(!coveredWeekends.contains(weekend)){
+	    						if(!coveredWeekends.contains(selectedWeekend)){
 		    						ArrayList<Shift> shiftsSelectedWeekend = getShiftsForWeekend(selectedWeekend,employee);
 		    						if(shiftsSelectedWeekend.size()>0){
 		    							if(notification==null){
@@ -366,8 +376,8 @@ public class CleaningManager {
 		    							itteration=10;
 		    							break;
 		    						}
-		    						itteration++;
 	    						}
+	    						itteration++;
 	    					}
 	    				}
     				}

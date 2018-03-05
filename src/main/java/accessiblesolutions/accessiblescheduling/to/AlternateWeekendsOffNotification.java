@@ -38,7 +38,7 @@ public class AlternateWeekendsOffNotification {
 
 	public void setWeekendsWorked(ArrayList<ArrayList<Shift>> weekendsWorked) throws CorruptDataException {
 		this.weekendsWorked = weekendsWorked;
-		
+		System.out.println("started setWeekendsWorked");
 		ArrayList<WeekendsNotificationInfo> weekendNotificationArray = new ArrayList<WeekendsNotificationInfo>();
 		
 		for(ArrayList<Shift> weekend:weekendsWorked){
@@ -80,18 +80,40 @@ public class AlternateWeekendsOffNotification {
 				}
 			}
 			
-			saturdaysInfo.setShifts((Shift[])saturdaysShifts.toArray());
-			sundaysInfo.setShifts((Shift[])sundaysShifts.toArray());
+			Shift[] saturdaysShiftArray = new Shift[saturdaysShifts.size()];
+			
+			for(int i = 0; i<saturdaysShifts.size();i++){
+				saturdaysShiftArray[i]=saturdaysShifts.get(i);
+			}
+			saturdaysInfo.setShifts(saturdaysShiftArray);
+
+			Shift[] sundaysShiftArray = new Shift[sundaysShifts.size()];
+			
+			for(int i = 0; i<sundaysShifts.size();i++){
+				sundaysShiftArray[i]=sundaysShifts.get(i);
+			}
+			sundaysInfo.setShifts(sundaysShiftArray);
 			
 			dayInfo.add(saturdaysInfo);
 			dayInfo.add(sundaysInfo);
 			
-			weekendInfo.setDays((DaysNotificationInfo[]) dayInfo.toArray());
+			DaysNotificationInfo[] daysNotificationInfo = new DaysNotificationInfo[dayInfo.size()];
+			
+			for(int i = 0; i<dayInfo.size();i++){
+				daysNotificationInfo[i]=dayInfo.get(i);
+			}
+			weekendInfo.setDays(daysNotificationInfo);
 			
 			weekendNotificationArray.add(weekendInfo);
+			
 		}
+		WeekendsNotificationInfo[] weekendsNotificationInfo = new WeekendsNotificationInfo[weekendNotificationArray.size()];
 		
-		setWeekendNotificationInfo((WeekendsNotificationInfo[])weekendNotificationArray.toArray());
+		for(int i = 0; i<weekendNotificationArray.size();i++){
+			weekendsNotificationInfo[i]=weekendNotificationArray.get(i);
+		}
+		setWeekendNotificationInfo(weekendsNotificationInfo);
+		System.out.println("ended setWeekendsWorked");
 	}
 
 	public WeekendsNotificationInfo[] getWeekendNotificationInfo() {
