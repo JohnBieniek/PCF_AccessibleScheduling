@@ -72,9 +72,11 @@ public class AlternateWeekendsOffNotification {
 			for(Shift shift :weekend){
 				if(shift.isWeekend()){
 					if(shift.getStartsLocalDate().getDayOfWeek().getValue()==7 || shift.getEndsLocalDate().getDayOfWeek().getValue()==7 ){
+						shift.setDisplayDate();
 						sundaysShifts.add(shift);
 					}
 					else if(shift.getStartsLocalDate().getDayOfWeek().getValue()==6 || shift.getEndsLocalDate().getDayOfWeek().getValue()==6){
+						shift.setDisplayDate();
 						saturdaysShifts.add(shift);
 					}
 				}
@@ -86,13 +88,15 @@ public class AlternateWeekendsOffNotification {
 				saturdaysShiftArray[i]=saturdaysShifts.get(i);
 			}
 			saturdaysInfo.setShifts(saturdaysShiftArray);
-
+			saturdaysInfo.setDate(saturday);
+			
 			Shift[] sundaysShiftArray = new Shift[sundaysShifts.size()];
 			
 			for(int i = 0; i<sundaysShifts.size();i++){
 				sundaysShiftArray[i]=sundaysShifts.get(i);
 			}
 			sundaysInfo.setShifts(sundaysShiftArray);
+			sundaysInfo.setDate(sunday);
 			
 			dayInfo.add(saturdaysInfo);
 			dayInfo.add(sundaysInfo);
