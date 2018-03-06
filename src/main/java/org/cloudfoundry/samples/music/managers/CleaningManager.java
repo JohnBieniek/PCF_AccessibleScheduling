@@ -345,12 +345,15 @@ public class CleaningManager {
 	    					int itteration=1;
 	    					Weekend selectedWeekend = weekend;
 	    					while(itteration<10){//if there was a shift next weekend check recursively and add
-	    						System.out.println("itterating over future weekend " + itteration);
+	    						System.out.println("itterating over future weekend " + itteration + " weekends covered" + coveredWeekends.size());
 	    						selectedWeekend=getNextWeekend(selectedWeekend);
 	    						if(!coveredWeekends.contains(selectedWeekend)){
+	    							
 		    						ArrayList<Shift> shiftsSelectedWeekend = getShiftsForWeekend(selectedWeekend,employee);
+		    						System.out.println("evaulating weekend: " + weekend.toString() +" with shift array size:"+shiftsSelectedWeekend.size());
 		    						if(shiftsSelectedWeekend.size()>0){
 		    							if(notification==null){
+		    								System.out.println("Making a notification");
 		    								ArrayList<Weekend> weekends = new ArrayList<Weekend>();
 		    								weekends.add(weekend);
 		    								weekends.add(selectedWeekend);
@@ -360,7 +363,10 @@ public class CleaningManager {
 		    								if(!coveredWeekends.contains(selectedWeekend)){
 		    	    							coveredWeekends.add(selectedWeekend);
 		    	    						}
+		    								
+		    								notifications.add(notification);
 		    							}else{
+		    								System.out.println("updating a notification");
 		    								ArrayList<ArrayList<Shift>>  weekendsWorked = notification.getWeekendsWorked();
 		    								
 		    								weekendsWorked.add(getShiftsForWeekend(selectedWeekend,employee));
@@ -370,6 +376,8 @@ public class CleaningManager {
 		    								if(!coveredWeekends.contains(selectedWeekend)){
 		    	    							coveredWeekends.add(selectedWeekend);
 		    	    						}
+		    								
+		    								notifications.add(notification);
 		    							}
 		        					}
 		    						else{

@@ -298,7 +298,7 @@
 				                </ul>
 				            </td>
 				            <td>
-								{{weeklyNotification.staff}}
+								{{weekendNotification.staff}}
 				            </td>
 				            <td>
 				            	<table class="table table-striped">
@@ -309,7 +309,7 @@
 								        </tr>
 							        </thead>
 							        <tbody>
-								        <tr ng-repeat="weekend in weeklyNotification.weekends">
+								        <tr ng-repeat="weekend in weekendNotification.weekendNotificationInfo">
 								        	<div>
 								        		<td>
 								        		 	{{weekend.displayInfo}}
@@ -326,7 +326,7 @@
 													        <tr ng-repeat="day in weekend.days">
 													        	<div>
 														            <td>
-														            	{{day.date}}
+														            	{{day.date.dayOfWeek}}
 														            </td>
 														            <td>
 														            	<table class="table table-striped">
@@ -352,7 +352,7 @@
 																			            	{{shift.date}}
 																			            </td>
 																			             <td>
-																			            	{{shift.client}}
+																			            	{{shift.clientName}}
 																			            </td>
 																		            </div>
 																		        </tr>
