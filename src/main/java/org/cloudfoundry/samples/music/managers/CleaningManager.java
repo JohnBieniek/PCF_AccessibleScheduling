@@ -314,79 +314,93 @@ public class CleaningManager {
     			ArrayList<Weekend> coveredWeekends = new ArrayList<Weekend>();
     			
     			for(Weekend weekend:upcomingWeekends){
-    				if(null!=weekend && !coveredWeekends.contains(weekend)){
-    					System.out.println("checking notifications for weekend:"+weekend.toString());
-	    				AlternateWeekendsOffNotification notification = null;
-	    				
-	    				ArrayList<Shift> assignedShifts = ShiftWorker.getAssignedShiftsFor(shifts, employee.getId());
-	    				System.out.println(employee.getFirst() + " has " + assignedShifts.size() + " shifts assigned");
-	    		    	boolean worksWeekend = false;
-	    				for(Shift shift :assignedShifts){
-	    					if(null!=shift && shift.isValid() &&
-	    						shift.getStartsLocalDate().getDayOfYear() == weekend.getSaturday().getDayOfYear() ||
-								shift.getStartsLocalDate().getDayOfYear() == weekend.getSunday().getDayOfYear() ||
-								shift.getEndsLocalDate().getDayOfYear() == weekend.getSaturday().getDayOfYear() ||
-								shift.getEndsLocalDate().getDayOfYear() == weekend.getSunday().getDayOfYear()){
-	    						System.out.println(employee.getFirst() + " works the weekend of " + weekend.toString());
-	    						worksWeekend=true;
-	    					}
-	    				}
-	    				
-	    				if(worksWeekend){
-	    					System.out.println(employee.getFirst() + " works the weekend of " + weekend.toString() + ". Checking surrounding weekends");
-	    					ArrayList<Shift> shiftsLastWeekend = getShiftsLastWeekend(weekend,employee);
-	    					
-	    					if(shiftsLastWeekend.size()>0){
-	    						notification = new AlternateWeekendsOffNotification(employee,getInitialWeekendsWorked(weekend,employee));
-	    						if(!coveredWeekends.contains(weekend)){
-	    							coveredWeekends.add(weekend);
-	    						}
-	    					}
-	    					int itteration=1;
-	    					Weekend selectedWeekend = weekend;
-	    					while(itteration<10){//if there was a shift next weekend check recursively and add
-	    						System.out.println("itterating over future weekend " + itteration + " weekends covered" + coveredWeekends.size());
-	    						selectedWeekend=getNextWeekend(selectedWeekend);
-	    						if(!coveredWeekends.contains(selectedWeekend)){
-	    							
-		    						ArrayList<Shift> shiftsSelectedWeekend = getShiftsForWeekend(selectedWeekend,employee);
-		    						System.out.println("evaulating weekend: " + weekend.toString() +" with shift array size:"+shiftsSelectedWeekend.size());
-		    						if(shiftsSelectedWeekend.size()>0){
-		    							if(notification==null){
-		    								System.out.println("Making a notification");
-		    								ArrayList<Weekend> weekends = new ArrayList<Weekend>();
-		    								weekends.add(weekend);
-		    								weekends.add(selectedWeekend);
-		    								
-		    								ArrayList<ArrayList<Shift>>  weekendsWorked = getWeekendsWorked(weekends,employee);
-		    								notification = new AlternateWeekendsOffNotification(employee,weekendsWorked);
-		    								if(!coveredWeekends.contains(selectedWeekend)){
-		    	    							coveredWeekends.add(selectedWeekend);
-		    	    						}
-		    								
-		    								notifications.add(notification);
-		    							}else{
-		    								System.out.println("updating a notification");
-		    								ArrayList<ArrayList<Shift>>  weekendsWorked = notification.getWeekendsWorked();
-		    								
-		    								weekendsWorked.add(getShiftsForWeekend(selectedWeekend,employee));
-		    								
-		    								notification.setWeekendsWorked(weekendsWorked);
-
-		    								if(!coveredWeekends.contains(selectedWeekend)){
-		    	    							coveredWeekends.add(selectedWeekend);
-		    	    						}
-		    								
-		    								notifications.add(notification);
-		    							}
-		        					}
-		    						else{
-		    							itteration=10;
-		    							break;
+    				if(weekend.isValid()){
+	    				boolean coveredContains = false;
+						for(Weekend coveredWeekend : coveredWeekends){
+							if(coveredWeekend.getSaturday().getDayOfYear()==weekend.getSaturday().getDayOfYear()){
+								coveredContains=true;
+							}
+						}
+	    				if(null!=weekend && !coveredContains){
+	    					System.out.println("checking notifications for weekend:"+weekend.toString());
+		    				AlternateWeekendsOffNotification notification = null;
+		    				
+		    				ArrayList<Shift> assignedShifts = ShiftWorker.getAssignedShiftsFor(shifts, employee.getId());
+		    				System.out.println(employee.getFirst() + " has " + assignedShifts.size() + " shifts assigned");
+		    		    	boolean worksWeekend = false;
+		    				for(Shift shift :assignedShifts){
+		    					if(null!=shift && shift.isValid() &&
+		    						shift.getStartsLocalDate().getDayOfYear() == weekend.getSaturday().getDayOfYear() ||
+									shift.getStartsLocalDate().getDayOfYear() == weekend.getSunday().getDayOfYear() ||
+									shift.getEndsLocalDate().getDayOfYear() == weekend.getSaturday().getDayOfYear() ||
+									shift.getEndsLocalDate().getDayOfYear() == weekend.getSunday().getDayOfYear()){
+		    						System.out.println(employee.getFirst() + " works the weekend of " + weekend.toString());
+		    						worksWeekend=true;
+		    					}
+		    				}
+		    				
+		    				if(worksWeekend){
+		    					System.out.println(employee.getFirst() + " works the weekend of " + weekend.toString() + ". Checking surrounding weekends");
+		    					ArrayList<Shift> shiftsLastWeekend = getShiftsLastWeekend(weekend,employee);
+		    					
+		    					if(shiftsLastWeekend.size()>0){
+		    						notification = new AlternateWeekendsOffNotification(employee,getInitialWeekendsWorked(weekend,employee));
+		    						if(!coveredWeekends.contains(weekend)){
+		    							coveredWeekends.add(weekend);
 		    						}
-	    						}
-	    						itteration++;
-	    					}
+		    					}
+		    					int itteration=1;
+		    					Weekend selectedWeekend = weekend;
+		    					while(itteration<10){//if there was a shift next weekend check recursively and add
+		    						System.out.println("itterating over future weekend " + itteration + " weekends covered" + coveredWeekends.size());
+		    						selectedWeekend=getNextWeekend(selectedWeekend);
+		    						if(selectedWeekend.isValid()){
+			    						coveredContains = false;
+			    						for(Weekend coveredWeekend : coveredWeekends){
+			    							if(coveredWeekend.getSaturday().getDayOfYear()==selectedWeekend.getSaturday().getDayOfYear()){
+			    								coveredContains=true;
+			    							}
+			    						}
+			    						if(!coveredContains){
+			    							
+				    						ArrayList<Shift> shiftsSelectedWeekend = getShiftsForWeekend(selectedWeekend,employee);
+				    						System.out.println("evaulating weekend: " + weekend.toString() +" with shift array size:"+shiftsSelectedWeekend.size());
+				    						if(shiftsSelectedWeekend.size()>0){
+				    							if(notification==null){
+				    								System.out.println("Making a notification");
+				    								ArrayList<Weekend> weekends = new ArrayList<Weekend>();
+				    								weekends.add(weekend);
+				    								weekends.add(selectedWeekend);
+				    								
+				    								ArrayList<ArrayList<Shift>>  weekendsWorked = getWeekendsWorked(weekends,employee);
+				    								notification = new AlternateWeekendsOffNotification(employee,weekendsWorked);
+				    	    							coveredWeekends.add(selectedWeekend);
+				    	    							System.out.println(notification.toString());
+				    							}else{
+				    								System.out.println("updating a notification");
+				    								ArrayList<ArrayList<Shift>>  weekendsWorked = notification.getWeekendsWorked();
+				    								
+				    								weekendsWorked.add(getShiftsForWeekend(selectedWeekend,employee));
+				    								
+				    								notification.setWeekendsWorked(weekendsWorked);
+		
+				    	    							coveredWeekends.add(selectedWeekend);
+				    								System.out.println(notification.toString());
+				    								
+				    							}
+				        					}
+				    						else{
+				    							itteration=10;
+				    							break;
+				    						}
+			    						}
+			    						itteration++;
+		    						}
+		    					}
+		    					if(notification!=null){
+		    						notifications.add(notification);
+		    					}
+		    				}
 	    				}
     				}
     			}
@@ -410,10 +424,11 @@ public class CleaningManager {
 	private Weekend getNextWeekend(Weekend weekend){
     	Weekend nextWeekend = new Weekend();
     	
-    	nextWeekend.setMonth(weekend.getSaturday().plusWeeks(1).getMonth());
-    	nextWeekend.setSaturday(weekend.getSaturday().plusWeeks(1));
-    	nextWeekend.setSunday(weekend.getSunday().plusWeeks(1));
-    	
+    	if(weekend.isValid()){
+	    	nextWeekend.setMonth(weekend.getSaturday().plusWeeks(1).getMonth());
+	    	nextWeekend.setSaturday(weekend.getSaturday().plusWeeks(1));
+	    	nextWeekend.setSunday(weekend.getSunday().plusWeeks(1));
+    	}
     	return nextWeekend;
     }
     private ArrayList<ArrayList<Shift>> getInitialWeekendsWorked(Weekend weekend, Employee employee) throws ProccessingException, CorruptDataException {
