@@ -50,6 +50,9 @@ public class AlternateWeekendsOffNotification {
 			if(date.getDayOfWeek().getValue()<6){
 				date.plusDays(1);
 			}
+			if(date.getDayOfWeek().getValue()<6){
+				date.plusDays(1);
+			}
 			
 			if(date.getDayOfWeek().getValue()==6){
 				saturday=date;

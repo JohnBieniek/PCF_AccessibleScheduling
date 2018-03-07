@@ -44,6 +44,11 @@ After installing the 'cf' [command-line interface for Cloud Foundry](http://docs
 ~~~
 $ ./gradlew clean assemble test --rereun-tasks
 
+$cf login -a api.run.pivotal.io
+
+email
+pass
+
 $ cf push
 or
 $ update
