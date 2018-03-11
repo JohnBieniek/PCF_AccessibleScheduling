@@ -28,6 +28,11 @@ public class CleaningController {
     private CleaningManager cleaningManager;
     public CleaningController() {
     }
+    
+    @RequestMapping(value = "/fixShiftNotification", method = RequestMethod.GET)
+    public String fixShiftNotification(ShiftNotification shiftNotification) throws CorruptDataException, ProccessingException{
+        return cleaningManager.fixShiftNotification(shiftNotification);
+    }
     @RequestMapping(value = "/alternateWeeekendsNotifications", method = RequestMethod.GET)
     public ArrayList<AlternateWeekendsOffNotification> getAlternateWeekendsOffNotifications() throws CorruptDataException, ProccessingException{
         return cleaningManager.getAlternateWeekendsOffNotifications();

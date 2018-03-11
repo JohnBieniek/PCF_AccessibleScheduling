@@ -158,6 +158,23 @@ function ShiftIssueController($scope, $modal, $http, Shifts, Shift, Employees,Cl
 	   	 	$scope.setSelectedShift(selectedShift);
 	   	 	$scope.setPage("shift");
 	 }
+	 $scope.autoFixShift = function (selectedIssue) {
+		 $http({
+	            url: '/cleaning/fixShiftNotification',
+	            method: 'GET',
+	            headers: {
+	                'Content-Type': 'application/x-www-form-urlencoded'
+	            },
+	            params: {
+	            	shiftNotification:selectedIssue
+	            }
+	        })
+	        .then(function(response) {
+	        	window.alert(response.data);
+	    		console.log(response.data);
+	        });
+	 }
+	 
 	 $scope.fixShift = function (selectedIssue,employees,clients) {
    	 	$scope.setSelectedShift(selectedIssue.issues[0].shift);
    	 	$scope.setPage("shift");
