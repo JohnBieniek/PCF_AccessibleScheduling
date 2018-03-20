@@ -35,7 +35,7 @@ angular.module('shifts', ['ngResource', 'ui.bootstrap']).
 
 function ShiftsController($scope, $filter, $modal, $http,  Shifts, Shift, Clients, Employees, Status) {
 	 $scope.multiTableEditing=false;
-	 $scope.selectedMonth=2;
+	 $scope.selectedMonth=4;
 	 $scope.selectedYear=2018;
 	 $scope.sortField="startDate";
 	 $scope.dates="Something";

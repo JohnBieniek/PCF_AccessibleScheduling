@@ -36,7 +36,7 @@ angular.module('shiftIssues', ['ngResource', 'ui.bootstrap']).
 function ShiftIssueController($scope, $modal, $http, Shifts, Shift, Employees,Clients, Status) {
 	 $scope.sortShiftIssueField="date";
 	 $scope.sortScheduleIssueField="staff";
-	 $scope.selectedMonth='2';
+	 $scope.selectedMonth='4';
 	 $scope.shiftIssues;
 	 $scope.scheduleIssues;
 	 $scope.weekendNotifications;

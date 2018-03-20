@@ -593,7 +593,7 @@ public class CleaningManager {
         Instant instant = date.toInstant();
 
         //3. Instant + system default time zone + toLocalDateTime() = LocalDateTime
-        LocalDateTime now = instant.atZone(defaultZoneId).toLocalDateTime();//Update without +1 glitch
+        LocalDateTime now = instant.atZone(defaultZoneId).plusWeeks(2).toLocalDateTime();//Update without +1 glitch
 
         int month = now.getMonthValue();
     	
@@ -659,7 +659,6 @@ public class CleaningManager {
     	
     	return notifications;
     }
-
 
 	public String fixShiftNotification(ShiftNotification shiftNotification) throws CorruptDataException, ProccessingException {
 		String output = "";
