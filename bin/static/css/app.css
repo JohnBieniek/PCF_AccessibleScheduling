@@ -1,0 +1,35 @@
+#body {
+    padding-top: 10px;
+}
+
+.navbar {
+    background-color: white;
+    border: 0;
+    margin-bottom: 20px;
+}
+/* button recolor */
+.nav-pills > li.active > a, .btn-primary {
+  background-color: #6C6C6C !important;
+  // feeling like it's a rounded corners kind of day
+  border-color: #6C6C6C !important;
+  border-radius: 25px; 
+}
+.navbar .container {
+    background-color: #6a0000;
+}
+
+.navbar .navbar-brand {
+    color: white;
+}
+
+.navbar .navbar-brand:hover {
+    color: white;
+}
+
+.btn {
+    background-color: white;
+}
+
+.icon-white {
+    color: white;
+}

@@ -1,0 +1,210 @@
+<div ng-controller="ShiftController" ng-init="listEmployees()">
+  	<div>
+	  	<h3>Shift Scheduling</h3>
+	  	<br/>
+		<div style="display:inline-block" ng-if="selectedShift.recurring==true">
+			<label>Recurring shift</label>
+		</div>
+		<div style="display:inline-block" ng-if="selectedShift.recurring==false">
+			<label>Shift</label>
+		</div>
+		<label> for </label>
+		<div style="display:inline-block" ng-if="selectedShift.event==true">
+			<label>{{selectedShift.eventName}}</label>
+		</div>
+		<div style="display:inline-block" ng-if="selectedShift.event==false">
+			<label>{{selectedShift.clientName}}</label>
+		</div>
+		<div style="display:inline-block" ng-init="getDuration(selectedShift)">
+			<label> lasting </label>
+			<label>{{selectedShift.duration}} hours</label>
+            <label> starting {{selectedShift.startDate}} at {{selectedShift.startTime}}</label>
+            <label> and ending {{selectedShift.endDate}} at {{selectedShift.endTime}}.</label>
+        </div>
+        <br/>
+        <div ng-if="selectedShift.requestedStaff!=null">
+			<label>Requested Staff: {{selectedShift.requestedStaff}}</label>
+			<br/>
+		</div>
+		<label>Assigned Staff Name: {{selectedShift.staffName}}</label>
+		<br/>
+		<br/>
+	    <label>Hide employees that shouldn't be assigned this shift:
+		    <input type="checkbox" ng-model="assignedFilter" checked>
+		</label>
+		
+    	<table class="table table-striped">
+        	<thead>
+        		<tr>
+        			<th></th>
+		            <th>First</th>
+		            <th>Initial</th>
+		            <th title="Assignable,Compatible,Not called off, Not inactive, Not fixed schedule, doesn't violate alternate weekends off.">Valid Match</th>
+		            <th title="Not called off, Unassigned, Available(they can work those specific hours).">Assignable</th>
+		            <th title="Matching medpass,gender,smoking,cats,signing,and custom requirements.">Compatible<input style="display:inline-block" type="checkbox" ng-model="compatibilityFilter"></th>
+		            <th title="Doesn't have a shift at this time yet. Not in two places at once.">Unassigned<input type="checkbox" ng-model="unassignedFilter"></th>
+		            <th title="They can work those specific hours.">Available<input type="checkbox" ng-model="availabilityFilter"></th>
+		           <!--  <th>Shifts Scheduled</th>-->
+		            <th title="For the week of this shift.">Hours Scheduled</th>
+		            <th>Min Hours</th>
+		            <th>Max Hours</th>
+		            <th title="How many hours until min requested is met.">Hours Needed</th>
+		            <!--<th>Hours Needed After Assignment</th> -->
+		            <th title="How many hours until max requested is met. At 0 overtime is acrued.">Hours Available</th>
+		           <!--  <th>Hours Available After Assignment</th>
+		            <th>Assignment Incurs Overtime</th> -->
+		            <th>Requests Overtime</th>
+		            <th>Fixed Schedule</th>
+		            <th title="They have called off for one of the days this shift covers.">Vacation</th>
+		            <th>Inactive</th>
+		            <th title="They request alternate weekends off and they work either the weekend before or the weekend after.">Assignment would break alternate weekends off</th>
+		            <!--<th>Hire Date</th>
+		              <th>Off Alternate Weekends</th>
+		            <th>Worked Last Weekend</th>
+		            <th>Working Next Weekend</th>-->
+        		</tr>
+        	</thead>
+        	<tbody>
+        	<tr ng-repeat= "employee in employees | 
+        					orderBy:'hoursAvailableAfterAssignment':sortDescending|
+        					filter: (assignedFilter || '') && { validity: assignedFilter}
+        					|filter: (compatibilityFilter || '') && { compatible: compatibilityFilter}
+        					|filter: (unassignedFilter || '') && { unassigned: unassignedFilter}
+        					|filter: (availabilityFilter || '') && { available: availabilityFilter}">
+	            <td class="dropdown">
+	                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+	                    <span class="glyphicon glyphicon-cog"></span>
+	                </a>
+	                <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+	                    <li role="presentation"><a ng-click="assignEmployee(employee)">assign</a></li>
+	                </ul>
+	            </td>
+	            <td>
+	            	<div>
+	            		{{employee.first}}
+	            	</div>
+	            </td>
+	            <td>
+	                <div>
+	            		{{employee.initial}}
+	            	</div>
+	            </td>
+	            <td>
+	            	<div ng-init="getValidity(employee,selectedShift)">
+	            		{{employee.validity}}
+	            	</div>
+	            </td>
+	            <td>
+	            	<div ng-init="getAssignability(employee,selectedShift)">
+	            		{{employee.assignable}}
+	            	</div>
+	            </td>
+	            <td>
+	            	<div style="width:90px;" ng-init="getCompatibility(employee,selectedShift)">
+	            		{{employee.compatible}}
+	            	</div>
+	            </td>
+	             <td>
+	            	<div style="width:100px;" ng-init="getUnassigned(employee,selectedShift)">
+	            		{{employee.unassigned}}
+	            	</div>
+	            </td>
+	            <td>
+	            	<div style="width:90px;" ng-init="getAvailability(employee,selectedShift)">
+	            		{{employee.available}}
+	            	</div>
+	            </td>
+	           <!--  <td>
+	            	<div ng-init="getShiftsScheduled(employee,selectedShift)">
+	            		{{employee.selectedShiftsScheduled}}
+	            	</div>
+	            </td>-->
+	            <td>
+	            	<div ng-init="getHoursScheduled(employee,selectedShift)">
+	            		{{employee.hoursScheduled}}
+	            	</div>
+	            </td>
+	            <td>
+	                <div>
+	            		{{employee.minHours}}
+	            	</div>
+	            </td>
+	            <td>
+	                <div>
+	            		{{employee.maxHours}}
+	            	</div>
+	           	</td>
+	            <td>
+	            	<div ng-init="getHoursNeeded(employee,selectedShift)">
+	            		{{employee.hoursNeeded}}
+	            	</div>
+	            </td>
+	            <!--<td>
+	            	<div ng-init="getHoursNeededAfterAssignment(employee,selectedShift)">
+	            		{{employee.hoursNeededAfterAssignment}}
+	            	</div>
+	            </td>-->
+	            <td>
+	            	<div ng-init="getHoursAvailable(employee,selectedShift)">
+	            		{{employee.hoursAvailable}}
+	            	</div>
+	            </td>
+	            <!--<td>
+	            	<div ng-init="getHoursAvailableAfterAssignment(employee,selectedShift)">
+	            		{{employee.hoursAvailableAfterAssignment}}
+	            	</div>
+	            </td>
+	            <td>
+	            	<div ng-init="getAssignmentIncursOvertime(employee,selectedShift)">
+	            		{{employee.assignmentIncursOvertime}}
+	            	</div>
+	            </td>-->
+	            <td>
+	                <div>
+	            		{{employee.requestsExtraShifts}}
+	            	</div>
+	            </td>
+	            <td>
+					<div>
+	            		{{employee.fixedSchedule}}
+	            	</div>
+	            </td>
+	            <td>
+	            	<div ng-init="getRequestedOff(employee,selectedShift)">
+	            		{{employee.vacationing}}
+	            	</div>
+	            </td>
+	            <td>
+	                <div>
+	            		{{employee.inactive}}
+	            	</div>
+	            </td>
+	            <td>
+	            	<div ng-init="getAssignmentViolatesOffAlternateWeekends(employee,selectedShift)">
+	            		{{employee.assignmentViolatesOffAlternateWeekends}}
+	            	</div>
+	            </td>
+	            <!--<td>
+	            	<div>
+	            		{{employee.hireDate}}
+	            	</div>
+	            </td>
+	            <td>
+	                <in-place-edit field-name='offAlternateWeekends' input-type='checkbox' input-class='input-large' model=employee>{{employee.offAlternateWeekends}}</in-place-edit>
+	            </td>
+	            <td>
+	            	<div ng-init="getWorkedLastWeekend(employee,selectedShift)">
+	            		{{employee.workedLastWeekend}}
+	            	</div>
+	            </td>
+	            <td>
+	            	<div ng-init="getWorkingNextWeekend(employee,selectedShift)">
+	            		{{employee.workingNextWeekend}}
+	            	</div>
+	            </td>-->
+        	</tr>
+        </tbody>
+    </table>
+ </div>
+ <script type="text/javascript" src="js/page/shiftPage.js"></script>
+</div>
