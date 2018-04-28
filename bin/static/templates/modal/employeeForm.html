@@ -1,0 +1,458 @@
+<div class="modal-header">
+    <h3 ng-show="employeeAction === 'add'">Add an employee</h3>
+    <h3 ng-show="employeeAction === 'update'">Edit an employee</h3>
+</div>
+
+<div class="modal-body">
+    <form name="employeeForm" role="form">
+        <div class="form-group has-feedback" ng-class="{'has-warning': employeeForm.first.$invalid, 'has-success': employeeForm.first.$valid}">
+            <label for="first" style="font-size:18px">First</label>
+            <input type="text" class="form-control input-large" id="first" name="first" required ng-model="employee.first">
+            <span class="glyphicon form-control-feedback" ng-class="{'glyphicon-warning-sign': employeeForm.first.$invalid, 'glyphicon-ok': employeeForm.first.$valid}"></span>
+        </div>
+        
+        <div class="form-group has-feedback" ng-class="{'has-warning': employeeForm.initial.$invalid, 'has-success': employeeForm.initial.$valid}">
+            <label for="initial" style="font-size:18px">Initial / Identifier</label>
+            <input type="text" class="form-control input-large" id="initial" name="initial" required ng-model="employee.initial">
+            <span class="glyphicon form-control-feedback" ng-class="{'glyphicon-warning-sign': employeeForm.initial.$invalid, 'glyphicon-ok': employeeForm.initial.$valid}"></span>
+        </div>
+        
+        <div>
+        	<div style="display:inline-block">
+	        	<label for="gender" style="font-size:18px">Gender:</label>
+        	</div>
+	        <div style="display:inline-block">
+	        	<label for="female" style="font-size:14px">Female</label>
+	        	<input type="radio"  name="gender" value="female" style="height:15px;width:15px" ng-model="employee.gender"/>
+	        </div>
+	        <div style="display:inline-block">
+	        	<label for="male" style="font-size:14px">Male</label>
+	        	<input type="radio"  class="input-large" name="gender" style="height:15px;width:15px" value="male" ng-model="employee.gender" />
+	        </div>
+	    </div>
+	    
+        <div>
+            <label for="noCats" style="font-size:18px">No Cats</label>
+            <input type="checkbox" id="noCats" name="noCats"  style="height:20px;width:20px" ng-model="employee.noCats">
+        </div>
+        
+        <div>
+            <label for="smoker" style="font-size:18px">Smoker</label>
+            <input type="checkbox" id="smoker" name="smoker"  style="height:20px;width:20px"  ng-model="employee.smoker">
+        </div>
+        
+        <div>
+            <label for="signing" style="font-size:18px">Signing</label>
+            <input type="checkbox" id="signing" name="signing" style="height:20px;width:20px" ng-model="employee.signing">
+        </div>
+        
+        <div>
+            <label for="medPassCertified" style="font-size:18px">Med Pass Certified</label>
+            <input type="checkbox" id="medPassCertified" name="medPassCertified" style="height:20px;width:20px" ng-model="employee.medPassCertified">
+        </div>
+        
+        <div ng-if="customFieldDataEditing">
+	        <div ng-repeat="customField in customFields">
+	        	<div ng-init="getCustomFieldData(employee,customField,$index)">
+	        		<label for="customField" style="font-size:18px">{{customField.employeeVariable}}</label>
+	        		<input type="checkbox" id="customField" name="customField" style="height:20px;width:20px" ng-model="employee.customValue[$index]">
+	        	</div>
+	        </div>
+        </div>
+        
+        <div>
+            <label for="requestsExtraShifts" style="font-size:18px">Requests Extra Shifts</label>
+            <input type="checkbox" id="requestsExtraShifts" name="requestsExtraShifts" style="height:20px;width:20px" ng-model="employee.requestsExtraShifts">
+        </div>
+        
+        <div>
+            <label for="offAlternateWeekends" style="font-size:18px">Off Alternate Weekends</label>
+            <input type="checkbox" id="offAlternateWeekends" name="offAlternateWeekends" style="height:20px;width:20px" ng-model="employee.offAlternateWeekends">
+        </div>
+        
+        <div>
+            <label for="fixedSchedule" style="font-size:18px">Fixed Schedule</label>
+            <input type="checkbox" id="fixedSchedule" name="fixedSchedule" style="height:20px;width:20px" ng-model="employee.fixedSchedule">
+        </div>
+        
+		<div>
+            <label for="inactive" style="font-size:18px">Inactive</label>
+            <input type="checkbox" id="inactive" name="inactive" style="height:20px;width:20px" ng-model="employee.inactive">
+        </div>
+    
+    	<div>
+           <label for="startDate" style="font-size:18px">Hire Date</label>
+           <input type="date" ng-model="employee.hireDate" placeholder="Date"/>
+        </div>
+            
+		<div>
+            <label for="minHours" style="font-size:18px">Minimum Requested Hours</label>
+            <input type="text" id="minHours" name="minHours"  size="15" ng-model="employee.minHours">
+        </div>
+        
+        <div>
+            <label for="maxHours" style="font-size:18px">Maximum Requested Hours</label>
+            <input type="text" id="maxHours" name="maxHours" size="15" ng-model="employee.maxHours">
+        </div>
+        
+        <div>
+            <label for="daysAvailable" style="font-size:18px">Days Available</label>
+            
+            <div>
+            	<label for="sunday" style="font-size:15px">Sunday</label>
+            	<input type="checkbox" id="offSun" name="offSun" ng-model="employee.daysAvailable[0]">
+            	<button ng-if="employee.daysAvailable[0]" ng-click="toggleAvailabilityFor(0,false)">Clear</button>
+				<button ng-if="employee.daysAvailable[0]" ng-click="toggleAvailabilityFor(0,true)">Fill</button>
+            </div>
+            <div ng-if="employee.daysAvailable[0]">        
+	            <div>
+	            	<span style="padding-left: 1.2em">12-1</span>
+	            	<span style="padding-left: .7em">1-2</span>
+					<span style="padding-left: .7em">2-3</span>
+					<span style="padding-left: .7em">3-4</span>
+					<span style="padding-left: .7em">4-5</span>
+					<span style="padding-left: .7em">5-6</span>
+					<span style="padding-left: .7em">6-7</span>
+					<span style="padding-left: .7em">7-8</span>
+					<span style="padding-left: .7em">8-9</span>
+					<span style="padding-left: .6em">9-10</span>
+					<span>10-11</span>
+					<span>11-12</span>		            	
+	            </div>           
+	            AM:
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.sundaysAvailability[0]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.sundaysAvailability[1]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.sundaysAvailability[2]"></label>
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.sundaysAvailability[3]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.sundaysAvailability[4]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.sundaysAvailability[5]"></label>
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.sundaysAvailability[6]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.sundaysAvailability[7]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.sundaysAvailability[8]"></label>
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.sundaysAvailability[9]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.sundaysAvailability[10]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.sundaysAvailability[11]"></label>       
+	            <div></div> 
+	            PM:
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.sundaysAvailability[12]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.sundaysAvailability[13]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.sundaysAvailability[14]"></label>
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.sundaysAvailability[15]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.sundaysAvailability[16]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.sundaysAvailability[17]"></label>
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.sundaysAvailability[18]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.sundaysAvailability[19]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.sundaysAvailability[20]"></label>
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.sundaysAvailability[21]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.sundaysAvailability[22]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.sundaysAvailability[23]"></label>    
+            </div>
+            <div ng-if="employee.daysAvailable[0]"></br></div>
+            <div>
+				<label for="monday" style="font-size:15px">Monday</label>
+				<input type="checkbox" id="offMon" name="offMon" ng-model="employee.daysAvailable[1]">
+				<button ng-if="employee.daysAvailable[1]" ng-click="toggleAvailabilityFor(1,false)">Clear</button>
+				<button ng-if="employee.daysAvailable[1]" ng-click="toggleAvailabilityFor(1,true)">Fill</button>
+			</div>
+            <div ng-if="employee.daysAvailable[1]">      	
+	            <div>
+	            	<span style="padding-left: 1.2em">12-1</span>
+	            	<span style="padding-left: .7em">1-2</span>
+					<span style="padding-left: .7em">2-3</span>
+					<span style="padding-left: .7em">3-4</span>
+					<span style="padding-left: .7em">4-5</span>
+					<span style="padding-left: .7em">5-6</span>
+					<span style="padding-left: .7em">6-7</span>
+					<span style="padding-left: .7em">7-8</span>
+					<span style="padding-left: .7em">8-9</span>
+					<span style="padding-left: .6em">9-10</span>
+					<span>10-11</span>
+					<span>11-12</span>		            	
+	            </div>           
+	            AM:
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.mondaysAvailability[0]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.mondaysAvailability[1]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.mondaysAvailability[2]"></label>
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.mondaysAvailability[3]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.mondaysAvailability[4]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.mondaysAvailability[5]"></label>
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.mondaysAvailability[6]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.mondaysAvailability[7]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.mondaysAvailability[8]"></label>
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.mondaysAvailability[9]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.mondaysAvailability[10]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.mondaysAvailability[11]"></label>       
+	            <div></div> 
+	            PM:
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.mondaysAvailability[12]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.mondaysAvailability[13]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.mondaysAvailability[14]"></label>
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.mondaysAvailability[15]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.mondaysAvailability[16]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.mondaysAvailability[17]"></label>
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.mondaysAvailability[18]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.mondaysAvailability[19]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.mondaysAvailability[20]"></label>
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.mondaysAvailability[21]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.mondaysAvailability[22]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.mondaysAvailability[23]"></label>    
+            </div>
+            <div ng-if="employee.daysAvailable[1]"></br></div>
+            <div>
+				<label for="tuesday" style="font-size:15px">Tuesday</label>
+				<input type="checkbox" id="offTues" name="offTues" ng-model="employee.daysAvailable[2]">
+				<button ng-if="employee.daysAvailable[2]" ng-click="toggleAvailabilityFor(2,false)">Clear</button>
+				<button ng-if="employee.daysAvailable[2]" ng-click="toggleAvailabilityFor(2,true)">Fill</button>
+			</div>
+            <div ng-if="employee.daysAvailable[2]">      	
+	            <div>
+	            	<span style="padding-left: 1.2em">12-1</span>
+	            	<span style="padding-left: .7em">1-2</span>
+					<span style="padding-left: .7em">2-3</span>
+					<span style="padding-left: .7em">3-4</span>
+					<span style="padding-left: .7em">4-5</span>
+					<span style="padding-left: .7em">5-6</span>
+					<span style="padding-left: .7em">6-7</span>
+					<span style="padding-left: .7em">7-8</span>
+					<span style="padding-left: .7em">8-9</span>
+					<span style="padding-left: .6em">9-10</span>
+					<span>10-11</span>
+					<span>11-12</span>		            	
+	            </div>           
+	            AM:
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.tuesdaysAvailability[0]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.tuesdaysAvailability[1]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.tuesdaysAvailability[2]"></label>
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.tuesdaysAvailability[3]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.tuesdaysAvailability[4]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.tuesdaysAvailability[5]"></label>
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.tuesdaysAvailability[6]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.tuesdaysAvailability[7]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.tuesdaysAvailability[8]"></label>
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.tuesdaysAvailability[9]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.tuesdaysAvailability[10]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.tuesdaysAvailability[11]"></label>       
+	            <div></div> 
+	            PM:
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.tuesdaysAvailability[12]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.tuesdaysAvailability[13]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.tuesdaysAvailability[14]"></label>
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.tuesdaysAvailability[15]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.tuesdaysAvailability[16]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.tuesdaysAvailability[17]"></label>
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.tuesdaysAvailability[18]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.tuesdaysAvailability[19]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.tuesdaysAvailability[20]"></label>
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.tuesdaysAvailability[21]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.tuesdaysAvailability[22]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.tuesdaysAvailability[23]"></label>    
+            </div>
+            <div ng-if="employee.daysAvailable[2]"></br></div>
+            <div>
+				<label for="wednesday" style="font-size:15px">Wednesday</label>
+				<input type="checkbox" id="offWed" name="offWed" ng-model="employee.daysAvailable[3]">
+				<button ng-if="employee.daysAvailable[3]" ng-click="toggleAvailabilityFor(3,false)">Clear</button>
+				<button ng-if="employee.daysAvailable[3]" ng-click="toggleAvailabilityFor(3,true)">Fill</button>
+			</div>
+            <div ng-if="employee.daysAvailable[3]">      	
+	            <div>
+	            	<span style="padding-left: 1.2em">12-1</span>
+	            	<span style="padding-left: .7em">1-2</span>
+					<span style="padding-left: .7em">2-3</span>
+					<span style="padding-left: .7em">3-4</span>
+					<span style="padding-left: .7em">4-5</span>
+					<span style="padding-left: .7em">5-6</span>
+					<span style="padding-left: .7em">6-7</span>
+					<span style="padding-left: .7em">7-8</span>
+					<span style="padding-left: .7em">8-9</span>
+					<span style="padding-left: .6em">9-10</span>
+					<span>10-11</span>
+					<span>11-12</span>		            	
+	            </div>           
+	            AM:
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.wednesdaysAvailability[0]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.wednesdaysAvailability[1]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.wednesdaysAvailability[2]"></label>
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.wednesdaysAvailability[3]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.wednesdaysAvailability[4]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.wednesdaysAvailability[5]"></label>
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.wednesdaysAvailability[6]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.wednesdaysAvailability[7]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.wednesdaysAvailability[8]"></label>
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.wednesdaysAvailability[9]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.wednesdaysAvailability[10]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.wednesdaysAvailability[11]"></label>       
+	            <div></div> 
+	            PM:
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.wednesdaysAvailability[12]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.wednesdaysAvailability[13]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.wednesdaysAvailability[14]"></label>
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.wednesdaysAvailability[15]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.wednesdaysAvailability[16]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.wednesdaysAvailability[17]"></label>
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.wednesdaysAvailability[18]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.wednesdaysAvailability[19]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.wednesdaysAvailability[20]"></label>
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.wednesdaysAvailability[21]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.wednesdaysAvailability[22]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.wednesdaysAvailability[23]"></label>    
+            </div>
+            <div ng-if="employee.daysAvailable[3]"></br></div>
+            <div>
+				<label for="thursday" style="font-size:15px">Thursday</label>
+				<input type="checkbox" id="offThurs" name="offThurs" ng-model="employee.daysAvailable[4]">
+				<button ng-if="employee.daysAvailable[4]" ng-click="toggleAvailabilityFor(4,false)">Clear</button>
+				<button ng-if="employee.daysAvailable[4]" ng-click="toggleAvailabilityFor(4,true)">Fill</button>
+			</div>
+            <div ng-if="employee.daysAvailable[4]">      	
+	            <div>
+	            	<span style="padding-left: 1.2em">12-1</span>
+	            	<span style="padding-left: .7em">1-2</span>
+					<span style="padding-left: .7em">2-3</span>
+					<span style="padding-left: .7em">3-4</span>
+					<span style="padding-left: .7em">4-5</span>
+					<span style="padding-left: .7em">5-6</span>
+					<span style="padding-left: .7em">6-7</span>
+					<span style="padding-left: .7em">7-8</span>
+					<span style="padding-left: .7em">8-9</span>
+					<span style="padding-left: .6em">9-10</span>
+					<span>10-11</span>
+					<span>11-12</span>		            	
+	            </div>           
+	            AM:
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.thursdaysAvailability[0]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.thursdaysAvailability[1]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.thursdaysAvailability[2]"></label>
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.thursdaysAvailability[3]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.thursdaysAvailability[4]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.thursdaysAvailability[5]"></label>
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.thursdaysAvailability[6]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.thursdaysAvailability[7]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.thursdaysAvailability[8]"></label>
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.thursdaysAvailability[9]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.thursdaysAvailability[10]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.thursdaysAvailability[11]"></label>       
+	            <div></div> 
+	            PM:
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.thursdaysAvailability[12]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.thursdaysAvailability[13]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.thursdaysAvailability[14]"></label>
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.thursdaysAvailability[15]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.thursdaysAvailability[16]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.thursdaysAvailability[17]"></label>
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.thursdaysAvailability[18]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.thursdaysAvailability[19]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.thursdaysAvailability[20]"></label>
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.thursdaysAvailability[21]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.thursdaysAvailability[22]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.thursdaysAvailability[23]"></label>    
+            </div>
+            <div ng-if="employee.daysAvailable[4]"></br></div>
+			<div>
+				<label for="friday" style="font-size:15px">Friday</label>
+				<input type="checkbox" id="offFri" name="offFri" ng-model="employee.daysAvailable[5]">
+				<button ng-if="employee.daysAvailable[5]" ng-click="toggleAvailabilityFor(5,false)">Clear</button>
+				<button ng-if="employee.daysAvailable[5]" ng-click="toggleAvailabilityFor(5,true)">Fill</button>
+			</div>
+            <div ng-if="employee.daysAvailable[5]">      	
+	            <div>
+	            	<span style="padding-left: 1.2em">12-1</span>
+	            	<span style="padding-left: .7em">1-2</span>
+					<span style="padding-left: .7em">2-3</span>
+					<span style="padding-left: .7em">3-4</span>
+					<span style="padding-left: .7em">4-5</span>
+					<span style="padding-left: .7em">5-6</span>
+					<span style="padding-left: .7em">6-7</span>
+					<span style="padding-left: .7em">7-8</span>
+					<span style="padding-left: .7em">8-9</span>
+					<span style="padding-left: .6em">9-10</span>
+					<span>10-11</span>
+					<span>11-12</span>		            	
+	            </div>           
+	            AM:
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.fridaysAvailability[0]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.fridaysAvailability[1]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.fridaysAvailability[2]"></label>
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.fridaysAvailability[3]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.fridaysAvailability[4]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.fridaysAvailability[5]"></label>
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.fridaysAvailability[6]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.fridaysAvailability[7]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.fridaysAvailability[8]"></label>
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.fridaysAvailability[9]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.fridaysAvailability[10]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.fridaysAvailability[11]"></label>       
+	            <div></div> 
+	            PM:
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.fridaysAvailability[12]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.fridaysAvailability[13]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.fridaysAvailability[14]"></label>
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.fridaysAvailability[15]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.fridaysAvailability[16]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.fridaysAvailability[17]"></label>
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.fridaysAvailability[18]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.fridaysAvailability[19]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.fridaysAvailability[20]"></label>
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.fridaysAvailability[21]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.fridaysAvailability[22]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.fridaysAvailability[23]"></label>    
+            </div>
+            <div ng-if="employee.daysAvailable[5]"></br></div>
+            <div>
+				<label for="saturday" style="font-size:15px">Saturday</label>
+				<input type="checkbox" id="offSat" name="offSat" ng-model="employee.daysAvailable[6]">
+				<button ng-if="employee.daysAvailable[6]" ng-click="toggleAvailabilityFor(6,false)">Clear</button>
+				<button ng-if="employee.daysAvailable[6]" ng-click="toggleAvailabilityFor(6,true)">Fill</button>
+			</div>
+            <div ng-if="employee.daysAvailable[6]">      	
+	            <div>
+	            	<span style="padding-left: 1.2em">12-1</span>
+	            	<span style="padding-left: .7em">1-2</span>
+					<span style="padding-left: .7em">2-3</span>
+					<span style="padding-left: .7em">3-4</span>
+					<span style="padding-left: .7em">4-5</span>
+					<span style="padding-left: .7em">5-6</span>
+					<span style="padding-left: .7em">6-7</span>
+					<span style="padding-left: .7em">7-8</span>
+					<span style="padding-left: .7em">8-9</span>
+					<span style="padding-left: .6em">9-10</span>
+					<span>10-11</span>
+					<span>11-12</span>		            	
+	            </div>           
+	            AM:
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.saturdaysAvailability[0]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.saturdaysAvailability[1]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.saturdaysAvailability[2]"></label>
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.saturdaysAvailability[3]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.saturdaysAvailability[4]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.saturdaysAvailability[5]"></label>
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.saturdaysAvailability[6]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.saturdaysAvailability[7]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.saturdaysAvailability[8]"></label>
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.saturdaysAvailability[9]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.saturdaysAvailability[10]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.saturdaysAvailability[11]"></label>       
+	            <div></div> 
+	            PM:
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.saturdaysAvailability[12]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.saturdaysAvailability[13]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.saturdaysAvailability[14]"></label>
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.saturdaysAvailability[15]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.saturdaysAvailability[16]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.saturdaysAvailability[17]"></label>
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.saturdaysAvailability[18]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.saturdaysAvailability[19]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.saturdaysAvailability[20]"></label>
+	            <label class="checkbox-inline"><input type="checkbox" ng-model="employee.saturdaysAvailability[21]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.saturdaysAvailability[22]"></label>
+				<label class="checkbox-inline"><input type="checkbox" ng-model="employee.saturdaysAvailability[23]"></label>    
+            </div>
+            <span class="glyphicon form-control-feedback"></span>
+        </div>
+    </form>
+</div>
+
+<div class="modal-footer">
+    <button class="btn btn-primary btn-md active"  ng-disabled="employeeForm.$invalid" ng-class="{ 'disabled': employeeform.$invalid }" ng-click="ok()" >OK</button>
+    <button class="btn btn-warning btn-md active" ng-click="cancel()">Cancel</button>
+</div>
