@@ -300,7 +300,22 @@ public class CleaningManager {
     	
     	return getWeekendArray(weekends);
     }
+    public String fixAlternateWeekendOffNotifications() throws ProccessingException, CorruptDataException {
+    	String result = "";
+    	ArrayList<AlternateWeekendsOffNotification> issues = getAlternateWeekendsOffNotifications();
+    	
+    	for(AlternateWeekendsOffNotification issue:issues) {
+    		result += fixAlternateWeekendOffNotification(issue);
+    	}
+    	
+    	return result;
+    }
     
+    public String fixAlternateWeekendOffNotification(AlternateWeekendsOffNotification issue) {
+    	String result = "";
+    	
+    	return result;
+    }
     public ArrayList<AlternateWeekendsOffNotification> getAlternateWeekendsOffNotifications() throws ProccessingException, CorruptDataException{
     	ArrayList<AlternateWeekendsOffNotification> notifications = new ArrayList<AlternateWeekendsOffNotification>();
     	Weekend[] upcomingWeekends = getUpcomingWeekends();
