@@ -71,10 +71,11 @@
 		           </td>
 	   	       	 <td style="width:180px;">
 		    		<form name="myForm" style="display:inline-block" >
-		    			<input style="display:inline-block" type="checkbox" ng-model="weekFilter">
+		    			<input style="display:inline-block" type="checkbox"  ng-change="setWeekFilter(weekFilter)" ng-model="weekFilter">
 			    		<select style="display:inline-block"
 			    				name="weekSelect" 
 			    				id="weekSelect"
+			    				ng-change="setSelectedWeek(selectedWeek)"
 					      		ng-model="selectedWeek"
 					      		ng-value="{{selectedWeek}}">
 						    <option value=0>1</option>
@@ -87,27 +88,28 @@
 				  	</form>
 		           </td>
 		        	<td>
-		    		<input type="checkbox" ng-model="assignedFilter" checked>
+		    		<input type="checkbox" ng-change="setAssignedFilter(assignedFilter)" ng-model="assignedFilter" ng-value="{{assignedFilter}}">
 		           </td>
 		            <td>
-				    <input type="checkbox" ng-model="unassignedFilter" checked>
+				    <input type="checkbox" ng-change="setUnassignedFilter(unassignedFilter)" ng-model="unassignedFilter" checked>
 		           </td>
 		           <td>
-		           	<input type="checkbox" ng-model="requestedFilter" checked>
+		           	<input type="checkbox" ng-change="setRequestedFilter(requestedFilter)" ng-model="requestedFilter" checked>
 		           </td>
 		           <td>
-				    <input type="checkbox" ng-model="unrequestedFilter" checked>
+				    <input type="checkbox" ng-change="setUnrequestedFilter(unrequestedFilter)" ng-model="unrequestedFilter" checked>
 		           </td>
 		           <td>
-		           	<input type="checkbox" ng-model="recurringFilter" checked>
+		           	<input type="checkbox" ng-change="setRecurringFilter(recurringFilter)" ng-model="recurringFilter" checked>
 		           </td>
 		           <td style="width:250px; white-space:nowrap;">
 		           	<form name="myForm" style="display:inline-block" >
 						<label style="display:inline-block">
-						    <input type="checkbox" ng-model="clientFilter">
+						    <input type="checkbox" ng-change="setClientFilter(clientFilter)" ng-model="clientFilter">
 						</label>
 					    <select style="display:inline-block"
 					    		name="mySelect" 
+					    		ng-change="setSelectedClient(selectedClient)"
 					    		id="mySelect"
 					      		ng-options='client.first for client in clients | orderBy:"first" track by client.id'
 					      		ng-model="selectedClient"
@@ -118,11 +120,12 @@
 		           <td style="width:280px; white-space:nowrap;">
 		            <form name="myForm" style="display:inline-block" >
 						<label>
-						    <input type="checkbox" ng-model="staffFilter">
+						    <input type="checkbox" ng-change="setStaffFilter(staffFilter)" ng-model="staffFilter">
 						</label>
 						
 					    <select name="mySelect2" 
 					    		id="mySelect2"
+					    		ng-change="setSelectedEmployee(selectedEmployee)"
 							    ng-options='employee.first for employee in employees | orderBy:"first" track by employee.id'
 							    ng-model="selectedEmployee"
 							    ng-value="{{employee.first}}">
@@ -211,6 +214,7 @@
 	  		<span> Sort by: </span>
 	  		<select name="sortSelect" 
 		    		id="sortSelect"
+		    		ng-change="setSortField(sortField)"
 		      		ng-model="sortField"
 		      		ng-value="{{sortField}}">
 			    <option value='clientName'>Client</option>
