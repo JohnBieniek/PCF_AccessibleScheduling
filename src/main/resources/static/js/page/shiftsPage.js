@@ -35,15 +35,11 @@ angular.module('shifts', ['ngResource', 'ui.bootstrap']).
 
 function ShiftsController($scope, $filter, $modal, $http,  Shifts, Shift, Clients, Employees, Status) {
 	 $scope.multiTableEditing=false;
-	 $scope.selectedMonth=4;
-	 $scope.selectedYear=2018;
-	 $scope.sortField="startDate";
+
 	 $scope.dates="Something";
 	 $scope.tab = 1;
 	 
-	 $scope.changeSortOrder = function(){
-		 $scope.sortDescending = !$scope.sortDescending;
-	 }
+	 
     $scope.setTab = function(newTab){
       $scope.tab = newTab;
       if(newTab==1){
@@ -60,6 +56,8 @@ function ShiftsController($scope, $filter, $modal, $http,  Shifts, Shift, Client
     };
 	    
     $scope.getDatesForMonth = function(year,month){
+    	$scope.setSelectedMonth(month);
+    	$scope.setSelectedYear(year);
     	$http({
             url: '/calendar/getDatesForMonth',
             method: 'GET',
