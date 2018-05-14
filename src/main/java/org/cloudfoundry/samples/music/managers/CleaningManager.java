@@ -17,6 +17,7 @@ import accessiblesolutions.accessiblescheduling.domain.Client;
 import accessiblesolutions.accessiblescheduling.domain.CustomField;
 import accessiblesolutions.accessiblescheduling.domain.CustomFieldData;
 import accessiblesolutions.accessiblescheduling.domain.Employee;
+import accessiblesolutions.accessiblescheduling.domain.EmployeeShiftCompatibilities;
 import accessiblesolutions.accessiblescheduling.domain.EmployeeShiftCompatibility;
 import accessiblesolutions.accessiblescheduling.domain.RecurringShiftNeed;
 import accessiblesolutions.accessiblescheduling.domain.Shift;
@@ -299,7 +300,22 @@ public class CleaningManager {
     	
     	return getWeekendArray(weekends);
     }
+    public String fixAlternateWeekendOffNotifications() throws ProccessingException, CorruptDataException {
+    	String result = "";
+    	ArrayList<AlternateWeekendsOffNotification> issues = getAlternateWeekendsOffNotifications();
+    	
+    	for(AlternateWeekendsOffNotification issue:issues) {
+    		result += fixAlternateWeekendOffNotification(issue);
+    	}
+    	
+    	return result;
+    }
     
+    public String fixAlternateWeekendOffNotification(AlternateWeekendsOffNotification issue) {
+    	String result = "";
+    	
+    	return result;
+    }
     public ArrayList<AlternateWeekendsOffNotification> getAlternateWeekendsOffNotifications() throws ProccessingException, CorruptDataException{
     	ArrayList<AlternateWeekendsOffNotification> notifications = new ArrayList<AlternateWeekendsOffNotification>();
     	Weekend[] upcomingWeekends = getUpcomingWeekends();
@@ -592,7 +608,7 @@ public class CleaningManager {
         Instant instant = date.toInstant();
 
         //3. Instant + system default time zone + toLocalDateTime() = LocalDateTime
-        LocalDateTime now = instant.atZone(defaultZoneId).toLocalDateTime();//Update without +1 glitch
+        LocalDateTime now = instant.atZone(defaultZoneId).plusWeeks(2).toLocalDateTime();//Update without +1 glitch
 
         int month = now.getMonthValue();
     	
@@ -658,4 +674,74 @@ public class CleaningManager {
     	
     	return notifications;
     }
+
+	public String fixShiftNotification(ShiftNotification shiftNotification) throws CorruptDataException, ProccessingException {
+		String output = "";
+		
+		Shift shift = shiftNotification.getIssues().get(0).getShift();
+		
+		if(null!=shift){
+			Employee previousEmployee = employeeCrud.findOne(shift.getStaffId());
+    		output+="Attempting to assign " +shift.toString();
+    		System.out.println("Attempitng to assign " + shift.toString());
+			EmployeeShiftCompatibilities shiftCompatibilities = employeeShiftCompatibilityManager.getValidUnfixedCompatibilities(employeeShiftCompatibilityManager.getEmployeeShiftCompatibilitiesFor(shift));
+			output+=shiftCompatibilities.compatibilities.toString();
+			Employee employee=null;
+			//attemptAssigningOnlyCompatibility
+			if(null!=shiftCompatibilities && shiftCompatibilities.compatibilities.size()==1){
+				if(shiftCompatibilities.compatibilities.get(0).getEmployee().getId().equalsIgnoreCase(previousEmployee.getId())){
+					employee=shiftCompatibilities.compatibilities.get(0).getEmployee();
+					shift.setAssignmentReason("Only " + employee.getFirst() +" was compatible and available. ");
+				}
+			}
+			//end attemptAssigningOnlyCompatibility
+			if(employee==null){
+				for(EmployeeShiftCompatibility compatibility :shiftCompatibilities.compatibilities){
+					if(employeeShiftCompatibilityManager.getHoursScheduledWeekOf(compatibility.getEmployee(),compatibility.getShift())<compatibility.getEmployee().getMinHours()){
+						if(compatibility.getEmployee().getId().equalsIgnoreCase(previousEmployee.getId())){
+							employee=compatibility.getEmployee();
+							shift.setAssignmentReason("Min");
+						}
+					}
+				}
+			}
+			if(employee==null && employeeShiftCompatibilityManager.getEmployeeWithMostTimeBeforeOvertimeAfterAssignment(shiftCompatibilities).getId().equalsIgnoreCase(previousEmployee.getId())){
+				employee=employeeShiftCompatibilityManager.getEmployeeWithMostTimeBeforeOvertimeAfterAssignment(shiftCompatibilities);
+				shift.setAssignmentReason("Employee had the most time before overtime after assignment");
+			}
+			else if(shift.getAssignmentReason().length()<10){
+				shift.setAssignmentReason("Employee had the most time until minimn was reached after assignment");
+			}
+			
+			if(employee==null&&shiftCompatibilities!=null&&shiftCompatibilities.compatibilities!=null&&shiftCompatibilities.compatibilities.size()>0){
+				float hours = 80;
+				for(EmployeeShiftCompatibility compatibility :shiftCompatibilities.compatibilities){
+					if(compatibility.getEmployee().getRequestsExtraShifts()){
+						if(employeeShiftCompatibilityManager.getHoursScheduledWeekOf(compatibility.getEmployee(),compatibility.getShift())<hours){
+							if(compatibility.getEmployee().getId().equalsIgnoreCase(previousEmployee.getId())){
+								hours=employeeShiftCompatibilityManager.getHoursScheduledWeekOf(compatibility.getEmployee(),compatibility.getShift());
+								employee=compatibility.getEmployee();
+								shift.setAssignmentReason("All in overtime, they requested it and have least hours");
+							}
+						}
+					}
+				}
+				
+				if(employee==null){
+					employee=shiftCompatibilities.compatibilities.get(0).getEmployee();
+					shift.setAssignmentReason("One of those in overtime who was available");
+				}
+			}
+			if(employee!=null){
+				System.out.println("assigning " + employee.getFirst() + " to shift " + shift.getId() + " " + shift.toString()
+				+ " beacause " + shift.getAssignmentReason());
+				shift.setStaffId(employee.getId());
+				shift.setStaffName(employee.getFirst());
+				shift.setAssigned(true);
+				shiftCrud.save(shift);
+				output+=" Assigning to "+employee.getFirst() + " " + employee.getInitial() + " because " + shift.getAssignmentReason();
+			}
+		}
+		return output;
+	}
 }

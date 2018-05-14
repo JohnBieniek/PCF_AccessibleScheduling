@@ -1,7 +1,6 @@
 package org.cloudfoundry.samples.music.web;
 
 import java.io.IOException;
-import java.util.List;
 
 import javax.validation.Valid;
 
@@ -21,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import accessiblesolutions.accessiblescheduling.domain.Client;
 import accessiblesolutions.accessiblescheduling.domain.Employee;
 
 @RestController
@@ -49,13 +47,18 @@ public class EmployeeController {
     @RequestMapping(method = RequestMethod.POST)
     public Employee update(@RequestBody @Valid Employee employee) {
         logger.info("Updating employee " + employee.getId());
+
         return repository.save(employee);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public Employee getById(@PathVariable String id) {
         logger.info("Getting employee " + id);
-        return repository.findOne(id);
+        
+        Employee employee = repository.findOne(id);
+       
+        
+        return employee;
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)

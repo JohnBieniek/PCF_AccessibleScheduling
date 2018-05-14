@@ -1,0 +1,25 @@
+<div id="adminView" ng-init="init()">
+    <div class="page-header">
+        <h1>Administrative view</h1>
+        <div>
+            <span> [ view : </span>
+            <a href="" ng-click="setPage('dashboard')">Dashboard</a>
+            <a href="" ng-click="setPage('clientList')">Clients</a>
+            <a href="" ng-click="setPage('scheduling')">Scheduling</a>
+            <a href="" ng-click="setPage('employeeList')">Employees</a>
+            <a href="" ng-click="setPage('vacation')">Vacation/Sickness</a>
+            <a href="" ng-click="setPage('eventList')">Events</a>
+            <a href="" ng-click="setPage('shiftList')">Shifts</a>
+            <a href="" ng-click="setPage('settings')">Settings</a>
+            <span> ] </span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div ng-include src="'templates/util/status.html'"></div>
+    </div>
+
+    <div class="row multi-columns-row">
+        <div ng-include src="page"></div>
+    </div>
+</div>
