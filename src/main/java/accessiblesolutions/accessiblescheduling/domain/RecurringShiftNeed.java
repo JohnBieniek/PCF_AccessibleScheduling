@@ -8,6 +8,7 @@ import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.J
 import accessiblesolutions.accessiblescheduling.util.Util;
 
 import java.time.DayOfWeek;
+import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -51,6 +52,14 @@ public class RecurringShiftNeed {
     	else{
 	    	DayOfWeek start = DayOfWeek.of(Util.getDayInt(startDay));
 	    	DayOfWeek end = DayOfWeek.of(Util.getDayInt(endDay)); 
+	    	
+	    	//Weeks ending sunday causes a wrapping issue calculating time on monday that makes it
+	    	//appear as though a sunday to monday shift ends before it starts
+	    	if(start.getValue()==7 && end.getValue()==1) {
+	    		start=start.minus(2);
+	    		end = start.plus(1);
+	    		System.out.println("start tweaked: "+start + " end tweaked: " +end);
+	    	}
 	    	
 	    	if(end.compareTo(start)<0||end.compareTo(start)>1){
 	    		valid=false;
