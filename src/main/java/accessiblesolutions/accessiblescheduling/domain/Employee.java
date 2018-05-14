@@ -6,6 +6,7 @@ import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.J
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.util.ArrayList;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -89,6 +90,44 @@ public class Employee {
 		saturdaysAvailability = new boolean[24];
 	}
 
+	public int cleanDuplicateVacationDays() {
+		int daysRemoved = 0;
+		System.out.println("clean in:"+requestedOff.toString());
+		
+		if(null!=requestedOff) {	
+			ArrayList<String> vacation = new ArrayList<String>();
+			
+			for (int i = 0; i< requestedOff.length ; i++) {
+				boolean duplicate = false;
+				String requestedDay = requestedOff[i];
+	
+				if(!vacation.isEmpty()) {
+					for (String vacationDay : vacation) {
+						System.out.println("vac" +vacationDay + " req:"+requestedDay);
+						if(null!=vacationDay && vacationDay.equalsIgnoreCase(requestedDay)) {
+							System.out.println("duplicate");
+							duplicate=true;
+						}
+					}
+				}
+				
+				if(null!= requestedDay && !duplicate && !requestedDay.trim().isEmpty()) {
+					vacation.add(requestedDay);
+				}
+				else {
+					daysRemoved++;
+				}
+	
+			}
+			
+			requestedOff =  vacation.toArray(requestedOff);
+		}
+		
+		System.out.println("days removed:"+daysRemoved);
+		System.out.println("clean out:"+requestedOff.toString());
+		return daysRemoved;
+	}
+	
 	public boolean[] getAvailabilityFor(int day) {
 		boolean[] availability = new boolean[7];
 
