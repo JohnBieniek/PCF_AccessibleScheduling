@@ -13,7 +13,7 @@
   <div ng-if="selectedEmployee">
 	  <h3>Days requested off for {{selectedEmployee.first}} {{selectedEmployee.initial}}</tth3><br/>
 	  </br>
-	     <ul ng-repeat="requestedDay in selectedEmployee.requestedOff">
+	     <ul ng-repeat="requestedDay in selectedEmployee.requestedOff track by $index">
 	         <li>
 	           <form>
       	        <div style="display:inline-block">
