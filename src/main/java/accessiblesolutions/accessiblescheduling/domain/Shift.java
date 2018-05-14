@@ -104,6 +104,7 @@ public class Shift {
 //    	if((isAssigned() && staffId==null) || (isAssigned() && staffName==Null)){//TODO
 //    		valid=false;
 //    	}
+    	System.out.println("Shift:"+toString()+" validity? "+valid);
     	return valid;
     }
     
@@ -135,21 +136,32 @@ public class Shift {
 		int endHour = (int) Integer.parseInt(endTime.split(":")[0]);
 		int endMin = (int) Integer.parseInt(endTime.split(":")[1]);
 		
-//		System.out.println("startHour"+startHour);
-//		System.out.println("startMin"+startMin);
-//				System.out.println("endHour"+endHour);
-//						System.out.println("endMin"+endMin);
+		System.out.println("startHour"+startHour);
+		System.out.println("startMin"+startMin);
+				System.out.println("endHour"+endHour);
+						System.out.println("endMin"+endMin);
     	if(getOvernight()){
     		duration+=24;
     	}
+//    	LocalDateTime startTime = getStartsLocalDateTime();
+//    	LocalDateTime endTime = getEndsLocalDateTime();
+//    	
+//    	//Weeks ending sunday causes a wrapping issue calculating time on monday that makes it
+//    	//appear as though a sunday to monday shift ends before it starts
+//    	if(startTime.getDayOfWeek().getValue()==7 && endTime.getDayOfWeek().getValue()==1) {
+//    		startTime=startTime.minusDays(2);
+//    		endTime = startTime.plusDays(1);
+//    		System.out.println("start tweaked: "+startTime + " end tweaked: " +endTime);
+//    	}
+    	
     	
     	if(getEndsLocalDateTime().isBefore(getStartsLocalDateTime())){
     		System.out.println("ERROR: shift ends before starting " +toString() + " duration:"+duration);
     		throw new CorruptDataException(Shift.class,this);
     	}
-    	//System.out.println("Getting duration");
+    	System.out.println("Getting duration");
     	duration+=(endHour-startHour) + ((endMin-startMin)/60.0);
-    	//System.out.println("Got duration:"+duration);
+    	System.out.println("Got duration:"+duration);
     	if(duration>24||duration<=0){
     		System.out.println("ERROR: shift is inappropriate duration " +toString() + " duration:"+duration);
     		throw new CorruptDataException(Shift.class,this);

@@ -6,7 +6,7 @@ function ShiftRequestModalController($scope, $modalInstance, $http, selectedClie
     $scope.shiftRequest = shiftRequest;
 
     // Will execute myCallback every 5 seconds 
-	var intervalID = setInterval(function(){ myCallback(shiftRequest)}, 1000);
+	var intervalID = setInterval(function(){ myCallback(shiftRequest)}, 500);
 
 	function myCallback(shiftRequest) {
 		$http({
