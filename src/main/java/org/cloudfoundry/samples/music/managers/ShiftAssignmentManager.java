@@ -303,30 +303,61 @@ public class ShiftAssignmentManager {
 				shift.setAssignmentReason("Only " + employee.getFirst() +" was compatible and available. ");
 			}
 			//end attemptAssigningOnlyCompatibility
+			
+			//Attempt to give to someone under min hours with the least hours scheduled
 			if(employee==null){
 				for(EmployeeShiftCompatibility compatibility :shiftCompatibilities.compatibilities){
-					if(employeeShiftCompatibilityManager.getHoursScheduledWeekOf(compatibility.getEmployee(),compatibility.getShift())<compatibility.getEmployee().getMinHours()){
-						employee=compatibility.getEmployee();
-						shift.setAssignmentReason("Min");
+					Employee staff = compatibility.getEmployee();
+					float hoursScheduled = employeeShiftCompatibilityManager.getHoursScheduledWeekOf(staff,compatibility.getShift());
+					if(hoursScheduled<staff.getMinHours()) {
+						if(null!=employee) {
+							float employeesHours = employeeShiftCompatibilityManager.getHoursScheduledWeekOf(employee,compatibility.getShift());
+							if(hoursScheduled<employeesHours) {
+								employee=staff;
+								shift.setAssignmentReason("Under min hours, least hours scheduled");
+							}
+						}
+						else {
+							employee=staff;
+							shift.setAssignmentReason("Under min hours");
+						}
 					}
 				}
 			}
+			
+			//Assign to an employee not in overtime with the most available hours
 			if(employee==null){
-				employee=employeeShiftCompatibilityManager.getEmployeeWithMostTimeBeforeOvertimeAfterAssignment(shiftCompatibilities);
-				shift.setAssignmentReason("Employee had the most time before overtime after assignment");
+				employee=employeeShiftCompatibilityManager.getEmployeeWithMostHoursAvailable(shiftCompatibilities);
+				shift.setAssignmentReason("Employee had the most time before overtime ");
 			}
 			else if(shift.getAssignmentReason().length()<10){
 				shift.setAssignmentReason("Employee had the most time until minimn was reached after assignment");
 			}
 			
 			if(employee==null&&shiftCompatibilities!=null&&shiftCompatibilities.compatibilities!=null&&shiftCompatibilities.compatibilities.size()>0){
-				float hours = 80;
+				//Assign to an employee in overtime who requested extra shifts who has less than 10 overtime hours and less than 50 hours this week
+				float hours = 50;
 				for(EmployeeShiftCompatibility compatibility :shiftCompatibilities.compatibilities){
-					if(compatibility.getEmployee().getRequestsExtraShifts()){
-						if(employeeShiftCompatibilityManager.getHoursScheduledWeekOf(compatibility.getEmployee(),compatibility.getShift())<hours){
-							hours=employeeShiftCompatibilityManager.getHoursScheduledWeekOf(compatibility.getEmployee(),compatibility.getShift());
-							employee=compatibility.getEmployee();
+					Employee selected = compatibility.getEmployee();
+					if(selected.getRequestsExtraShifts()){
+						float selectedHours = employeeShiftCompatibilityManager.getHoursScheduledWeekOf(selected,compatibility.getShift());
+						if(selectedHours<(employee.getMaxHours()+10) && selectedHours<hours){
+							hours=selectedHours;
+							employee=selected;
 							shift.setAssignmentReason("All in overtime, they requested it and have least hours");
+						}
+					}
+				}
+				
+				if(employee==null){
+					hours = 60;
+					for(EmployeeShiftCompatibility compatibility :shiftCompatibilities.compatibilities){
+						Employee selected = compatibility.getEmployee();
+						float selectedHours = employeeShiftCompatibilityManager.getHoursScheduledWeekOf(selected,compatibility.getShift());
+						if(selectedHours<hours){
+							hours=selectedHours;
+							employee=selected;
+							shift.setAssignmentReason("All in overtime, they have least hours");
 						}
 					}
 				}

@@ -68,6 +68,26 @@ public class EmployeeShiftCompatibilityManager {
 		return isAssignableFor(employee,shift);
 	}
     
+    public Employee getEmployeeWithMostHoursAvailable(EmployeeShiftCompatibilities compatibilities) throws CorruptDataException {
+    	//System.out.println("Getting the employee with the most time for " + compatibilities.compatibilities.get(0).getShift().toString());
+		Employee employee = null;
+		float time = 0;
+		
+		for(EmployeeShiftCompatibility compatibility :compatibilities.compatibilities){
+			float timeUntilOvertimeForShift = compatibility.getEmployee().getMaxHoursAvailable();
+			System.out.println(compatibility.getEmployee().getFirst() + " has "+ timeUntilOvertimeForShift + " hours available per week");
+			System.out.println(compatibility.getShift().getDuration() + " is the length of "+compatibility.getShift().toString());
+			
+			if(timeUntilOvertimeForShift>time && !getAssignmentWouldViolateAlternateWeekendsOff(compatibility)){
+				System.out.println(compatibility.getEmployee().getFirst() + " at "+timeUntilOvertimeForShift+" has more time till overtime than anyone "+employee + " at " + time);
+				time=timeUntilOvertimeForShift;
+				employee=compatibility.getEmployee();
+			}
+		}
+		//System.out.println(employee.getFirst() + " has more time till overtime than anyone for "+compatibilities.compatibilities.get(0).getShift().toString());
+		return employee;
+	}
+    
     public Employee getEmployeeWithMostTimeBeforeOvertimeAfterAssignment(EmployeeShiftCompatibilities compatibilities) throws CorruptDataException {
     	//System.out.println("Getting the employee with the most time for " + compatibilities.compatibilities.get(0).getShift().toString());
 		Employee employee = null;
