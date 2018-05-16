@@ -201,14 +201,35 @@ public class ShiftAssignmentManager {
 			}
 			
 			
+			//Attempt to give to someone under min hours with the least hours scheduled
 			if(employee==null){
 				for(EmployeeShiftCompatibility compatibility :shiftCompatibilities.compatibilities){
-					if(employeeShiftCompatibilityManager.getHoursScheduledWeekOf(compatibility.getEmployee(),compatibility.getShift())<compatibility.getEmployee().getMinHours()){
-						employee=compatibility.getEmployee();
-						shift.setAssignmentReason("Min");
+					Employee staff = compatibility.getEmployee();
+					float hoursScheduled = employeeShiftCompatibilityManager.getHoursScheduledWeekOf(staff,compatibility.getShift());
+					if(hoursScheduled<staff.getMinHours()) {
+						if(null!=employee) {
+							float employeesHours = employeeShiftCompatibilityManager.getHoursScheduledWeekOf(employee,compatibility.getShift());
+							if(hoursScheduled<employeesHours) {
+								employee=staff;
+								shift.setAssignmentReason("Under min hours, least hours scheduled");
+							}
+						}
+						else {
+							employee=staff;
+							shift.setAssignmentReason("Under min hours");
+						}
 					}
 				}
 			}
+			
+//			if(employee==null){
+//				for(EmployeeShiftCompatibility compatibility :shiftCompatibilities.compatibilities){
+//					if(employeeShiftCompatibilityManager.getHoursScheduledWeekOf(compatibility.getEmployee(),compatibility.getShift())<compatibility.getEmployee().getMinHours()){
+//						employee=compatibility.getEmployee();
+//						shift.setAssignmentReason("Min");
+//					}
+//				}
+//			}
 			
 			if(employee==null){
 				employee=employeeShiftCompatibilityManager.getEmployeeWithMostTimeBeforeOvertimeAfterAssignment(shiftCompatibilities);
@@ -238,14 +259,28 @@ public class ShiftAssignmentManager {
 						if(compatibility.getEmployee().getRequestsExtraShifts()){
 							if(employeeShiftCompatibilityManager.getHoursScheduledWeekOf(compatibility.getEmployee(),compatibility.getShift())<compatibility.getEmployee().getMinHours()){
 								employee=compatibility.getEmployee();
-								shift.setAssignmentReason("Min");
+								shift.setAssignmentReason("All in overtime. Staff requested extra shifts");
 							}
 						}
 					}
 				}
+				
+				//Set to available with least hours this week
 				if(employee==null){
-					employee=shiftCompatibilities.compatibilities.get(0).getEmployee();
-					shift.setAssignmentReason("One of those in overtime who was available");
+					for(EmployeeShiftCompatibility compatibility :shiftCompatibilities.compatibilities){
+						Employee staff = compatibility.getEmployee();
+						float hoursScheduled = employeeShiftCompatibilityManager.getHoursScheduledWeekOf(staff,compatibility.getShift());
+						if(null!=employee) {
+							float employeesHours = employeeShiftCompatibilityManager.getHoursScheduledWeekOf(employee,compatibility.getShift());
+							if(hoursScheduled<employeesHours) {
+								employee=staff;
+							}
+						}
+						else {
+							employee=staff;
+							shift.setAssignmentReason("Available with least hours");
+						}
+					}
 				}
 			}
 			if(employee!=null){
@@ -362,9 +397,22 @@ public class ShiftAssignmentManager {
 					}
 				}
 				
+				//Set to available with least hours this week
 				if(employee==null){
-					employee=shiftCompatibilities.compatibilities.get(0).getEmployee();
-					shift.setAssignmentReason("One of those in overtime who was available");
+					for(EmployeeShiftCompatibility compatibility :shiftCompatibilities.compatibilities){
+						Employee staff = compatibility.getEmployee();
+						float hoursScheduled = employeeShiftCompatibilityManager.getHoursScheduledWeekOf(staff,compatibility.getShift());
+						if(null!=employee) {
+							float employeesHours = employeeShiftCompatibilityManager.getHoursScheduledWeekOf(employee,compatibility.getShift());
+							if(hoursScheduled<employeesHours) {
+								employee=staff;
+							}
+						}
+						else {
+							employee=staff;
+							shift.setAssignmentReason("Available with least hours");
+						}
+					}
 				}
 			}
 			if(employee!=null){
