@@ -86,6 +86,7 @@ testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test',
     // Testing
     testCompile 'junit:junit-dep:4.10'
 	compile 'junit:junit-dep:4.10'
+	testCompile "org.mockito:mockito-core:1.+" 
     // Security
     compile("org.springframework.boot:spring-boot-starter-security")
 }

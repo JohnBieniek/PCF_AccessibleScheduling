@@ -17,10 +17,11 @@ import accessiblesolutions.accessiblescheduling.worker.ShiftWorker;
 
 @Component
 public class ShiftAssignmentManager {
-    private CrudRepository<Shift, String> shiftCrud;
+	@Autowired
+	private CrudRepository<Shift, String> shiftCrud;
     
     @Autowired
-    CrudRepository<Employee,String> employeeCrud;
+    public CrudRepository<Employee,String> employeeCrud;
     
     @Autowired
     CustomDataManager customDataManager;
@@ -37,9 +38,7 @@ public class ShiftAssignmentManager {
     @Autowired
     ShiftGenerationManager shiftGenerationManager;
     
-    @Autowired
-    public ShiftAssignmentManager(CrudRepository<Shift, String> shiftCrud) {
-        this.shiftCrud = shiftCrud;
+    public ShiftAssignmentManager() {
     }
    
     public String staffPreassignedShifts(String month, String year) throws CorruptDataException, ProccessingException{
