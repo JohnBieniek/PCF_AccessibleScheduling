@@ -1,14 +1,9 @@
 package managers;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import javax.annotation.Resource;
 
@@ -19,19 +14,14 @@ import org.cloudfoundry.samples.music.managers.ShiftAssignmentManager;
 import org.cloudfoundry.samples.music.managers.ShiftGenerationManager;
 import org.cloudfoundry.samples.music.managers.ShiftManager;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 
 import accessiblesolutions.accessiblescheduling.domain.Employee;
 import accessiblesolutions.accessiblescheduling.domain.Shift;
-import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
-import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
-import accessiblesolutions.accessiblescheduling.util.Util;
 
 public class ShiftAssignmentManagerSpec {
 	@Mock
@@ -58,21 +48,79 @@ public class ShiftAssignmentManagerSpec {
 	@Mock
     ShiftGenerationManager shiftGenerationManager;
 	
+	// Testing instance, mocked `resource` should be injected here 
+	@InjectMocks
+	@Resource
+	private ShiftAssignmentManager fixture;
+	
 	@Before
 	public void setUp() throws Exception {
 	    // Initialize mocks created above
 	    MockitoAnnotations.initMocks(this);
-	    // Change behaviour of `resource`
-	    when(employeeCrud.findOne("sampleA")).thenReturn(new Employee());   
+	    
+	    Employee onAlways = new Employee("On","Always");
+	    when(employeeCrud.findOne("onAlways")).thenReturn(onAlways);// Change behaviour of `resource`
+	    
+	    Employee offOnce = new Employee("Off","Once");
+	    String[] requestedOff = {"2018-04-01"};
+	    offOnce.setRequestedOff(requestedOff);
+	    when(employeeCrud.findOne("offOnce")).thenReturn(offOnce);
+
 	}
 	
-	// Testing instance, mocked `resource` should be injected here 
-	@InjectMocks
-	@Resource
-	private ShiftAssignmentManager fixture;// = new ShiftAssignmentManager();
 	@Test
-	public void sampleMockedTest() {
+	public void getOnPrestaffedShiftsReturnsEmptyListForNull() {
+		ArrayList<Shift> availableShifts  = fixture.getOnPrestaffedShifts(null);
+		assertEquals(availableShifts.size(),0);
+	}
+	
+	@Test
+	public void getOnPrestaffedShiftsReturnsEmptyListForRemovedEmployee() {
+		ArrayList<Shift> shifts = new ArrayList<Shift>();
+		Shift shift = new Shift();
 		
-		assertNotNull(fixture.employeeCrud.findOne("sampleA"));
+		shift.setStartDate("2018-04-01");
+		shift.setEndDate("2018-04-01");
+		shift.setRequestedStaffId("nonExistantEmployee");
+		shifts.add(shift);
+		
+		ArrayList<Shift> availableShifts  = fixture.getOnPrestaffedShifts(shifts);
+		assertEquals(availableShifts.size(),0);
+	}
+	
+	@Test
+	public void getOnPrestaffedShiftsReturnsEmptyListForRequestedOffShift() {
+		ArrayList<Shift> shifts = new ArrayList<Shift>();
+		Shift shift = new Shift();
+		
+		shift.setStartDate("2018-04-01");
+		shift.setEndDate("2018-04-01");
+		shift.setRequestedStaffId("offOnce");
+		shifts.add(shift);
+		
+		ArrayList<Shift> availableShifts  = fixture.getOnPrestaffedShifts(shifts);
+		assertEquals(availableShifts.size(),0);
+	}
+	
+	@Test
+	public void getOnPrestaffedShiftsReturnsAvailableListForShifts() {
+		ArrayList<Shift> shifts = new ArrayList<Shift>();
+		Shift shift = new Shift();
+		ArrayList<Shift> availableShifts =null;
+		
+		shift.setStartDate("2018-04-01");
+		shift.setEndDate("2018-04-01");
+		shift.setRequestedStaffId("offOnce");
+		shifts.add(shift);
+		
+		shift = new Shift();
+		shift.setStartDate("2018-04-01");
+		shift.setEndDate("2018-04-01");
+		shift.setRequestedStaffId("onAlways");
+		shifts.add(shift);
+		
+		availableShifts  = fixture.getOnPrestaffedShifts(shifts);
+		
+		assertEquals(availableShifts.size(),1);
 	}
 }

@@ -6,6 +6,7 @@ import accessiblesolutions.accessiblescheduling.domain.EmployeeShiftCompatibilit
 import accessiblesolutions.accessiblescheduling.domain.EmployeeShiftCompatibility;
 import accessiblesolutions.accessiblescheduling.domain.Shift;
 
+import org.junit.experimental.theories.suppliers.TestedOn;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
@@ -64,18 +65,24 @@ public class ShiftAssignmentManager {
 //
 //    	shiftCrud.save(assignedUnconflictedPrestaffedRecuringShifts);
 //    }
+
+    //@Tested
     public ArrayList<Shift> getOnPrestaffedShifts(ArrayList<Shift> shifts){
     	ArrayList<Shift> onShifts = new ArrayList<Shift>();
     	
-    	for(Shift shift: shifts){
-    		Employee employee = employeeCrud.findOne(shift.getRequestedStaffId());
-    		
-    		if(null!=employee && !employee.requestedOff(shift)){
-    			onShifts.add(shift);
-    		}
+    	if(null!=shifts) {
+	    	for(Shift shift: shifts){
+	    		Employee employee = employeeCrud.findOne(shift.getRequestedStaffId());
+	    		
+	    		if(null!=employee && !employee.requestedOff(shift)){
+	    			onShifts.add(shift);
+	    		}
+	    	}
     	}
+    	
     	return onShifts;
     }
+    
     public String saveAssignedUnconflictedPrestaffedRecuringShiftsToTableForMonth(int selectedMonth) throws CorruptDataException, ProccessingException{
     	ArrayList<Shift> prestaffedRecuringShifts = shiftManager.getPrestaffedRecurringShiftsForMonth(selectedMonth);
     	ArrayList<Shift> onPrestaffedRecuringShifts =getOnPrestaffedShifts(prestaffedRecuringShifts);
