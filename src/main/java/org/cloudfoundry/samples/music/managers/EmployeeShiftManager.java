@@ -139,7 +139,6 @@ public class EmployeeShiftManager {
 		return getHoursScheduledWeek(employeeRepository.findOne(employeeId), week, month);
 	}
   	
-  	
   	public float getHoursScheduledWeek(Employee employee,int week, int month) throws CorruptDataException{
 		float hours = 80;
 		if(null!=employee){
