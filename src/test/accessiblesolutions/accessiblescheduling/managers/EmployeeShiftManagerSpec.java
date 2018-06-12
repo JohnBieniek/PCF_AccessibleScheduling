@@ -93,24 +93,54 @@ public class EmployeeShiftManagerSpec {
 	    assignedOneDayShifts.add(assignedOneDayShift3);
 	    when(shiftRepository.findByStartMonth(4)).thenReturn(assignedOneDayShifts);
 	    when(employeeCrud.findOne("assignedOneDay")).thenReturn(assignedOneDay);
+	    
+	    Employee crossMonthEmployee = new Employee("Cross","Month");
+	    ArrayList<Shift> crossMonthShifts = new ArrayList<Shift>();
+	    Shift crossMonthShift1 = new Shift();
+	    crossMonthShift1.setStaffId("crossMonth");
+	    crossMonthShift1.setStartDate("2018-05-31");
+	    crossMonthShift1.setEndDate("2018-06-01");
+	    when(shiftRepository.findByStartMonth(5)).thenReturn(crossMonthShifts);
+	    when(employeeCrud.findOne("crossMonth")).thenReturn(crossMonthEmployee);
 	}
 	
 	@Test
-	public void getAssignedShiftsForEmployeeForMonthReturns3Shifts() {
+	public void getAssignedShiftsForEmployeeForMonthReturnsShiftsWhenAssigned() {
 		ArrayList<Shift> assignedShifts = fixture.getAssignedShiftsForEmployeeForMonth("assignedOneDay", 4);
 		assertEquals(assignedShifts.size(),3);
 		
-		Shift assignedOneDayShift4 = new Shift();
-		assignedOneDayShift4.setStaffId("assignedOneDay");
-	    assignedOneDayShift4.setStartDate("2018-04-05");
-	    assignedOneDayShift4.setEndDate("2018-04-05");
-		ArrayList<Shift> assignedOneDayShifts = (ArrayList<Shift>) shiftRepository.findByStartMonth(4);
-	    
-	    assignedOneDayShifts.add(assignedOneDayShift4);
-	    when(shiftRepository.findByStartMonth(4)).thenReturn(assignedOneDayShifts);
+//		Shift assignedOneDayShift4 = new Shift();
+//		assignedOneDayShift4.setStaffId("assignedOneDay");
+//	    assignedOneDayShift4.setStartDate("2018-04-05");
+//	    assignedOneDayShift4.setEndDate("2018-04-05");
+//		ArrayList<Shift> assignedOneDayShifts = (ArrayList<Shift>) shiftRepository.findByStartMonth(4);
+//	    
+//	    assignedOneDayShifts.add(assignedOneDayShift4);
+//	    when(shiftRepository.findByStartMonth(4)).thenReturn(assignedOneDayShifts);
 	    
 	    
 //	    assignedShifts = fixture.getAssignedShiftsForEmployeeForMonth("offOnce", 4);
 //		assertEquals(0,assignedShifts.size());
+	}
+	
+	@Test
+	public void getAssignedShiftsForEmployeeForMonthReturnsEmptyWhenUnassigned() {
+		ArrayList<Shift> assignedShifts = fixture.getAssignedShiftsForEmployeeForMonth("offOnce", 4);
+
+		assertEquals(0,assignedShifts.size());
+	}
+	
+	@Test
+	public void getAssignedShiftsForEmployeeForMonthReturnsEmptyWithNullId() {
+		ArrayList<Shift> assignedShifts = fixture.getAssignedShiftsForEmployeeForMonth(null, 4);
+
+		assertEquals(0,assignedShifts.size());
+	}
+	
+	@Test
+	public void getAssignedShiftsForEmployeeForMonthReturnsShiftsCrossingMonths() {
+		ArrayList<Shift> assignedShifts = fixture.getAssignedShiftsForEmployeeForMonth("crossMonth", 6);
+
+		assertEquals(1,assignedShifts.size());
 	}
 }
