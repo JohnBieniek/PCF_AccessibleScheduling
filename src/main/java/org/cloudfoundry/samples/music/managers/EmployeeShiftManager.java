@@ -72,19 +72,22 @@ public class EmployeeShiftManager {
   	
   	public ArrayList<Shift> getAssignedShiftsForEmployeeForMonth(String employeeId, int month){
 		ArrayList<Shift> assignedShiftsForEmployeeForMonth = new ArrayList<Shift>();
-		ArrayList<Shift> assignedOvernightShiftsForEmployeForTheLastDayOfMonthBefore = new ArrayList<Shift>();
 		
-		for(Shift shift: shiftRepository.findByStartMonth(month)){
-			if(shift!=null&& shift.getStaffId()!=null&&shift.getStaffId().equals(employeeId)){
-				assignedShiftsForEmployeeForMonth.add(shift);
+		if(null!=employeeId) {
+			ArrayList<Shift> assignedOvernightShiftsForEmployeForTheLastDayOfMonthBefore = new ArrayList<Shift>();
+			
+			for(Shift shift: shiftRepository.findByStartMonth(month)){
+				if(shift!=null&& shift.getStaffId()!=null&&shift.getStaffId().equals(employeeId)){
+					assignedShiftsForEmployeeForMonth.add(shift);
+				}
 			}
+			
+	//		assignedOvernightShiftsForEmployeForTheLastDayOfMonthBefore= getAssignedOvernightShiftsForEmployeForTheLastDayOfMonthBefore(employeeId,month);
+	//		
+	//		if(!assignedOvernightShiftsForEmployeForTheLastDayOfMonthBefore.isEmpty()){
+	//			assignedShiftsForEmployeeForMonth.addAll(assignedOvernightShiftsForEmployeForTheLastDayOfMonthBefore);
+	//		}
 		}
-		
-//		assignedOvernightShiftsForEmployeForTheLastDayOfMonthBefore= getAssignedOvernightShiftsForEmployeForTheLastDayOfMonthBefore(employeeId,month);
-//		
-//		if(!assignedOvernightShiftsForEmployeForTheLastDayOfMonthBefore.isEmpty()){
-//			assignedShiftsForEmployeeForMonth.addAll(assignedOvernightShiftsForEmployeForTheLastDayOfMonthBefore);
-//		}
 		
 		return assignedShiftsForEmployeeForMonth;
 	}
