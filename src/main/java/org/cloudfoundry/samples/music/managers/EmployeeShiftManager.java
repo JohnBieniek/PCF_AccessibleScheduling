@@ -39,11 +39,15 @@ public class EmployeeShiftManager {
   		return getAssignedShiftsForEmployeeForWeekOfMonth(employeeId,shift.getStartWeek(), shift.getStartMonth());
   	}
   	
+  	/**Does not return shifts for previous weeks that run into this week.
+  	 * Weeks are 0 indexed starting with week 0
+  	 * 
+  	 * @Tested
+  	 */
   	public ArrayList<Shift> getAssignedShiftsForEmployeeForWeekOfMonth(String employeeId, int week, int month) throws CorruptDataException{
 		ArrayList<Shift> assignedShiftsForEmployeeForMonth =getAssignedShiftsForEmployeeForMonth(employeeId,month);
 		
 		ArrayList<Shift> assignedShiftsForEmployeeForWeekOfMonth = new ArrayList<Shift>();
-		
 		if(assignedShiftsForEmployeeForMonth!=null){
 			for(Shift shift: assignedShiftsForEmployeeForMonth){
 				if(shift.getStartWeek()==week){
@@ -70,23 +74,30 @@ public class EmployeeShiftManager {
 		return assignedShiftsForEmployeeForDayOfMonth;
 	}
   	
+  	/**Includes shifts starting in previous months that roll into the first day
+  	 * 
+  	 * @Tested
+  	 */
   	public ArrayList<Shift> getAssignedShiftsForEmployeeForMonth(String employeeId, int month){
 		ArrayList<Shift> assignedShiftsForEmployeeForMonth = new ArrayList<Shift>();
 		
 		if(null!=employeeId) {
-			ArrayList<Shift> assignedOvernightShiftsForEmployeForTheLastDayOfMonthBefore = new ArrayList<Shift>();
-			
 			for(Shift shift: shiftRepository.findByStartMonth(month)){
 				if(shift!=null&& shift.getStaffId()!=null&&shift.getStaffId().equals(employeeId)){
 					assignedShiftsForEmployeeForMonth.add(shift);
 				}
 			}
 			
-	//		assignedOvernightShiftsForEmployeForTheLastDayOfMonthBefore= getAssignedOvernightShiftsForEmployeForTheLastDayOfMonthBefore(employeeId,month);
-	//		
-	//		if(!assignedOvernightShiftsForEmployeForTheLastDayOfMonthBefore.isEmpty()){
-	//			assignedShiftsForEmployeeForMonth.addAll(assignedOvernightShiftsForEmployeForTheLastDayOfMonthBefore);
-	//		}
+			for(Shift shift: shiftRepository.findByStartMonth(month-1>0?month-1:12)){
+				try {
+					if(shift!=null&& shift.getStaffId()!=null&&shift.getStaffId().equals(employeeId)&& shift.getEndsLocalDate().getMonthValue()==month){
+						assignedShiftsForEmployeeForMonth.add(shift);
+					}
+				} catch (CorruptDataException e) {
+					// TODO LOG, we want to know its an issue but it doesn't stop this
+					e.printStackTrace();
+				}
+			}
 		}
 		
 		return assignedShiftsForEmployeeForMonth;
