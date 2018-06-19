@@ -170,6 +170,79 @@ public class EmployeeShiftManagerSpec {
 	}
 	
 	@Test
+	public void getAssignedShiftsForEmployeeForWeekOfShiftReturnsAssignedShifts() {
+		ArrayList<Shift> assignedShifts=null;
+		
+		Shift assignedOneDayShift1 = new Shift();
+	    assignedOneDayShift1.setStaffId("assignedOneDay");
+	    assignedOneDayShift1.setStartDate("2018-04-02");
+	    assignedOneDayShift1.setEndDate("2018-04-02");
+	    assignedOneDayShift1.setStartMonth(4);
+	    
+		try {
+			assignedShifts = fixture.getAssignedShiftsForEmployeeForWeekOfShift("assignedOneDay", assignedOneDayShift1);
+		} catch (CorruptDataException e) {
+			e.printStackTrace();
+		}
+		
+		assertEquals(3,assignedShifts.size());
+	}
+	
+	
+	@Test
+	public void getAssignedShiftsForEmployeeForWeekOfShiftReturnsEmptyForNullEmployee() {
+		ArrayList<Shift> assignedShifts=null;
+		
+		Shift assignedOneDayShift1 = new Shift();
+	    assignedOneDayShift1.setStaffId("assignedOneDay");
+	    assignedOneDayShift1.setStartDate("2018-04-01");
+	    assignedOneDayShift1.setEndDate("2018-04-02");
+	    
+		try {
+			assignedShifts = fixture.getAssignedShiftsForEmployeeForWeekOfShift(null, assignedOneDayShift1);
+		} catch (CorruptDataException e) {
+			e.printStackTrace();
+		}
+		
+		assertEquals(0,assignedShifts.size());
+	}
+	@Test
+	public void getAssignedShiftsForEmployeeForWeekOfShiftReturnsEmptyForNullShift() {
+		ArrayList<Shift> assignedShifts=null;
+		
+		Shift assignedOneDayShift1 = new Shift();
+	    assignedOneDayShift1.setStaffId("assignedOneDay");
+	    assignedOneDayShift1.setStartDate("2018-04-01");
+	    assignedOneDayShift1.setEndDate("2018-04-02");
+	    
+		try {
+			assignedShifts = fixture.getAssignedShiftsForEmployeeForWeekOfShift("assignedOneDay",null);
+		} catch (CorruptDataException e) {
+			e.printStackTrace();
+		}
+		
+		assertEquals(0,assignedShifts.size());
+	}
+	
+	@Test
+	public void getAssignedShiftsForEmployeeForWeekOfShiftReturnsEmptyForUnassignedEmployee() {
+		ArrayList<Shift> assignedShifts=null;
+		
+		Shift assignedOneDayShift1 = new Shift();
+	    assignedOneDayShift1.setStaffId("assignedOneDay");
+	    assignedOneDayShift1.setStartDate("2018-04-01");
+	    assignedOneDayShift1.setEndDate("2018-04-02");
+	    
+		try {
+			assignedShifts = fixture.getAssignedShiftsForEmployeeForWeekOfShift("offOnce",assignedOneDayShift1);
+		} catch (CorruptDataException e) {
+			e.printStackTrace();
+		}
+		
+		assertEquals(0,assignedShifts.size());
+	}
+	
+	@Test
 	public void getAssignedShiftsForEmployeeForDayOfMonthReturnsEmptyForNullEmployee() {
 		ArrayList<Shift> assignedShifts=null;
 		
@@ -186,8 +259,7 @@ public class EmployeeShiftManagerSpec {
 		
 		assertEquals(0,assignedShifts.size());
 	}
-	
-	//TODO
+
 	@Test
 	public void getAssignedShiftsForEmployeeForDayOfMonthReturnsAssignedShifts() {
 		ArrayList<Shift> assignedShifts=null;
@@ -195,5 +267,32 @@ public class EmployeeShiftManagerSpec {
 		assignedShifts = fixture.getAssignedShiftsForEmployeeForDayOfMonth("assignedOneDay", 2, 4);
 		
 		assertEquals(3,assignedShifts.size());
+	}
+	
+	@Test
+	public void getAssignedShiftsForEmployeeStartingDayOfMonthReturnsEmptyForNullEmployee() {
+		ArrayList<Shift> assignedShifts=null;
+		
+		assignedShifts = fixture.getAssignedShiftsForEmployeeStartingDayOfMonth(null, 0, 4);
+		
+		assertEquals(0,assignedShifts.size());
+	}
+	
+	@Test
+	public void getAssignedShiftsForEmployeeStartingDayOfMonthReturnsEmptyForUnassignedEmployee() {
+		ArrayList<Shift> assignedShifts=null;
+		
+		assignedShifts = fixture.getAssignedShiftsForEmployeeStartingDayOfMonth("offOnce", 0, 4);
+		
+		assertEquals(0,assignedShifts.size());
+	}
+	
+	@Test
+	public void getAssignedShiftsForEmployeeStartingDayOfMonthReturnsAssignedShifts() {
+		ArrayList<Shift> assignedShifts=null;
+		
+		assignedShifts = fixture.getAssignedShiftsForEmployeeStartingDayOfMonth("assignedOneDay", 2, 4);
+		
+		assertEquals(2,assignedShifts.size());
 	}
 }
