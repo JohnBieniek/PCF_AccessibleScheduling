@@ -1,5 +1,6 @@
 package org.cloudfoundry.samples.music.managers;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import accessiblesolutions.accessiblescheduling.domain.Shift;
@@ -34,9 +35,20 @@ public class EmployeeShiftManager {
 		return shifts;
 	}
   	
-    //If the shift in question starts saturday night and ends sunday info for the week of saturday is returned
+    /**If the shift in question starts saturday night and ends sunday info for the week of saturday is returned.
+     * Does not return shifts for previous weeks that run into this week.
+  	 * Weeks are 0 indexed starting with week 0.
+  	 * 
+  	 * @Tested
+  	 */
   	public ArrayList<Shift> getAssignedShiftsForEmployeeForWeekOfShift(String employeeId, Shift shift) throws CorruptDataException{
-  		return getAssignedShiftsForEmployeeForWeekOfMonth(employeeId,shift.getStartWeek(), shift.getStartMonth());
+  		ArrayList<Shift> assignedShiftsForEmployee = new ArrayList<Shift>();
+  		
+  		if(null!=shift) {
+  			assignedShiftsForEmployee = getAssignedShiftsForEmployeeForWeekOfMonth(employeeId,shift.getStartWeek(), shift.getStartMonth());
+  		}
+  		
+  		return assignedShiftsForEmployee;
   	}
   	
   	/**Does not return shifts for previous weeks that run into this week.
@@ -58,7 +70,42 @@ public class EmployeeShiftManager {
 		return assignedShiftsForEmployeeForWeekOfMonth;
 	}
   	
+  	/**Returns and empty list if nothing is found
+  	 * 
+  	 * @Tested
+  	 */
   	public ArrayList<Shift> getAssignedShiftsForEmployeeForDayOfMonth(String employeeId, int day, int month){
+		ArrayList<Shift> assignedShiftsForEmployeeForDayOfMonth = new ArrayList<Shift>();
+		
+		if(null!=employeeId && day>0) {
+			assignedShiftsForEmployeeForDayOfMonth = getAssignedShiftsForEmployeeStartingDayOfMonth(employeeId,day,month);
+			LocalDate previousDay = LocalDate.of(2018,month,day).minusDays(1);
+			
+			ArrayList<Shift> assignedShiftsForEmployeeForPreviousDayOfMonth = getAssignedShiftsForEmployeeStartingDayOfMonth(employeeId,previousDay.getDayOfMonth(),previousDay.getMonthValue());
+			if(assignedShiftsForEmployeeForPreviousDayOfMonth!=null){
+				for(Shift shift: assignedShiftsForEmployeeForPreviousDayOfMonth){
+					int endDay=-1;
+					try {
+						endDay = shift.getEndsLocalDate().getDayOfMonth();
+						
+						if(endDay==day){
+							assignedShiftsForEmployeeForDayOfMonth.add(shift);
+						}
+					} catch (CorruptDataException e) {
+						// TODO LOG
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+		return assignedShiftsForEmployeeForDayOfMonth;
+	}
+  	
+  	/**Returns and empty list if nothing is found
+  	 * 
+  	 * @Tested
+  	 */
+  	public ArrayList<Shift> getAssignedShiftsForEmployeeStartingDayOfMonth(String employeeId, int day, int month){
 		ArrayList<Shift> assignedShiftsForEmployeeForMonth =getAssignedShiftsForEmployeeForMonth(employeeId,month);
 		
 		ArrayList<Shift> assignedShiftsForEmployeeForDayOfMonth = new ArrayList<Shift>();
@@ -73,7 +120,6 @@ public class EmployeeShiftManager {
 		
 		return assignedShiftsForEmployeeForDayOfMonth;
 	}
-  	
   	/**Includes shifts starting in previous months that roll into the first day
   	 * 
   	 * @Tested
