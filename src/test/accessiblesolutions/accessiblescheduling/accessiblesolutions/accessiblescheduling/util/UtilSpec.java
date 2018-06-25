@@ -232,7 +232,7 @@ public class UtilSpec {
 	}
 	
 	@Test
-	public void getWeekBeforeDateConvertsAGoodDate(){
+	public void getWeekBeforeDateConvertsAGoodDate1(){
 		boolean exception = false;
 		int week =0;
 		try {
