@@ -26,12 +26,23 @@ public class EmployeeShiftManager {
         this.shiftRepository = shiftRepository;
     }
     
-    public ArrayList<Shift> getShiftsForEmployeeForWeekAfter(String employeeId, Shift shift) throws CorruptDataException, ProccessingException {
-		LocalDate weekAftersDate = shift.getStartsLocalDate().plusWeeks(1);
-		int weekAfter = Util.getWeekOfDate(weekAftersDate.getYear()+"-"+weekAftersDate.getMonth().getValue()+"-"+weekAftersDate.getDayOfMonth());
-		
-		ArrayList<Shift> shifts = getAssignedShiftsForEmployeeForWeekOfMonth(employeeId,weekAfter,weekAftersDate.getMonthValue());
-		
+    /**A week after the start date of the assigned shift we get getAssignedShiftsForEmployeeForWeekOfMonth.
+     * If the shift in question starts saturday night and ends sunday info for the week of saturday is returned.
+     * Does not return shifts for previous weeks that run into this week.
+  	 * Weeks are 0 indexed starting with week 0.
+  	 */
+    public ArrayList<Shift> getAssignedShiftsForEmployeeForWeekAfterShift(String employeeId, Shift shift) throws CorruptDataException, ProccessingException {
+    	ArrayList<Shift> shifts = new ArrayList<Shift>();
+    	
+    	if(null!=shift&& null!=employeeId) {
+	    	LocalDate weekAftersDate = shift.getStartsLocalDate().plusWeeks(1);
+			String month = weekAftersDate.getMonth().getValue()>9?weekAftersDate.getMonth().getValue()+"":"0"+weekAftersDate.getMonth().getValue();
+			String day = weekAftersDate.getDayOfMonth()>9?weekAftersDate.getDayOfMonth()+"":"0"+weekAftersDate.getDayOfMonth();
+			int weekAfter = Util.getWeekOfDate(weekAftersDate.getYear()+"-"+month+"-"+day);
+			
+			shifts = getAssignedShiftsForEmployeeForWeekOfMonth(employeeId,weekAfter,weekAftersDate.getMonthValue());
+    	}
+    	
 		return shifts;
 	}
   	

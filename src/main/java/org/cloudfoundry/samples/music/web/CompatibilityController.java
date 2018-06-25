@@ -405,7 +405,7 @@ public class CompatibilityController {
     		to.setEmployeeId(employee.getId());
     	}
     	
-    	to.setBooleanResponse(employeeShiftManager.getShiftsForEmployeeForWeekAfter(employee.getId(),shift).size()>0);
+    	to.setBooleanResponse(employeeShiftManager.getAssignedShiftsForEmployeeForWeekAfterShift(employee.getId(),shift).size()>0);
 
     	return to;
     }
