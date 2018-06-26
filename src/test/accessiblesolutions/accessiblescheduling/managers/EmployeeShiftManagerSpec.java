@@ -411,4 +411,28 @@ public class EmployeeShiftManagerSpec {
 		
 		assertTrue(errored);
 	}
+	
+//	@Test
+//	public void getHoursScheduledWeeekOfMonthReturns0ForUnassignedEmployee() {
+//		boolean errored = false;
+//		float hours = -1;
+//		float zero = 0;
+//
+//	    Employee offOnce = new Employee("Off","Once");
+//	    String[] requestedOff = {"2018-04-01"};
+//	    offOnce.setRequestedOff(requestedOff);
+//	    
+//		try {
+//			hours = fixture.getHoursScheduledWeekOfMonth(offOnce,1,6);
+//		} catch (CorruptDataException e) {
+//			errored=true;
+//			e.printStackTrace();
+//		} catch (ProccessingException e) {
+//			errored=true;
+//			e.printStackTrace();
+//		}
+//		
+//		assertFalse(errored);
+//		assertTrue(zero==hours);
+//	}
 }

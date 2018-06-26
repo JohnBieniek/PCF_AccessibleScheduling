@@ -240,6 +240,27 @@ public abstract class Util {
 		return getWeekOfDate(dayCursor.toString());
 	}
 	
+	public static LocalDate getLocalDateOfDayInWeek(int year,int month, int selectedWeek){
+		LocalDate sampleDay = null;
+		
+		LocalDate dateCursor = LocalDate.of(year,month,1);
+		
+		for(int day =0 ; day<32;day++) {
+			try {
+				if(getWeekOfDate(dateCursor.toString())==selectedWeek) {
+					sampleDay = dateCursor;
+					break;
+				}
+			} catch (ProccessingException e) {
+				e.printStackTrace();
+			}
+			
+			dateCursor.plusDays(1);
+		}
+		
+		return sampleDay;
+	}
+	
 	private static boolean getWeekInMonth(int year,int month, int selectedWeek) {
 		LocalDate startDate = LocalDate.of(year, month, 1);
 		DayOfWeek monthStart = startDate.getDayOfWeek(); 
