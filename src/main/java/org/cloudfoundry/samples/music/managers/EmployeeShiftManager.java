@@ -30,6 +30,8 @@ public class EmployeeShiftManager {
      * If the shift in question starts saturday night and ends sunday info for the week of saturday is returned.
      * Does not return shifts for previous weeks that run into this week.
   	 * Weeks are 0 indexed starting with week 0.
+  	 * 
+  	 * @Tested
   	 */
     public ArrayList<Shift> getAssignedShiftsForEmployeeForWeekAfterShift(String employeeId, Shift shift) throws CorruptDataException, ProccessingException {
     	ArrayList<Shift> shifts = new ArrayList<Shift>();
@@ -64,7 +66,11 @@ public class EmployeeShiftManager {
   	
   	/**Does not return shifts for previous weeks that run into this week.
   	 * Weeks are 0 indexed starting with week 0
-  	 * 
+  	 * @param employeeId
+  	 * @param week
+  	 * @param month
+  	 * @return ArrayList<Shift> Shift
+  	 * @throws CorruptDataException when a shift has a malformed or missing start week
   	 * @Tested
   	 */
   	public ArrayList<Shift> getAssignedShiftsForEmployeeForWeekOfMonth(String employeeId, int week, int month) throws CorruptDataException{
@@ -206,15 +212,29 @@ public class EmployeeShiftManager {
 		return shifts;
 	}
 
-  	public float getHoursScheduledWeek(String employeeId,int week, int month) throws CorruptDataException{
-		return getHoursScheduledWeek(employeeRepository.findOne(employeeId), week, month);
+  	public float getHoursScheduledWeek(String employeeId,int week, int month) throws CorruptDataException, ProccessingException{
+		return getHoursScheduledWeekOfMonth(employeeRepository.findOne(employeeId), week, month);
 	}
   	
-  	public float getHoursScheduledWeek(Employee employee,int week, int month) throws CorruptDataException{
-		float hours = 80;
+  	/** Return the hours the selected employee is currently scheduled for the week of the month provided.
+  	 * 
+  	 * @param employee
+  	 * @param week
+  	 * @param month
+  	 * @return float hours scheduled for the employee
+  	 * @throws CorruptDataException when a shift has a malformed or missing start week
+  	 * @throws ProccessingException when no employee is provided
+  	 */
+  	public float getHoursScheduledWeekOfMonth(Employee employee,int week, int month) throws CorruptDataException, ProccessingException{
+		float hours = 0;
+		ArrayList<Shift> shiftsForWeek = null;
+		int weekBefore = -1;//The week before the one provided
+		ArrayList<Shift> shiftsForPreviousWeek;
+		String[] endTime = null;//For  a shift on the last day of the week going overnight
+		int hoursThisWeek = 0;//For  a shift on the last day of the week going overnight
+		int minutesThisWeek = 0;//For  a shift on the last day of the week going overnight
+		
 		if(null!=employee){
-			hours= 0;
-			ArrayList<Shift> shiftsForWeek = null;
 			shiftsForWeek = getAssignedShiftsForEmployeeForWeekOfMonth(employee.getId(), week, month);
 			
 			if(null!=shiftsForWeek){
@@ -222,7 +242,30 @@ public class EmployeeShiftManager {
 					hours+= scheduledShift.getDuration();
 				}
 			}
+			
+			//Handle the possibility of a shift on the last day of the week going overnight
+			weekBefore = Util.getWeekBeforeDate(shiftsForWeek.get(0).getStartDate());
+			shiftsForPreviousWeek = getAssignedShiftsForEmployeeForWeekOfMonth(employee.getId(), weekBefore, month);
+			
+			if(null!=shiftsForPreviousWeek){
+				for(Shift scheduledShift : shiftsForPreviousWeek){
+					if(scheduledShift.isValid() &&
+							Util.getWeekOfDate(scheduledShift.getEndsLocalDate().toString())==week) {
+						endTime = scheduledShift.getEndTime().split(":");
+						
+						hoursThisWeek = Integer.parseInt(endTime[0]);
+						hours+= hoursThisWeek;
+						
+						minutesThisWeek = Integer.parseInt(endTime[1]);
+						hours+= minutesThisWeek/60;
+					}
+				}
+			}
 		}
+		else {
+			throw new ProccessingException("Cannot getHoursScheduledWeekOfMonth for a null employee");
+		}
+		
 		return hours;
 	}
 }

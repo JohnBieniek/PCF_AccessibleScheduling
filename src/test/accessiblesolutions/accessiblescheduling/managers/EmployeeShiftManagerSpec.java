@@ -2,6 +2,7 @@ package managers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -394,5 +395,20 @@ public class EmployeeShiftManagerSpec {
 		
 		assertFalse(errored);
 		assertEquals(0,assignedShifts.size());
+	}
+	
+	@Test
+	public void getHoursScheduledWeeekOfMonthThrowsProccessingExceptionForNullEmployee() {
+		boolean errored = false;
+		try {
+			float hours = fixture.getHoursScheduledWeekOfMonth(null,1,4);
+		} catch (CorruptDataException e) {
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
 	}
 }
