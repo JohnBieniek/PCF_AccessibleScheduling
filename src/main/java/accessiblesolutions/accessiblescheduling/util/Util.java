@@ -240,22 +240,32 @@ public abstract class Util {
 		return getWeekOfDate(dayCursor.toString());
 	}
 	
+	/**Returns the first day of the selected week for the given month and year
+	 * 
+	 * @param year
+	 * @param month
+	 * @param selectedWeek
+	 * @return LocalDate The first day of the selected week for the given month and year
+	 */
 	public static LocalDate getLocalDateOfDayInWeek(int year,int month, int selectedWeek){
 		LocalDate sampleDay = null;
 		
-		LocalDate dateCursor = LocalDate.of(year,month,1);
-		
-		for(int day =0 ; day<32;day++) {
-			try {
-				if(getWeekOfDate(dateCursor.toString())==selectedWeek) {
-					sampleDay = dateCursor;
-					break;
-				}
-			} catch (ProccessingException e) {
-				e.printStackTrace();
-			}
+		if(monthIsValid(month+"")&& yearIsValid(year+"") && selectedWeek <8 && selectedWeek>-1) {
+			LocalDate dateCursor = LocalDate.of(year,month,1);
 			
-			dateCursor.plusDays(1);
+			for(int day =0 ; day<32;day++) {
+				try {
+					if(getWeekOfDate(dateCursor.toString())==selectedWeek) {
+						sampleDay = dateCursor;
+						break;
+					}
+				} catch (ProccessingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				dateCursor.plusDays(1);
+			}
 		}
 		
 		return sampleDay;
