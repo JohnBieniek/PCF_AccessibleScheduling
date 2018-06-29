@@ -533,9 +533,16 @@ public class UtilSpec {
 	}
 	
 	@Test
-	public void getLocalDateOfDayInWeekReturnsFirstDayOfWeek(){
-		LocalDate date = Util.getLocalDateOfDayInWeek(2018,6,4);
-		
-		assertNotNull(date);
+	public void getLocalDateOfDayInWeekReturnsLastDayOfWeek0(){
+		LocalDate date = Util.getLocalDateOfDayInWeek(2018,6,0);
+	
+		assertEquals(2,date.getDayOfMonth());
+	}
+	
+	@Test
+	public void getLocalDateOfDayInWeekReturnsLastDayOfWeek1(){
+		LocalDate date = Util.getLocalDateOfDayInWeek(2018,6,1);
+
+		assertEquals(9,date.getDayOfMonth());
 	}
 }
