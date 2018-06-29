@@ -244,7 +244,7 @@ public class EmployeeShiftManager {
 			}
 			
 			//Handle the possibility of a shift on the last day of the week going overnight
-			weekBefore = Util.getWeekBeforeDate(shiftsForWeek.get(0).getStartDate());
+			weekBefore = Util.getWeekBeforeDate(Util.getLocalDateOfDayInWeek(2018, month,  week).toString());
 			shiftsForPreviousWeek = getAssignedShiftsForEmployeeForWeekOfMonth(employee.getId(), weekBefore, month);
 			
 			if(null!=shiftsForPreviousWeek){
