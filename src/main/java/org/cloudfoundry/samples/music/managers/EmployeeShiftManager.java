@@ -217,6 +217,7 @@ public class EmployeeShiftManager {
 	}
   	
   	/** Return the hours the selected employee is currently scheduled for the week of the month provided.
+  	 * Weeks are 0 indexed.
   	 * 
   	 * @param employee
   	 * @param week
