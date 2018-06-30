@@ -3,6 +3,7 @@ package accessiblesolutions.accessiblescheduling.util;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.time.LocalDate;
@@ -507,5 +508,41 @@ public class UtilSpec {
 		}
 		
 		assertFalse(exception);
+	}
+	
+
+	@Test
+	public void getLocalDateOfDayInWeekReturnsNullForInvalidYear(){
+		LocalDate date = Util.getLocalDateOfDayInWeek(201,6,1);
+		
+		assertNull(date);
+	}
+	
+	@Test
+	public void getLocalDateOfDayInWeekReturnsNullForInvalidMonth(){
+		LocalDate date = Util.getLocalDateOfDayInWeek(2018,13,1);
+		
+		assertNull(date);
+	}
+	
+	@Test
+	public void getLocalDateOfDayInWeekReturnsNullForInvalidWeek(){
+		LocalDate date = Util.getLocalDateOfDayInWeek(2018,10,9);
+		
+		assertNull(date);
+	}
+	
+	@Test
+	public void getLocalDateOfDayInWeekReturnsLastDayOfWeek0(){
+		LocalDate date = Util.getLocalDateOfDayInWeek(2018,6,0);
+	
+		assertEquals(2,date.getDayOfMonth());
+	}
+	
+	@Test
+	public void getLocalDateOfDayInWeekReturnsLastDayOfWeek1(){
+		LocalDate date = Util.getLocalDateOfDayInWeek(2018,6,1);
+
+		assertEquals(9,date.getDayOfMonth());
 	}
 }
