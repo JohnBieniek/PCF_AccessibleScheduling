@@ -2,7 +2,9 @@ package managers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -81,17 +83,22 @@ public class EmployeeShiftManagerSpec {
 	    assignedOneDayShift1.setStaffId("assignedOneDay");
 	    assignedOneDayShift1.setStartDate("2018-04-01");
 	    assignedOneDayShift1.setEndDate("2018-04-02");
+	    assignedOneDayShift1.setStartTime("20:00");
+	    assignedOneDayShift1.setEndTime("10:00");
 	    
 	    Shift assignedOneDayShift2 = new Shift();
 	    assignedOneDayShift2.setStaffId("assignedOneDay");
 	    assignedOneDayShift2.setStartDate("2018-04-02");
 	    assignedOneDayShift2.setEndDate("2018-04-02");
+	    assignedOneDayShift2.setStartTime("10:00");
+	    assignedOneDayShift2.setEndTime("18:00");
 	    
 	    Shift assignedOneDayShift3 = new Shift();
 	    assignedOneDayShift3.setStaffId("assignedOneDay");
 	    assignedOneDayShift3.setStartDate("2018-04-02");
 	    assignedOneDayShift3.setEndDate("2018-04-03");
-	    
+	    assignedOneDayShift3.setStartTime("20:00");
+	    assignedOneDayShift3.setEndTime("10:00");
 	    assignedOneDayShifts.add(assignedOneDayShift1);
 	    assignedOneDayShifts.add(assignedOneDayShift2);
 	    assignedOneDayShifts.add(assignedOneDayShift3);
@@ -398,7 +405,7 @@ public class EmployeeShiftManagerSpec {
 	}
 	
 	@Test
-	public void getHoursScheduledWeeekOfMonthThrowsProccessingExceptionForNullEmployee() {
+	public void getHoursScheduledWeekOfMonthThrowsProccessingExceptionForNullEmployee() {
 		boolean errored = false;
 		try {
 			float hours = fixture.getHoursScheduledWeekOfMonth(null,1,4);
@@ -413,7 +420,7 @@ public class EmployeeShiftManagerSpec {
 	}
 	
 	@Test
-	public void getHoursScheduledWeeekOfMonthReturns0ForUnassignedEmployee() {
+	public void getHoursScheduledWeekOfMonthReturns0ForUnassignedEmployee() {
 		boolean errored = false;
 		float hours = -1;
 		float zero = 0;
@@ -435,5 +442,48 @@ public class EmployeeShiftManagerSpec {
 		assertFalse(errored);
 		assertTrue(zero==hours);
 	}
-	//TODO add more tests here for assigned employees for the above method
+	
+	@Test
+	public void getHoursScheduledWeekOfMonthReturnsSumOfShiftsInWeek() {
+		boolean errored = false;
+		float hours = -1;
+
+		Employee assignedOneDay = new Employee("Assigned","OneDay");
+		assignedOneDay.setId("assignedOneDay");
+	    
+		try {
+			hours = fixture.getHoursScheduledWeekOfMonth(assignedOneDay,0,4);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+
+		assertFalse(errored);
+		assertTrue(36==hours);
+	}
+	
+//	@Test
+//	public void getHoursScheduledWeekOfMonthReturnsSumOfShiftsCrossWeek() {
+//		boolean errored = false;
+//		float hours = -1;
+//
+//		Employee assignedOneDay = new Employee("Assigned","OneDay");
+//		assignedOneDay.setId("assignedOneDay");
+//	    
+//		try {
+//			hours = fixture.getHoursScheduledWeekOfMonth(assignedOneDay,0,4);
+//		} catch (CorruptDataException e) {
+//			errored=true;
+//			e.printStackTrace();
+//		} catch (ProccessingException e) {
+//			errored=true;
+//			e.printStackTrace();
+//		}
+//		fail();//Add setup for a shift crossing into this week 
+//		assertFalse(errored);
+//		assertTrue(36==hours);
+//	}
 }
