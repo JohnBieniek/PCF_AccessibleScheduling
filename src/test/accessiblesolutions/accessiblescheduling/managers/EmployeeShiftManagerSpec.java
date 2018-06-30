@@ -109,8 +109,11 @@ public class EmployeeShiftManagerSpec {
 	    ArrayList<Shift> crossMonthShifts = new ArrayList<Shift>();
 	    Shift crossMonthShift1 = new Shift();
 	    crossMonthShift1.setStaffId("crossMonth");
+	    crossMonthShift1.setClientId("crossMonthClient");
 	    crossMonthShift1.setStartDate("2018-05-31");
 	    crossMonthShift1.setEndDate("2018-06-01");
+	    crossMonthShift1.setStartTime("20:00");
+	    crossMonthShift1.setEndTime("10:00");
 	    crossMonthShifts.add(crossMonthShift1);
 	    when(shiftRepository.findByStartMonth(5)).thenReturn(crossMonthShifts);
 	    when(employeeCrud.findOne("crossMonth")).thenReturn(crossMonthEmployee);
@@ -465,25 +468,25 @@ public class EmployeeShiftManagerSpec {
 		assertTrue(36==hours);
 	}
 	
-//	@Test
-//	public void getHoursScheduledWeekOfMonthReturnsSumOfShiftsCrossWeek() {
-//		boolean errored = false;
-//		float hours = -1;
-//
-//		Employee assignedOneDay = new Employee("Assigned","OneDay");
-//		assignedOneDay.setId("assignedOneDay");
-//	    
-//		try {
-//			hours = fixture.getHoursScheduledWeekOfMonth(assignedOneDay,0,4);
-//		} catch (CorruptDataException e) {
-//			errored=true;
-//			e.printStackTrace();
-//		} catch (ProccessingException e) {
-//			errored=true;
-//			e.printStackTrace();
-//		}
-//		fail();//Add setup for a shift crossing into this week 
-//		assertFalse(errored);
-//		assertTrue(36==hours);
-//	}
+	@Test
+	public void getHoursScheduledWeekOfMonthReturnsSumOfShiftsCrossWeekOrMonth() {
+		boolean errored = false;
+		float hours = -1;
+
+		Employee crossMonth = new Employee("Cross","Month");
+		crossMonth.setId("crossMonth");
+	    
+		try {
+			hours = fixture.getHoursScheduledWeekOfMonth(crossMonth,0,6);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(10==hours);
+	}
 }
