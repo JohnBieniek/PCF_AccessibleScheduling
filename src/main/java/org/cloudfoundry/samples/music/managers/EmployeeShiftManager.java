@@ -203,12 +203,29 @@ public class EmployeeShiftManager {
 		return assignedOvernightShiftsForEmployeeForMonth;
 	}
   	
-  	public ArrayList<Shift> getShiftsForEmployeeForWeekBefore(String employeeId,Shift shift) throws CorruptDataException, ProccessingException {
-		LocalDate weekBeforesDate = shift.getStartsLocalDate().minusWeeks(1);
-		int weekBefore = Util.getWeekOfDate(weekBeforesDate.getYear()+"-"+weekBeforesDate.getMonth().getValue()+"-"+weekBeforesDate.getDayOfMonth());
-		
-		ArrayList<Shift> shifts = getAssignedShiftsForEmployeeForWeekOfMonth(employeeId,weekBefore,weekBeforesDate.getMonthValue());
-		
+	/**Returns an ArrayList<Shift> of everything the employee is scheduled for the
+	 * week prior to the provided shift.
+	 * 
+	 * @param employeeId
+	 * @param shift
+	 * @return
+	 * @throws CorruptDataException when a shift has a malformed or missing start week
+	 * @throws ProccessingException when the shifts start date is malformed
+	 * @Tested
+	 * @TODO consider a refactor to throw proccessingExceptions with null input
+	 */
+  	public ArrayList<Shift> getAssignedShiftsForEmployeeForWeekBeforeShift(String employeeId,Shift shift) throws CorruptDataException, ProccessingException {
+  		ArrayList<Shift> shifts = new ArrayList<Shift>();
+  		
+  		if(null!=employeeId && null!=shift) {
+	  		LocalDate weekBeforesDate = shift.getStartsLocalDate().minusWeeks(1);
+			String month = weekBeforesDate.getMonth().getValue()>9?weekBeforesDate.getMonth().getValue()+"":"0"+weekBeforesDate.getMonth().getValue();
+			String day = weekBeforesDate.getDayOfMonth()>9?weekBeforesDate.getDayOfMonth()+"":"0"+weekBeforesDate.getDayOfMonth();
+			int weekBefore = Util.getWeekOfDate(weekBeforesDate.getYear()+"-"+month+"-"+day);
+	  		
+			shifts = getAssignedShiftsForEmployeeForWeekOfMonth(employeeId,weekBefore,weekBeforesDate.getMonthValue());
+  		}
+  		
 		return shifts;
 	}
   	

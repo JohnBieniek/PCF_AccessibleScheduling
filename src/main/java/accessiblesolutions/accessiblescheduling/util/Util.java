@@ -296,6 +296,12 @@ public abstract class Util {
 		return in;
 	}
 	
+	/**Returns the 0 indexed week int for the provided date string of the form YYYY-MM.DD.
+	 * 
+	 * @param date yyyy-mm-dd
+	 * @return
+	 * @throws ProccessingException when the date is malformed
+	 */
 	public static int getWeekOfDate(String date) throws ProccessingException{
 		if(null==date){
     		throw new ProccessingException(String.class,date);
