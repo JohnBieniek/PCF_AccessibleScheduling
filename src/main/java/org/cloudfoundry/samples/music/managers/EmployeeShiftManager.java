@@ -17,8 +17,8 @@ import accessiblesolutions.accessiblescheduling.worker.ShiftWorker;
 
 @Component
 public class EmployeeShiftManager {
-    private CrudRepository<Employee, String> employeeRepository;
-    private MongoShiftRepository shiftRepository;
+    public CrudRepository<Employee, String> employeeRepository;
+    public MongoShiftRepository shiftRepository;
     
     @Autowired
     public EmployeeShiftManager(CrudRepository<Employee, String> employeeRepository, MongoShiftRepository shiftRepository) {

@@ -495,8 +495,6 @@ public class EmployeeShiftManagerSpec {
 		assertTrue(10==hours);
 	}
 	
-	//
-
 	@Test
 	public void getAssignedShiftsForEmployeeForWeekBeforeShiftReturnsAssignedShifts() {
 		ArrayList<Shift> assignedShifts=null;
