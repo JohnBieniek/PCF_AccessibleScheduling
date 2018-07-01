@@ -43,6 +43,9 @@ public class EmployeeShiftManagerSpec {
 	
 	@Mock
     CrudRepository<Employee,String> employeeCrud;
+	
+	@Mock
+    CrudRepository<Employee,String> employeeRepository;
     
 	@Mock
     CustomDataManager customDataManager;
@@ -104,6 +107,7 @@ public class EmployeeShiftManagerSpec {
 	    assignedOneDayShifts.add(assignedOneDayShift3);
 	    when(shiftRepository.findByStartMonth(4)).thenReturn(assignedOneDayShifts);
 	    when(employeeCrud.findOne("assignedOneDay")).thenReturn(assignedOneDay);
+	    when(employeeRepository.findOne("assignedOneDay")).thenReturn(assignedOneDay);
 	    
 	    Employee crossMonthEmployee = new Employee("Cross","Month");
 	    ArrayList<Shift> crossMonthShifts = new ArrayList<Shift>();
@@ -117,6 +121,7 @@ public class EmployeeShiftManagerSpec {
 	    crossMonthShifts.add(crossMonthShift1);
 	    when(shiftRepository.findByStartMonth(5)).thenReturn(crossMonthShifts);
 	    when(employeeCrud.findOne("crossMonth")).thenReturn(crossMonthEmployee);
+	    when(employeeRepository.findOne("crossMonth")).thenReturn(crossMonthEmployee);
 	}
 	
 	@Test

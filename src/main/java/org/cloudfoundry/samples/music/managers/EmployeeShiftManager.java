@@ -211,10 +211,6 @@ public class EmployeeShiftManager {
 		
 		return shifts;
 	}
-
-  	public float getHoursScheduledWeek(String employeeId,int week, int month) throws CorruptDataException, ProccessingException{
-		return getHoursScheduledWeekOfMonth(employeeRepository.findOne(employeeId), week, month);
-	}
   	
   	/** Return the hours the selected employee is currently scheduled for the week of the month provided.
   	 * Weeks are 0 indexed.
@@ -225,6 +221,7 @@ public class EmployeeShiftManager {
   	 * @return float hours scheduled for the employee
   	 * @throws CorruptDataException when a shift has a malformed or missing start week
   	 * @throws ProccessingException when no employee is provided
+  	 * @Tested
   	 */
   	public float getHoursScheduledWeekOfMonth(Employee employee,int week, int month) throws CorruptDataException, ProccessingException{
 		float hours = 0;
