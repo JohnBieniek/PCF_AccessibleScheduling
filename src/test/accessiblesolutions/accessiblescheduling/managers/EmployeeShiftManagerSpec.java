@@ -572,4 +572,57 @@ public class EmployeeShiftManagerSpec {
 		
 		assertEquals(0,assignedShifts.size());
 	}
+	
+
+	@Test
+	public void getAssignedOvernightShiftsForEmployeeForMonthReturnsShiftsWhenAssigned() {
+		ArrayList<Shift> assignedShifts = null;
+		try {
+			assignedShifts = fixture.getAssignedOvernightShiftsForEmployeeForMonth("assignedOneDay", 4);
+		} catch (CorruptDataException | ProccessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		assertEquals(2,assignedShifts.size());
+	}
+	
+	@Test
+	public void getAssignedOvernightShiftsForEmployeeForMonthReturnsEmptyWhenUnassigned() {
+		ArrayList<Shift> assignedShifts = null;
+		try {
+			assignedShifts = fixture.getAssignedOvernightShiftsForEmployeeForMonth("offOnce", 4);
+		} catch (CorruptDataException | ProccessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		assertEquals(0,assignedShifts.size());
+	}
+	
+	@Test
+	public void getAssignedOvernightShiftsForEmployeeForMonthReturnsEmptyWithNullId() {
+		ArrayList<Shift> assignedShifts = null;
+		try {
+			assignedShifts = fixture.getAssignedOvernightShiftsForEmployeeForMonth(null, 4);
+		} catch (CorruptDataException | ProccessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		assertEquals(0,assignedShifts.size());
+	}
+	
+	@Test
+	public void getAssignedOvernightShiftsForEmployeeForMonthReturnsShiftsCrossingMonths() {
+		ArrayList<Shift> assignedShifts = null;
+		try {
+			assignedShifts = fixture.getAssignedOvernightShiftsForEmployeeForMonth("crossMonth", 6);
+		} catch (CorruptDataException | ProccessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		assertEquals(1,assignedShifts.size());
+	}
+	
 }

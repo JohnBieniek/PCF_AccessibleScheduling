@@ -137,8 +137,12 @@ public class EmployeeShiftManager {
 		
 		return assignedShiftsForEmployeeForDayOfMonth;
 	}
+ 
   	/**Includes shifts starting in previous months that roll into the first day
   	 * 
+  	 * @param employeeId
+  	 * @param month
+  	 * @return ArrayList<Shift> Shift
   	 * @Tested
   	 */
   	public ArrayList<Shift> getAssignedShiftsForEmployeeForMonth(String employeeId, int month){
@@ -185,7 +189,7 @@ public class EmployeeShiftManager {
 	public ArrayList<Shift> getAssignedOvernightShiftsForEmployeForTheLastDayOfMonth(String employeeId, int month) throws CorruptDataException, ProccessingException{
 		ArrayList<Shift> assignedOvernightShiftsForEmployeForTheLastDayOfMonth = new ArrayList<Shift>();
 		
-		ArrayList<Shift> shifts = getAssignedOvernightShiftsForEmployeForMonth(employeeId,month);
+		ArrayList<Shift> shifts = getAssignedOvernightShiftsForEmployeeForMonth(employeeId,month);
 		
 		assignedOvernightShiftsForEmployeForTheLastDayOfMonth = ShiftWorker.getShiftsStartingTheLastDayOfMonth(shifts, month);
 		
@@ -193,7 +197,20 @@ public class EmployeeShiftManager {
 	}
 	
 
-	public ArrayList<Shift> getAssignedOvernightShiftsForEmployeForMonth(String employeeId, int month) throws CorruptDataException, ProccessingException{
+	/**Returns all shifts that start and end on a different day assigned to the requested
+	 * employee for the provided month.
+	 * If the shift in question starts saturday night and ends sunday info for the week of saturday is returned.
+     * Does not return shifts for previous weeks that run into this week.
+  	 * Weeks are 0 indexed starting with week 0.
+	 * 
+	 * @param employeeId
+	 * @param month 1-12
+	 * @return ArrayList<Shift> Shift
+	 * @throws CorruptDataException A Shift has a null start or end date
+	 * @throws ProccessingException Shifts are null internally
+	 * @Tested
+	 */
+	public ArrayList<Shift> getAssignedOvernightShiftsForEmployeeForMonth(String employeeId, int month) throws CorruptDataException, ProccessingException{
 		ArrayList<Shift> assignedOvernightShiftsForEmployeeForMonth = new ArrayList<Shift>();
 		
 		ArrayList<Shift> shifts = getAssignedShiftsForEmployeeForMonth(employeeId,month);
