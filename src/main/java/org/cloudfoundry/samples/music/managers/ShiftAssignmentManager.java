@@ -209,7 +209,7 @@ public class ShiftAssignmentManager {
 			
 			if(employee==null){
 				for(EmployeeShiftCompatibility compatibility :shiftCompatibilities.compatibilities){
-					if(employeeShiftCompatibilityManager.getHoursScheduledWeekOf(compatibility.getEmployee(),compatibility.getShift())<compatibility.getEmployee().getMinHours()){
+					if(employeeShiftCompatibilityManager.getHoursScheduledWeekOfShift(compatibility.getEmployee(),compatibility.getShift())<compatibility.getEmployee().getMinHours()){
 						employee=compatibility.getEmployee();
 						shift.setAssignmentReason("Min");
 					}
@@ -231,8 +231,8 @@ public class ShiftAssignmentManager {
 				float hours = 80;
 				for(EmployeeShiftCompatibility compatibility :shiftCompatibilities.compatibilities){
 					if(compatibility.getEmployee().getRequestsExtraShifts()){
-						if(employeeShiftCompatibilityManager.getHoursScheduledWeekOf(compatibility.getEmployee(),compatibility.getShift())<hours){
-							hours=employeeShiftCompatibilityManager.getHoursScheduledWeekOf(compatibility.getEmployee(),compatibility.getShift());
+						if(employeeShiftCompatibilityManager.getHoursScheduledWeekOfShift(compatibility.getEmployee(),compatibility.getShift())<hours){
+							hours=employeeShiftCompatibilityManager.getHoursScheduledWeekOfShift(compatibility.getEmployee(),compatibility.getShift());
 							employee=compatibility.getEmployee();
 							shift.setAssignmentReason("All in overtime, they requested it and have least hours");
 						}
@@ -242,7 +242,7 @@ public class ShiftAssignmentManager {
 				if(employee==null){
 					for(EmployeeShiftCompatibility compatibility :shiftCompatibilities.compatibilities){
 						if(compatibility.getEmployee().getRequestsExtraShifts()){
-							if(employeeShiftCompatibilityManager.getHoursScheduledWeekOf(compatibility.getEmployee(),compatibility.getShift())<compatibility.getEmployee().getMinHours()){
+							if(employeeShiftCompatibilityManager.getHoursScheduledWeekOfShift(compatibility.getEmployee(),compatibility.getShift())<compatibility.getEmployee().getMinHours()){
 								employee=compatibility.getEmployee();
 								shift.setAssignmentReason("Min");
 							}
@@ -311,7 +311,7 @@ public class ShiftAssignmentManager {
 			//end attemptAssigningOnlyCompatibility
 			if(employee==null){
 				for(EmployeeShiftCompatibility compatibility :shiftCompatibilities.compatibilities){
-					if(employeeShiftCompatibilityManager.getHoursScheduledWeekOf(compatibility.getEmployee(),compatibility.getShift())<compatibility.getEmployee().getMinHours()){
+					if(employeeShiftCompatibilityManager.getHoursScheduledWeekOfShift(compatibility.getEmployee(),compatibility.getShift())<compatibility.getEmployee().getMinHours()){
 						employee=compatibility.getEmployee();
 						shift.setAssignmentReason("Min");
 					}
@@ -329,8 +329,8 @@ public class ShiftAssignmentManager {
 				float hours = 80;
 				for(EmployeeShiftCompatibility compatibility :shiftCompatibilities.compatibilities){
 					if(compatibility.getEmployee().getRequestsExtraShifts()){
-						if(employeeShiftCompatibilityManager.getHoursScheduledWeekOf(compatibility.getEmployee(),compatibility.getShift())<hours){
-							hours=employeeShiftCompatibilityManager.getHoursScheduledWeekOf(compatibility.getEmployee(),compatibility.getShift());
+						if(employeeShiftCompatibilityManager.getHoursScheduledWeekOfShift(compatibility.getEmployee(),compatibility.getShift())<hours){
+							hours=employeeShiftCompatibilityManager.getHoursScheduledWeekOfShift(compatibility.getEmployee(),compatibility.getShift());
 							employee=compatibility.getEmployee();
 							shift.setAssignmentReason("All in overtime, they requested it and have least hours");
 						}

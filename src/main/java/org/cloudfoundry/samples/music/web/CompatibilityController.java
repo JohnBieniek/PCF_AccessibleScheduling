@@ -109,7 +109,7 @@ public class CompatibilityController {
     	return to;
     }
     @RequestMapping(method = RequestMethod.POST, value= "/hoursNeeded")
-    public @ResponseBody EmployeeUpdateTO getHoursNeeded(HttpServletRequest request) throws CorruptDataException{
+    public @ResponseBody EmployeeUpdateTO getHoursNeeded(HttpServletRequest request) throws CorruptDataException, ProccessingException{
     	Employee employee =null;
     	Shift shift =null;
 
@@ -139,7 +139,7 @@ public class CompatibilityController {
     	return to;
     }
     @RequestMapping(method = RequestMethod.POST, value= "/hoursNeededAfterAssignment")
-    public @ResponseBody EmployeeUpdateTO getHoursNeededAfterAssignment(HttpServletRequest request) throws CorruptDataException{
+    public @ResponseBody EmployeeUpdateTO getHoursNeededAfterAssignment(HttpServletRequest request) throws CorruptDataException, ProccessingException{
     	Employee employee =null;
     	Shift shift =null;
 
@@ -169,7 +169,7 @@ public class CompatibilityController {
     	return to;
     }
     @RequestMapping(method = RequestMethod.POST, value= "/hoursAvailableAfterAssignment")
-    public @ResponseBody EmployeeUpdateTO getHoursAvailableAfterAssignment(HttpServletRequest request) throws CorruptDataException{
+    public @ResponseBody EmployeeUpdateTO getHoursAvailableAfterAssignment(HttpServletRequest request) throws CorruptDataException, ProccessingException{
     	Employee employee =null;
     	Shift shift =null;
 
@@ -199,7 +199,7 @@ public class CompatibilityController {
     	return to;
     }
     @RequestMapping(method = RequestMethod.POST, value= "/hoursAvailable")
-    public @ResponseBody EmployeeUpdateTO getHoursAvailable(HttpServletRequest request) throws CorruptDataException{
+    public @ResponseBody EmployeeUpdateTO getHoursAvailable(HttpServletRequest request) throws CorruptDataException, ProccessingException{
     	Employee employee =null;
     	Shift shift =null;
 
@@ -319,7 +319,7 @@ public class CompatibilityController {
     	return to;
     }
     @RequestMapping(method = RequestMethod.POST, value= "/assignmentIncursOvertime")
-    public @ResponseBody EmployeeUpdateTO getAssignmentIncursOvertime(HttpServletRequest request) throws CorruptDataException{
+    public @ResponseBody EmployeeUpdateTO getAssignmentIncursOvertime(HttpServletRequest request) throws CorruptDataException, ProccessingException{
     	Employee employee =null;
     	Shift shift =null;
 
