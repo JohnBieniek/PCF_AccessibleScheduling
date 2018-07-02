@@ -2,6 +2,7 @@ package org.cloudfoundry.samples.music.managers;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 
 import accessiblesolutions.accessiblescheduling.domain.Shift;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoShiftRepository;
@@ -74,7 +75,8 @@ public class EmployeeShiftManager {
   	 * @Tested
   	 */
   	public ArrayList<Shift> getAssignedShiftsForEmployeeForWeekOfMonth(String employeeId, int week, int month) throws CorruptDataException{
-		ArrayList<Shift> assignedShiftsForEmployeeForMonth =getAssignedShiftsForEmployeeForMonth(employeeId,month);
+		System.out.println("internal method called");
+  		ArrayList<Shift> assignedShiftsForEmployeeForMonth =getAssignedShiftsForEmployeeForMonth(employeeId,month);
 		
 		ArrayList<Shift> assignedShiftsForEmployeeForWeekOfMonth = new ArrayList<Shift>();
 		if(assignedShiftsForEmployeeForMonth!=null){
@@ -147,9 +149,12 @@ public class EmployeeShiftManager {
   	 */
   	public ArrayList<Shift> getAssignedShiftsForEmployeeForMonth(String employeeId, int month){
 		ArrayList<Shift> assignedShiftsForEmployeeForMonth = new ArrayList<Shift>();
-		
+		System.out.println("monthl level called"+employeeId+month);
 		if(null!=employeeId) {
-			for(Shift shift: shiftRepository.findByStartMonth(month)){
+			List<Shift> shifts = shiftRepository.findByStartMonth(month);
+			System.out.println(shifts);
+			for(Shift shift: shifts ){
+				System.out.println(shift);
 				if(shift!=null&& shift.getStaffId()!=null&&shift.getStaffId().equals(employeeId)){
 					assignedShiftsForEmployeeForMonth.add(shift);
 				}
@@ -265,11 +270,12 @@ public class EmployeeShiftManager {
 		String[] endTime = null;//For  a shift on the last day of the week going overnight
 		int hoursThisWeek = 0;//For  a shift on the last day of the week going overnight
 		int minutesThisWeek = 0;//For  a shift on the last day of the week going overnight
-		
+		System.out.println("method called"+week+" "+month);
 		if(null!=employee){
 			shiftsForWeek = getAssignedShiftsForEmployeeForWeekOfMonth(employee.getId(), week, month);
 			
-			if(null!=shiftsForWeek){
+			if(null!=shiftsForWeek&& !shiftsForWeek.isEmpty()){
+				System.out.println("Shifts found");
 				for(Shift scheduledShift : shiftsForWeek){
 					hours+= scheduledShift.getDuration();
 				}
@@ -278,7 +284,7 @@ public class EmployeeShiftManager {
 			//Handle the possibility of a shift on the last day of the week going overnight
 			weekBefore = Util.getWeekBeforeDate(Util.getLocalDateOfDayInWeek(2018, month,  week).toString());
 			shiftsForPreviousWeek = getAssignedShiftsForEmployeeForWeekOfMonth(employee.getId(), weekBefore, month);
-			
+			System.out.println("Shifts for previous week"+shiftsForPreviousWeek);
 			if(null!=shiftsForPreviousWeek){
 				for(Shift scheduledShift : shiftsForPreviousWeek){
 					if(scheduledShift.isValid() &&
@@ -297,7 +303,7 @@ public class EmployeeShiftManager {
 		else {
 			throw new ProccessingException("Cannot getHoursScheduledWeekOfMonth for a null employee");
 		}
-		
+		System.out.println("hours for week of month : "+hours);
 		return hours;
 	}
 }
