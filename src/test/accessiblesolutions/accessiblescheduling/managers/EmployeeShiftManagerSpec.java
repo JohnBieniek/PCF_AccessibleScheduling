@@ -120,6 +120,7 @@ public class EmployeeShiftManagerSpec {
 	    crossMonthShift1.setEndTime("10:00");
 	    crossMonthShifts.add(crossMonthShift1);
 	    when(shiftRepository.findByStartMonth(5)).thenReturn(crossMonthShifts);
+	    when(shiftRepository.findByStartMonth(6)).thenReturn(crossMonthShifts);
 	    when(employeeCrud.findOne("crossMonth")).thenReturn(crossMonthEmployee);
 	    when(employeeRepository.findOne("crossMonth")).thenReturn(crossMonthEmployee);
 	}
