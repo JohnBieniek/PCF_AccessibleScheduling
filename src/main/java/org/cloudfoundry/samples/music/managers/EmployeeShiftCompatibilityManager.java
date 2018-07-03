@@ -579,7 +579,6 @@ public class EmployeeShiftCompatibilityManager {
 				int week = Util.getWeekOfDate(shift.getStartDate());
 				
 				try {
-					System.out.println("Calling");
 					hours = employeeShiftManager.getHoursScheduledWeekOfMonth(employee,week,shift.getStartMonth());
 				} catch (CorruptDataException e) {
 					throw new ProccessingException(e);

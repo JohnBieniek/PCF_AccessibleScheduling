@@ -620,7 +620,7 @@ public class EmployeeShiftManagerSpec {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+		System.out.println(assignedShifts);
 		assertEquals(1,assignedShifts.size());
 	}
 	
