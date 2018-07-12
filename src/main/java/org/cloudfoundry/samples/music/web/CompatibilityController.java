@@ -134,7 +134,12 @@ public class CompatibilityController {
     		to.setEmployeeId(employee.getId());
     	}
     	
-    	to.setNumericResponse(employeeShiftCompatibilityManager.hoursNeededWeekOf(employee,shift));
+    	try {
+			to.setNumericResponse(employeeShiftCompatibilityManager.hoursNeededWeekOf(employee,shift));
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
     	return to;
     }

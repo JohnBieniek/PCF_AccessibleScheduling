@@ -16,6 +16,7 @@ import org.cloudfoundry.samples.music.managers.ShiftGenerationManager;
 import org.cloudfoundry.samples.music.managers.ShiftManager;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoClientRepository;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoShiftRepository;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -140,6 +141,10 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	     fixture.employeeShiftManager=customEmployeeShiftManager;
 	}
 	
+	@After
+    public final void tearDown() {
+		
+	}
 
 	@Test
 	public void getHoursScheduledWeekOfMonthThrowsProccessingExceptionForNullEmployee() {

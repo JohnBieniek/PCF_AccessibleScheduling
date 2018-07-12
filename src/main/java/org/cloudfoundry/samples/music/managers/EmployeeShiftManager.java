@@ -158,7 +158,9 @@ public class EmployeeShiftManager {
 			for(Shift shift: shiftRepository.findByStartMonth(month-1>0?month-1:12)){
 				try {
 					if(shift!=null&& shift.getStaffId()!=null&&shift.getStaffId().equals(employeeId)&& shift.getEndsLocalDate().getMonthValue()==month){
-						assignedShiftsForEmployeeForMonth.add(shift);
+						if(!assignedShiftsForEmployeeForMonth.contains(shift)){
+							assignedShiftsForEmployeeForMonth.add(shift);
+						}
 					}
 				} catch (CorruptDataException e) {
 					// TODO LOG, we want to know its an issue but it doesn't stop this
