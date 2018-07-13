@@ -146,7 +146,7 @@ public class EmployeeShiftManagerSpec {
 		assertEquals(0,assignedShifts.size());
 	}
 	
-	@Failing
+	
 	@Test
 	public void getAssignedShiftsForEmployeeForMonthReturnsShiftsCrossingMonths() {
 		ArrayList<Shift> assignedShifts = fixture.getAssignedShiftsForEmployeeForMonth("crossMonth", 6);
@@ -476,7 +476,7 @@ public class EmployeeShiftManagerSpec {
 		assertTrue(36==hours);
 	}
 	
-	@Failing
+	
 	@Test
 	public void getHoursScheduledWeekOfMonthReturnsSumOfShiftsCrossWeekOrMonth() {
 		boolean errored = false;
@@ -614,7 +614,7 @@ public class EmployeeShiftManagerSpec {
 		assertEquals(0,assignedShifts.size());
 	}
 	
-	@Failing
+	
 	@Test
 	public void getAssignedOvernightShiftsForEmployeeForMonthReturnsShiftsCrossingMonths() {
 		ArrayList<Shift> assignedShifts = null;
