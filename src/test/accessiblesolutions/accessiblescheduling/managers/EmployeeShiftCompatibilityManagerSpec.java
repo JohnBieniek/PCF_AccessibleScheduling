@@ -28,6 +28,7 @@ import org.springframework.data.repository.CrudRepository;
 
 import accessiblesolutions.accessiblescheduling.domain.Client;
 import accessiblesolutions.accessiblescheduling.domain.Employee;
+import accessiblesolutions.accessiblescheduling.domain.EmployeeShiftCompatibility;
 import accessiblesolutions.accessiblescheduling.domain.Shift;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
@@ -319,6 +320,166 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		assertTrue(36==result);
 	}
 
+	@Test
+	public void getAssignmentWouldIncurOvertimeThrowsProccessingExceptionWithNullCompatibility() {
+		boolean exception = false;
+		Employee crossMonth = new Employee("Cross","Month");
+		crossMonth.setId("crossMonth");
+	    
+		Shift crossMonthShift1 = new Shift();
+	    crossMonthShift1.setStaffId("crossMonth");
+	    crossMonthShift1.setClientId("crossMonthClient");
+	    crossMonthShift1.setStartMonth(6);
+	    crossMonthShift1.setStartDate("2018-06-01");
+	    crossMonthShift1.setEndDate("2018-06-01");
+	    crossMonthShift1.setStartTime("20:00");
+	    crossMonthShift1.setEndTime("22:00");
+		try {
+			fixture.getAssignmentWouldIncurOvertime(null);
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			exception=true;
+			e.printStackTrace();
+		}
+		assertTrue(exception);
+	}
 
+	@Test
+	public void getAssignmentWouldIncurOvertimeThrowsProccessingExceptionWithNullShift() {
+		boolean exception = false;
+		Employee crossMonth = new Employee("Cross","Month");
+		crossMonth.setId("crossMonth");
+	    
+		Shift crossMonthShift1 = new Shift();
+	    crossMonthShift1.setStaffId("crossMonth");
+	    crossMonthShift1.setClientId("crossMonthClient");
+	    crossMonthShift1.setStartMonth(6);
+	    crossMonthShift1.setStartDate("2018-06-01");
+	    crossMonthShift1.setEndDate("2018-06-01");
+	    crossMonthShift1.setStartTime("20:00");
+	    crossMonthShift1.setEndTime("22:00");
+	    EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(crossMonth,null);
+		try {
+			fixture.getAssignmentWouldIncurOvertime(compatibility);
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			exception=true;
+			e.printStackTrace();
+		}
+		assertTrue(exception);
+	}
 	
+	@Test
+	public void getAssignmentWouldIncurOvertimeThrowsProccessingExceptionWithNullEmployee() {
+		boolean exception = false;
+		Employee crossMonth = new Employee("Cross","Month");
+		crossMonth.setId("crossMonth");
+	    
+		Shift crossMonthShift1 = new Shift();
+	    crossMonthShift1.setStaffId("crossMonth");
+	    crossMonthShift1.setClientId("crossMonthClient");
+	    crossMonthShift1.setStartMonth(6);
+	    crossMonthShift1.setStartDate("2018-06-01");
+	    crossMonthShift1.setEndDate("2018-06-01");
+	    crossMonthShift1.setStartTime("20:00");
+	    crossMonthShift1.setEndTime("22:00");
+	    EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(null,crossMonthShift1);
+		try {
+			fixture.getAssignmentWouldIncurOvertime(compatibility);
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			exception=true;
+			e.printStackTrace();
+		}
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getAssignmentWouldIncurOvertimeThrowsCorruptDataExceptionWithInvalidShift() {
+		boolean exception = false;
+		Employee crossMonth = new Employee("Cross","Month");
+		crossMonth.setId("crossMonth");
+	    
+		Shift crossMonthShift1 = new Shift();
+	    crossMonthShift1.setStaffId("crossMonth");
+	    crossMonthShift1.setClientId("crossMonthClient");
+	    crossMonthShift1.setStartMonth(6);
+	    crossMonthShift1.setEndDate("2018-06-01");
+	    crossMonthShift1.setStartTime("20:00");
+	    crossMonthShift1.setEndTime("22:00");
+	    EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(crossMonth,crossMonthShift1);
+		try {
+			fixture.getAssignmentWouldIncurOvertime(compatibility);
+		} catch (CorruptDataException e) {
+			exception=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			e.printStackTrace();
+		}
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getAssignmentWouldIncurOvertimeReturnsFalseWhenBelowMaxAfterAssignment() {
+		boolean exception = false;
+		boolean overtime=true;
+		Employee crossMonth = new Employee("Cross","Month");
+		crossMonth.setId("crossMonth");
+	    
+		Shift crossMonthShift1 = new Shift();
+	    crossMonthShift1.setStaffId("crossMonth");
+	    crossMonthShift1.setClientId("crossMonthClient");
+	    crossMonthShift1.setStartMonth(6);
+	    crossMonthShift1.setStartDate("2018-06-01");
+	    crossMonthShift1.setEndDate("2018-06-01");
+	    crossMonthShift1.setStartTime("20:00");
+	    crossMonthShift1.setEndTime("22:00");
+	    EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(crossMonth,crossMonthShift1);
+		try {
+			overtime = fixture.getAssignmentWouldIncurOvertime(compatibility);
+		} catch (CorruptDataException e) {
+			exception=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			exception=true;
+			e.printStackTrace();
+		}
+		assertFalse(exception);
+		assertFalse(overtime);
+	}
+	
+//	@Test
+//	public void getAssignmentWouldIncurOvertimeReturnsTrueWhenAboveMaxAfterAssignment() {
+//		boolean exception = false;
+//		boolean overtime=true;
+//		Employee crossMonth = new Employee("Cross","Month");
+//		crossMonth.setId("crossMonth");
+//	    
+//		Shift crossMonthShift1 = new Shift();
+//	    crossMonthShift1.setStaffId("crossMonth");
+//	    crossMonthShift1.setClientId("crossMonthClient");
+//	    crossMonthShift1.setStartMonth(6);
+//	    crossMonthShift1.setStartDate("2018-06-01");
+//	    crossMonthShift1.setEndDate("2018-06-01");
+//	    crossMonthShift1.setStartTime("02:00");
+//	    crossMonthShift1.setEndTime("22:00");
+//	    EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(crossMonth,crossMonthShift1);
+//		try {
+//			overtime = fixture.getAssignmentWouldIncurOvertime(compatibility);
+//		} catch (CorruptDataException e) {
+//			exception=true;
+//			e.printStackTrace();
+//		} catch (ProccessingException e) {
+//			exception=true;
+//			e.printStackTrace();
+//		}
+//		assertFalse(exception);
+//		assertTrue(overtime);
+//	}
 }

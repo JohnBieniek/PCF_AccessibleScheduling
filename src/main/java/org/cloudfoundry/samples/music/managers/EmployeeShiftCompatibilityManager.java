@@ -278,11 +278,37 @@ public class EmployeeShiftCompatibilityManager {
 		return violatesMaxWeeklyWorkDays;
 	}
 	
+	/** Would assigning this employee this shift would put them over thier maximum requested hours for the week?
+	 * 
+	 * @param compatibility An employee and shift for consideration in assignment
+	 * @return boolean Assigning this employee this shift would put them over thier maximum requested hours for the week
+	 * @throws ProccessingException Coding failure, null employee,shift or compatibility
+	 * @throws CorruptDataException The Shift provided is invalid
+	 */
 	public boolean getAssignmentWouldIncurOvertime(EmployeeShiftCompatibility compatibility) throws CorruptDataException, ProccessingException {
-		Employee employee = compatibility.getEmployee();
-		Shift shift = compatibility.getShift();
+		boolean incursOvertime;
 		
-		return getHoursScheduledWeekOfShift(employee,shift)+shift.getDuration()>employee.getMaxHours();
+		if(null!=compatibility) {
+			Employee employee = compatibility.getEmployee();
+			Shift shift = compatibility.getShift();
+			
+			if(null!=shift && null!=employee) {
+				if(shift.isValid()) {
+					incursOvertime=getHoursScheduledWeekOfShift(employee,shift)+shift.getDuration()>employee.getMaxHours();
+				}
+				else{
+					throw new CorruptDataException("Invalid shift provided in getAssignmentWouldIncurOvertime");
+				}
+			}
+			else {
+				throw new ProccessingException("Null Shift or Employee provided for assesment to getAssignmentWouldIncurOvertim");
+			}
+		}
+		else {
+			throw new ProccessingException("Null EmployeeShiftCompatibility provided for assesment to getAssignmentWouldIncurOvertim");
+		}
+		
+		return incursOvertime;
 	}
 	
 	public float getHoursAfterAssignment(EmployeeShiftCompatibility compatibility) throws CorruptDataException, ProccessingException {
