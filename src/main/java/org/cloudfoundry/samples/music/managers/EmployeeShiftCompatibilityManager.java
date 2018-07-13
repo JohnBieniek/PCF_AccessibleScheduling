@@ -568,8 +568,9 @@ public class EmployeeShiftCompatibilityManager {
 	 * @param employee
 	 * @param shift
 	 * @return float hours
-	 * @throws ProccessingException Coding failure
+	 * @throws ProccessingException Coding failure, null employee or shift
 	 * @throws CorruptDataException The Shift provided is invalid
+	 * @Tested
 	 */
 	public float getHoursScheduledWeekOfShift(Employee employee,Shift shift) throws ProccessingException, CorruptDataException{
 		float hours = 200;
@@ -579,7 +580,9 @@ public class EmployeeShiftCompatibilityManager {
 				int week = Util.getWeekOfDate(shift.getStartDate());
 				
 				try {
+					System.out.println("getting hours");
 					hours = employeeShiftManager.getHoursScheduledWeekOfMonth(employee,week,shift.getStartMonth());
+					System.out.println("got "+hours+" hours");
 				} catch (CorruptDataException e) {
 					throw new ProccessingException(e);
 				}
