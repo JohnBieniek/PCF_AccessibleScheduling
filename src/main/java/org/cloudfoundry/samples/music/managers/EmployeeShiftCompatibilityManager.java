@@ -278,12 +278,13 @@ public class EmployeeShiftCompatibilityManager {
 		return violatesMaxWeeklyWorkDays;
 	}
 	
-	/** Would assigning this employee this shift would put them over thier maximum requested hours for the week?
+	/** Would assigning this employee this shift would put them over their maximum requested hours for the week?
 	 * 
 	 * @param compatibility An employee and shift for consideration in assignment
-	 * @return boolean Assigning this employee this shift would put them over thier maximum requested hours for the week
+	 * @return boolean Assigning this employee this shift would put them over their maximum requested hours for the week
 	 * @throws ProccessingException Coding failure, null employee,shift or compatibility
 	 * @throws CorruptDataException The Shift provided is invalid
+	 * @Tested
 	 */
 	public boolean getAssignmentWouldIncurOvertime(EmployeeShiftCompatibility compatibility) throws CorruptDataException, ProccessingException {
 		boolean incursOvertime;
