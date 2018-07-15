@@ -475,6 +475,15 @@ public final class ShiftWorker {
     	return weekdayShifts;
 	}
 
+	/**Returns all shifts in the list that are on Saturday or Sunday.
+	 * Returns an empty list for null or empty list
+	 * 
+	 * @param shifts ArrayList<Shift>
+	 * @return ArrayList<Shift> Shifts
+	 * @throws CorruptDataException Invalid shift provided in the list
+	 * @throws ProccessingException Null shift provided in the list
+	 * @Tested
+	 */
 	public static ArrayList<Shift> getWeekendShifts(ArrayList<Shift> shifts) throws CorruptDataException, ProccessingException{
     	ArrayList<Shift> weekendShifts = new ArrayList<Shift>();
     	
@@ -495,35 +504,50 @@ public final class ShiftWorker {
     	return weekendShifts;
 	}
 
-	public static boolean isAlmostOverlapping(LocalDateTime start1, LocalDateTime end1, LocalDateTime start2, LocalDateTime end2) {
+	/**Return if the provided times are within 30 minutes of overlapping.
+	 * 
+	 * @param start1 LocalDateTime The start of shift 1
+	 * @param end1 LocalDateTime The end of shift 1
+	 * @param start2 LocalDateTime The start of shift 2
+	 * @param end2 LocalDateTime The end of shift 2
+	 * @return boolean If the shifts times are within 30 minutes of overlapping
+	 * @throws ProccessingException Null time provided
+	 */
+	public static boolean isAlmostOverlapping(LocalDateTime start1, LocalDateTime end1, LocalDateTime start2, LocalDateTime end2) throws ProccessingException {
 		boolean overlapping = false;
 		
-		int minutes = start1.getMinute();
+		if(null==start1 || null==end1 || null==start2 ||null==end2) {
+			throw new ProccessingException("Null time provided to isAlmostOverlapping");
+		}
+		System.out.println(start1+"-"+end1+" & "+start2 +"-"+end2);
 		
-		if(minutes<30){
-			int hour = start1.getHour();
-			if(hour==0){
-				minutes = minutes+30;
-				hour=23;
-				start1=start1.withHour(hour).withMinute(minutes).minusDays(1);
-			}
-		}
-		else{
-			start1=start1.minusMinutes(30);
-		}
-		
-		if(minutes>30){
-			int hour = start1.getHour();
-			if(hour==23){
-				minutes = minutes-30;
-				hour=0;
-				start1=start1.withHour(hour).withMinute(minutes).plusDays(1);
-			}
-		}
-		else{
-			start1=start1.minusMinutes(30);
-		}
-		overlapping = start1.isBefore(end2) && end1.isAfter(start2);
+		overlapping = start1.isBefore(end2.plusMinutes(29)) && end1.isAfter(start2.minusMinutes(29));
+//		int minutes = start1.getMinute();
+//		
+//		if(minutes<30){
+//			int hour = start1.getHour();
+//			if(hour==0){
+//				minutes = minutes+30;
+//				hour=23;
+//				start1=start1.withHour(hour).withMinute(minutes).minusDays(1);
+//			}
+//		}
+//		else{
+//			start1=start1.minusMinutes(30);
+//		}
+//		
+//		if(minutes>30){
+//			int hour = start1.getHour();
+//			if(hour==23){
+//				minutes = minutes-30;
+//				hour=0;
+//				start1=start1.withHour(hour).withMinute(minutes).plusDays(1);
+//			}
+//		}
+//		else{
+//			start1=start1.minusMinutes(30);
+//		}
+//		overlapping = start1.isBefore(end2) && end1.isAfter(start2);
 		
 		return overlapping;
 	}
@@ -548,6 +572,15 @@ public final class ShiftWorker {
 				);
 	}
 	
+    /**Returns if these two shifts contain overlapping durations.
+     * 
+     * @param baseShift
+     * @param comparingShift 
+     * @return boolean if these two shifts contain overlapping durations
+     * @throws CorruptDataException No StartsLocalDateTime and EndsLocalDateTime provided in shifts
+     * @throws ProccessingException Null Shift provided
+     * @Tested
+     */
 	public static boolean isOverlapping(Shift baseShift, Shift comparingShift) throws CorruptDataException, ProccessingException {
 		if(null==baseShift||null==comparingShift){
 			throw new ProccessingException("Null shift present");

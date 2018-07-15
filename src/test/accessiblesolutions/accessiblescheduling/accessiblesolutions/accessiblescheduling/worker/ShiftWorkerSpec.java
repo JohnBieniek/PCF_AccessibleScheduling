@@ -2970,4 +2970,50 @@ public class ShiftWorkerSpec {
 		}
 		assertTrue(error);
 	}
+	
+	@Test
+	public void isAlmostOverlappingThrowsProccessingExceptionWithNullTime() {
+		LocalDateTime localDateTime = LocalDateTime.now();
+		boolean errored =false;
+		try {
+			ShiftWorker.isAlmostOverlapping(null, localDateTime,localDateTime,localDateTime);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void isAlmostOverlappingReturnsFalseBeyond28Minutes() {
+		LocalDateTime localDateTime = LocalDateTime.now();
+		boolean errored =false;
+		boolean almostOverlapping = true;
+		try {
+			almostOverlapping =ShiftWorker.isAlmostOverlapping(localDateTime.minusHours(3), localDateTime,localDateTime.plusMinutes(29),localDateTime.plusHours(3));
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertFalse(almostOverlapping);
+	}
+	
+	@Test
+	public void isAlmostOverlappingReturnsTrueBelow28Minutes1() {
+		LocalDateTime localDateTime = LocalDateTime.now();
+		boolean errored =false;
+		boolean almostOverlapping = false;
+		try {
+			almostOverlapping =ShiftWorker.isAlmostOverlapping(localDateTime.minusHours(3), localDateTime,localDateTime.plusMinutes(28),localDateTime.plusHours(3));
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(almostOverlapping);
+	}
 }
