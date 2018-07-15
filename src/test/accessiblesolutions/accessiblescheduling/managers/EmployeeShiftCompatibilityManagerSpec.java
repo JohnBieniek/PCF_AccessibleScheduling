@@ -121,7 +121,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	    
 	    Employee crossMonthEmployee = new Employee("Cross","Month");
 	    ArrayList<Shift> crossMonthShifts = new ArrayList<Shift>();
-	    Shift crossMonthShift1 = new Shift();
+	    Shift  crossMonthShift1 = new Shift();
 	    crossMonthShift1.setStaffId("crossMonth");
 	    crossMonthShift1.setClientId("crossMonthClient");
 	    crossMonthShift1.setStartDate("2018-05-31");
@@ -135,6 +135,22 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	    employeeShiftManager.shiftRepository=shiftRepository;
 	    when(shiftRepository.findByStartMonth(6)).thenReturn(crossMonthShifts);
 	   
+	    Employee inOvertime = new Employee("In","Overtime");
+	    inOvertime.setMaxHours(1);
+	    when(employeeCrud.findOne("inOvertime")).thenReturn(inOvertime);
+	    Shift inOvertimeShift1 = new Shift();
+	    inOvertimeShift1.setStaffId("inOvertime");
+	    inOvertimeShift1.setClientId("inOvertimeClient");
+	    inOvertimeShift1.setStartDate("2018-07-01");
+	    inOvertimeShift1.setEndDate("2018-07-01");
+	    inOvertimeShift1.setStartTime("10:00");
+	    inOvertimeShift1.setEndTime("20:00");
+	    inOvertimeShift1.setStartMonth(7);
+	    ArrayList<Shift> inOvertimeShifts = new ArrayList<Shift>();
+		inOvertimeShifts.add(inOvertimeShift1);
+		
+	    when(shiftRepository.findByStartMonth(7)).thenReturn(inOvertimeShifts);
+	    
 	    EmployeeShiftManager customEmployeeShiftManager = new EmployeeShiftManager(employeeCrud, shiftRepository);
 	    customEmployeeShiftManager.shiftRepository=shiftRepository;
 	    
@@ -454,32 +470,33 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		assertFalse(overtime);
 	}
 	
-//	@Test
-//	public void getAssignmentWouldIncurOvertimeReturnsTrueWhenAboveMaxAfterAssignment() {
-//		boolean exception = false;
-//		boolean overtime=true;
-//		Employee crossMonth = new Employee("Cross","Month");
-//		crossMonth.setId("crossMonth");
-//	    
-//		Shift crossMonthShift1 = new Shift();
-//	    crossMonthShift1.setStaffId("crossMonth");
-//	    crossMonthShift1.setClientId("crossMonthClient");
-//	    crossMonthShift1.setStartMonth(6);
-//	    crossMonthShift1.setStartDate("2018-06-01");
-//	    crossMonthShift1.setEndDate("2018-06-01");
-//	    crossMonthShift1.setStartTime("02:00");
-//	    crossMonthShift1.setEndTime("22:00");
-//	    EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(crossMonth,crossMonthShift1);
-//		try {
-//			overtime = fixture.getAssignmentWouldIncurOvertime(compatibility);
-//		} catch (CorruptDataException e) {
-//			exception=true;
-//			e.printStackTrace();
-//		} catch (ProccessingException e) {
-//			exception=true;
-//			e.printStackTrace();
-//		}
-//		assertFalse(exception);
-//		assertTrue(overtime);
-//	}
+	@Test
+	public void getAssignmentWouldIncurOvertimeReturnsTrueWhenAboveMaxAfterAssignment() {
+		boolean exception = false;
+		boolean overtime=true;
+		Employee inOvertime = new Employee("In","Overtime");
+		inOvertime.setMaxHours(1);
+		inOvertime.setId("inOvertime");
+	    
+		Shift inOvertimeShift1 = new Shift();
+		inOvertimeShift1.setStaffId("inOvertime");
+		inOvertimeShift1.setClientId("inOvertimeClient");
+		inOvertimeShift1.setStartMonth(7);
+		inOvertimeShift1.setStartDate("2018-07-02");
+		inOvertimeShift1.setEndDate("2018-07-02");
+		inOvertimeShift1.setStartTime("02:00");
+	    inOvertimeShift1.setEndTime("22:00");
+	    EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(inOvertime,inOvertimeShift1);
+		try {
+			overtime = fixture.getAssignmentWouldIncurOvertime(compatibility);
+		} catch (CorruptDataException e) {
+			exception=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			exception=true;
+			e.printStackTrace();
+		}
+		assertFalse(exception);
+		assertTrue(overtime);
+	}
 }
