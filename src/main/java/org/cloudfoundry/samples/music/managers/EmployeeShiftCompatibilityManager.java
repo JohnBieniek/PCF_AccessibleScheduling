@@ -313,11 +313,11 @@ public class EmployeeShiftCompatibilityManager {
 	}
 	
 	public float getHoursAfterAssignment(EmployeeShiftCompatibility compatibility) throws CorruptDataException, ProccessingException {
-		return hoursNeededWeekOf(compatibility.getEmployee(),compatibility.getShift())-compatibility.getShift().getDuration()<0?0:hoursNeededWeekOf(compatibility.getEmployee(),compatibility.getShift())-compatibility.getShift().getDuration();
+		return hoursNeededWeekOfShift(compatibility.getEmployee(),compatibility.getShift())-compatibility.getShift().getDuration()<0?0:hoursNeededWeekOfShift(compatibility.getEmployee(),compatibility.getShift())-compatibility.getShift().getDuration();
 	}
 	
 	public float getHoursNeededAfterAssignment(EmployeeShiftCompatibility compatibility) throws CorruptDataException, ProccessingException {
-		return hoursNeededWeekOf(compatibility.getEmployee(),compatibility.getShift())-compatibility.getShift().getDuration()<0?0:hoursNeededWeekOf(compatibility.getEmployee(),compatibility.getShift())-compatibility.getShift().getDuration();
+		return hoursNeededWeekOfShift(compatibility.getEmployee(),compatibility.getShift())-compatibility.getShift().getDuration()<0?0:hoursNeededWeekOfShift(compatibility.getEmployee(),compatibility.getShift())-compatibility.getShift().getDuration();
 	}
 
 	public boolean getAssignmentWouldReachMinimum(EmployeeShiftCompatibility compatibility) throws CorruptDataException, ProccessingException {
@@ -325,7 +325,7 @@ public class EmployeeShiftCompatibilityManager {
 	}
 	
 	public float getHoursNeeded(EmployeeShiftCompatibility compatibility) throws CorruptDataException, ProccessingException {
-		return hoursNeededWeekOf(compatibility.getEmployee(),compatibility.getShift());
+		return hoursNeededWeekOfShift(compatibility.getEmployee(),compatibility.getShift());
 	}
 	
 	public Employee getEmployeeWithMostTimeAfterAssignment(EmployeeShiftCompatibilities compatibilties) throws CorruptDataException, ProccessingException {
@@ -454,11 +454,22 @@ public class EmployeeShiftCompatibilityManager {
     	
     }
     
-	public float hoursAvailable(Employee employee,Shift shift) throws CorruptDataException, ProccessingException{
+	/**Return the number of hours below maximum the provided employee is for the week of this shift
+	 * 
+	 * @param employee 
+	 * @param shift A fully formed shift that returns true with shift.isValid
+	 * @return float number of hours below minimum
+	 * @throws ProccessingException Coding failure, null employee or shift
+	 * @throws CorruptDataException The Shift provided is invalid
+	 * @Tested
+	 */
+	public float hoursAvailableWeekOfShift(Employee employee,Shift shift) throws CorruptDataException, ProccessingException{
 		float hoursScheduled = getHoursScheduledWeekOfShift(employee,shift);
-		
-		return (hoursScheduled>employee.getMaxHours()) ? 0 : (employee.getMaxHours()-hoursScheduled);
+		float hoursAvailable = (hoursScheduled>employee.getMaxHours()) ? 0 : (employee.getMaxHours()-hoursScheduled);
+
+		return hoursAvailable;
 	}
+	
 	public float hoursAvailableAfterAssignment(Employee employee,Shift shift) throws CorruptDataException, ProccessingException{
 		float hoursScheduled = getHoursScheduledWeekOfShift(employee,shift);
 		
@@ -474,7 +485,7 @@ public class EmployeeShiftCompatibilityManager {
 	 * @throws CorruptDataException The Shift provided is invalid
 	 * @Tested
 	 */
-	public float hoursNeededWeekOf(Employee employee,Shift shift) throws CorruptDataException, ProccessingException{
+	public float hoursNeededWeekOfShift(Employee employee,Shift shift) throws CorruptDataException, ProccessingException{
 		float hoursScheduled = getHoursScheduledWeekOfShift(employee,shift);
 		float hoursNeeded = (hoursScheduled>employee.getMinHours()) ? 0 : (employee.getMinHours()-hoursScheduled);
 		

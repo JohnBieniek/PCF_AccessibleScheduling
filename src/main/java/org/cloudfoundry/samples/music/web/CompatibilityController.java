@@ -135,7 +135,7 @@ public class CompatibilityController {
     	}
     	
     	try {
-			to.setNumericResponse(employeeShiftCompatibilityManager.hoursNeededWeekOf(employee,shift));
+			to.setNumericResponse(employeeShiftCompatibilityManager.hoursNeededWeekOfShift(employee,shift));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -229,7 +229,7 @@ public class CompatibilityController {
     		to.setEmployeeId(employee.getId());
     	}
     	
-    	to.setNumericResponse(employeeShiftCompatibilityManager.hoursAvailable(employee,shift));
+    	to.setNumericResponse(employeeShiftCompatibilityManager.hoursAvailableWeekOfShift(employee,shift));
 
     	return to;
     }

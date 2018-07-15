@@ -501,12 +501,12 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	}
 	
 	@Test
-	public void hoursNeededWeekOfThrowsProccessingExceptionWithNullEmployee() {
+	public void hoursNeededWeekOfShiftThrowsProccessingExceptionWithNullEmployee() {
 		Shift shift = new Shift();
 		boolean exception=false;
 		
 		try {
-			fixture.hoursNeededWeekOf(null,shift);
+			fixture.hoursNeededWeekOfShift(null,shift);
 		} catch (CorruptDataException e) {
 			e.printStackTrace();
 		} catch (ProccessingException e) {
@@ -518,12 +518,12 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	}
 	
 	@Test
-	public void hoursNeededWeekOfThrowsProccessingExceptionWithNullShift() {
+	public void hoursNeededWeekOfShiftThrowsProccessingExceptionWithNullShift() {
 		Employee employee = new Employee();
 		boolean exception=false;
 		
 		try {
-			fixture.hoursNeededWeekOf(employee,null);
+			fixture.hoursNeededWeekOfShift(employee,null);
 		} catch (CorruptDataException e) {
 			e.printStackTrace();
 		} catch (ProccessingException e) {
@@ -535,13 +535,13 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	}
 	
 	@Test
-	public void hoursNeededWeekOfThrowsCorruptDataExceptionWithInvalidShift() {
+	public void hoursNeededWeekOfShiftThrowsCorruptDataExceptionWithInvalidShift() {
 		Employee employee = new Employee();
 		Shift shift = new Shift();
 		boolean exception=false;
 		
 		try {
-			fixture.hoursNeededWeekOf(employee,shift);
+			fixture.hoursNeededWeekOfShift(employee,shift);
 		} catch (CorruptDataException e) {
 			exception=true;
 			e.printStackTrace();
@@ -553,7 +553,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	}
 	
 	@Test
-	public void hoursNeededWeekOfReturnsFloatWhenUnderHours() {
+	public void hoursNeededWeekOfShiftReturnsFloatWhenUnderHours() {
 	    Employee assignedOneDay = new Employee("Assigned","OneDay");
 	    assignedOneDay.setId("assignedOneDay");
 	    assignedOneDay.setMinHours(40);
@@ -568,7 +568,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		boolean exception=false;
 		float hours=0;
 		try {
-			hours = fixture.hoursNeededWeekOf(assignedOneDay,assignedOneDayShift1);
+			hours = fixture.hoursNeededWeekOfShift(assignedOneDay,assignedOneDayShift1);
 		} catch (CorruptDataException e) {
 			exception=true;
 			e.printStackTrace();
@@ -582,7 +582,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	}
 	
 	@Test
-	public void hoursNeededWeekOfReturns0WhenMinMet() {
+	public void hoursNeededWeekOfShiftReturns0WhenMinMet() {
 	    Employee assignedOneDay = new Employee("Assigned","OneDay");
 	    assignedOneDay.setId("assignedOneDay");
 	    Shift assignedOneDayShift1 = new Shift();
@@ -596,7 +596,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		boolean exception=false;
 		float hours=0;
 		try {
-			hours = fixture.hoursNeededWeekOf(assignedOneDay,assignedOneDayShift1);
+			hours = fixture.hoursNeededWeekOfShift(assignedOneDay,assignedOneDayShift1);
 		} catch (CorruptDataException e) {
 			exception=true;
 			e.printStackTrace();
@@ -607,5 +607,114 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		
 		assertFalse(exception);
 		assertTrue(hours==0.0);
+	}
+	
+	@Test
+	public void hoursAvailableWeekOfShiftThrowsProccessingExceptionWithNullEmployee() {
+		Shift shift = new Shift();
+		boolean exception=false;
+		
+		try {
+			fixture.hoursAvailableWeekOfShift(null,shift);
+		} catch (CorruptDataException e) {
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			exception=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void hoursAvailableWeekOfShiftThrowsProccessingExceptionWithNullShift() {
+		Employee employee = new Employee();
+		boolean exception=false;
+		
+		try {
+			fixture.hoursAvailableWeekOfShift(employee,null);
+		} catch (CorruptDataException e) {
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			exception=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void hoursAvailableWeekOfShiftThrowsCorruptDataExceptionWithInvalidShift() {
+		Employee employee = new Employee();
+		Shift shift = new Shift();
+		boolean exception=false;
+		
+		try {
+			fixture.hoursAvailableWeekOfShift(employee,shift);
+		} catch (CorruptDataException e) {
+			exception=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			e.printStackTrace();
+		}
+		
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void hoursAvailableWeekOfShiftReturnsFloatWhenUnderHours() {
+	    Employee assignedOneDay = new Employee("Assigned","OneDay");
+	    assignedOneDay.setId("assignedOneDay");
+	    assignedOneDay.setMinHours(40);
+	    Shift assignedOneDayShift1 = new Shift();
+	    assignedOneDayShift1.setStaffId("assignedOneDay");
+	    assignedOneDayShift1.setClientId("assignedOneDayClient");
+	    assignedOneDayShift1.setStartDate("2018-04-01");
+	    assignedOneDayShift1.setEndDate("2018-04-01");
+	    assignedOneDayShift1.setStartMonth(4);
+	    assignedOneDayShift1.setStartTime("02:00");
+	    assignedOneDayShift1.setEndTime("10:00");
+		boolean exception=false;
+		float hours=0;
+		try {
+			hours = fixture.hoursAvailableWeekOfShift(assignedOneDay,assignedOneDayShift1);
+		} catch (CorruptDataException e) {
+			exception=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			exception=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(exception);
+		assertTrue(hours==4.0);
+	}
+	
+	@Test
+	public void hoursAvailableWeekOfShiftReturns0WhenMinMet() {
+	    Employee assignedOneDay = new Employee("Assigned","OneDay");
+	    assignedOneDay.setId("assignedOneDay");
+	    Shift assignedOneDayShift1 = new Shift();
+	    assignedOneDayShift1.setStaffId("assignedOneDay");
+	    assignedOneDayShift1.setClientId("assignedOneDayClient");
+	    assignedOneDayShift1.setStartDate("2018-04-01");
+	    assignedOneDayShift1.setEndDate("2018-04-01");
+	    assignedOneDayShift1.setStartMonth(4);
+	    assignedOneDayShift1.setStartTime("02:00");
+	    assignedOneDayShift1.setEndTime("10:00");
+		boolean exception=false;
+		float hours=0;
+		try {
+			hours = fixture.hoursAvailableWeekOfShift(assignedOneDay,assignedOneDayShift1);
+		} catch (CorruptDataException e) {
+			exception=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			exception=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(exception);
+		assertTrue(hours==4.0);
 	}
 }
