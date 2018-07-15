@@ -240,6 +240,36 @@ public abstract class Util {
 		return getWeekOfDate(dayCursor.toString());
 	}
 	
+	/**Returns the last day of the selected week for the given month and year
+	 * 
+	 * @param year
+	 * @param month
+	 * @param selectedWeek
+	 * @return LocalDate The last day of the selected week for the given month and year
+	 * @Tested
+	 */
+	public static LocalDate getLocalDateOfDayInWeek(int year,int month, int selectedWeek){
+		LocalDate sampleDay = null;
+		
+		if(month>0 && month<13&& selectedWeek <8 && selectedWeek>-1 && year>2000) {
+			LocalDate dateCursor = LocalDate.of(year,month,1);
+			
+			for(int day =0 ; day<32;day++) {
+				try {
+					if(getWeekOfDate(dateCursor.toString())==selectedWeek) {
+						sampleDay = dateCursor;
+					}
+				} catch (ProccessingException e) {
+					e.printStackTrace();
+				}
+				
+				dateCursor = dateCursor.plusDays(1);
+			}
+		}
+		
+		return sampleDay;
+	}
+	
 	private static boolean getWeekInMonth(int year,int month, int selectedWeek) {
 		LocalDate startDate = LocalDate.of(year, month, 1);
 		DayOfWeek monthStart = startDate.getDayOfWeek(); 
@@ -266,6 +296,12 @@ public abstract class Util {
 		return in;
 	}
 	
+	/**Returns the 0 indexed week int for the provided date string of the form YYYY-MM.DD.
+	 * 
+	 * @param date yyyy-mm-dd
+	 * @return
+	 * @throws ProccessingException when the date is malformed
+	 */
 	public static int getWeekOfDate(String date) throws ProccessingException{
 		if(null==date){
     		throw new ProccessingException(String.class,date);

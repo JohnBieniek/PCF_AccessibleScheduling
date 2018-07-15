@@ -79,7 +79,7 @@ public class CompatibilityController {
     }
     
     @RequestMapping(method = RequestMethod.POST, value= "/hours")
-    public @ResponseBody EmployeeUpdateTO getHoursScheduled(HttpServletRequest request) throws CorruptDataException{
+    public @ResponseBody EmployeeUpdateTO getHoursScheduled(HttpServletRequest request) throws CorruptDataException, ProccessingException{
     	Employee employee =null;
     	Shift shift =null;
 
@@ -104,12 +104,12 @@ public class CompatibilityController {
     		to.setEmployeeId(employee.getId());
     	}
     	
-    	to.setNumericResponse(employeeShiftManager.getHoursScheduledWeek(employee,shift.getStartWeek(),shift.getStartMonth()));
+    	to.setNumericResponse(employeeShiftManager.getHoursScheduledWeekOfMonth(employee,shift.getStartWeek(),shift.getStartMonth()));
 
     	return to;
     }
     @RequestMapping(method = RequestMethod.POST, value= "/hoursNeeded")
-    public @ResponseBody EmployeeUpdateTO getHoursNeeded(HttpServletRequest request) throws CorruptDataException{
+    public @ResponseBody EmployeeUpdateTO getHoursNeeded(HttpServletRequest request) throws CorruptDataException, ProccessingException{
     	Employee employee =null;
     	Shift shift =null;
 
@@ -134,12 +134,17 @@ public class CompatibilityController {
     		to.setEmployeeId(employee.getId());
     	}
     	
-    	to.setNumericResponse(employeeShiftCompatibilityManager.hoursNeededWeekOf(employee,shift));
+    	try {
+			to.setNumericResponse(employeeShiftCompatibilityManager.hoursNeededWeekOf(employee,shift));
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
     	return to;
     }
     @RequestMapping(method = RequestMethod.POST, value= "/hoursNeededAfterAssignment")
-    public @ResponseBody EmployeeUpdateTO getHoursNeededAfterAssignment(HttpServletRequest request) throws CorruptDataException{
+    public @ResponseBody EmployeeUpdateTO getHoursNeededAfterAssignment(HttpServletRequest request) throws CorruptDataException, ProccessingException{
     	Employee employee =null;
     	Shift shift =null;
 
@@ -169,7 +174,7 @@ public class CompatibilityController {
     	return to;
     }
     @RequestMapping(method = RequestMethod.POST, value= "/hoursAvailableAfterAssignment")
-    public @ResponseBody EmployeeUpdateTO getHoursAvailableAfterAssignment(HttpServletRequest request) throws CorruptDataException{
+    public @ResponseBody EmployeeUpdateTO getHoursAvailableAfterAssignment(HttpServletRequest request) throws CorruptDataException, ProccessingException{
     	Employee employee =null;
     	Shift shift =null;
 
@@ -199,7 +204,7 @@ public class CompatibilityController {
     	return to;
     }
     @RequestMapping(method = RequestMethod.POST, value= "/hoursAvailable")
-    public @ResponseBody EmployeeUpdateTO getHoursAvailable(HttpServletRequest request) throws CorruptDataException{
+    public @ResponseBody EmployeeUpdateTO getHoursAvailable(HttpServletRequest request) throws CorruptDataException, ProccessingException{
     	Employee employee =null;
     	Shift shift =null;
 
@@ -319,7 +324,7 @@ public class CompatibilityController {
     	return to;
     }
     @RequestMapping(method = RequestMethod.POST, value= "/assignmentIncursOvertime")
-    public @ResponseBody EmployeeUpdateTO getAssignmentIncursOvertime(HttpServletRequest request) throws CorruptDataException{
+    public @ResponseBody EmployeeUpdateTO getAssignmentIncursOvertime(HttpServletRequest request) throws CorruptDataException, ProccessingException{
     	Employee employee =null;
     	Shift shift =null;
 
@@ -374,7 +379,7 @@ public class CompatibilityController {
     		to.setEmployeeId(employee.getId());
     	}
     	
-    	to.setBooleanResponse(employeeShiftManager.getShiftsForEmployeeForWeekBefore(employee.getId(),shift).size()>0);
+    	to.setBooleanResponse(employeeShiftManager.getAssignedShiftsForEmployeeForWeekBeforeShift(employee.getId(),shift).size()>0);
 
     	return to;
     }

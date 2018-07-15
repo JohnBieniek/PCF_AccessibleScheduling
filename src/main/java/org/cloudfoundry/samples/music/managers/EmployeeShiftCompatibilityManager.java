@@ -15,6 +15,7 @@ import accessiblesolutions.accessiblescheduling.domain.Client;
 import accessiblesolutions.accessiblescheduling.domain.Employee;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
+import accessiblesolutions.accessiblescheduling.util.Util;
 import accessiblesolutions.accessiblescheduling.worker.ShiftWorker;
 
 @Component
@@ -26,7 +27,7 @@ public class EmployeeShiftCompatibilityManager {
     private CrudRepository<Employee, String> employeeRepository;
     
     @Autowired
-    EmployeeShiftManager employeeShiftManager;
+    public EmployeeShiftManager employeeShiftManager;
     
     @Autowired
     EmployeeClientCompatibilityManager employeeClientCompatibilityManager;
@@ -68,7 +69,7 @@ public class EmployeeShiftCompatibilityManager {
 		return isAssignableFor(employee,shift);
 	}
     
-    public Employee getEmployeeWithMostTimeBeforeOvertimeAfterAssignment(EmployeeShiftCompatibilities compatibilities) throws CorruptDataException {
+    public Employee getEmployeeWithMostTimeBeforeOvertimeAfterAssignment(EmployeeShiftCompatibilities compatibilities) throws CorruptDataException, ProccessingException {
     	//System.out.println("Getting the employee with the most time for " + compatibilities.compatibilities.get(0).getShift().toString());
 		Employee employee = null;
 		float time = 0;
@@ -78,8 +79,8 @@ public class EmployeeShiftCompatibilityManager {
 			System.out.println(compatibility.getEmployee().getFirst() + " has "+ timeUntilOvertimeForShift + " hours available per week");
 			System.out.println(compatibility.getShift().getDuration() + " is the length of "+compatibility.getShift().toString());
 			timeUntilOvertimeForShift-=compatibility.getShift().getDuration();
-			System.out.println(compatibility.getEmployee().getFirst() + " is scheduled" +getHoursScheduledWeekOf(compatibility.getEmployee(),compatibility.getShift()) + " the week of shift " + compatibility.getShift().toString());
-			timeUntilOvertimeForShift-=getHoursScheduledWeekOf(compatibility.getEmployee(),compatibility.getShift());
+			System.out.println(compatibility.getEmployee().getFirst() + " is scheduled" +getHoursScheduledWeekOfShift(compatibility.getEmployee(),compatibility.getShift()) + " the week of shift " + compatibility.getShift().toString());
+			timeUntilOvertimeForShift-=getHoursScheduledWeekOfShift(compatibility.getEmployee(),compatibility.getShift());
 			System.out.println(compatibility.getEmployee().getFirst() + " would have "+ timeUntilOvertimeForShift + " time till overtime");
 			if(timeUntilOvertimeForShift>time && !getAssignmentWouldViolateAlternateWeekendsOff(compatibility)){
 				System.out.println(compatibility.getEmployee().getFirst() + " at "+timeUntilOvertimeForShift+" has more time till overtime than anyone "+employee + " at " + time);
@@ -209,7 +210,7 @@ public class EmployeeShiftCompatibilityManager {
 		
 		return resting;
 	}
-	public Employee getEmployeeWithMostTime(EmployeeShiftCompatibilities compatibilities) throws CorruptDataException {
+	public Employee getEmployeeWithMostTime(EmployeeShiftCompatibilities compatibilities) throws CorruptDataException, ProccessingException {
     	Employee employee = null;
 		float time = 0;
 		
@@ -277,30 +278,57 @@ public class EmployeeShiftCompatibilityManager {
 		return violatesMaxWeeklyWorkDays;
 	}
 	
-	public boolean getAssignmentWouldIncurOvertime(EmployeeShiftCompatibility compatibility) throws CorruptDataException {
-		Employee employee = compatibility.getEmployee();
-		Shift shift = compatibility.getShift();
+	/** Would assigning this employee this shift would put them over their maximum requested hours for the week?
+	 * 
+	 * @param compatibility An employee and shift for consideration in assignment
+	 * @return boolean Assigning this employee this shift would put them over their maximum requested hours for the week
+	 * @throws ProccessingException Coding failure, null employee,shift or compatibility
+	 * @throws CorruptDataException The Shift provided is invalid
+	 * @Tested
+	 */
+	public boolean getAssignmentWouldIncurOvertime(EmployeeShiftCompatibility compatibility) throws CorruptDataException, ProccessingException {
+		boolean incursOvertime;
 		
-		return getHoursScheduledWeekOf(employee,shift)+shift.getDuration()>employee.getMaxHours();
+		if(null!=compatibility) {
+			Employee employee = compatibility.getEmployee();
+			Shift shift = compatibility.getShift();
+			
+			if(null!=shift && null!=employee) {
+				if(shift.isValid()) {
+					incursOvertime=getHoursScheduledWeekOfShift(employee,shift)+shift.getDuration()>employee.getMaxHours();
+				}
+				else{
+					throw new CorruptDataException("Invalid shift provided in getAssignmentWouldIncurOvertime");
+				}
+			}
+			else {
+				throw new ProccessingException("Null Shift or Employee provided for assesment to getAssignmentWouldIncurOvertim");
+			}
+		}
+		else {
+			throw new ProccessingException("Null EmployeeShiftCompatibility provided for assesment to getAssignmentWouldIncurOvertim");
+		}
+		
+		return incursOvertime;
 	}
 	
-	public float getHoursAfterAssignment(EmployeeShiftCompatibility compatibility) throws CorruptDataException {
+	public float getHoursAfterAssignment(EmployeeShiftCompatibility compatibility) throws CorruptDataException, ProccessingException {
 		return hoursNeededWeekOf(compatibility.getEmployee(),compatibility.getShift())-compatibility.getShift().getDuration()<0?0:hoursNeededWeekOf(compatibility.getEmployee(),compatibility.getShift())-compatibility.getShift().getDuration();
 	}
 	
-	public float getHoursNeededAfterAssignment(EmployeeShiftCompatibility compatibility) throws CorruptDataException {
+	public float getHoursNeededAfterAssignment(EmployeeShiftCompatibility compatibility) throws CorruptDataException, ProccessingException {
 		return hoursNeededWeekOf(compatibility.getEmployee(),compatibility.getShift())-compatibility.getShift().getDuration()<0?0:hoursNeededWeekOf(compatibility.getEmployee(),compatibility.getShift())-compatibility.getShift().getDuration();
 	}
 
-	public boolean getAssignmentWouldReachMinimum(EmployeeShiftCompatibility compatibility) throws CorruptDataException {
+	public boolean getAssignmentWouldReachMinimum(EmployeeShiftCompatibility compatibility) throws CorruptDataException, ProccessingException {
 		return compatibility.getShift().getDuration()>=getHoursNeeded(compatibility);
 	}
 	
-	public float getHoursNeeded(EmployeeShiftCompatibility compatibility) throws CorruptDataException {
+	public float getHoursNeeded(EmployeeShiftCompatibility compatibility) throws CorruptDataException, ProccessingException {
 		return hoursNeededWeekOf(compatibility.getEmployee(),compatibility.getShift());
 	}
 	
-	public Employee getEmployeeWithMostTimeAfterAssignment(EmployeeShiftCompatibilities compatibilties) throws CorruptDataException {
+	public Employee getEmployeeWithMostTimeAfterAssignment(EmployeeShiftCompatibilities compatibilties) throws CorruptDataException, ProccessingException {
 		Employee employee = null;
 		float time = 0;
 		
@@ -314,7 +342,7 @@ public class EmployeeShiftCompatibilityManager {
 		
 		return employee;
 	}
-	public float getEmployeeWithMostTimeAfterAssignmentsTimeAfterAssignment(EmployeeShiftCompatibilities compatibilities) throws CorruptDataException{
+	public float getEmployeeWithMostTimeAfterAssignmentsTimeAfterAssignment(EmployeeShiftCompatibilities compatibilities) throws CorruptDataException, ProccessingException{
 		float time = 0;
 		
 		for(EmployeeShiftCompatibility compatibility :compatibilities.compatibilities){
@@ -426,19 +454,19 @@ public class EmployeeShiftCompatibilityManager {
     	
     }
     
-	public float hoursAvailable(Employee employee,Shift shift) throws CorruptDataException{
-		float hoursScheduled = getHoursScheduledWeekOf(employee,shift);
+	public float hoursAvailable(Employee employee,Shift shift) throws CorruptDataException, ProccessingException{
+		float hoursScheduled = getHoursScheduledWeekOfShift(employee,shift);
 		
 		return (hoursScheduled>employee.getMaxHours()) ? 0 : (employee.getMaxHours()-hoursScheduled);
 	}
-	public float hoursAvailableAfterAssignment(Employee employee,Shift shift) throws CorruptDataException{
-		float hoursScheduled = getHoursScheduledWeekOf(employee,shift);
+	public float hoursAvailableAfterAssignment(Employee employee,Shift shift) throws CorruptDataException, ProccessingException{
+		float hoursScheduled = getHoursScheduledWeekOfShift(employee,shift);
 		
 		return (hoursScheduled+shift.getDuration()>employee.getMaxHours()) ? 0 : (employee.getMaxHours()-hoursScheduled-shift.getDuration());
 	}
 		
-	public float hoursNeededWeekOf(Employee employee,Shift shift) throws CorruptDataException{
-		float hoursScheduled = getHoursScheduledWeekOf(employee,shift);
+	public float hoursNeededWeekOf(Employee employee,Shift shift) throws CorruptDataException, ProccessingException{
+		float hoursScheduled = getHoursScheduledWeekOfShift(employee,shift);
 		
 		return (hoursScheduled>employee.getMinHours()) ? 0 : (employee.getMinHours()-hoursScheduled);
 	}
@@ -561,19 +589,39 @@ public class EmployeeShiftCompatibilityManager {
 		return true;
 	}
 	
-	public float getHoursScheduledWeekOf(Employee employee,Shift shift) throws CorruptDataException{
-		float hours = 80;
+	 
+	/** Returns the number of hours scheduled the week of the start date for the provided Shift.
+	 * 
+	 * @param employee
+	 * @param shift
+	 * @return float hours
+	 * @throws ProccessingException Coding failure, null employee or shift
+	 * @throws CorruptDataException The Shift provided is invalid
+	 * @Tested
+	 */
+	public float getHoursScheduledWeekOfShift(Employee employee,Shift shift) throws ProccessingException, CorruptDataException{
+		float hours = 200;
+		
 		if(null!=employee && null !=shift){
-			hours= 0;
-			ArrayList<Shift> shiftsForWeek = null;
-			shiftsForWeek = employeeShiftManager.getAssignedShiftsForEmployeeForWeekOfShift(employee.getId(), shift);
-			
-			if(null!=shiftsForWeek){
-				for(Shift scheduledShift : shiftsForWeek){
-					hours+= scheduledShift.getDuration();
+			if(shift.isValid()) {
+				int week = Util.getWeekOfDate(shift.getStartDate());
+				
+				try {
+					System.out.println("getting hours");
+					hours = employeeShiftManager.getHoursScheduledWeekOfMonth(employee,week,shift.getStartMonth());
+					System.out.println("got "+hours+" hours");
+				} catch (CorruptDataException e) {
+					throw new ProccessingException(e);
 				}
 			}
+			else {
+				throw new CorruptDataException("Shift is invalid when trying to get hours schedule for week of shift");
+			}
 		}
+		else {
+			throw new ProccessingException("Cannot get hours scheduled for a null employee or shift");
+		}
+		
 		return hours;
 	}
 }
