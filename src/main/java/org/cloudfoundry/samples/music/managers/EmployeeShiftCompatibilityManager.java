@@ -465,10 +465,20 @@ public class EmployeeShiftCompatibilityManager {
 		return (hoursScheduled+shift.getDuration()>employee.getMaxHours()) ? 0 : (employee.getMaxHours()-hoursScheduled-shift.getDuration());
 	}
 		
+	/**Return the number of hours below minimum the provided employee is for the week of this shift
+	 * 
+	 * @param employee 
+	 * @param shift A fully formed shift that returns true with shift.isValid
+	 * @return float number of hours below minimum
+	 * @throws ProccessingException Coding failure, null employee or shift
+	 * @throws CorruptDataException The Shift provided is invalid
+	 * @Tested
+	 */
 	public float hoursNeededWeekOf(Employee employee,Shift shift) throws CorruptDataException, ProccessingException{
 		float hoursScheduled = getHoursScheduledWeekOfShift(employee,shift);
+		float hoursNeeded = (hoursScheduled>employee.getMinHours()) ? 0 : (employee.getMinHours()-hoursScheduled);
 		
-		return (hoursScheduled>employee.getMinHours()) ? 0 : (employee.getMinHours()-hoursScheduled);
+		return hoursNeeded;
 	}
 	
 	public boolean isAssignableFor(Employee employee,Shift shift) throws CorruptDataException, ProccessingException{
