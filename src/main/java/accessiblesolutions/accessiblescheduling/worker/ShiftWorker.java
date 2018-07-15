@@ -505,6 +505,8 @@ public final class ShiftWorker {
 	}
 
 	/**Return if the provided times are within 30 minutes of overlapping.
+	 * e.g. A shift could end at 12:30 with the next at 1:00 and those are not almost overlapping
+	 * e.g. A shift could not end at 1:00 and start at 1:29 as they are almost overlapping
 	 * 
 	 * @param start1 LocalDateTime The start of shift 1
 	 * @param end1 LocalDateTime The end of shift 1
@@ -512,6 +514,7 @@ public final class ShiftWorker {
 	 * @param end2 LocalDateTime The end of shift 2
 	 * @return boolean If the shifts times are within 30 minutes of overlapping
 	 * @throws ProccessingException Null time provided
+	 * @Tested
 	 */
 	public static boolean isAlmostOverlapping(LocalDateTime start1, LocalDateTime end1, LocalDateTime start2, LocalDateTime end2) throws ProccessingException {
 		boolean overlapping = false;
@@ -519,42 +522,27 @@ public final class ShiftWorker {
 		if(null==start1 || null==end1 || null==start2 ||null==end2) {
 			throw new ProccessingException("Null time provided to isAlmostOverlapping");
 		}
-		System.out.println(start1+"-"+end1+" & "+start2 +"-"+end2);
 		
-		overlapping = start1.isBefore(end2.plusMinutes(29)) && end1.isAfter(start2.minusMinutes(29));
-//		int minutes = start1.getMinute();
-//		
-//		if(minutes<30){
-//			int hour = start1.getHour();
-//			if(hour==0){
-//				minutes = minutes+30;
-//				hour=23;
-//				start1=start1.withHour(hour).withMinute(minutes).minusDays(1);
-//			}
-//		}
-//		else{
-//			start1=start1.minusMinutes(30);
-//		}
-//		
-//		if(minutes>30){
-//			int hour = start1.getHour();
-//			if(hour==23){
-//				minutes = minutes-30;
-//				hour=0;
-//				start1=start1.withHour(hour).withMinute(minutes).plusDays(1);
-//			}
-//		}
-//		else{
-//			start1=start1.minusMinutes(30);
-//		}
-//		overlapping = start1.isBefore(end2) && end1.isAfter(start2);
+		overlapping = start1.isBefore(end2.plusMinutes(30)) && end1.isAfter(start2.minusMinutes(30));
 		
 		return overlapping;
 	}
 
     
+	/**Return if the provided times are within 30 minutes of overlapping.
+	 * e.g. A shift could end at 12:30 with the next at 1:00 and those are not almost overlapping
+	 * e.g. A shift could not end at 1:00 and start at 1:29 as they are almost overlapping
+	 * 
+	 * @param baseShift 
+	 * @param comparingShift
+	 * @return boolean If the shifts times are within 30 minutes of overlapping
+	 * @throws ProccessingException Null time provided
+	 * @throws CorruptDataException No StartsLocalDateTime and EndsLocalDateTime provided in shifts
+	 * @Tested
+	 */
     public static boolean isAlmostOverlapping(Shift baseShift, Shift comparingShift) throws CorruptDataException, ProccessingException {
-		if(null==baseShift||null==comparingShift)return false;
+		if(null==baseShift||null==comparingShift)throw new ProccessingException("Null shift provided to isAlmostOverlapping");
+		
 		if(null!=baseShift.getClientId() && (baseShift.getClientId().equals(comparingShift.getClientId()))){
 			return Util.isOverlapping(
 				baseShift.getStartsLocalDateTime(),
