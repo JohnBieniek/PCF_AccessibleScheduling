@@ -662,7 +662,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	}
 	
 	@Test
-	public void hoursAvailableWeekOfShiftReturnsFloatWhenUnderHours() {
+	public void hoursAvailableWeekOfShiftReturnsFloatWhenUnderMaxHours() {
 	    Employee assignedOneDay = new Employee("Assigned","OneDay");
 	    assignedOneDay.setId("assignedOneDay");
 	    assignedOneDay.setMinHours(40);
@@ -691,8 +691,9 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	}
 	
 	@Test
-	public void hoursAvailableWeekOfShiftReturns0WhenMinMet() {
+	public void hoursAvailableWeekOfShiftReturns0WhenMaxMet() {
 	    Employee assignedOneDay = new Employee("Assigned","OneDay");
+	    assignedOneDay.setMaxHours(1);
 	    assignedOneDay.setId("assignedOneDay");
 	    Shift assignedOneDayShift1 = new Shift();
 	    assignedOneDayShift1.setStaffId("assignedOneDay");
@@ -715,6 +716,115 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		}
 		
 		assertFalse(exception);
-		assertTrue(hours==4.0);
+		assertTrue(hours==0.0);
+	}
+	
+	@Test
+	public void hoursAvailableAfterAssignmentThrowsProccessingExceptionWithNullEmployee() {
+		Shift shift = new Shift();
+		boolean exception=false;
+		
+		try {
+			fixture.hoursAvailableAfterAssignment(null,shift);
+		} catch (CorruptDataException e) {
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			exception=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void hoursAvailableAfterAssignmentThrowsProccessingExceptionWithNullShift() {
+		Employee employee = new Employee();
+		boolean exception=false;
+		
+		try {
+			fixture.hoursAvailableAfterAssignment(employee,null);
+		} catch (CorruptDataException e) {
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			exception=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void hoursAvailableAfterAssignmentThrowsCorruptDataExceptionWithInvalidShift() {
+		Employee employee = new Employee();
+		Shift shift = new Shift();
+		boolean exception=false;
+		
+		try {
+			fixture.hoursAvailableAfterAssignment(employee,shift);
+		} catch (CorruptDataException e) {
+			exception=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			e.printStackTrace();
+		}
+		
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void hoursAvailableAfterAssignmentReturnsFloatWhenUnderHours() {
+	    Employee assignedOneDay = new Employee("Assigned","OneDay");
+	    assignedOneDay.setId("assignedOneDay");
+	    assignedOneDay.setMinHours(40);
+	    Shift assignedOneDayShift1 = new Shift();
+	    assignedOneDayShift1.setStaffId("assignedOneDay");
+	    assignedOneDayShift1.setClientId("assignedOneDayClient");
+	    assignedOneDayShift1.setStartDate("2018-04-01");
+	    assignedOneDayShift1.setEndDate("2018-04-01");
+	    assignedOneDayShift1.setStartMonth(4);
+	    assignedOneDayShift1.setStartTime("02:00");
+	    assignedOneDayShift1.setEndTime("04:00");
+		boolean exception=false;
+		float hours=0;
+		try {
+			hours = fixture.hoursAvailableAfterAssignment(assignedOneDay,assignedOneDayShift1);
+		} catch (CorruptDataException e) {
+			exception=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			exception=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(exception);
+		assertTrue(hours==2.0);
+	}
+	
+	@Test
+	public void hoursAvailableAfterAssignmentReturns0WhenMaxMet() {
+	    Employee assignedOneDay = new Employee("Assigned","OneDay");
+	    assignedOneDay.setId("assignedOneDay");
+	    Shift assignedOneDayShift1 = new Shift();
+	    assignedOneDayShift1.setStaffId("assignedOneDay");
+	    assignedOneDayShift1.setClientId("assignedOneDayClient");
+	    assignedOneDayShift1.setStartDate("2018-04-01");
+	    assignedOneDayShift1.setEndDate("2018-04-01");
+	    assignedOneDayShift1.setStartMonth(4);
+	    assignedOneDayShift1.setStartTime("02:00");
+	    assignedOneDayShift1.setEndTime("10:00");
+		boolean exception=false;
+		float hours=0;
+		try {
+			hours = fixture.hoursAvailableAfterAssignment(assignedOneDay,assignedOneDayShift1);
+		} catch (CorruptDataException e) {
+			exception=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			exception=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(exception);
+		assertTrue(hours==0.0);
 	}
 }
