@@ -529,9 +529,10 @@ public final class ShiftWorker {
 	}
 
     
-	/**Return if the provided times are within 30 minutes of overlapping.
+	/**Return if the provided times are within 30 minutes of overlapping for different clients. 
+	 * Shifts with the same client cannot overlap.
 	 * e.g. A shift could end at 12:30 with the next at 1:00 and those are not almost overlapping
-	 * e.g. A shift could not end at 1:00 and start at 1:29 as they are almost overlapping
+	 * e.g. Shifts with differing clients could not end at 1:00 and start at 1:29 as they are almost overlapping
 	 * 
 	 * @param baseShift 
 	 * @param comparingShift

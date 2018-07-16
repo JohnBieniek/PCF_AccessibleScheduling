@@ -91,6 +91,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	    when(employeeCrud.findOne("offOnce")).thenReturn(offOnce);
 
 	    Employee assignedOneDay = new Employee("Assigned","OneDay");
+	    assignedOneDay.setId("assignedOneDay");
 	    ArrayList<Shift> assignedOneDayShifts = new ArrayList<Shift>();
 	    Shift assignedOneDayShift1 = new Shift();
 	    assignedOneDayShift1.setStaffId("assignedOneDay");
@@ -826,5 +827,199 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		
 		assertFalse(exception);
 		assertTrue(hours==0.0);
+	}
+	
+	@Test
+	public void isUnassignedForThrowsProccessingExceptionForNullEmployee() {
+		Shift shift = new Shift();
+		boolean errored=false;
+		
+		try {
+			fixture.isUnassignedFor(null, shift);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void isUnassignedForThrowsProccessingExceptionForNullShift() {
+		Employee employee = new Employee();
+		boolean errored=false;
+		
+		try {
+			fixture.isUnassignedFor(employee,null);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void isUnassignedForThrowsCorruptDataExceptionForInvalidShift() {
+		Employee employee = new Employee();
+		Shift shift = new Shift();
+		boolean errored=false;
+		
+		try {
+			fixture.isUnassignedFor(employee,shift);
+		} catch (ProccessingException e) {
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void isUnassignedForReturnsTrueForShiftlessEmployee() {
+		Employee assignedOneDay = new Employee("Assigned","OneDay");
+		assignedOneDay.setId("assignedOneDay");
+		 Shift inOvertimeShift1 = new Shift();
+		    inOvertimeShift1.setStaffId("inOvertime");
+		    inOvertimeShift1.setClientId("inOvertimeClient");
+		    inOvertimeShift1.setStartDate("2018-07-01");
+		    inOvertimeShift1.setEndDate("2018-07-01");
+		    inOvertimeShift1.setStartTime("10:00");
+		    inOvertimeShift1.setEndTime("20:00");
+		    inOvertimeShift1.setStartMonth(7);
+		boolean errored=false;
+		boolean unassigned = false;
+		try {
+			unassigned = fixture.isUnassignedFor(assignedOneDay,inOvertimeShift1);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(unassigned);
+	}
+	
+	@Test
+	public void isUnassignedForReturnsTrueForAlternateClientAfter30Minutes() {
+		Employee assignedOneDay = new Employee("In","Overtime");
+		assignedOneDay.setId("inOvertime");
+		 Shift inOvertimeShift1 = new Shift();
+		    inOvertimeShift1.setStaffId("inOvertime");
+		    inOvertimeShift1.setClientId("inOvertimeClient2");
+		    inOvertimeShift1.setStartDate("2018-07-01");
+		    inOvertimeShift1.setEndDate("2018-07-01");
+		    inOvertimeShift1.setStartTime("20:30");
+		    inOvertimeShift1.setEndTime("22:00");
+		    inOvertimeShift1.setStartMonth(7);
+		boolean errored=false;
+		boolean unassigned = false;
+		try {
+			unassigned = fixture.isUnassignedFor(assignedOneDay,inOvertimeShift1);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(unassigned);
+	}
+	
+	@Test
+	public void isUnassignedForReturnsFalseForOverlappingShift() {
+		Employee assignedOneDay = new Employee("In","Overtime");
+		assignedOneDay.setId("inOvertime");
+		 Shift inOvertimeShift1 = new Shift();
+		    inOvertimeShift1.setStaffId("inOvertime");
+		    inOvertimeShift1.setClientId("inOvertimeClient");
+		    inOvertimeShift1.setStartDate("2018-07-01");
+		    inOvertimeShift1.setEndDate("2018-07-01");
+		    inOvertimeShift1.setStartTime("10:00");
+		    inOvertimeShift1.setEndTime("20:00");
+		    inOvertimeShift1.setStartMonth(7);
+		boolean errored=false;
+		boolean unassigned = false;
+		try {
+			unassigned = fixture.isUnassignedFor(assignedOneDay,inOvertimeShift1);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertFalse(unassigned);
+	}
+	
+	@Test
+	public void isUnassignedForReturnsFalseForAlmostOverlappingShift() {
+		Employee assignedOneDay = new Employee("In","Overtime");
+		assignedOneDay.setId("inOvertime");
+		 Shift inOvertimeShift1 = new Shift();
+		    inOvertimeShift1.setStaffId("inOvertime");
+		    inOvertimeShift1.setClientId("inOvertimeClient2");
+		    inOvertimeShift1.setStartDate("2018-07-01");
+		    inOvertimeShift1.setEndDate("2018-07-01");
+		    inOvertimeShift1.setStartTime("20:29");
+		    inOvertimeShift1.setEndTime("22:00");
+		    inOvertimeShift1.setStartMonth(7);
+		boolean errored=false;
+		boolean unassigned = false;
+		try {
+			unassigned = fixture.isUnassignedFor(assignedOneDay,inOvertimeShift1);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertFalse(unassigned);
+	}
+	
+	@Test
+	public void isUnassignedForReturnsTrueForAlmostOverlappingShiftOfSameClient() {
+		Employee assignedOneDay = new Employee("In","Overtime");
+		assignedOneDay.setId("inOvertime");
+		 Shift inOvertimeShift1 = new Shift();
+		    inOvertimeShift1.setStaffId("inOvertime");
+		    inOvertimeShift1.setClientId("inOvertimeClient");
+		    inOvertimeShift1.setStartDate("2018-07-01");
+		    inOvertimeShift1.setEndDate("2018-07-01");
+		    inOvertimeShift1.setStartTime("20:29");
+		    inOvertimeShift1.setEndTime("22:00");
+		    inOvertimeShift1.setStartMonth(7);
+		boolean errored=false;
+		boolean unassigned = false;
+		try {
+			unassigned = fixture.isUnassignedFor(assignedOneDay,inOvertimeShift1);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(unassigned);
 	}
 }

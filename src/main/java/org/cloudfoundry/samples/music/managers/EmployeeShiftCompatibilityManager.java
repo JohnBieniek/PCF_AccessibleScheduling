@@ -520,9 +520,26 @@ public class EmployeeShiftCompatibilityManager {
     	return true;//Ya ran the gauntlet
     }
 	
-	public boolean isUnassignedFor(Employee employee, Shift shift) throws CorruptDataException, ProccessingException{
+	/** Returns if the employee has no shift currently scheduled at the same time as the selected shift and
+	 * if the employee has no shift scheduled with different clients within 29 minutes of each other.
+	 * 
+	 * @param employee
+	 * @param shift a valid shift
+	 * @return boolean  if the employee has no shift currently scheduled at the same time
+	 * @throws CorruptDataException invalid shift
+	 * @throws ProccessingException null employee or shift
+	 * @Tested
+	 */
+	public boolean isUnassignedFor(Employee employee, Shift shift) throws ProccessingException, CorruptDataException{
 		boolean unassigned= true;
-
+		
+		if(null==employee||null==shift) {
+			throw new ProccessingException("Null employee or shift provided to isUnassignedFor");
+		}
+		else if(!shift.isValid()) {
+			throw new CorruptDataException("Invalid shift provided to isUnassignedFor");
+		}
+		
 		ArrayList<Shift> shiftsForWeek = employeeShiftManager.getAssignedShiftsForEmployeeForWeekOfShift(employee.getId(), shift);
     	
 		for(Shift scheduledShift : shiftsForWeek){
