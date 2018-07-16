@@ -1183,4 +1183,135 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		assertNotNull(compatibilities);
 		assertTrue(compatibilities.compatibilities.size()==0);
 	}
+	
+	@Test
+	public void getHoursNeededThrowsProccessingExceptionWithNullCompatibility() {
+		boolean exception=false;
+		
+		try {
+			fixture.getHoursNeeded(null);
+		} catch (CorruptDataException e) {
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			exception=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getHoursNeededThrowsProccessingExceptionWithNullEmployee() {
+		Shift shift = new Shift();
+		
+		boolean exception=false;
+		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(null,shift);
+		try {
+			fixture.getHoursNeeded(compatibility);
+		} catch (CorruptDataException e) {
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			exception=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getHoursNeededThrowsProccessingExceptionWithNullShift() {
+		Employee employee = new Employee();
+		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,null);
+		boolean exception=false;
+		
+		try {
+			fixture.getHoursNeeded(compatibility);
+		} catch (CorruptDataException e) {
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			exception=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getHoursNeededThrowsCorruptDataExceptionWithInvalidShift() {
+		Employee employee = new Employee();
+		Shift shift = new Shift();
+		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,shift);
+		boolean exception=false;
+		
+		try {
+			fixture.getHoursNeeded(compatibility);
+		} catch (CorruptDataException e) {
+			exception=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			e.printStackTrace();
+		}
+		
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getHoursNeededReturnsFloatWhenUnderHours() {
+	    Employee assignedOneDay = new Employee("Assigned","OneDay");
+	    assignedOneDay.setId("assignedOneDay");
+	    assignedOneDay.setMinHours(40);
+	    Shift assignedOneDayShift1 = new Shift();
+	    assignedOneDayShift1.setStaffId("assignedOneDay");
+	    assignedOneDayShift1.setClientId("assignedOneDayClient");
+	    assignedOneDayShift1.setStartDate("2018-04-01");
+	    assignedOneDayShift1.setEndDate("2018-04-01");
+	    assignedOneDayShift1.setStartMonth(4);
+	    assignedOneDayShift1.setStartTime("02:00");
+	    assignedOneDayShift1.setEndTime("10:00");
+	    EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(assignedOneDay,assignedOneDayShift1);
+		boolean exception=false;
+		float hours=0;
+		try {
+			hours = fixture.getHoursNeeded(compatibility);
+		} catch (CorruptDataException e) {
+			exception=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			exception=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(exception);
+		assertTrue(hours==4.0);
+	}
+	
+	@Test
+	public void getHoursNeededReturns0WhenMinMet() {
+	    Employee assignedOneDay = new Employee("Assigned","OneDay");
+	    assignedOneDay.setId("assignedOneDay");
+	    Shift assignedOneDayShift1 = new Shift();
+	    assignedOneDayShift1.setStaffId("assignedOneDay");
+	    assignedOneDayShift1.setClientId("assignedOneDayClient");
+	    assignedOneDayShift1.setStartDate("2018-04-01");
+	    assignedOneDayShift1.setEndDate("2018-04-01");
+	    assignedOneDayShift1.setStartMonth(4);
+	    assignedOneDayShift1.setStartTime("02:00");
+	    assignedOneDayShift1.setEndTime("10:00");
+	    EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(assignedOneDay,assignedOneDayShift1);
+
+		boolean exception=false;
+		float hours=0;
+		try {
+			hours = fixture.getHoursNeeded(compatibility);
+		} catch (CorruptDataException e) {
+			exception=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			exception=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(exception);
+		assertTrue(hours==0.0);
+	}
 }
