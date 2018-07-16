@@ -348,7 +348,20 @@ public class EmployeeShiftCompatibilityManager {
 		return compatibility.getShift().getDuration()>=getHoursNeeded(compatibility);
 	}
 	
+	/**Return the number of hours below minimum the provided employee is for the week of this shift
+	 * 
+	 * @param EmployeeShiftCompatibility An employee, shift, and client for consideration
+	 * @return float number of hours below minimum
+	 * @throws ProccessingException Coding failure, null employee or shift
+	 * @throws CorruptDataException The Shift provided is invalid
+	 * @Tested
+	 */
 	public float getHoursNeeded(EmployeeShiftCompatibility compatibility) throws CorruptDataException, ProccessingException {
+		if(null==compatibility) {
+			throw new ProccessingException("Null EmployeeShiftCompatibility provided for assesment to getHoursNeeded");
+
+		}
+		
 		return hoursNeededWeekOfShift(compatibility.getEmployee(),compatibility.getShift());
 	}
 	
