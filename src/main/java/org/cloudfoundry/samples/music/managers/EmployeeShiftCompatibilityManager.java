@@ -51,12 +51,36 @@ public class EmployeeShiftCompatibilityManager {
     	return new EmployeeShiftCompatibilities(validCompatibilities);
     }
 
-    public EmployeeShiftCompatibilities getEmployeeShiftCompatibilitiesFor(Shift shift) {
+    /**Returns an EmployeeShiftCompatibility for every employee and the provided shift and the shifts client.
+     * A null client is provided for all event shifts.
+     * Returns Empty when no employees exist
+     * 
+     * @param shift a valid non-event shift 
+     * @return EmployeeShiftCompatibilities An EmployeeShiftCompatibility for every employee and the provided shift
+     * @throws ProccessingException null shift
+     * @throws CorruptDataException invalid shift
+     * @Tested
+     */
+    public EmployeeShiftCompatibilities getEmployeeShiftCompatibilitiesForShift(Shift shift) throws ProccessingException, CorruptDataException {
+    	if(null==shift) {
+    		throw new ProccessingException("Null Shift provided for assesment to getEmployeeShiftCompatibilitiesForShift");
+    	}
+    	else if(!shift.isValid()) {
+    		throw new CorruptDataException("Invalid Shift provided for assesment to getEmployeeShiftCompatibilitiesForShift");
+    	}
+    	
 		ArrayList<EmployeeShiftCompatibility> compatibility = new ArrayList<EmployeeShiftCompatibility>();
-		
+		Client client = null;
 		ArrayList<Employee> employees = (ArrayList<Employee>) employeeRepository.findAll();
-		for(Employee employee : employees){
-			compatibility.add(new EmployeeShiftCompatibility(employee,shift,clientRepository.findOne(shift.getClientId())));
+
+		if(!shift.getEvent()) {
+			client = clientRepository.findOne(shift.getClientId());
+		}
+
+		if(null!=employees) {
+			for(Employee employee : employees){
+				compatibility.add(new EmployeeShiftCompatibility(employee,shift,client));
+			}
 		}
 		
 		return new EmployeeShiftCompatibilities(compatibility);
