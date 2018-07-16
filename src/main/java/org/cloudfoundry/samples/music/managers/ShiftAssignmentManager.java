@@ -141,7 +141,7 @@ public class ShiftAssignmentManager {
 		int possible = 9001;
 		Shift selected = null;
 		for(Shift shift : unassignedShiftsForWeekends){
-			EmployeeShiftCompatibilities compatibilities = employeeShiftCompatibilityManager.getValidUnfixedCompatibilities(employeeShiftCompatibilityManager.getEmployeeShiftCompatibilitiesFor(shift));
+			EmployeeShiftCompatibilities compatibilities = employeeShiftCompatibilityManager.getValidUnfixedCompatibilities(employeeShiftCompatibilityManager.getEmployeeShiftCompatibilitiesForShift(shift));
 			if(compatibilities.compatibilities.size()<possible&&compatibilities.compatibilities.size()>0){
 				possible=compatibilities.compatibilities.size();
 				selected=shift;
@@ -157,7 +157,7 @@ public class ShiftAssignmentManager {
 		int possible = 9001;
 		Shift selected = null;
 		for(Shift shift : unassignedShiftsForWeekdays){
-			EmployeeShiftCompatibilities compatibilities = employeeShiftCompatibilityManager.getValidUnfixedCompatibilities(employeeShiftCompatibilityManager.getEmployeeShiftCompatibilitiesFor(shift));
+			EmployeeShiftCompatibilities compatibilities = employeeShiftCompatibilityManager.getValidUnfixedCompatibilities(employeeShiftCompatibilityManager.getEmployeeShiftCompatibilitiesForShift(shift));
 			if(compatibilities.compatibilities.size()<possible&&compatibilities.compatibilities.size()>0){
 				possible=compatibilities.compatibilities.size();
 				selected=shift;
@@ -193,7 +193,7 @@ public class ShiftAssignmentManager {
     		result+="Attempting to assign "+shift.toString();
     	
 			System.out.println("Attempitng to assign " + shift.toString());
-			EmployeeShiftCompatibilities shiftCompatibilities = employeeShiftCompatibilityManager.getValidUnfixedCompatibilities(employeeShiftCompatibilityManager.getEmployeeShiftCompatibilitiesFor(shift));
+			EmployeeShiftCompatibilities shiftCompatibilities = employeeShiftCompatibilityManager.getValidUnfixedCompatibilities(employeeShiftCompatibilityManager.getEmployeeShiftCompatibilitiesForShift(shift));
 			result+=". Shift compatibilities: "+ shiftCompatibilities.toString();
 			Employee employee=null;
 			//attemptAssigningOnlyCompatibility
@@ -300,7 +300,7 @@ public class ShiftAssignmentManager {
     	if(null!=shift){
     		result+="Attempting to assign " +shift.toString();
     		System.out.println("Attempitng to assign " + shift.toString());
-			EmployeeShiftCompatibilities shiftCompatibilities = employeeShiftCompatibilityManager.getValidUnfixedCompatibilities(employeeShiftCompatibilityManager.getEmployeeShiftCompatibilitiesFor(shift));
+			EmployeeShiftCompatibilities shiftCompatibilities = employeeShiftCompatibilityManager.getValidUnfixedCompatibilities(employeeShiftCompatibilityManager.getEmployeeShiftCompatibilitiesForShift(shift));
 			result+=shiftCompatibilities.compatibilities.toString();
 			Employee employee=null;
 			//attemptAssigningOnlyCompatibility

@@ -1,6 +1,8 @@
 package managers;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
@@ -28,6 +30,7 @@ import org.springframework.data.repository.CrudRepository;
 
 import accessiblesolutions.accessiblescheduling.domain.Client;
 import accessiblesolutions.accessiblescheduling.domain.Employee;
+import accessiblesolutions.accessiblescheduling.domain.EmployeeShiftCompatibilities;
 import accessiblesolutions.accessiblescheduling.domain.EmployeeShiftCompatibility;
 import accessiblesolutions.accessiblescheduling.domain.Shift;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
@@ -149,12 +152,17 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	    inOvertimeShift1.setStartMonth(7);
 	    ArrayList<Shift> inOvertimeShifts = new ArrayList<Shift>();
 		inOvertimeShifts.add(inOvertimeShift1);
-		
 	    when(shiftRepository.findByStartMonth(7)).thenReturn(inOvertimeShifts);
 	    
+	    ArrayList<Employee> employees = new ArrayList<Employee>();
+		employees.add(inOvertime);
+		Iterable<Employee> itterable = employees;
+		when(employeeCrud.findAll()).thenReturn(itterable);
+		when(clientRepository.findOne("inOvertimeClient")).thenReturn(new Client());
+		
 	    EmployeeShiftManager customEmployeeShiftManager = new EmployeeShiftManager(employeeCrud, shiftRepository);
 	    customEmployeeShiftManager.shiftRepository=shiftRepository;
-	    
+	    when(employeeCrud.findAll()).thenReturn(itterable);
 	     fixture= new EmployeeShiftCompatibilityManager(clientRepository, employeeCrud);
 	     fixture.employeeShiftManager=customEmployeeShiftManager;
 	}
@@ -1021,5 +1029,158 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		
 		assertFalse(errored);
 		assertTrue(unassigned);
+	}
+	
+	@Test
+	public void getEmployeeShiftCompatibilitiesForShiftNullShiftThrowsProccessingException() {
+		boolean exception = false;
+		
+		try {
+			fixture.getEmployeeShiftCompatibilitiesForShift(null);
+		} catch (ProccessingException e) {
+			exception=true;
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			e.printStackTrace();
+		}
+		
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getEmployeeShiftCompatibilitiesForShiftInvalidShiftThrowsCorruptDataException() {
+		boolean exception = false;
+		
+		try {
+			fixture.getEmployeeShiftCompatibilitiesForShift(new Shift());
+		} catch (ProccessingException e) {
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			exception=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getEmployeeShiftCompatibilitiesForShiftReturnsContentForAllEmployees() {
+		boolean exception = false;
+		
+		Shift inOvertimeShift1 = new Shift();
+	    inOvertimeShift1.setStaffId("inOvertime");
+	    inOvertimeShift1.setClientId("inOvertimeClient");
+	    inOvertimeShift1.setStartDate("2018-07-01");
+	    inOvertimeShift1.setEndDate("2018-07-01");
+	    inOvertimeShift1.setStartTime("10:00");
+	    inOvertimeShift1.setEndTime("20:00");
+	    inOvertimeShift1.setStartMonth(7);
+	    EmployeeShiftCompatibilities compatibilities=null;
+		try {
+			compatibilities = fixture.getEmployeeShiftCompatibilitiesForShift(inOvertimeShift1);
+		} catch (ProccessingException e) {
+			exception=true;
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			exception=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(exception);
+		assertNotNull(compatibilities);
+		assertTrue(compatibilities.compatibilities.size()==1);
+	}
+	
+	@Test
+	public void getEmployeeShiftCompatibilitiesForShiftReturnsClientInfo() {
+		boolean exception = false;
+		
+		Shift inOvertimeShift1 = new Shift();
+	    inOvertimeShift1.setStaffId("inOvertime");
+	    inOvertimeShift1.setClientId("inOvertimeClient");
+	    inOvertimeShift1.setStartDate("2018-07-01");
+	    inOvertimeShift1.setEndDate("2018-07-01");
+	    inOvertimeShift1.setStartTime("10:00");
+	    inOvertimeShift1.setEndTime("20:00");
+	    inOvertimeShift1.setStartMonth(7);
+	    EmployeeShiftCompatibilities compatibilities=null;
+		try {
+			compatibilities = fixture.getEmployeeShiftCompatibilitiesForShift(inOvertimeShift1);
+		} catch (ProccessingException e) {
+			exception=true;
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			exception=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(exception);
+		assertNotNull(compatibilities);
+		assertNotNull(compatibilities.compatibilities.get(0));
+		assertNotNull(compatibilities.compatibilities.get(0).client);
+	}
+	
+	@Test
+	public void getEmployeeShiftCompatibilitiesForShiftReturnsNoClientInfoForEvents() {
+		boolean exception = false;
+		
+		Shift inOvertimeShift1 = new Shift();
+		inOvertimeShift1.setEvent(true);
+	    inOvertimeShift1.setStaffId("inOvertime");
+	    inOvertimeShift1.setClientId("inOvertimeClient");
+	    inOvertimeShift1.setStartDate("2018-07-01");
+	    inOvertimeShift1.setEndDate("2018-07-01");
+	    inOvertimeShift1.setStartTime("10:00");
+	    inOvertimeShift1.setEndTime("20:00");
+	    inOvertimeShift1.setStartMonth(7);
+	    EmployeeShiftCompatibilities compatibilities=null;
+		try {
+			compatibilities = fixture.getEmployeeShiftCompatibilitiesForShift(inOvertimeShift1);
+		} catch (ProccessingException e) {
+			exception=true;
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			exception=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(exception);
+		assertNotNull(compatibilities);
+		assertNotNull(compatibilities.compatibilities.get(0));
+		assertNull(compatibilities.compatibilities.get(0).client);
+	}
+	
+	@Test
+	public void getEmployeeShiftCompatibilitiesForShiftReturnsEmptyForNoEmployees() {
+		EmployeeShiftManager customEmployeeShiftManager = new EmployeeShiftManager(employeeCrud, shiftRepository);
+	    customEmployeeShiftManager.shiftRepository=shiftRepository;
+	    when(employeeCrud.findAll()).thenReturn(null);
+	     fixture= new EmployeeShiftCompatibilityManager(clientRepository, employeeCrud);
+	     fixture.employeeShiftManager=customEmployeeShiftManager;
+	     
+		boolean exception = false;
+		
+		Shift inOvertimeShift1 = new Shift();
+	    inOvertimeShift1.setStaffId("inOvertime");
+	    inOvertimeShift1.setClientId("inOvertimeClient");
+	    inOvertimeShift1.setStartDate("2018-07-01");
+	    inOvertimeShift1.setEndDate("2018-07-01");
+	    inOvertimeShift1.setStartTime("10:00");
+	    inOvertimeShift1.setEndTime("20:00");
+	    inOvertimeShift1.setStartMonth(7);
+	    EmployeeShiftCompatibilities compatibilities=null;
+		try {
+			compatibilities = fixture.getEmployeeShiftCompatibilitiesForShift(inOvertimeShift1);
+		} catch (ProccessingException e) {
+			exception=true;
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			exception=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(exception);
+		assertNotNull(compatibilities);
+		assertTrue(compatibilities.compatibilities.size()==0);
 	}
 }
