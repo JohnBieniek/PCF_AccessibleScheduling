@@ -51,9 +51,13 @@ public class EmployeeShiftManager {
     /**If the shift in question starts saturday night and ends sunday info for the week of saturday is returned.
      * Does not return shifts for previous weeks that run into this week.
   	 * Weeks are 0 indexed starting with week 0.
-  	 * 
-  	 * @Tested
-  	 */
+     * 
+     * @param employeeId The unique identified of an employee in DB
+     * @param shift a valid shift
+     * @return ArrayList<Shift> Assigned shifts for employee for week
+     * @throws CorruptDataException when a shift has a malformed or missing start week
+     * @Tested
+     */
   	public ArrayList<Shift> getAssignedShiftsForEmployeeForWeekOfShift(String employeeId, Shift shift) throws CorruptDataException{
   		ArrayList<Shift> assignedShiftsForEmployee = new ArrayList<Shift>();
   		
