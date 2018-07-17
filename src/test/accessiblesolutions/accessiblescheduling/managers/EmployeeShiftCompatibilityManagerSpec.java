@@ -1415,4 +1415,136 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		assertFalse(exception);
 		assertTrue(hours==4.0);
 	}
+	
+
+	@Test
+	public void getAssignmentWouldReachMinimumThrowsProccessingExceptionWithNullCompatibility() {
+		boolean exception=false;
+		
+		try {
+			fixture.getAssignmentWouldReachMinimum(null);
+		} catch (CorruptDataException e) {
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			exception=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getAssignmentWouldReachMinimumThrowsProccessingExceptionWithNullEmployee() {
+		Shift shift = new Shift();
+		
+		boolean exception=false;
+		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(null,shift);
+		try {
+			fixture.getAssignmentWouldReachMinimum(compatibility);
+		} catch (CorruptDataException e) {
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			exception=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getAssignmentWouldReachMinimumThrowsProccessingExceptionWithNullShift() {
+		Employee employee = new Employee();
+		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,null);
+		boolean exception=false;
+		
+		try {
+			fixture.getAssignmentWouldReachMinimum(compatibility);
+		} catch (CorruptDataException e) {
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			exception=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getAssignmentWouldReachMinimumThrowsCorruptDataExceptionWithInvalidShift() {
+		Employee employee = new Employee();
+		Shift shift = new Shift();
+		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,shift);
+		boolean exception=false;
+		
+		try {
+			fixture.getAssignmentWouldReachMinimum(compatibility);
+		} catch (CorruptDataException e) {
+			exception=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			e.printStackTrace();
+		}
+		
+		assertTrue(exception);
+	}
+	
+	@Test
+	public void getAssignmentWouldReachMinimumReturnsFalseWhenUnderHours() {
+	    Employee assignedOneDay = new Employee("Assigned","OneDay");
+	    assignedOneDay.setId("assignedOneDay");
+	    assignedOneDay.setMinHours(40);
+	    Shift assignedOneDayShift1 = new Shift();
+	    assignedOneDayShift1.setStaffId("assignedOneDay");
+	    assignedOneDayShift1.setClientId("assignedOneDayClient");
+	    assignedOneDayShift1.setStartDate("2018-04-01");
+	    assignedOneDayShift1.setEndDate("2018-04-01");
+	    assignedOneDayShift1.setStartMonth(4);
+	    assignedOneDayShift1.setStartTime("02:00");
+	    assignedOneDayShift1.setEndTime("04:00");
+	    EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(assignedOneDay,assignedOneDayShift1);
+		boolean exception=false;
+		boolean minReached=true;
+		try {
+			minReached = fixture.getAssignmentWouldReachMinimum(compatibility);
+		} catch (CorruptDataException e) {
+			exception=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			exception=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(exception);
+		assertFalse(minReached);
+	}
+	
+	@Test
+	public void getAssignmentWouldReachMinimumReturnsTrueWhenMinMet() {
+	    Employee assignedOneDay = new Employee("Assigned","OneDay");
+	    assignedOneDay.setId("assignedOneDay");
+	    Shift assignedOneDayShift1 = new Shift();
+	    assignedOneDayShift1.setStaffId("assignedOneDay");
+	    assignedOneDayShift1.setClientId("assignedOneDayClient");
+	    assignedOneDayShift1.setStartDate("2018-04-01");
+	    assignedOneDayShift1.setEndDate("2018-04-01");
+	    assignedOneDayShift1.setStartMonth(4);
+	    assignedOneDayShift1.setStartTime("02:00");
+	    assignedOneDayShift1.setEndTime("10:00");
+	    EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(assignedOneDay,assignedOneDayShift1);
+
+		boolean exception=false;
+		boolean minReached = false;
+		try {
+			minReached = fixture.getAssignmentWouldReachMinimum(compatibility);
+		} catch (CorruptDataException e) {
+			exception=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			exception=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(exception);
+		assertTrue(minReached);
+	}
 }

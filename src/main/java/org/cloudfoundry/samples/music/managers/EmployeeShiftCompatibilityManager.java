@@ -355,8 +355,24 @@ public class EmployeeShiftCompatibilityManager {
 		return hoursNeededWeekOfShift(compatibility.getEmployee(),compatibility.getShift())-compatibility.getShift().getDuration()<0?0:hoursNeededWeekOfShift(compatibility.getEmployee(),compatibility.getShift())-compatibility.getShift().getDuration();
 	}
 
+	/**Return if the employee would reach their minimum requested
+	 * hours if they were to be assigned the provided shift
+	 * 
+	 * @param EmployeeShiftCompatibility An employee, shift, and client for consideration
+	 * @return boolean the employee would satisfy their minimum hour request if assigned this shift
+	 * @throws ProccessingException Coding failure, null employee,shift or compatibility
+	 * @throws CorruptDataException The Shift provided is invalid
+	 * @Tested
+	 */
 	public boolean getAssignmentWouldReachMinimum(EmployeeShiftCompatibility compatibility) throws CorruptDataException, ProccessingException {
-		return compatibility.getShift().getDuration()>=getHoursNeeded(compatibility);
+		if(null==compatibility || null == compatibility.getShift() || null == compatibility.getEmployee()) {
+			throw new ProccessingException("Null EmployeeShiftCompatibility , Shift, or Employee provided for assesment to getAssignmentWouldReachMinimum");
+		}
+		else if(!compatibility.getShift().isValid()) {
+			throw new CorruptDataException("Shift is invalid when trying to getAssignmentWouldReachMinimum");
+		}
+		
+		return getHoursNeededAfterAssignment(compatibility)==0;
 	}
 	
 	/**Return the number of hours below minimum the provided employee is for the week of this shift
