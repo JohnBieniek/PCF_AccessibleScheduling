@@ -336,11 +336,22 @@ public class EmployeeShiftCompatibilityManager {
 		return incursOvertime;
 	}
 	
-	public float getHoursAfterAssignment(EmployeeShiftCompatibility compatibility) throws CorruptDataException, ProccessingException {
-		return hoursNeededWeekOfShift(compatibility.getEmployee(),compatibility.getShift())-compatibility.getShift().getDuration()<0?0:hoursNeededWeekOfShift(compatibility.getEmployee(),compatibility.getShift())-compatibility.getShift().getDuration();
-	}
-	
+	/**Return the number of hours below minimum the provided employee is for the week of this shift
+	 * minus the duration of the provided shift. This is how many hours the employee would still need
+	 * to reach their minimum requested hours if they were to be assigned the provided shift.
+	 * 
+	 * @param EmployeeShiftCompatibility An employee, shift, and client for consideration
+	 * @return number of hours below minimum the employee would be the week 
+	 * 		   of the shift if they were to be assigned it
+	 * @throws ProccessingException Coding failure, null employee,shift or compatibility
+	 * @throws CorruptDataException The Shift provided is invalid
+	 * @Tested
+	 */
 	public float getHoursNeededAfterAssignment(EmployeeShiftCompatibility compatibility) throws CorruptDataException, ProccessingException {
+		if(null==compatibility || null == compatibility.getShift() || null == compatibility.getEmployee()) {
+			throw new ProccessingException("Null EmployeeShiftCompatibility , Shift, or Employee provided for assesment to getHoursNeededAfterAssignment");
+		}
+		
 		return hoursNeededWeekOfShift(compatibility.getEmployee(),compatibility.getShift())-compatibility.getShift().getDuration()<0?0:hoursNeededWeekOfShift(compatibility.getEmployee(),compatibility.getShift())-compatibility.getShift().getDuration();
 	}
 
@@ -352,14 +363,13 @@ public class EmployeeShiftCompatibilityManager {
 	 * 
 	 * @param EmployeeShiftCompatibility An employee, shift, and client for consideration
 	 * @return float number of hours below minimum
-	 * @throws ProccessingException Coding failure, null employee or shift
+	 * @throws ProccessingException Coding failure, null employee,shift or compatibility
 	 * @throws CorruptDataException The Shift provided is invalid
 	 * @Tested
 	 */
 	public float getHoursNeeded(EmployeeShiftCompatibility compatibility) throws CorruptDataException, ProccessingException {
 		if(null==compatibility) {
 			throw new ProccessingException("Null EmployeeShiftCompatibility provided for assesment to getHoursNeeded");
-
 		}
 		
 		return hoursNeededWeekOfShift(compatibility.getEmployee(),compatibility.getShift());
