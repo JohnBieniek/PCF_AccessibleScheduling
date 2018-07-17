@@ -88,7 +88,7 @@ public class EmployeeShiftManager {
 				}
 			}
 		}
-		System.out.println("got "+assignedShiftsForEmployeeForMonth.size()+ " shifts");
+		System.out.println("got "+assignedShiftsForEmployeeForMonth.size()+ " shifts for "+employeeId + " week:"+week);
 		return assignedShiftsForEmployeeForWeekOfMonth;
 	}
   	
