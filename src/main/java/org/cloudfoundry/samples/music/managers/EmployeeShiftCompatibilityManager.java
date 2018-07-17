@@ -219,7 +219,7 @@ public class EmployeeShiftCompatibilityManager {
 		return violatesAlternateWeekendsOff;
 	}
 	
-	public boolean getResting(EmployeeShiftCompatibility compatibility) throws CorruptDataException{
+	public boolean getResting(EmployeeShiftCompatibility compatibility) throws CorruptDataException, ProccessingException{
 		boolean resting = false;
 		
 		if(getAssignmentWouldViolateMaxShiftsPerDay(compatibility)){
@@ -249,17 +249,42 @@ public class EmployeeShiftCompatibilityManager {
 		return employee;
 	}
 	
-	public boolean getAssignmentWouldViolateMaxShiftsPerDay(EmployeeShiftCompatibility compatibility){
-		Employee employee = compatibility.getEmployee();
-		Shift shift = compatibility.getShift();
+	/**Return if assignment would violate max shifts per day
+	 * 
+	 * @param EmployeeShiftCompatibility An employee, shift, and client for consideration
+	 * @return boolean if assignment would violate max shifts per day
+	 * @throws ProccessingException Coding failure, null employee,shift or compatibility
+	 * @throws CorruptDataException The Shift provided is invalid
+	 * @Tested
+	 */
+	public boolean getAssignmentWouldViolateMaxShiftsPerDay(EmployeeShiftCompatibility compatibility) throws CorruptDataException, ProccessingException{
+		boolean violatesMaxShiftsPerDay = true;
 		
-		ArrayList<Shift> shiftsForDay =employeeShiftManager.getAssignedShiftsForEmployeeForDayOfMonth(employee.getId(), shift.getStartDay(), shift.getStartMonth());
-		
-		if(shiftsForDay.size()>=MAX_SHIFTS_PER_DAY){
-			return true;
+		if(null!=compatibility) {
+			Employee employee = compatibility.getEmployee();
+			Shift shift = compatibility.getShift();
+			
+			if(null!=shift && null!=employee) {
+				if(shift.isValid()) {
+					ArrayList<Shift> shiftsForDay =employeeShiftManager.getAssignedShiftsForEmployeeForDayOfMonth(employee.getId(), shift.getStartDay(), shift.getStartMonth());
+					
+					if(!(shiftsForDay.size()>=MAX_SHIFTS_PER_DAY)){
+						violatesMaxShiftsPerDay=false;
+					}
+				}
+				else{
+					throw new CorruptDataException("Invalid shift provided in getAssignmentWouldViolateMaxShiftsPerDay");
+				}
+			}
+			else {
+				throw new ProccessingException("Null Shift or Employee provided for assesment to getAssignmentWouldViolateMaxShiftsPerDay");
+			}
+		}
+		else {
+			throw new ProccessingException("Null EmployeeShiftCompatibility provided for assesment to getAssignmentWouldViolateMaxShiftsPerDay");
 		}
 		
-		return false;
+		return violatesMaxShiftsPerDay;
 	}
 	
 	public boolean getAssignmentWouldViolateMaxWeeklyWorkDays(EmployeeShiftCompatibility compatibility) throws CorruptDataException{
@@ -355,8 +380,24 @@ public class EmployeeShiftCompatibilityManager {
 		return hoursNeededWeekOfShift(compatibility.getEmployee(),compatibility.getShift())-compatibility.getShift().getDuration()<0?0:hoursNeededWeekOfShift(compatibility.getEmployee(),compatibility.getShift())-compatibility.getShift().getDuration();
 	}
 
+	/**Return if the employee would reach their minimum requested
+	 * hours if they were to be assigned the provided shift
+	 * 
+	 * @param EmployeeShiftCompatibility An employee, shift, and client for consideration
+	 * @return boolean the employee would satisfy their minimum hour request if assigned this shift
+	 * @throws ProccessingException Coding failure, null employee,shift or compatibility
+	 * @throws CorruptDataException The Shift provided is invalid
+	 * @Tested
+	 */
 	public boolean getAssignmentWouldReachMinimum(EmployeeShiftCompatibility compatibility) throws CorruptDataException, ProccessingException {
-		return compatibility.getShift().getDuration()>=getHoursNeeded(compatibility);
+		if(null==compatibility || null == compatibility.getShift() || null == compatibility.getEmployee()) {
+			throw new ProccessingException("Null EmployeeShiftCompatibility , Shift, or Employee provided for assesment to getAssignmentWouldReachMinimum");
+		}
+		else if(!compatibility.getShift().isValid()) {
+			throw new CorruptDataException("Shift is invalid when trying to getAssignmentWouldReachMinimum");
+		}
+		
+		return getHoursNeededAfterAssignment(compatibility)==0;
 	}
 	
 	/**Return the number of hours below minimum the provided employee is for the week of this shift
