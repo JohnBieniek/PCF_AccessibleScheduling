@@ -287,41 +287,84 @@ public class EmployeeShiftCompatibilityManager {
 		return violatesMaxShiftsPerDay;
 	}
 	
-	public boolean getAssignmentWouldViolateMaxWeeklyWorkDays(EmployeeShiftCompatibility compatibility) throws CorruptDataException{
+	/** Returns if assignment would violate max weekly work days rules.
+	 * 
+	 * @param EmployeeShiftCompatibility An employee, shift, and client for consideration
+	 * @return boolean if assignment would violate max work days per week
+	 * @throws CorruptDataException The Shift provided is invalid
+	 * @throws ProccessingException Coding failure, null employee,shift or compatibility
+	 * @Tested
+	 */
+	public boolean getAssignmentWouldViolateMaxWeeklyWorkDays(EmployeeShiftCompatibility compatibility) throws CorruptDataException, ProccessingException{
 		boolean violatesMaxWeeklyWorkDays = false;
-		int daysWorked = 0;
 		
-		Employee employee = compatibility.getEmployee();
-		Shift shift = compatibility.getShift();
-		
-		ArrayList<Shift> shiftsForWeek =employeeShiftManager.getAssignedShiftsForEmployeeForWeekOfMonth(employee.getId(), shift.getStartDay(), shift.getStartMonth());
-		
-		ArrayList<Boolean> workedDays = new ArrayList<Boolean>();
-		for(int i =0;i<7;i++){
-			workedDays.add(false);
-		}
+		if(null!=compatibility) {
+			Employee employee = compatibility.getEmployee();
+			Shift shift = compatibility.getShift();
+			
+			if(null!=shift && null!=employee) {
+				if(shift.isValid()) {
+					int daysWorked = 0;
+					
+					ArrayList<Shift> shiftsForWeek =employeeShiftManager.getAssignedShiftsForEmployeeForWeekOfMonth(employee.getId(), shift.getStartWeek(), shift.getStartMonth());
 
-		for(Shift selectedShift:shiftsForWeek){
-			int startDay = -1;
-			int endDay = -1;
-			
-			startDay = selectedShift.getStartsLocalDate().getDayOfWeek().getValue() ==7?0:selectedShift.getStartsLocalDate().getDayOfWeek().getValue();
-			workedDays.set(startDay,true);
-			
-			if(selectedShift.getOvernight()){
-				endDay = selectedShift.getEndsLocalDate().getDayOfWeek().getValue() ==7?0:selectedShift.getEndsLocalDate().getDayOfWeek().getValue();
-				workedDays.set(startDay,true);
+					ArrayList<Boolean> workedDays = new ArrayList<Boolean>();
+					for(int i =0;i<7;i++){
+						workedDays.add(false);
+					}
+					
+					int startDay = -1;
+					int endDay = -1;
+					
+					startDay = shift.getStartsLocalDate().getDayOfWeek().getValue() ==7?0:shift.getStartsLocalDate().getDayOfWeek().getValue();
+					
+					workedDays.set(startDay,true);
+					
+					if(shift.getOvernight()){
+						endDay = shift.getEndsLocalDate().getDayOfWeek().getValue() ==7?0:shift.getEndsLocalDate().getDayOfWeek().getValue();
+						workedDays.set(endDay,true);
+					}
+					
+					for(Shift selectedShift:shiftsForWeek){
+						startDay = -1;
+						endDay = -1;
+						
+						startDay = selectedShift.getStartsLocalDate().getDayOfWeek().getValue() ==7?0:selectedShift.getStartsLocalDate().getDayOfWeek().getValue();
+						
+						if(!workedDays.contains(startDay)) {
+							workedDays.set(startDay,true);
+						}
+						
+						
+						if(selectedShift.getOvernight()){
+							endDay = selectedShift.getEndsLocalDate().getDayOfWeek().getValue() ==7?0:selectedShift.getEndsLocalDate().getDayOfWeek().getValue();
+							
+							if(!workedDays.contains(endDay)) {
+								workedDays.set(endDay,true);
+							}
+						}
+					}
+					
+					for(Boolean day: workedDays){
+						if(day){
+							daysWorked++;
+						}
+					}
+					System.out.println("days worked"+daysWorked);
+					if(daysWorked>MAX_WEEKLY_WORK_DAYS){
+						violatesMaxWeeklyWorkDays=true;
+					}
+				}
+				else{
+					throw new CorruptDataException("Invalid shift provided in getAssignmentWouldViolateMaxWeeklyWorkDays");
+				}
+			}
+			else {
+				throw new ProccessingException("Null Shift or Employee provided for assesment to getAssignmentWouldViolateMaxWeeklyWorkDays");
 			}
 		}
-		
-		for(Boolean day: workedDays){
-			if(day){
-				daysWorked++;
-			}
-		}
-		
-		if(daysWorked>=MAX_WEEKLY_WORK_DAYS){
-			violatesMaxWeeklyWorkDays=true;
+		else {
+			throw new ProccessingException("Null EmployeeShiftCompatibility provided for assesment to getAssignmentWouldViolateMaxWeeklyWorkDays");
 		}
 		
 		return violatesMaxWeeklyWorkDays;

@@ -160,6 +160,59 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		when(employeeCrud.findAll()).thenReturn(itterable);
 		when(clientRepository.findOne("inOvertimeClient")).thenReturn(new Client());
 		
+		Employee assignedFiveDay = new Employee("Assigned","FiveDay");
+	    assignedFiveDay.setId("assignedFiveDay");
+	    ArrayList<Shift> assignedFiveDayShifts = new ArrayList<Shift>();
+	    Shift assignedFiveDayShift1 = new Shift();
+	    assignedFiveDayShift1.setStaffId("assignedFiveDay");
+	    assignedFiveDayShift1.setStartDate("2018-02-05");
+	    assignedFiveDayShift1.setEndDate("2018-02-05");
+	    assignedFiveDayShift1.setStartTime("02:00");
+	    assignedFiveDayShift1.setEndTime("10:00");
+	    assignedFiveDayShift1.setStartMonth(2);
+	    
+	    Shift assignedFiveDayShift2 = new Shift();
+	    assignedFiveDayShift2.setStaffId("assignedFiveDay");
+	    assignedFiveDayShift2.setStartDate("2018-02-06");
+	    assignedFiveDayShift2.setEndDate("2018-02-06");
+	    assignedFiveDayShift2.setStartTime("02:00");
+	    assignedFiveDayShift2.setEndTime("18:00");
+	    assignedFiveDayShift2.setStartMonth(2);
+	    
+	    Shift assignedFiveDayShift3 = new Shift();
+	    assignedFiveDayShift3.setStaffId("assignedFiveDay");
+	    assignedFiveDayShift3.setStartDate("2018-02-07");
+	    assignedFiveDayShift3.setEndDate("2018-02-07");
+	    assignedFiveDayShift3.setStartTime("02:00");
+	    assignedFiveDayShift3.setEndTime("10:00");
+	    assignedFiveDayShift3.setStartMonth(2);
+	    
+	    Shift assignedFiveDayShift4 = new Shift();
+	    assignedFiveDayShift4.setStaffId("assignedFiveDay");
+	    assignedFiveDayShift4.setStartDate("2018-02-08");
+	    assignedFiveDayShift4.setEndDate("2018-02-08");
+	    assignedFiveDayShift4.setStartTime("02:00");
+	    assignedFiveDayShift4.setEndTime("10:00");
+	    assignedFiveDayShift4.setStartMonth(2);
+	    
+	    Shift assignedFiveDayShift5 = new Shift();
+	    assignedFiveDayShift5.setStaffId("assignedFiveDay");
+	    assignedFiveDayShift5.setStartDate("2018-02-09");
+	    assignedFiveDayShift5.setEndDate("2018-02-09");
+	    assignedFiveDayShift5.setStartTime("02:00");
+	    assignedFiveDayShift5.setEndTime("10:00");
+	    assignedFiveDayShift5.setStartMonth(2);
+	    
+	    assignedFiveDayShifts.add(assignedFiveDayShift1);
+	    assignedFiveDayShifts.add(assignedFiveDayShift2);
+	    assignedFiveDayShifts.add(assignedFiveDayShift3);
+	    assignedFiveDayShifts.add(assignedFiveDayShift4);
+	    assignedFiveDayShifts.add(assignedFiveDayShift5);
+	    
+	    when(shiftRepository.findByStartMonth(2)).thenReturn(assignedFiveDayShifts);
+	    when(employeeCrud.findOne("assignedFiveDay")).thenReturn(assignedFiveDay);
+	    when(employeeRepository.findOne("assignedFiveDay")).thenReturn(assignedFiveDay);
+	    
 	    EmployeeShiftManager customEmployeeShiftManager = new EmployeeShiftManager(employeeCrud, shiftRepository);
 	    customEmployeeShiftManager.shiftRepository=shiftRepository;
 	    when(employeeCrud.findAll()).thenReturn(itterable);
@@ -1677,5 +1730,168 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		
 		assertFalse(errored);
 		assertTrue(violates);
+	}
+	
+
+	@Test
+	public void getAssignmentWouldViolateMaxWeeklyWorkDaysReturnsProccessingExceptionWithNullCompatibility() {
+		boolean errored=false;
+		
+		try {
+			fixture.getAssignmentWouldViolateMaxWeeklyWorkDays(null);
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void getAssignmentWouldViolateMaxWeeklyWorkDaysReturnsProccessingExceptionWithNullEmployee() {
+		boolean errored=false;
+		Employee employee = new Employee();
+		Shift shift = new Shift();
+		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(null,shift);
+		try {
+			fixture.getAssignmentWouldViolateMaxWeeklyWorkDays(compatibility);
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void getAssignmentWouldViolateMaxWeeklyWorkDaysReturnsProccessingExceptionWithNullShift() {
+		boolean errored=false;
+		Employee employee = new Employee();
+		Shift shift = new Shift();
+		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,null);
+		try {
+			fixture.getAssignmentWouldViolateMaxWeeklyWorkDays(compatibility);
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void getAssignmentWouldViolateMaxWeeklyWorkDaysReturnsCorruptDataExceptionWithInvalidShift() {
+		boolean errored=false;
+		Employee employee = new Employee();
+		Shift shift = new Shift();
+		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,shift);
+		try {
+			fixture.getAssignmentWouldViolateMaxWeeklyWorkDays(compatibility);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void getAssignmentWouldViolateMaxWeeklyWorkDaysReturnsFalseUnderMax() {
+		boolean errored=false;
+	    Employee assignedOneDay = new Employee("Assigned","OneDay");
+	    assignedOneDay.setId("assignedOneDay");
+	    Shift assignedOneDayShift1 = new Shift();
+	    assignedOneDayShift1.setStaffId("assignedOneDay");
+	    assignedOneDayShift1.setClientId("assignedOneDayClient");
+	    assignedOneDayShift1.setStartDate("2018-04-01");
+	    assignedOneDayShift1.setEndDate("2018-04-01");
+	    assignedOneDayShift1.setStartMonth(4);
+	    assignedOneDayShift1.setStartTime("02:00");
+	    assignedOneDayShift1.setEndTime("10:00");
+	    EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(assignedOneDay,assignedOneDayShift1);
+	    boolean violates =true;
+		try {
+			violates =fixture.getAssignmentWouldViolateMaxWeeklyWorkDays(compatibility);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertFalse(violates);
+	}
+	
+	@Test
+	public void getAssignmentWouldViolateMaxWeeklyWorkDaysReturnsTrueAtMax() {
+		boolean errored=false;
+		Employee assignedFiveDay = new Employee("Assigned","FiveDay");
+	    assignedFiveDay.setId("assignedFiveDay");
+	    Shift assignedFiveDayShift1 = new Shift();
+	    assignedFiveDayShift1.setStaffId("assignedFiveDay");
+	    assignedFiveDayShift1.setClientId("assignedFiveDayClient");
+	    assignedFiveDayShift1.setStartDate("2018-02-10");
+	    assignedFiveDayShift1.setEndDate("2018-02-10");
+	    assignedFiveDayShift1.setStartTime("02:00");
+	    assignedFiveDayShift1.setEndTime("10:00");
+	    assignedFiveDayShift1.setStartMonth(2);
+	    
+	    EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(assignedFiveDay,assignedFiveDayShift1);
+	    boolean violates =true;
+		try {
+			violates =fixture.getAssignmentWouldViolateMaxWeeklyWorkDays(compatibility);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(violates);
+	}
+	
+	@Test
+	public void getAssignmentWouldViolateMaxWeeklyWorkDaysReturnsFalseAtMaxForDuplicateDay() {
+		boolean errored=false;
+		Employee assignedFiveDay = new Employee("Assigned","FiveDay");
+	    assignedFiveDay.setId("assignedFiveDay");
+	    Shift assignedFiveDayShift1 = new Shift();
+	    assignedFiveDayShift1.setStaffId("assignedFiveDay");
+	    assignedFiveDayShift1.setClientId("assignedFiveDayClient2");
+	    assignedFiveDayShift1.setStartDate("2018-02-09");
+	    assignedFiveDayShift1.setEndDate("2018-02-09");
+	    assignedFiveDayShift1.setStartTime("12:00");
+	    assignedFiveDayShift1.setEndTime("22:00");
+	    assignedFiveDayShift1.setStartMonth(2);
+	    
+	    EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(assignedFiveDay,assignedFiveDayShift1);
+	    boolean violates =true;
+		try {
+			violates =fixture.getAssignmentWouldViolateMaxWeeklyWorkDays(compatibility);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertFalse(violates);
 	}
 }
