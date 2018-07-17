@@ -1547,4 +1547,135 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		assertFalse(exception);
 		assertTrue(minReached);
 	}
+	
+	@Test
+	public void getAssignmentWouldViolateMaxShiftsPerDayReturnsProccessingExceptionWithNullCompatibility() {
+		boolean errored=false;
+		
+		try {
+			fixture.getAssignmentWouldViolateMaxShiftsPerDay(null);
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void getAssignmentWouldViolateMaxShiftsPerDayReturnsProccessingExceptionWithNullEmployee() {
+		boolean errored=false;
+		Employee employee = new Employee();
+		Shift shift = new Shift();
+		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(null,shift);
+		try {
+			fixture.getAssignmentWouldViolateMaxShiftsPerDay(compatibility);
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void getAssignmentWouldViolateMaxShiftsPerDayReturnsProccessingExceptionWithNullShift() {
+		boolean errored=false;
+		Employee employee = new Employee();
+		Shift shift = new Shift();
+		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,null);
+		try {
+			fixture.getAssignmentWouldViolateMaxShiftsPerDay(compatibility);
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void getAssignmentWouldViolateMaxShiftsPerDayReturnsCorruptDataExceptionWithInvalidShift() {
+		boolean errored=false;
+		Employee employee = new Employee();
+		Shift shift = new Shift();
+		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,shift);
+		try {
+			fixture.getAssignmentWouldViolateMaxShiftsPerDay(compatibility);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void getAssignmentWouldViolateMaxShiftsPerDayReturnsFalseUnderMax() {
+		boolean errored=false;
+	    Employee assignedOneDay = new Employee("Assigned","OneDay");
+	    assignedOneDay.setId("assignedOneDay");
+	    Shift assignedOneDayShift1 = new Shift();
+	    assignedOneDayShift1.setStaffId("assignedOneDay");
+	    assignedOneDayShift1.setClientId("assignedOneDayClient");
+	    assignedOneDayShift1.setStartDate("2018-04-01");
+	    assignedOneDayShift1.setEndDate("2018-04-01");
+	    assignedOneDayShift1.setStartMonth(4);
+	    assignedOneDayShift1.setStartTime("02:00");
+	    assignedOneDayShift1.setEndTime("10:00");
+	    EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(assignedOneDay,assignedOneDayShift1);
+	    boolean violates =true;
+		try {
+			violates =fixture.getAssignmentWouldViolateMaxShiftsPerDay(compatibility);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertFalse(violates);
+	}
+	
+	@Test
+	public void getAssignmentWouldViolateMaxShiftsPerDayReturnsTrueAtMax() {
+		boolean errored=false;
+	    Employee assignedOneDay = new Employee("Assigned","OneDay");
+	    assignedOneDay.setId("assignedOneDay");
+	    Shift assignedOneDayShift1 = new Shift();
+	    assignedOneDayShift1.setStaffId("assignedOneDay");
+	    assignedOneDayShift1.setClientId("assignedOneDayClient");
+	    assignedOneDayShift1.setStartDate("2018-04-02");
+	    assignedOneDayShift1.setEndDate("2018-04-02");
+	    assignedOneDayShift1.setStartMonth(4);
+	    assignedOneDayShift1.setStartTime("02:00");
+	    assignedOneDayShift1.setEndTime("10:00");
+	    EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(assignedOneDay,assignedOneDayShift1);
+	    boolean violates =true;
+		try {
+			violates =fixture.getAssignmentWouldViolateMaxShiftsPerDay(compatibility);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(violates);
+	}
 }

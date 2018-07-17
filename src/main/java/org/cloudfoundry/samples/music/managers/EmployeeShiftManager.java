@@ -92,8 +92,14 @@ public class EmployeeShiftManager {
 		return assignedShiftsForEmployeeForWeekOfMonth;
 	}
   	
-  	/**Returns and empty list if nothing is found
+  	/**Return ArrayList<Shift> of all assigned shifts for the selected employee 
+  	 * for the given day of the month.
+  	 * Returns and empty list if nothing is found.
   	 * 
+  	 * @param employeeId unique string
+  	 * @param day int 1-31
+  	 * @param month int 1-12
+  	 * @return ArrayList<Shift> Shift
   	 * @Tested
   	 */
   	public ArrayList<Shift> getAssignedShiftsForEmployeeForDayOfMonth(String employeeId, int day, int month){
