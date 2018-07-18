@@ -116,7 +116,7 @@ public class EmployeeShiftCompatibilityManager {
 		return employee;
 	}
     
-	public boolean getCompatible(EmployeeShiftCompatibility compatibility) {
+	public boolean getCompatible(EmployeeShiftCompatibility compatibility) throws ProccessingException {
 		Employee employee = compatibility.getEmployee();
 		Shift shift = compatibility.getShift();
 		
@@ -473,18 +473,6 @@ public class EmployeeShiftCompatibilityManager {
 		
 		return employee;
 	}
-	public float getEmployeeWithMostTimeAfterAssignmentsTimeAfterAssignment(EmployeeShiftCompatibilities compatibilities) throws CorruptDataException, ProccessingException{
-		float time = 0;
-		
-		for(EmployeeShiftCompatibility compatibility :compatibilities.compatibilities){
-			if(getHoursNeededAfterAssignment(compatibility)>time){
-				time=getHoursNeededAfterAssignment(compatibility);
-			}
-		}
-		
-		
-		return time;
-	}
 	
 //    public EmployeeShiftCompatibilities getValidCompatibilities(EmployeeShiftCompatibilities compatibilities){
 //		ArrayList<EmployeeShiftCompatibility> validCompatibilities = new ArrayList<EmployeeShiftCompatibility>();
@@ -570,7 +558,7 @@ public class EmployeeShiftCompatibilityManager {
 		return validity;
 	}
 
-	public boolean isCompatibleWith(Employee employee,Shift shift){
+	public boolean isCompatibleWith(Employee employee,Shift shift) throws ProccessingException{
     	if(!shift.getEvent()){
     		String clientID = shift.getClientId();
 	    	Client client = null;
