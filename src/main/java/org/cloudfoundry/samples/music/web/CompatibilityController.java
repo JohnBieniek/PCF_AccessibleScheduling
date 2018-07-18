@@ -507,7 +507,7 @@ public class CompatibilityController {
     }
     
     @RequestMapping(method = RequestMethod.POST, value= "/compatibility")
-    public @ResponseBody CompatibilityDTO getCompatibility(HttpServletRequest request){
+    public @ResponseBody CompatibilityDTO getCompatibility(HttpServletRequest request) throws ProccessingException{
     	Employee employee =null;
     	Shift shift =null;
 

@@ -1,4 +1,4 @@
-package managers;
+package accessiblesolutions.accessiblescheduling.managers;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
