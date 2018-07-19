@@ -12,6 +12,7 @@ import accessiblesolutions.accessiblescheduling.domain.CustomField;
 import accessiblesolutions.accessiblescheduling.domain.CustomFieldData;
 import accessiblesolutions.accessiblescheduling.domain.Employee;
 import accessiblesolutions.accessiblescheduling.domain.ShiftRequest;
+import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
 
 @Component
 public class CustomDataManager {
@@ -71,34 +72,73 @@ public class CustomDataManager {
     	return orphans;
 	}
     
-    public boolean getCustomFieldData(Employee employee, CustomField customField) {
-		List<CustomFieldData> data= customFieldDataRepository.findByOwnerId(employee.getId());
-		CustomFieldData fieldData=null;
-		if(data.isEmpty()){
-			setCustomFieldData(employee,customField,false);
-			data= customFieldDataRepository.findByOwnerId(employee.getId());
-		}
+    public boolean getCustomFieldData(Object individual, CustomField customField) throws ProccessingException {
+    	String id = null;
+    	
+    	if(null==individual || null ==customField ) {
+    		throw new ProccessingException("Null individual pr customField provided to getCustomFieldDataOrCreateIfMissing");
+    	}
+    	
+    	if(individual.getClass()==Employee.class) {
+    		Employee employee = (Employee) individual;
+    		id = employee.getId();
+    	}
+    	else if(individual.getClass()==Client.class) {
+    		Client client = (Client) individual;
+    		id = client.getId();
+    	}
+    	else {
+    		throw new ProccessingException("Invalid individual provided to getCustomFieldDataOrCreateIfMissing");
+    	}
+    	
+		List<CustomFieldData> data= customFieldDataRepository.findByOwnerId(id);
 		
-		for(CustomFieldData customFieldData : data){
-			if(customFieldData.getCustomFieldId().equals(customField.getId())){
-				fieldData=customFieldData;
+		CustomFieldData fieldData=null;
+		
+		if(null!=data) {
+			for(CustomFieldData customFieldData : data){
+				if(customFieldData.getCustomFieldId().equals(customField.getId())){
+					fieldData=customFieldData;
+				}
 			}
-		}
-
-		if(fieldData==null){
-			setCustomFieldData(employee,customField,false);
 		}
 		
 		return fieldData==null?false:fieldData.getBooleanData();
-	}
-
-	public boolean getClientCustomFieldData(Client client, CustomField customField) {
-		List<CustomFieldData> data= customFieldDataRepository.findByOwnerId(client.getId());
+    }
+    
+    public boolean getCustomFieldDataOrCreateIfMissing(Object individual, CustomField customField) throws ProccessingException {
+    	String id = null;
+    	
+    	if(null==individual) {
+    		throw new ProccessingException("Null individual provided to getCustomFieldDataOrCreateIfMissing");
+    	}
+    	
+    	if(individual.getClass()==Employee.class) {
+    		Employee employee = (Employee) individual;
+    		id = employee.getId();
+    	}
+    	else if(individual.getClass()==Client.class) {
+    		Client client = (Client) individual;
+    		id = client.getId();
+    	}
+    	else {
+    		throw new ProccessingException("Invalid individual provided to getCustomFieldDataOrCreateIfMissing");
+    	}
+    	
+		List<CustomFieldData> data= customFieldDataRepository.findByOwnerId(id);
+		
 		CustomFieldData fieldData=null;
 		if(data.isEmpty()){
-			setClientCustomFieldData(client,customField,false);
-
-			data= customFieldDataRepository.findByOwnerId(client.getId());
+			if(individual.getClass()==Employee.class) {
+	    		Employee employee = (Employee) individual;
+	    		setCustomFieldData(employee,customField,false);
+	    	}
+	    	else if(individual.getClass()==Client.class) {
+	    		Client client = (Client) individual;
+	    		setClientCustomFieldData(client,customField,false);
+	    	}
+			
+			data= customFieldDataRepository.findByOwnerId(id);
 		}
 		
 		for(CustomFieldData customFieldData : data){
@@ -106,10 +146,18 @@ public class CustomDataManager {
 				fieldData=customFieldData;
 			}
 		}
-		
+
 		if(fieldData==null){
-			setClientCustomFieldData(client,customField,false);
+			if(individual.getClass()==Employee.class) {
+	    		Employee employee = (Employee) individual;
+	    		setCustomFieldData(employee,customField,false);
+	    	}
+	    	else if(individual.getClass()==Client.class) {
+	    		Client client = (Client) individual;
+	    		setClientCustomFieldData(client,customField,false);
+	    	}
 		}
+		
 		return fieldData==null?false:fieldData.getBooleanData();
 	}
 
@@ -148,6 +196,13 @@ public class CustomDataManager {
 		return value;
 	}
 
+	/**
+	 * 
+	 * @param employee
+	 * @param customField
+	 * @param value 
+	 * @return boolean of the custom field
+	 */
 	public boolean setCustomFieldData(Employee employee, CustomField customField, boolean value) {
 		List<CustomFieldData> data= customFieldDataRepository.findByOwnerId(employee.getId());
 		boolean dataFound = false;
