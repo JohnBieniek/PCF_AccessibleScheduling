@@ -256,25 +256,6 @@ public class EmployeeClientCompatibilityManagerSpec {
 	}
 	
 	@Test
-	public void isCompatibleWithReturnsTrueForCompatibilePeopleWithNoCustomData() {
-		boolean errored=false;
-		boolean compatible = false;
-		Employee employee = new Employee();
-		Client client = new Client();
-		
-		try {
-			compatible = fixture.isCompatibleWith(new Employee(),client);
-		} catch (ProccessingException e) {
-			errored=true;
-			e.printStackTrace();
-		}
-		
-		assertFalse(errored);
-		assertFalse(employee.getMedPassCertified());
-		assertTrue(compatible);
-	}
-	
-	@Test
 	public void isCompatibleWithReturnsFalseWithMissingMedpass() {
 		boolean errored=false;
 		boolean compatible = false;
@@ -391,25 +372,229 @@ public class EmployeeClientCompatibilityManagerSpec {
 		assertFalse(compatible);
 	}
 
+	@Test
+	public void isCompatibleWithReturnsTrueForCompatibilePeopleWithNoCustomData1() {
+		boolean errored=false;
+		boolean compatible = false;
+		Employee employee = new Employee();
+		Client client = new Client();
+		
+		try {
+			compatible = fixture.isCompatibleWith(new Employee(),client);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertFalse(employee.getMedPassCertified());
+		assertTrue(compatible);
+	}
+	
+	@Test
+	public void isCompatibleWithReturnsTrueForCompatibilePeopleWithNoCustomData2() {
+		boolean errored=false;
+		boolean compatible = false;
+		Employee employee = new Employee();
+		employee.setMedPassCertified(true);
+		Client client = new Client();
+		client.setMedPass(true);
+		try {
+			compatible = fixture.isCompatibleWith(employee,client);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(compatible);
+	}
+	
+	@Test
+	public void isCompatibleWithReturnsTrueForCompatibilePeopleWithNoCustomData3() {
+		boolean errored=false;
+		boolean compatible = false;
+		Employee employee = new Employee();
+		Client client = new Client();
+		client.setNoSmokers(true);
+		
+		try {
+			compatible = fixture.isCompatibleWith(employee,client);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(compatible);
+	}
+	
+	@Test
+	public void isCompatibleWithReturnsTrueForCompatibilePeopleWithNoCustomData4() {
+		boolean errored=false;
+		boolean compatible = false;
+		Employee employee = new Employee();
+		Client client = new Client();
+		client.setNoMale(true);
+		
+		
+		try {
+			compatible = fixture.isCompatibleWith(employee,client);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(compatible);
+	}
+	
+	@Test
+	public void isCompatibleWithReturnsTrueForCompatibilePeopleWithNoCustomData5() {
+		boolean errored=false;
+		boolean compatible = false;
+		Employee employee = new Employee();
+		Client client = new Client();
+		client.setNoMale(true);
+		
+		
+		try {
+			compatible = fixture.isCompatibleWith(employee,client);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(compatible);
+	}
+	
+	@Test
+	public void isCompatibleWithReturnsTrueForCompatibilePeopleWithNoCustomData6() {
+		boolean errored=false;
+		boolean compatible = false;
+		Employee employee = new Employee();
+		employee.setGender(Gender.MALE);
+		Client client = new Client();
+		client.setNoFemale(true);
+		
+		try {
+			compatible = fixture.isCompatibleWith(employee,client);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(compatible);
+	}
+	public void isCompatibleWithReturnsTrueForCompatibilePeopleWithNoCustomData7() {
+		boolean errored=false;
+		boolean compatible = false;
+		Employee employee = new Employee();
+		employee.setNoCats(true);
+		Client client = new Client();
+		
+		try {
+			compatible = fixture.isCompatibleWith(employee,client);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(compatible);
+	}
+	
+	@Test
+	public void isCompatibleWithReturnsTrueForCompatibilePeopleWithNoCustomData8() {
+		boolean errored=false;
+		boolean compatible = false;
+		Employee employee = new Employee();
+		Client client = new Client();
+		client.setOwnCats(true);
+		
+		try {
+			compatible = fixture.isCompatibleWith(employee,client);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(compatible);
+	}
+	
+	@Test
+	public void isCompatibleWithReturnsTrueForCompatibilePeopleWithNoCustomData9() {
+		boolean errored=false;
+		boolean compatible = false;
+		Employee employee = new Employee();
+		employee.setSigning(true);
+		Client client = new Client();
+		client.setSigningOnly(true);	
+		
+		try {
+			compatible = fixture.isCompatibleWith(employee,client);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(compatible);
+	}
+	
+	@Test
+	public void isCompatibleWithReturnsTrueForCompatibilePeopleWithNoCustomData10() {
+		boolean errored=false;
+		boolean compatible = false;
+		Employee employee = new Employee();
+		employee.setSigning(true);
+		Client client = new Client();
+		
+		try {
+			compatible = fixture.isCompatibleWith(employee,client);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(compatible);
+	}
+	
+	//TODO isCompatibleWithReturnsFalseCasesWithCustomFieldData after dependencies tested
 //	@Test
-//	public void isCompatibleWithReturnsTrueCasesWithAlternateSetups() {
+//	public void isCompatibleWithReturnsFalseWithFailingClientRequirement() {
 //		boolean errored=false;
 //		boolean compatible = false;
-//		Employee employee = new Employee();
-//		Client client = new Client();
-//		client.setSigningOnly(true);
+//		
+//		Employee onAlways = new Employee("On","Always");
+//		onAlways.setId("onAlways");
+//		
+//		when(employeeCrud.findOne("onAlways")).thenReturn(onAlways);
+//
+//		Client onAlwaysClient = new Client("On","AlwaysClient");
+//		
+//		CustomField woodField = new CustomField();
+//		woodField.setClientRequirement(true);
+//		
+//		ArrayList<CustomField> customFields = new ArrayList<CustomField>();
+//		customFields.add(woodField);
+//		when(customFieldRepository.findAll()).thenReturn(customFields);
+//		
 //		try {
-//			compatible = fixture.isCompatibleWith(employee,client);
+//			compatible = fixture.isCompatibleWith(onAlways,onAlwaysClient);
 //		} catch (ProccessingException e) {
 //			errored=true;
 //			e.printStackTrace();
 //		}
 //		
 //		assertFalse(errored);
-//		assertFalse(employee.getMedPassCertified());
-//		assertTrue(compatible);
+//		assertFalse(compatible);
 //	}
-//	
+	
 //	@Test
 //	public void isCompatibleWithReturnsTrueCasesWithCustomFieldData() {
 //		boolean errored=false;
@@ -429,22 +614,5 @@ public class EmployeeClientCompatibilityManagerSpec {
 //		assertTrue(compatible);
 //	}
 //	
-//	@Test
-//	public void isCompatibleWithReturnsFalseCasesWithCustomFieldData() {
-//		boolean errored=false;
-//		boolean compatible = false;
-//		Employee employee = new Employee();
-//		Client client = new Client();
-//		client.setSigningOnly(true);
-//		try {
-//			compatible = fixture.isCompatibleWith(employee,client);
-//		} catch (ProccessingException e) {
-//			errored=true;
-//			e.printStackTrace();
-//		}
-//		
-//		assertFalse(errored);
-//		assertFalse(employee.getMedPassCertified());
-//		assertTrue(compatible);
-//	}
+
 }

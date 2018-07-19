@@ -25,10 +25,10 @@ public class EmployeeClientCompatibilityManager {
     }
     
     /**Returns if this employee allowed to work with this client.
-     * Clients with requiring medpass must have employees that are medpass certified.
+     * Clients requiring medpass must have employees that are medpass certified.
      * Clients must have staff of the proper gender.
      * Clients must not be paired with smokers upon request.
-     * Clients must not be paired with employees who have cat allergies.
+     * Clients with cats must not be paired with employees who have cat allergies.
      * Clients must be paired with signing staff when required.
      * Clients and employees must be properly aligned with custom requirements.
      * 
@@ -64,6 +64,7 @@ public class EmployeeClientCompatibilityManager {
     	}
     	
     	Iterable<CustomField> customFields = customFieldRepository.findAll();
+    	
     	if(null!=customFields) {
 	    	for(CustomField customField : customFields){
 	    		boolean clientData = customDataManager.getClientCustomFieldData(client,customField);
