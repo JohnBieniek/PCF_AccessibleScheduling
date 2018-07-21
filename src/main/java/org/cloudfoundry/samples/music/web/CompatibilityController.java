@@ -541,7 +541,7 @@ public class CompatibilityController {
     }
     
     @RequestMapping(method = RequestMethod.POST, value= "/customFieldData")
-    public @ResponseBody EmployeeUpdateTO getCustomFieldData(HttpServletRequest request){
+    public @ResponseBody EmployeeUpdateTO getCustomFieldData(HttpServletRequest request) throws ProccessingException{
     	Employee employee =null;
     	CustomField customField =null;
     	int index = 0;
@@ -568,13 +568,13 @@ public class CompatibilityController {
     		dto.setEmployeeId(employee.getId());
     	}
     	
-    	dto.setBooleanResponse(customDataManager.getCustomFieldData(employee,customField));
+    	dto.setBooleanResponse(customDataManager.getCustomFieldDataOrCreateIfMissing(employee,customField));
     	dto.setNumericResponse(index);
     	return dto;
     }
     
     @RequestMapping(method = RequestMethod.POST, value= "/clientCustomFieldData")
-    public @ResponseBody UpdateTO getClientCustomFieldData(HttpServletRequest request){
+    public @ResponseBody UpdateTO getClientCustomFieldData(HttpServletRequest request) throws ProccessingException{
     	Client client =null;
     	CustomField customField =null;
     	int index = 0;
@@ -601,13 +601,13 @@ public class CompatibilityController {
     		dto.setId(client.getId());
     	}
     	
-    	dto.setBooleanResponse(customDataManager.getClientCustomFieldData(client,customField));
+    	dto.setBooleanResponse(customDataManager.getCustomFieldDataOrCreateIfMissing(client,customField));
     	dto.setNumericResponse(index);
     	return dto;
     }
     
     @RequestMapping(method = RequestMethod.POST, value= "/setClientCustomFieldData")
-    public @ResponseBody UpdateTO setClientCustomFieldData(HttpServletRequest request){
+    public @ResponseBody UpdateTO setClientCustomFieldData(HttpServletRequest request) throws ProccessingException{
     	Client client =null;
     	CustomField customField =null;
     	boolean value = true;
@@ -632,7 +632,7 @@ public class CompatibilityController {
     	
     	if(client!=null){
     		dto.setId(client.getId());
-        	dto.setBooleanResponse(customDataManager.setClientCustomFieldData(client,customField,value));
+        	dto.setBooleanResponse(customDataManager.setCustomFieldData(client,customField,value));
     	}
     	
 
@@ -640,7 +640,7 @@ public class CompatibilityController {
     }
     
     @RequestMapping(method = RequestMethod.POST, value= "/setCustomFieldData")
-    public @ResponseBody UpdateTO setCustomFieldData(HttpServletRequest request){
+    public @ResponseBody UpdateTO setCustomFieldData(HttpServletRequest request) throws ProccessingException{
     	Employee employee =null;
     	CustomField customField =null;
     	boolean value = true;

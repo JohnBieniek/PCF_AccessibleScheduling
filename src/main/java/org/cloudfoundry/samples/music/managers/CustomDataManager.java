@@ -12,6 +12,8 @@ import accessiblesolutions.accessiblescheduling.domain.CustomField;
 import accessiblesolutions.accessiblescheduling.domain.CustomFieldData;
 import accessiblesolutions.accessiblescheduling.domain.Employee;
 import accessiblesolutions.accessiblescheduling.domain.ShiftRequest;
+import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
+import accessiblesolutions.accessiblescheduling.util.Util;
 
 @Component
 public class CustomDataManager {
@@ -71,12 +73,53 @@ public class CustomDataManager {
     	return orphans;
 	}
     
-    public boolean getCustomFieldData(Employee employee, CustomField customField) {
-		List<CustomFieldData> data= customFieldDataRepository.findByOwnerId(employee.getId());
+    public boolean getCustomFieldData(Object individual, CustomField customField) throws ProccessingException {
+    	String id = null;
+    	
+    	if(null==individual || null ==customField ) {
+    		throw new ProccessingException("Null individual pr customField provided to getCustomFieldDataOrCreateIfMissing");
+    	}
+    	
+    	id = Util.getIdFromEmployeeOrClient(individual);
+    	
+		List<CustomFieldData> data= customFieldDataRepository.findByOwnerId(id);
+		
+		CustomFieldData fieldData=null;
+		
+		if(null!=data) {
+			for(CustomFieldData customFieldData : data){
+				if(customFieldData.getCustomFieldId().equals(customField.getId())){
+					fieldData=customFieldData;
+				}
+			}
+		}
+		
+		return fieldData==null?false:fieldData.getBooleanData();
+    }
+    
+    public boolean getCustomFieldDataOrCreateIfMissing(Object individual, CustomField customField) throws ProccessingException {
+    	String id = null;
+    	
+    	if(null==individual) {
+    		throw new ProccessingException("Null individual provided to getCustomFieldDataOrCreateIfMissing");
+    	}
+    	
+    	id = Util.getIdFromEmployeeOrClient(individual);
+    	
+		List<CustomFieldData> data= customFieldDataRepository.findByOwnerId(id);
+		
 		CustomFieldData fieldData=null;
 		if(data.isEmpty()){
-			setCustomFieldData(employee,customField,false);
-			data= customFieldDataRepository.findByOwnerId(employee.getId());
+			if(individual.getClass()==Employee.class) {
+	    		Employee employee = (Employee) individual;
+	    		setCustomFieldData(employee,customField,false);
+	    	}
+	    	else if(individual.getClass()==Client.class) {
+	    		Client client = (Client) individual;
+	    		setCustomFieldData(client,customField,false);
+	    	}
+			
+			data= customFieldDataRepository.findByOwnerId(id);
 		}
 		
 		for(CustomFieldData customFieldData : data){
@@ -86,81 +129,46 @@ public class CustomDataManager {
 		}
 
 		if(fieldData==null){
-			setCustomFieldData(employee,customField,false);
+			if(individual.getClass()==Employee.class) {
+	    		Employee employee = (Employee) individual;
+	    		setCustomFieldData(employee,customField,false);
+	    	}
+	    	else if(individual.getClass()==Client.class) {
+	    		Client client = (Client) individual;
+	    		setCustomFieldData(client,customField,false);
+	    	}
 		}
 		
 		return fieldData==null?false:fieldData.getBooleanData();
 	}
 
-	public boolean getClientCustomFieldData(Client client, CustomField customField) {
-		List<CustomFieldData> data= customFieldDataRepository.findByOwnerId(client.getId());
-		CustomFieldData fieldData=null;
-		if(data.isEmpty()){
-			setClientCustomFieldData(client,customField,false);
-
-			data= customFieldDataRepository.findByOwnerId(client.getId());
+	/**
+	 * 
+	 * @param object an Employee or Client containing a valid ID, and preferably a first name for output
+	 * @param customField containing a valid ID
+	 * @param value the data to set for the CustomFieldData for this person and field
+	 * @return boolean of the custom field
+	 * @throws ProccessingException Null input provided
+	 */
+	public boolean setCustomFieldData(Object individual, CustomField customField, boolean value) throws ProccessingException {
+		String id;
+		
+		if(null==individual || null==customField) {
+			throw new ProccessingException("Client,Employee,or CustomField null in setCustomFieldData");
 		}
 		
-		for(CustomFieldData customFieldData : data){
-			if(customFieldData.getCustomFieldId().equals(customField.getId())){
-				fieldData=customFieldData;
-			}
-		}
+		id = Util.getIdFromEmployeeOrClient(individual);
 		
-		if(fieldData==null){
-			setClientCustomFieldData(client,customField,false);
-		}
-		return fieldData==null?false:fieldData.getBooleanData();
-	}
-
-	public boolean setClientCustomFieldData(Client client, CustomField customField,boolean value) {
-		List<CustomFieldData> data= customFieldDataRepository.findByOwnerId(client.getId());
-		boolean dataFound = false;
-		if(data.isEmpty()){
-			CustomFieldData newData = new CustomFieldData();
-			newData.setOwnerId(client.getId());
-			newData.setCustomFieldId(customField.getId());
-			newData.setBooleanData(value);
-			customFieldDataCrud.save(newData);
-			data= customFieldDataRepository.findByOwnerId(client.getId());
-		}
-		
-		for(CustomFieldData customFieldData : data){
-			System.out.println(client.getFirst()+customField.getClientVariable()+"set for " +value);
-			if(customFieldData.getCustomFieldId().equals(customField.getId())){
-				customFieldData.setBooleanData(value);;
-				customFieldDataCrud.save(customFieldData);
-				System.out.println("Saved the thing");
-				dataFound=true;
-			}
-		}
-		
-		if(!dataFound){
-			CustomFieldData newData = new CustomFieldData();
-			newData.setOwnerId(client.getId());
-			newData.setCustomFieldId(customField.getId());
-			newData.setBooleanData(value);
-			customFieldDataCrud.save(newData);
-			System.out.println(client.getFirst()+customField.getClientVariable()+"set for " +value+"part2");
-			System.out.println("Saved the thing");
-		}
-		
-		return value;
-	}
-
-	public boolean setCustomFieldData(Employee employee, CustomField customField, boolean value) {
-		List<CustomFieldData> data= customFieldDataRepository.findByOwnerId(employee.getId());
+		List<CustomFieldData> data= customFieldDataRepository.findByOwnerId(id);
 		boolean dataFound = false;
 		
 		if(data.isEmpty()){
 			CustomFieldData newData = new CustomFieldData();
-			newData.setOwnerId(employee.getId());
+			newData.setOwnerId(id);
 			newData.setCustomFieldId(customField.getId());
 			newData.setBooleanData(value);
 			customFieldDataCrud.save(newData);
-			data= customFieldDataRepository.findByOwnerId(employee.getId());
-			System.out.println(employee.getFirst()+customField.getEmployeeVariable()+"set for " +value+"part1");
-			System.out.println("Saved the thing");
+			data= customFieldDataRepository.findByOwnerId(id);
 		}
 		
 		for(CustomFieldData customFieldData : data){
@@ -169,19 +177,15 @@ public class CustomDataManager {
 				customFieldDataCrud.save(customFieldData);
 				
 				dataFound=true;
-				System.out.println(employee.getFirst()+customField.getEmployeeVariable()+"set for " +value+"part2");
-				System.out.println("Saved the thing");
 			}
 		}
 		
 		if(!dataFound){
 			CustomFieldData newData = new CustomFieldData();
-			newData.setOwnerId(employee.getId());
+			newData.setOwnerId(id);
 			newData.setCustomFieldId(customField.getId());
 			newData.setBooleanData(value);
 			customFieldDataCrud.save(newData);
-			System.out.println(employee.getFirst()+customField.getEmployeeVariable()+"set for " +value+"part3");
-			System.out.println("Saved the thing");
 		}
 		
 		return value;

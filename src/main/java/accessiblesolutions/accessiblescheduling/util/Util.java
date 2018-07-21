@@ -9,12 +9,44 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import accessiblesolutions.accessiblescheduling.domain.Client;
+import accessiblesolutions.accessiblescheduling.domain.Employee;
 import accessiblesolutions.accessiblescheduling.domain.Event;
 import accessiblesolutions.accessiblescheduling.domain.Shift;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
 
 public abstract class Util {
+	/**Returns the ID after it casts the object provided to an Employee or Client
+	 * 
+	 * @param individual a Client or Employee
+	 * @return String Id of the Client or Employee
+	 * @throws ProccessingException Null or Invalid individual provided to getIdFromEmployeeOrClient
+	 * @Tested
+	 */
+	public static String getIdFromEmployeeOrClient(Object individual) throws ProccessingException {
+		String id;
+		
+		if(individual!=null) {
+			if(individual.getClass()==Employee.class) {
+	    		Employee employee = (Employee) individual;
+	    		id = employee.getId();
+	    	}
+	    	else if(individual.getClass()==Client.class) {
+	    		Client client = (Client) individual;
+	    		id = client.getId();
+	    	}
+	    	else {
+	    		throw new ProccessingException("Invalid individual provided to getIdFromEmployeeOrClient");
+	    	}
+		}
+		else {
+    		throw new ProccessingException("Null individual provided to getIdFromEmployeeOrClient");
+    	}
+		
+		return id;
+	}
+	
     public static boolean eventArrayListContainsEvent(ArrayList<Event> events, String eventId){
     	boolean containsEvent = false;
     	
