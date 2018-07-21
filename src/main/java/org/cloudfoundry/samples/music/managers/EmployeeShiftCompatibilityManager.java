@@ -116,7 +116,7 @@ public class EmployeeShiftCompatibilityManager {
 		return employee;
 	}
     
-	public boolean getCompatible(EmployeeShiftCompatibility compatibility) throws ProccessingException {
+	public boolean getCompatible(EmployeeShiftCompatibility compatibility) throws ProccessingException, CorruptDataException {
 		Employee employee = compatibility.getEmployee();
 		Shift shift = compatibility.getShift();
 		
@@ -558,7 +558,7 @@ public class EmployeeShiftCompatibilityManager {
 		return validity;
 	}
 
-	public boolean isCompatibleWith(Employee employee,Shift shift) throws ProccessingException{
+	public boolean isCompatibleWith(Employee employee,Shift shift) throws ProccessingException, CorruptDataException{
     	if(!shift.getEvent()){
     		String clientID = shift.getClientId();
 	    	Client client = null;

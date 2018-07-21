@@ -236,6 +236,9 @@ public class EmployeeClientCompatibilityManagerSpec {
 		} catch (ProccessingException e) {
 			errored=true;
 			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
 		assertTrue(errored);
@@ -249,6 +252,9 @@ public class EmployeeClientCompatibilityManagerSpec {
 			fixture.isCompatibleWith(new Employee(),null);
 		} catch (ProccessingException e) {
 			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -266,6 +272,9 @@ public class EmployeeClientCompatibilityManagerSpec {
 			compatible = fixture.isCompatibleWith(new Employee(),client);
 		} catch (ProccessingException e) {
 			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -285,6 +294,9 @@ public class EmployeeClientCompatibilityManagerSpec {
 			compatible = fixture.isCompatibleWith(new Employee(),client);
 		} catch (ProccessingException e) {
 			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -306,6 +318,9 @@ public class EmployeeClientCompatibilityManagerSpec {
 		} catch (ProccessingException e) {
 			errored=true;
 			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
 		assertFalse(errored);
@@ -325,6 +340,9 @@ public class EmployeeClientCompatibilityManagerSpec {
 			compatible = fixture.isCompatibleWith(employee,client);
 		} catch (ProccessingException e) {
 			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -346,6 +364,9 @@ public class EmployeeClientCompatibilityManagerSpec {
 		} catch (ProccessingException e) {
 			errored=true;
 			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
 		assertFalse(errored);
@@ -365,6 +386,9 @@ public class EmployeeClientCompatibilityManagerSpec {
 		} catch (ProccessingException e) {
 			errored=true;
 			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
 		assertFalse(errored);
@@ -383,6 +407,9 @@ public class EmployeeClientCompatibilityManagerSpec {
 			compatible = fixture.isCompatibleWith(new Employee(),client);
 		} catch (ProccessingException e) {
 			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -404,6 +431,9 @@ public class EmployeeClientCompatibilityManagerSpec {
 		} catch (ProccessingException e) {
 			errored=true;
 			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
 		assertFalse(errored);
@@ -422,6 +452,9 @@ public class EmployeeClientCompatibilityManagerSpec {
 			compatible = fixture.isCompatibleWith(employee,client);
 		} catch (ProccessingException e) {
 			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -443,6 +476,9 @@ public class EmployeeClientCompatibilityManagerSpec {
 		} catch (ProccessingException e) {
 			errored=true;
 			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
 		assertFalse(errored);
@@ -462,6 +498,9 @@ public class EmployeeClientCompatibilityManagerSpec {
 			compatible = fixture.isCompatibleWith(employee,client);
 		} catch (ProccessingException e) {
 			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -483,6 +522,9 @@ public class EmployeeClientCompatibilityManagerSpec {
 		} catch (ProccessingException e) {
 			errored=true;
 			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
 		assertFalse(errored);
@@ -499,6 +541,9 @@ public class EmployeeClientCompatibilityManagerSpec {
 			compatible = fixture.isCompatibleWith(employee,client);
 		} catch (ProccessingException e) {
 			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -518,6 +563,9 @@ public class EmployeeClientCompatibilityManagerSpec {
 			compatible = fixture.isCompatibleWith(employee,client);
 		} catch (ProccessingException e) {
 			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -539,6 +587,9 @@ public class EmployeeClientCompatibilityManagerSpec {
 		} catch (ProccessingException e) {
 			errored=true;
 			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
 		assertFalse(errored);
@@ -557,6 +608,9 @@ public class EmployeeClientCompatibilityManagerSpec {
 			compatible = fixture.isCompatibleWith(employee,client);
 		} catch (ProccessingException e) {
 			errored=true;
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		

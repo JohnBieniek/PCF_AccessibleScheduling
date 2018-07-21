@@ -507,7 +507,7 @@ public class CompatibilityController {
     }
     
     @RequestMapping(method = RequestMethod.POST, value= "/compatibility")
-    public @ResponseBody CompatibilityDTO getCompatibility(HttpServletRequest request) throws ProccessingException{
+    public @ResponseBody CompatibilityDTO getCompatibility(HttpServletRequest request) throws ProccessingException, CorruptDataException{
     	Employee employee =null;
     	Shift shift =null;
 
@@ -541,7 +541,7 @@ public class CompatibilityController {
     }
     
     @RequestMapping(method = RequestMethod.POST, value= "/customFieldData")
-    public @ResponseBody EmployeeUpdateTO getCustomFieldData(HttpServletRequest request) throws ProccessingException{
+    public @ResponseBody EmployeeUpdateTO getCustomFieldData(HttpServletRequest request) throws ProccessingException, CorruptDataException{
     	Employee employee =null;
     	CustomField customField =null;
     	int index = 0;
@@ -574,7 +574,7 @@ public class CompatibilityController {
     }
     
     @RequestMapping(method = RequestMethod.POST, value= "/clientCustomFieldData")
-    public @ResponseBody UpdateTO getClientCustomFieldData(HttpServletRequest request) throws ProccessingException{
+    public @ResponseBody UpdateTO getClientCustomFieldData(HttpServletRequest request) throws ProccessingException, CorruptDataException{
     	Client client =null;
     	CustomField customField =null;
     	int index = 0;
@@ -607,7 +607,7 @@ public class CompatibilityController {
     }
     
     @RequestMapping(method = RequestMethod.POST, value= "/setClientCustomFieldData")
-    public @ResponseBody UpdateTO setClientCustomFieldData(HttpServletRequest request) throws ProccessingException{
+    public @ResponseBody UpdateTO setClientCustomFieldData(HttpServletRequest request) throws ProccessingException, CorruptDataException{
     	Client client =null;
     	CustomField customField =null;
     	boolean value = true;
@@ -631,8 +631,9 @@ public class CompatibilityController {
     	UpdateTO dto = new UpdateTO();
     	
     	if(client!=null){
+    		customDataManager.setCustomFieldData(client,customField,value);
     		dto.setId(client.getId());
-        	dto.setBooleanResponse(customDataManager.setCustomFieldData(client,customField,value));
+        	dto.setBooleanResponse(true);
     	}
     	
 
@@ -640,7 +641,7 @@ public class CompatibilityController {
     }
     
     @RequestMapping(method = RequestMethod.POST, value= "/setCustomFieldData")
-    public @ResponseBody UpdateTO setCustomFieldData(HttpServletRequest request) throws ProccessingException{
+    public @ResponseBody UpdateTO setCustomFieldData(HttpServletRequest request) throws ProccessingException, CorruptDataException{
     	Employee employee =null;
     	CustomField customField =null;
     	boolean value = true;
@@ -664,8 +665,9 @@ public class CompatibilityController {
     	UpdateTO dto = new UpdateTO();
     	
     	if(employee!=null){
+    		customDataManager.setCustomFieldData(employee,customField,value);
     		dto.setId(employee.getId());
-        	dto.setBooleanResponse(customDataManager.setCustomFieldData(employee,customField,value));
+        	dto.setBooleanResponse(true);
     	}
     	
 

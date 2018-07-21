@@ -18,6 +18,7 @@ import org.cloudfoundry.samples.music.managers.EmployeeShiftMapManager;
 import org.cloudfoundry.samples.music.managers.ShiftGenerationManager;
 import org.cloudfoundry.samples.music.managers.ShiftManager;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoClientRepository;
+import org.cloudfoundry.samples.music.repositories.mongodb.MongoCustomFieldDataRepository;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoShiftRepository;
 import org.junit.After;
 import org.junit.Before;
@@ -26,12 +27,14 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.repository.CrudRepository;
 
 import accessiblesolutions.accessiblescheduling.constants.Constants;
 import accessiblesolutions.accessiblescheduling.domain.Client;
 import accessiblesolutions.accessiblescheduling.domain.CustomField;
+import accessiblesolutions.accessiblescheduling.domain.CustomFieldData;
 import accessiblesolutions.accessiblescheduling.domain.Employee;
 import accessiblesolutions.accessiblescheduling.domain.EmployeeShiftCompatibilities;
 import accessiblesolutions.accessiblescheduling.domain.EmployeeShiftCompatibility;
@@ -57,8 +60,14 @@ public class CustomDataManagerSpec {
 	
 	@Mock
 	CrudRepository<CustomField, String> customFieldRepository;
-	@Mock
 	
+	@Mock
+	MongoCustomFieldDataRepository customFieldDataRepository;
+	
+	@Mock
+	CrudRepository<CustomFieldData, String> customFieldDataCrud;
+	
+	@Mock
     CrudRepository<Employee,String> employeeCrud;
 	
 	@Mock
@@ -85,7 +94,7 @@ public class CustomDataManagerSpec {
 	// Testing instance, mocked `resource` should be injected here 
 	@InjectMocks
 	@Resource
-	private EmployeeClientCompatibilityManager fixture;
+	private CustomDataManager fixture;
 	
 	@Before
 	public void setUp() throws Exception {
@@ -224,11 +233,95 @@ public class CustomDataManagerSpec {
 	    customEmployeeShiftManager.shiftRepository=shiftRepository;
 	    when(employeeCrud.findAll()).thenReturn(itterable);
 	     
-		fixture= new EmployeeClientCompatibilityManager(customFieldRepository);
+		fixture = new CustomDataManager();
+		fixture.customFieldDataRepository = customFieldDataRepository;
+		fixture.customFieldDataCrud = customFieldDataCrud;
 	}
 	
-//	@Test
-//	public void setCustomFieldDataDoesThings() {
-//		
-//	}
+	@Test
+	public void setCustomFieldDataThrowProccessingExceptionWithNullIndividual() {
+		boolean errored =false;
+		
+		try {
+			fixture.setCustomFieldData(null, new CustomField(), false);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void setCustomFieldDataThrowProccessingExceptionWithNullField() {
+		boolean errored =false;
+		
+		try {
+			fixture.setCustomFieldData(new Employee(),null, false);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void setCustomFieldDataThrowCorruptDataExceptionWithNullEmployeeId() {
+		boolean errored =false;
+		
+		try {
+			fixture.setCustomFieldData(new Employee(),new CustomField(), false);
+		} catch (ProccessingException e) {
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void setCustomFieldDataThrowCorruptDataExceptionWithNullClientId() {
+		boolean errored =false;
+		
+		try {
+			fixture.setCustomFieldData(new Client(),new CustomField(), false);
+		} catch (ProccessingException e) {
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void setCustomFieldDataInsertsWhenFieldNotFound() {
+		boolean errored =false;
+		Client client = new Client();
+		client.setId("client");
+		CustomField customField = new CustomField();
+		customField.setId("test");
+		
+		try {
+			fixture.setCustomFieldData(client,customField, false);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+	
+		assertFalse(errored);
+		//System.out.println(customFieldDataCrud.findOne());
+	}
 }
