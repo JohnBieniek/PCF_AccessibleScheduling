@@ -607,7 +607,7 @@ public class CompatibilityController {
     }
     
     @RequestMapping(method = RequestMethod.POST, value= "/setClientCustomFieldData")
-    public @ResponseBody UpdateTO setClientCustomFieldData(HttpServletRequest request){
+    public @ResponseBody UpdateTO setClientCustomFieldData(HttpServletRequest request) throws ProccessingException{
     	Client client =null;
     	CustomField customField =null;
     	boolean value = true;
@@ -632,7 +632,7 @@ public class CompatibilityController {
     	
     	if(client!=null){
     		dto.setId(client.getId());
-        	dto.setBooleanResponse(customDataManager.setClientCustomFieldData(client,customField,value));
+        	dto.setBooleanResponse(customDataManager.setCustomFieldData(client,customField,value));
     	}
     	
 
@@ -640,7 +640,7 @@ public class CompatibilityController {
     }
     
     @RequestMapping(method = RequestMethod.POST, value= "/setCustomFieldData")
-    public @ResponseBody UpdateTO setCustomFieldData(HttpServletRequest request){
+    public @ResponseBody UpdateTO setCustomFieldData(HttpServletRequest request) throws ProccessingException{
     	Employee employee =null;
     	CustomField customField =null;
     	boolean value = true;

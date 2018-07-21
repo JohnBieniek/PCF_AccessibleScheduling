@@ -13,6 +13,7 @@ import accessiblesolutions.accessiblescheduling.domain.CustomFieldData;
 import accessiblesolutions.accessiblescheduling.domain.Employee;
 import accessiblesolutions.accessiblescheduling.domain.ShiftRequest;
 import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
+import accessiblesolutions.accessiblescheduling.util.Util;
 
 @Component
 public class CustomDataManager {
@@ -79,17 +80,7 @@ public class CustomDataManager {
     		throw new ProccessingException("Null individual pr customField provided to getCustomFieldDataOrCreateIfMissing");
     	}
     	
-    	if(individual.getClass()==Employee.class) {
-    		Employee employee = (Employee) individual;
-    		id = employee.getId();
-    	}
-    	else if(individual.getClass()==Client.class) {
-    		Client client = (Client) individual;
-    		id = client.getId();
-    	}
-    	else {
-    		throw new ProccessingException("Invalid individual provided to getCustomFieldDataOrCreateIfMissing");
-    	}
+    	id = Util.getIdFromEmployeeOrClient(individual);
     	
 		List<CustomFieldData> data= customFieldDataRepository.findByOwnerId(id);
 		
@@ -113,17 +104,7 @@ public class CustomDataManager {
     		throw new ProccessingException("Null individual provided to getCustomFieldDataOrCreateIfMissing");
     	}
     	
-    	if(individual.getClass()==Employee.class) {
-    		Employee employee = (Employee) individual;
-    		id = employee.getId();
-    	}
-    	else if(individual.getClass()==Client.class) {
-    		Client client = (Client) individual;
-    		id = client.getId();
-    	}
-    	else {
-    		throw new ProccessingException("Invalid individual provided to getCustomFieldDataOrCreateIfMissing");
-    	}
+    	id = Util.getIdFromEmployeeOrClient(individual);
     	
 		List<CustomFieldData> data= customFieldDataRepository.findByOwnerId(id);
 		
@@ -135,7 +116,7 @@ public class CustomDataManager {
 	    	}
 	    	else if(individual.getClass()==Client.class) {
 	    		Client client = (Client) individual;
-	    		setClientCustomFieldData(client,customField,false);
+	    		setCustomFieldData(client,customField,false);
 	    	}
 			
 			data= customFieldDataRepository.findByOwnerId(id);
@@ -154,68 +135,40 @@ public class CustomDataManager {
 	    	}
 	    	else if(individual.getClass()==Client.class) {
 	    		Client client = (Client) individual;
-	    		setClientCustomFieldData(client,customField,false);
+	    		setCustomFieldData(client,customField,false);
 	    	}
 		}
 		
 		return fieldData==null?false:fieldData.getBooleanData();
 	}
 
-	public boolean setClientCustomFieldData(Client client, CustomField customField,boolean value) {
-		List<CustomFieldData> data= customFieldDataRepository.findByOwnerId(client.getId());
-		boolean dataFound = false;
-		if(data.isEmpty()){
-			CustomFieldData newData = new CustomFieldData();
-			newData.setOwnerId(client.getId());
-			newData.setCustomFieldId(customField.getId());
-			newData.setBooleanData(value);
-			customFieldDataCrud.save(newData);
-			data= customFieldDataRepository.findByOwnerId(client.getId());
-		}
-		
-		for(CustomFieldData customFieldData : data){
-			System.out.println(client.getFirst()+customField.getClientVariable()+"set for " +value);
-			if(customFieldData.getCustomFieldId().equals(customField.getId())){
-				customFieldData.setBooleanData(value);;
-				customFieldDataCrud.save(customFieldData);
-				System.out.println("Saved the thing");
-				dataFound=true;
-			}
-		}
-		
-		if(!dataFound){
-			CustomFieldData newData = new CustomFieldData();
-			newData.setOwnerId(client.getId());
-			newData.setCustomFieldId(customField.getId());
-			newData.setBooleanData(value);
-			customFieldDataCrud.save(newData);
-			System.out.println(client.getFirst()+customField.getClientVariable()+"set for " +value+"part2");
-			System.out.println("Saved the thing");
-		}
-		
-		return value;
-	}
-
 	/**
 	 * 
-	 * @param employee
-	 * @param customField
-	 * @param value 
+	 * @param object an Employee or Client containing a valid ID, and preferably a first name for output
+	 * @param customField containing a valid ID
+	 * @param value the data to set for the CustomFieldData for this person and field
 	 * @return boolean of the custom field
+	 * @throws ProccessingException Null input provided
 	 */
-	public boolean setCustomFieldData(Employee employee, CustomField customField, boolean value) {
-		List<CustomFieldData> data= customFieldDataRepository.findByOwnerId(employee.getId());
+	public boolean setCustomFieldData(Object individual, CustomField customField, boolean value) throws ProccessingException {
+		String id;
+		
+		if(null==individual || null==customField) {
+			throw new ProccessingException("Client,Employee,or CustomField null in setCustomFieldData");
+		}
+		
+		id = Util.getIdFromEmployeeOrClient(individual);
+		
+		List<CustomFieldData> data= customFieldDataRepository.findByOwnerId(id);
 		boolean dataFound = false;
 		
 		if(data.isEmpty()){
 			CustomFieldData newData = new CustomFieldData();
-			newData.setOwnerId(employee.getId());
+			newData.setOwnerId(id);
 			newData.setCustomFieldId(customField.getId());
 			newData.setBooleanData(value);
 			customFieldDataCrud.save(newData);
-			data= customFieldDataRepository.findByOwnerId(employee.getId());
-			System.out.println(employee.getFirst()+customField.getEmployeeVariable()+"set for " +value+"part1");
-			System.out.println("Saved the thing");
+			data= customFieldDataRepository.findByOwnerId(id);
 		}
 		
 		for(CustomFieldData customFieldData : data){
@@ -224,19 +177,15 @@ public class CustomDataManager {
 				customFieldDataCrud.save(customFieldData);
 				
 				dataFound=true;
-				System.out.println(employee.getFirst()+customField.getEmployeeVariable()+"set for " +value+"part2");
-				System.out.println("Saved the thing");
 			}
 		}
 		
 		if(!dataFound){
 			CustomFieldData newData = new CustomFieldData();
-			newData.setOwnerId(employee.getId());
+			newData.setOwnerId(id);
 			newData.setCustomFieldId(customField.getId());
 			newData.setBooleanData(value);
 			customFieldDataCrud.save(newData);
-			System.out.println(employee.getFirst()+customField.getEmployeeVariable()+"set for " +value+"part3");
-			System.out.println("Saved the thing");
 		}
 		
 		return value;
