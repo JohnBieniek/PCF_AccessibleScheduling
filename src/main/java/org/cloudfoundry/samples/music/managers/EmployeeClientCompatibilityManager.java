@@ -68,8 +68,8 @@ public class EmployeeClientCompatibilityManager {
     	
     	if(null!=customFields) {
 	    	for(CustomField customField : customFields){
-	    		boolean clientData = customDataManager.getCustomFieldDataOrCreateIfMissing(client,customField);
-	    		boolean employeeData = customDataManager.getCustomFieldDataOrCreateIfMissing(employee,customField);
+	    		boolean clientData = customDataManager.getCustomFieldDatasValueOrCreateIfMissing(client,customField);
+	    		boolean employeeData = customDataManager.getCustomFieldDatasValueOrCreateIfMissing(employee,customField);
 	    		
 	    		if(customField.getClientRequirement()){
 	    			if(clientData && !employeeData){

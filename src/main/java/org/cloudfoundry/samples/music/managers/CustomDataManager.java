@@ -44,6 +44,7 @@ public class CustomDataManager {
     		customFieldDataCrud.delete(request);
     	}
 	}
+    
     public ArrayList<CustomFieldData> getOrphanedCustomFieldData() {
     	ArrayList<CustomFieldData> orphans = new ArrayList<CustomFieldData>();
     	Iterable<CustomFieldData> table = customFieldDataCrud.findAll();
@@ -74,40 +75,32 @@ public class CustomDataManager {
     	}
     	
     	return orphans;
-	}
+	}  
     
-    public boolean getCustomFieldData(Object individual, CustomField customField) throws ProccessingException {
+    
+    /**Finds the CustomFieldData for the provided Client/Employee and field
+	 * or creates the object in the database if it is missing.
+	 * Returns the CustomFieldData's boolean value.
+     * 
+     * @param object an Employee or Client containing a valid ID, and preferably a first name for output
+     * @param customField containing a valid ID
+     * @return boolean value of the CustomFieldData
+     * @throws ProccessingException Null input provided
+     * @throws CorruptDataException No Id provided for individual in setCustomFieldData
+     * @Tested
+     */
+    public boolean getCustomFieldDatasValueOrCreateIfMissing(Object individual, CustomField customField) throws ProccessingException, CorruptDataException {
     	String id = null;
     	
-    	if(null==individual || null ==customField ) {
-    		throw new ProccessingException("Null individual pr customField provided to getCustomFieldDataOrCreateIfMissing");
-    	}
-    	
-    	id = Util.getIdFromEmployeeOrClient(individual);
-    	
-		List<CustomFieldData> data= customFieldDataRepository.findByOwnerId(id);
-		
-		CustomFieldData fieldData=null;
-
-		if(null!=data) {
-			for(CustomFieldData customFieldData : data){
-				if(customFieldData.getCustomFieldId().equals(customField.getId())){
-					fieldData=customFieldData;
-				}
-			}
+    	if(null==individual || null==customField) {
+			throw new ProccessingException("Client,Employee,or CustomField null in setCustomFieldData");
 		}
-		
-		return fieldData==null?false:fieldData.getBooleanData();
-    }
-    
-    public boolean getCustomFieldDataOrCreateIfMissing(Object individual, CustomField customField) throws ProccessingException, CorruptDataException {
-    	String id = null;
-    	
-    	if(null==individual) {
-    		throw new ProccessingException("Null individual provided to getCustomFieldDataOrCreateIfMissing");
-    	}
     	
     	id = Util.getIdFromEmployeeOrClient(individual);
+    	
+    	if(null==id) {
+			throw new CorruptDataException("No Id provided for individual in setCustomFieldData");
+		}
     	
 		List<CustomFieldData> data= customFieldDataRepository.findByOwnerId(id);
 		

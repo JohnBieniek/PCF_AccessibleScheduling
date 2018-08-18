@@ -568,7 +568,7 @@ public class CompatibilityController {
     		dto.setEmployeeId(employee.getId());
     	}
     	
-    	dto.setBooleanResponse(customDataManager.getCustomFieldDataOrCreateIfMissing(employee,customField));
+    	dto.setBooleanResponse(customDataManager.getCustomFieldDatasValueOrCreateIfMissing(employee,customField));
     	dto.setNumericResponse(index);
     	return dto;
     }
@@ -601,7 +601,7 @@ public class CompatibilityController {
     		dto.setId(client.getId());
     	}
     	
-    	dto.setBooleanResponse(customDataManager.getCustomFieldDataOrCreateIfMissing(client,customField));
+    	dto.setBooleanResponse(customDataManager.getCustomFieldDatasValueOrCreateIfMissing(client,customField));
     	dto.setNumericResponse(index);
     	return dto;
     }
