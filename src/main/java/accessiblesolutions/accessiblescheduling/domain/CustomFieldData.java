@@ -63,4 +63,10 @@ public class CustomFieldData {
 	public void setOwnerId(String ownerId) {
 		this.ownerId = ownerId;
 	}
+
+	@Override
+	public String toString() {
+		return "CustomFieldData [id=" + id + ", booleanData=" + booleanData + ", customFieldId=" + customFieldId
+				+ ", ownerId=" + ownerId + ", variableType=" + variableType + "]";
+	}
 }

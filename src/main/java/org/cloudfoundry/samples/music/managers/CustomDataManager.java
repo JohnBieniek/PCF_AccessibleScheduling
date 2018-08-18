@@ -88,7 +88,7 @@ public class CustomDataManager {
 		List<CustomFieldData> data= customFieldDataRepository.findByOwnerId(id);
 		
 		CustomFieldData fieldData=null;
-		
+
 		if(null!=data) {
 			for(CustomFieldData customFieldData : data){
 				if(customFieldData.getCustomFieldId().equals(customField.getId())){
@@ -154,11 +154,13 @@ public class CustomDataManager {
 	 * @param value the data to set for the CustomFieldData for this person and field
 	 * @throws ProccessingException Null input provided
 	 * @throws CorruptDataException No Id provided for individual in setCustomFieldData
+	 * @Tested
 	 */
-	public void setCustomFieldData(Object individual, CustomField customField, boolean value) throws ProccessingException, CorruptDataException {
+	public CustomFieldData setCustomFieldData(Object individual, CustomField customField, boolean value) throws ProccessingException, CorruptDataException {
 		String id =null;
 		List<CustomFieldData> data = null;
 		boolean dataFound = false;
+		CustomFieldData updatedData = null;
 		
 		if(null==individual || null==customField) {
 			throw new ProccessingException("Client,Employee,or CustomField null in setCustomFieldData");
@@ -173,11 +175,11 @@ public class CustomDataManager {
 		data = customFieldDataRepository.findByOwnerId(id);
 		
 		//Find the data for this individual/field and set it's data to the passed value
-		if(null!=data && data.isEmpty()){
+		if(null!=data && !data.isEmpty()){
 			for(CustomFieldData customFieldData : data){
 				if(customFieldData.getCustomFieldId().equals(customField.getId())){
-					customFieldData.setBooleanData(value);;
-					customFieldDataCrud.save(customFieldData);
+					customFieldData.setBooleanData(value);
+					updatedData=customFieldData;
 					
 					dataFound=true;
 				}
@@ -186,12 +188,16 @@ public class CustomDataManager {
 		
 		//Create the CustomFieldData and save it if it was not found
 		if(!dataFound){
-			CustomFieldData newData = new CustomFieldData();
-			newData.setOwnerId(id);
-			newData.setCustomFieldId(customField.getId());
-			newData.setBooleanData(value);
-			
-			customFieldDataCrud.save(newData);
+			updatedData = new CustomFieldData();
+			updatedData.setOwnerId(id);
+			updatedData.setCustomFieldId(customField.getId());
+			updatedData.setBooleanData(value);
 		}
+		
+		if(null!=updatedData) {
+			customFieldDataCrud.save(updatedData);
+		}
+		
+		return updatedData;
 	}
 }

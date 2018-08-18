@@ -4,6 +4,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -304,15 +305,126 @@ public class CustomDataManagerSpec {
 	}
 	
 	@Test
-	public void setCustomFieldDataInsertsWhenFieldNotFound() {
+	public void setCustomFieldDataInsertsWhenFieldNotFound1() throws ProccessingException {
 		boolean errored =false;
+		boolean success=false;
+		
 		Client client = new Client();
 		client.setId("client");
+		
 		CustomField customField = new CustomField();
 		customField.setId("test");
 		
+	    when(fixture.customFieldDataCrud.save(any(CustomFieldData.class))).thenThrow(new RuntimeException());
+
+		
 		try {
-			fixture.setCustomFieldData(client,customField, false);
+			fixture.setCustomFieldData(client,customField, true);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		catch(Exception e) {
+			success=true;
+		}
+		
+		assertFalse(errored);
+		
+		assertTrue(success);
+	}
+	
+	@Test
+	public void setCustomFieldDataInsertsWhenFieldNotFound2() throws ProccessingException {
+		boolean errored =false;
+		
+		Client client = new Client();
+		client.setId("client");
+		
+		CustomField customField = new CustomField();
+		customField.setId("test");
+		
+		CustomFieldData output = null;
+		try {
+			output = fixture.setCustomFieldData(client,customField, true);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		
+		assertTrue(output.getBooleanData());
+	}
+	
+	@Test
+	public void setCustomFieldDataUpdatesWhenFieldFound1() throws ProccessingException {
+		boolean errored =false;
+		boolean success=false;
+		Client client = new Client();
+		client.setId("client");
+		
+		CustomField customField = new CustomField();
+		customField.setId("test");
+		
+		CustomFieldData data = new CustomFieldData();
+		data.setId("sample");
+		data.setOwnerId("client");
+		data.setCustomFieldId("test");
+		data.setBooleanData(false);
+		
+		ArrayList<CustomFieldData> list = new ArrayList<CustomFieldData>();
+		list.add(data);
+		
+	    when(fixture.customFieldDataRepository.findByOwnerId("client")).thenReturn(list);
+	    when(fixture.customFieldDataCrud.save(any(CustomFieldData.class))).thenThrow(new RuntimeException());
+		
+		try {
+			fixture.setCustomFieldData(client,customField, true);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		catch(Exception e) {
+			success=true;
+		}
+		
+		assertFalse(errored);
+		assertTrue(success);
+	}
+	
+	@Test
+	public void setCustomFieldDataUpdatesWhenFieldFound2() throws ProccessingException {
+		boolean errored =false;
+		Client client = new Client();
+		client.setId("client");
+		
+		CustomField customField = new CustomField();
+		customField.setId("test");
+		
+		CustomFieldData data = new CustomFieldData();
+		data.setId("sample");
+		data.setOwnerId("client");
+		data.setCustomFieldId("test");
+		data.setBooleanData(false);
+		
+		ArrayList<CustomFieldData> list = new ArrayList<CustomFieldData>();
+		list.add(data);
+		
+		CustomFieldData output = null;
+		
+	    when(fixture.customFieldDataRepository.findByOwnerId("client")).thenReturn(list);
+		
+		try {
+			output = fixture.setCustomFieldData(client,customField, true);
 		} catch (ProccessingException e) {
 			errored=true;
 			e.printStackTrace();
@@ -322,6 +434,6 @@ public class CustomDataManagerSpec {
 		}
 	
 		assertFalse(errored);
-		//System.out.println(customFieldDataCrud.findOne());
+		assertTrue(output.getBooleanData());
 	}
 }
