@@ -14,7 +14,7 @@ public class EmployeeClientCompatibilityManager {
     private CrudRepository<CustomField, String> customFieldRepository;
     
     @Autowired
-    private CustomDataManager customDataManager;
+    public CustomDataManager customDataManager;
     
     @Autowired
     EmployeeShiftManager employeeShiftManager;
@@ -65,11 +65,17 @@ public class EmployeeClientCompatibilityManager {
     	}
     	
     	Iterable<CustomField> customFields = customFieldRepository.findAll();
-    	
     	if(null!=customFields) {
+    		System.out.println("Had a field");
 	    	for(CustomField customField : customFields){
+	    		System.out.println("customField"+customField.toString());
+	    		System.out.println(employee.toString() + client.toString());
 	    		boolean clientData = customDataManager.getCustomFieldDatasValueOrCreateIfMissing(client,customField);
+	    		System.out.println("past this");
 	    		boolean employeeData = customDataManager.getCustomFieldDatasValueOrCreateIfMissing(employee,customField);
+	    		System.out.println(clientData+" "+employeeData);
+	    		
+	    		
 	    		
 	    		if(customField.getClientRequirement()){
 	    			if(clientData && !employeeData){

@@ -77,4 +77,11 @@ public class CustomField {
 	public void setId(String id) {
 		this.id= id;
 	}
+
+	@Override
+	public String toString() {
+		return "CustomField [id=" + id + ", clientVariable=" + clientVariable + ", employeeVariable=" + employeeVariable
+				+ ", clientRequirement=" + clientRequirement + ", employeeRequirement=" + employeeRequirement
+				+ ", overrideable=" + overrideable + "]";
+	}
 }
