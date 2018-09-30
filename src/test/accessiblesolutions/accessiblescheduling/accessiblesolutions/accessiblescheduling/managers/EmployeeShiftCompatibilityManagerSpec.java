@@ -115,20 +115,21 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	    assignedOneDayShift1.setEndDate("2018-04-02");
 	    assignedOneDayShift1.setStartTime("20:00");
 	    assignedOneDayShift1.setEndTime("10:00");
-	    
+	    assignedOneDayShift1.setClientId("generic");
 	    Shift assignedOneDayShift2 = new Shift();
 	    assignedOneDayShift2.setStaffId("assignedOneDay");
 	    assignedOneDayShift2.setStartDate("2018-04-02");
 	    assignedOneDayShift2.setEndDate("2018-04-02");
 	    assignedOneDayShift2.setStartTime("10:00");
 	    assignedOneDayShift2.setEndTime("18:00");
-	    
+	    assignedOneDayShift2.setClientId("generic");
 	    Shift assignedOneDayShift3 = new Shift();
 	    assignedOneDayShift3.setStaffId("assignedOneDay");
 	    assignedOneDayShift3.setStartDate("2018-04-02");
 	    assignedOneDayShift3.setEndDate("2018-04-03");
 	    assignedOneDayShift3.setStartTime("20:00");
 	    assignedOneDayShift3.setEndTime("10:00");
+	    assignedOneDayShift3.setClientId("generic");
 	    assignedOneDayShifts.add(assignedOneDayShift1);
 	    assignedOneDayShifts.add(assignedOneDayShift2);
 	    assignedOneDayShifts.add(assignedOneDayShift3);
@@ -4081,5 +4082,193 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		shift.setEndTime("14:00");
 		shift.setClientId("generic");
 		assertTrue(fixture.isAssignableFor(employee,shift));
+	}
+	
+	@Test
+	public void getAssignmentWouldViolateAlternateWeekendsOffThrowsProccessingExceptionForNullCompatibility() {
+		boolean errored=true;
+		
+		try {
+			fixture.getAssignmentWouldViolateAlternateWeekendsOff(null);
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void getAssignmentWouldViolateAlternateWeekendsOffThrowsProccessingExceptionForNullEmployee() {
+		boolean errored=true;
+		Employee employee = new Employee();
+		Shift shift = new Shift();
+		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(null,shift);
+		
+		try {
+			fixture.getAssignmentWouldViolateAlternateWeekendsOff(compatibility);
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+
+	@Test
+	public void getAssignmentWouldViolateAlternateWeekendsOffThrowsProccessingExceptionForNullShift() {
+		boolean errored=true;
+		Employee employee = new Employee();
+		Shift shift = new Shift();
+		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,null);
+		
+		try {
+			fixture.getAssignmentWouldViolateAlternateWeekendsOff(compatibility);
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void getAssignmentWouldViolateAlternateWeekendsOffThrowsCorruptDataExceptionForInvalidShift() {
+		boolean errored=true;
+		Employee employee = new Employee();
+		Shift shift = new Shift();
+		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,shift);
+		
+		try {
+			fixture.getAssignmentWouldViolateAlternateWeekendsOff(compatibility);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void getAssignmentWouldViolateAlternateWeekendsOffReturnsTrueWorkingPreviousWeekend() {
+		boolean errored=false;
+		Employee employee = new Employee();
+		employee.setOffAlternateWeekends(true);
+		employee.setId("assignedOneDay");
+		Shift shift = new Shift();
+		shift.setStartDate("2018-04-07");
+		shift.setEndDate("2018-04-07");
+		shift.setStartTime("10:00");
+		shift.setEndTime("14:00");
+		shift.setClientId("generic");
+		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,shift);
+		boolean result = false;
+		try {
+			result = fixture.getAssignmentWouldViolateAlternateWeekendsOff(compatibility);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(result);
+	}
+	
+	@Test
+	public void getAssignmentWouldViolateAlternateWeekendsOffReturnsTrueWorkingNextWeekend() {
+		boolean errored=false;
+		Employee employee = new Employee();
+		employee.setOffAlternateWeekends(true);
+		employee.setId("assignedOneDay");
+		Shift shift = new Shift();
+		shift.setStartDate("2018-03-25");
+		shift.setEndDate("2018-03-25");
+		shift.setStartTime("10:00");
+		shift.setEndTime("14:00");
+		shift.setClientId("generic");
+		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,shift);
+		boolean result = false;
+		try {
+			result = fixture.getAssignmentWouldViolateAlternateWeekendsOff(compatibility);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(result);
+	}
+	
+	@Test
+	public void getAssignmentWouldViolateAlternateWeekendsOffReturnsFalseNotWorking() {
+		boolean errored=false;
+		Employee employee = new Employee();
+		employee.setOffAlternateWeekends(true);
+		employee.setId("assignedOneDay");
+		Shift shift = new Shift();
+		shift.setStartDate("2018-06-25");
+		shift.setEndDate("2018-06-25");
+		shift.setStartTime("10:00");
+		shift.setEndTime("14:00");
+		shift.setClientId("generic");
+		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,shift);
+		boolean result = false;
+		try {
+			result = fixture.getAssignmentWouldViolateAlternateWeekendsOff(compatibility);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertFalse(result);
+	}
+	
+	@Test
+	public void getAssignmentWouldViolateAlternateWeekendsOffReturnsFalseWhenAlternateWeekendsAllowed() {
+		boolean errored=false;
+		Employee employee = new Employee();
+		employee.setId("assignedOneDay");
+		Shift shift = new Shift();
+		shift.setStartDate("2018-03-25");
+		shift.setEndDate("2018-03-25");
+		shift.setStartTime("10:00");
+		shift.setEndTime("14:00");
+		shift.setClientId("generic");
+		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,shift);
+		boolean result = false;
+		try {
+			result = fixture.getAssignmentWouldViolateAlternateWeekendsOff(compatibility);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertFalse(result);
 	}
 }

@@ -89,14 +89,6 @@ public class EmployeeShiftCompatibilityManager {
 	}
 
   //TODO Test
-    public boolean getAssignable(EmployeeShiftCompatibility compatibility) throws CorruptDataException, ProccessingException {
-    	Employee employee = compatibility.getEmployee();
-		Shift shift = compatibility.getShift();
-		
-		return isAssignableFor(employee,shift);
-	}
-    
-  //TODO Test
     public Employee getEmployeeWithMostTimeBeforeOvertimeAfterAssignment(EmployeeShiftCompatibilities compatibilities) throws CorruptDataException, ProccessingException {
     	//System.out.println("Getting the employee with the most time for " + compatibilities.compatibilities.get(0).getShift().toString());
 		Employee employee = null;
@@ -147,38 +139,36 @@ public class EmployeeShiftCompatibilityManager {
 		
 		return isCompatibleWith(employee,shift);
 	}
-	
-//	public boolean getAssignmentWouldViolateAlternateWeekendsOff(EmployeeShiftCompatibility compatibility) {
-//		boolean violatesAlternateWeekendsOff = false;
-//		Shift shift = compatibility.getShift();
-//		ArrayList<Shift> earlierShifts = employeeShiftManager.getShiftsForEmployeeForWeekBefore(compatibility.getEmployee().getId(),shift);
-//		ArrayList<Shift> laterShifts = employeeShiftManager.getShiftsForEmployeeForWeekAfter(compatibility.getEmployee().getId(),shift);
-//		
-//		for(Shift selectedShift :earlierShifts){
-//			if(selectedShift.isWeekend()){
-//				violatesAlternateWeekendsOff = true;
-//			}
-//		}
-//		
-//		for(Shift selectedShift :laterShifts){
-//			if(selectedShift.isWeekend()){
-//				violatesAlternateWeekendsOff = true;
-//			}
-//		}
-//		
-//		return violatesAlternateWeekendsOff;
-//	}
-	
-	//TODO Test
-	public boolean getAssignmentWouldViolateAlternateWeekendsOff(EmployeeShiftCompatibility compatibility) throws CorruptDataException {
-		Employee employee =compatibility.getEmployee();
 
+	/**Returns true if the employee requests alternate weekends off and is currently scheduled
+	 * to work a shift either the weekend before or after this shift (if this is a weekend shift).
+	 * 
+	 * @param compatibility an employee and valid shift
+	 * @return boolean true when employee and shift are incompatible
+	 * @throws CorruptDataException invalid shift
+	 * @throws ProccessingException null compatibility, employee, or shift
+	 * @Tested
+	 */
+	public boolean getAssignmentWouldViolateAlternateWeekendsOff(EmployeeShiftCompatibility compatibility) throws CorruptDataException, ProccessingException {
+		Employee employee = null;
+		Shift shift = null; 
 		boolean violatesAlternateWeekendsOff = false;
-		//System.out.println("checking alternate week violation for"+compatibility.getEmployee().getFirst());
+		
+		if(null==compatibility ){
+			throw new ProccessingException("Null compatibility provided to getAssignmentWouldViolateAlternateWeekendsOff");
+		}
+		
+		employee = compatibility.getEmployee();
+		shift = compatibility.getShift();
+		
+		if(null==employee || null==shift) {
+			throw new ProccessingException("Null employee or shift provided to getAssignmentWouldViolateAlternateWeekendsOff");
+		}
+		else if(!shift.isValid()) {
+			throw new CorruptDataException("Invalid shift provided to getAssignmentWouldViolateAlternateWeekendsOff");
+		}
+		
 		if(employee.getOffAlternateWeekends()){
-			System.out.println(compatibility.getEmployee().getFirst()+" requires alternate weekends off");
-			Shift shift = compatibility.getShift();
-			System.out.println("Can " + compatibility.getEmployee().getFirst()+" work on "+shift.getStartDate() + " and " + shift.getEndDate());
 			if(shift.isWeekend()|| shift.getStartsLocalDate().getDayOfWeek().getValue()==6
 					||shift.getStartsLocalDate().getDayOfWeek().getValue()==7
 					||shift.getEndsLocalDate().getDayOfWeek().getValue()==6
@@ -210,38 +200,62 @@ public class EmployeeShiftCompatibilityManager {
 					nextSaturday=shift.getStartsLocalDate().plusDays(8);
 					nextSunday=shift.getStartsLocalDate().plusDays(9);
 				}
+				int thisMonth=shift.getStartMonth();
+				int lastMonth =thisMonth-1;
+				if(lastMonth<1) {
+					lastMonth=12;
+				}
 				
-				ArrayList<Shift> lastMonthsShifts = employeeShiftManager.getAssignedShiftsForEmployeeForMonth(employee.getId(),shift.getStartMonth()-1);
-				ArrayList<Shift> thisMonthsShifts = employeeShiftManager.getAssignedShiftsForEmployeeForMonth(employee.getId(),shift.getStartMonth());
+				int nextMonth=thisMonth+1;
+				if(nextMonth>12) {
+					nextMonth=1;
+				}
+				
+				ArrayList<Shift> lastMonthsShifts = employeeShiftManager.getAssignedShiftsForEmployeeForMonth(employee.getId(),lastMonth);
+				ArrayList<Shift> thisMonthsShifts = employeeShiftManager.getAssignedShiftsForEmployeeForMonth(employee.getId(),thisMonth);
+				ArrayList<Shift> nextMonthsShifts = employeeShiftManager.getAssignedShiftsForEmployeeForMonth(employee.getId(),nextMonth);
 				
 				for(Shift selectedShift :lastMonthsShifts){
-					if(selectedShift.getStartDate().equals(lastSaturday)
-					   ||selectedShift.getStartDate().equals(lastSunday)
-					   ||selectedShift.getStartDate().equals(nextSaturday)
-					   ||selectedShift.getStartDate().equals(nextSunday)
-					   ||selectedShift.getEndDate().equals(nextSunday)
-					   ||selectedShift.getEndDate().equals(nextSaturday)
-					   ||selectedShift.getEndDate().equals(lastSunday)
-					   ||selectedShift.getEndDate().equals(lastSaturday)){
+					if(selectedShift.getStartDate().equals(lastSaturday.toString())
+					   ||selectedShift.getStartDate().equals(lastSunday.toString())
+					   ||selectedShift.getStartDate().equals(nextSaturday.toString())
+					   ||selectedShift.getStartDate().equals(nextSunday.toString())
+					   ||selectedShift.getEndDate().equals(nextSunday.toString())
+					   ||selectedShift.getEndDate().equals(nextSaturday.toString())
+					   ||selectedShift.getEndDate().equals(lastSunday.toString())
+					   ||selectedShift.getEndDate().equals(lastSaturday.toString())){
 						violatesAlternateWeekendsOff = true;
 					}
 				}
 				
 				for(Shift selectedShift :thisMonthsShifts){
-					if(selectedShift.getStartDate().equals(lastSaturday)
-					   ||selectedShift.getStartDate().equals(lastSunday)
-					   ||selectedShift.getStartDate().equals(nextSaturday)
-					   ||selectedShift.getStartDate().equals(nextSunday)
-					   ||selectedShift.getEndDate().equals(nextSunday)
-					   ||selectedShift.getEndDate().equals(nextSaturday)
-					   ||selectedShift.getEndDate().equals(lastSunday)
-					   ||selectedShift.getEndDate().equals(lastSaturday)){
+					if(selectedShift.getStartDate().equals(lastSaturday.toString())
+					   ||selectedShift.getStartDate().equals(lastSunday.toString())
+					   ||selectedShift.getStartDate().equals(nextSaturday.toString())
+					   ||selectedShift.getStartDate().equals(nextSunday.toString())
+					   ||selectedShift.getEndDate().equals(nextSunday.toString())
+					   ||selectedShift.getEndDate().equals(nextSaturday.toString())
+					   ||selectedShift.getEndDate().equals(lastSunday.toString())
+					   ||selectedShift.getEndDate().equals(lastSaturday.toString())){
+						violatesAlternateWeekendsOff = true;
+					}
+				}
+				
+				for(Shift selectedShift :nextMonthsShifts){
+					if(selectedShift.getStartDate().equals(lastSaturday.toString())
+					   ||selectedShift.getStartDate().equals(lastSunday.toString())
+					   ||selectedShift.getStartDate().equals(nextSaturday.toString())
+					   ||selectedShift.getStartDate().equals(nextSunday.toString())
+					   ||selectedShift.getEndDate().equals(nextSunday.toString())
+					   ||selectedShift.getEndDate().equals(nextSaturday.toString())
+					   ||selectedShift.getEndDate().equals(lastSunday.toString())
+					   ||selectedShift.getEndDate().equals(lastSaturday.toString())){
 						violatesAlternateWeekendsOff = true;
 					}
 				}
 			}
 		}
-		System.out.println(violatesAlternateWeekendsOff);
+		
 		return violatesAlternateWeekendsOff;
 	}
 	

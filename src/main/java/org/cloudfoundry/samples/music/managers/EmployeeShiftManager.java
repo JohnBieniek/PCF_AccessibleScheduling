@@ -179,7 +179,7 @@ public class EmployeeShiftManager {
 				}
 			}
 		}
-		
+		System.out.println("found shifts for month:"+assignedShiftsForEmployeeForMonth.size());
 		return assignedShiftsForEmployeeForMonth;
 	}
   
