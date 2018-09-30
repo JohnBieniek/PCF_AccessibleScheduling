@@ -117,9 +117,30 @@ public class EmployeeShiftCompatibilityManager {
 		return employee;
 	}
     
+    /**Returns if this employee allowed to work this shift and with any client covered by it.
+     * Clients requiring medpass must have employees that are medpass certified.
+     * Clients must have staff of the proper gender.
+     * Clients must not be paired with smokers upon request.
+     * Clients with cats must not be paired with employees who have cat allergies.
+     * Clients must be paired with signing staff when required.
+     * Clients and employees must be properly aligned with custom requirements.
+     * 
+	 * @param EmployeeShiftCompatibility
+	 * @return boolean true for valid events. If the employee is allowed to work with the client this shift is scheduled for
+	 * @throws ProccessingException Coding failure, null compatibility, employee, shift or client
+	 * @throws CorruptDataException The Shift provided is invalid
+	 * @Tested
+	 */
 	public boolean getCompatible(EmployeeShiftCompatibility compatibility) throws ProccessingException, CorruptDataException {
-		Employee employee = compatibility.getEmployee();
-		Shift shift = compatibility.getShift();
+		Employee employee = null;
+		Shift shift = null;
+		
+		if(null==compatibility) {
+			throw new ProccessingException("Null compatibility provided to isCompatibleWith");
+		}
+		
+		employee= compatibility.getEmployee();
+		shift = compatibility.getShift();
 		
 		return isCompatibleWith(employee,shift);
 	}
@@ -702,18 +723,33 @@ public class EmployeeShiftCompatibilityManager {
     	return unassigned;
 	}
 	
-	public boolean isAvailableFor(Employee employee, Shift shift) throws CorruptDataException{
+	/**Returns if the employee has themselves listed as willing to work during the days and times covered by the shift
+	 * 
+	 * @param employee
+	 * @param shift a valid shift
+	 * @return boolean if the employee has themselves listed as willing to work during the days and times covered by the shift
+	 * @throws CorruptDataException invalid shift
+	 * @throws ProccessingException null employee or shift
+	 * @Tested
+	 */
+	public boolean isAvailableFor(Employee employee, Shift shift) throws CorruptDataException, ProccessingException{
+		boolean available = true;
+		
+		if(null==employee||null==shift) {
+			throw new ProccessingException("Null employee or shift provided to isAvailableFor");
+		}
+		else if(!shift.isValid()) {
+			throw new CorruptDataException("Invalid shift provided to isAvailableFor");
+		}
+
 		LocalDate date = LocalDate.of(shift.getStartYear(), shift.getStartMonth(), shift.getStartDay());
 		DayOfWeek day = date.getDayOfWeek();
 		int dayInt = day.getValue();
 		if(dayInt==7){
 			dayInt=0;
 		}
-		if(null!=employee && null!=shift){
-			System.out.println("is "+employee.getFirst()+" available for " +shift.toString());
-		}
+		
 		if(!shift.getOvernight()){
-			System.out.println("available on the day");
 			if(employee.getDaysAvailable()[dayInt]){
 				boolean[] availability = employee.getAvailabilityFor(dayInt);
 				
@@ -727,31 +763,29 @@ public class EmployeeShiftCompatibilityManager {
 				for(int hourCursor = startHour;hourCursor<=endHour;hourCursor++){
 					if(hourCursor!=endHour){
     					if(!availability[hourCursor]){
-    						return false;
+    						available = false;
     					}
 					}
 					else if(endMinute!=0){
 						if(!availability[hourCursor]){
-    						return false;
+							available = false;
     					}
 					}
 				}
 			}
 			else{
-				return false;
+				available = false;
 			}
 		}
 		else{
-			System.out.println("checking availability for an overnight shift");
 			if(employee.getDaysAvailable()[dayInt]){
 				boolean[] availability = employee.getAvailabilityFor(dayInt);
 				
 				String start = shift.getStartTime();
 				int startHour = (int) Integer.parseInt(start.split(":")[0]);
-				
 				for(int hourCursor = startHour;hourCursor<24;hourCursor++){
 					if(!availability[hourCursor]){
-						return false;
+						available = false;
 					}
 				}
 				
@@ -764,29 +798,32 @@ public class EmployeeShiftCompatibilityManager {
 				int endHour = (int) Integer.parseInt(end.split(":")[0]);
 				int endMinute = (int) Integer.parseInt(end.split(":")[1]);
 				
+				availability = employee.getAvailabilityFor(dayInt);
+				
 				if(employee.getDaysAvailable()[dayInt]){
 					for(int hourCursor =0;hourCursor<endHour;hourCursor++){
     					if(hourCursor!=endHour){
 	    					if(!availability[hourCursor]){
-	    						return false;
+	    						available = false;
 	    					}
     					}
     					else if(endMinute!=0){
 							if(!availability[hourCursor]){
-	    						return false;
+								available = false;
 	    					}
     					}
     				}
 				}
 				else{
-    				return false;
+					available = false;
     			}
 			}
 			else{
-				return false;
+				available = false;
 			}
 		}
-		return true;
+		
+		return available;
 	}
 	
 	 
