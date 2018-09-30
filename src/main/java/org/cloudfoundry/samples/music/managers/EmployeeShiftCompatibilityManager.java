@@ -30,6 +30,7 @@ public class EmployeeShiftCompatibilityManager {
     public EmployeeShiftManager employeeShiftManager;
     
     @Autowired
+	public
     EmployeeClientCompatibilityManager employeeClientCompatibilityManager;
     
     @Autowired
@@ -558,19 +559,50 @@ public class EmployeeShiftCompatibilityManager {
 		return validity;
 	}
 
+	/**Returns if this employee allowed to work this shift and with any client covered by it.
+     * Clients requiring medpass must have employees that are medpass certified.
+     * Clients must have staff of the proper gender.
+     * Clients must not be paired with smokers upon request.
+     * Clients with cats must not be paired with employees who have cat allergies.
+     * Clients must be paired with signing staff when required.
+     * Clients and employees must be properly aligned with custom requirements.
+     * 
+	 * @param employee
+	 * @param shift A fully formed shift that returns true with shift.isValid
+	 * @return boolean true for valid events. If the employee is allowed to work with the client this shift is scheduled for
+	 * @throws ProccessingException Coding failure, null employee, shift or client
+	 * @throws CorruptDataException The Shift provided is invalid
+	 * @Tested
+	 */
 	public boolean isCompatibleWith(Employee employee,Shift shift) throws ProccessingException, CorruptDataException{
-    	if(!shift.getEvent()){
-    		String clientID = shift.getClientId();
-	    	Client client = null;
-    		client=clientRepository.findOne(clientID);
-	    	
-	    	return employeeClientCompatibilityManager.isCompatibleWith(employee,client);
+		String clientID=null;
+		Client client = null;
+		boolean valid = false; 
+		
+		if(null==employee||null==shift) {
+			throw new ProccessingException("Null employee or shift provided to isCompatibleWith");
+		}
+		else if(!shift.isValid()) {
+			throw new CorruptDataException("Invalid shift provided to isCompatibleWith");
+		}
+		else if(null==shift.getClientId()) {
+			throw new ProccessingException("Null clientId provided to isCompatibleWith");
+		}
+		
+		
+    	if(shift.getEvent()){
+    		valid =  true;
     	}
     	else{
-    		return true;
-    		
+    		clientID = shift.getClientId();
+    		System.out.println("getting client "+clientID);
+    		client=clientRepository.findOne(clientID);
+
+    		System.out.println("got client "+client.toString());
+	    	valid = employeeClientCompatibilityManager.isCompatibleWith(employee,client);
     	}
     	
+    	return valid;
     }
     
 	/**Return the number of hours below maximum the provided employee is for the week of this shift

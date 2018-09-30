@@ -37,6 +37,7 @@ public class EmployeeClientCompatibilityManager {
      * @return boolean Is this employee allowed to work with this client?
      * @throws ProccessingException Null employee or client provided to isCompatibleWith
      * @throws CorruptDataException 
+     * @Tested
      */
     public boolean isCompatibleWith(Employee employee,Client client) throws ProccessingException, CorruptDataException{
     	if(null==employee||null==client) {
