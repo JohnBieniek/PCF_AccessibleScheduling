@@ -290,7 +290,7 @@ public class Shift {
     }
 
     public int getStartMonth() {
-        return startMonth;
+        return (int) Integer.parseInt(startDate.split("-")[1]);
     }
     
     public LocalDate getStartsLocalDate() throws CorruptDataException{
@@ -399,7 +399,7 @@ public class Shift {
     }
 
     public int getStartYear() {
-        return startYear;
+        return (int) Integer.parseInt(startDate.split("-")[0]);
     }
 
     public boolean isWeekend() throws CorruptDataException{

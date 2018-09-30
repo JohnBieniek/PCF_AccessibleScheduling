@@ -14,7 +14,7 @@ public class EmployeeClientCompatibilityManager {
     private CrudRepository<CustomField, String> customFieldRepository;
     
     @Autowired
-    private CustomDataManager customDataManager;
+    public CustomDataManager customDataManager;
     
     @Autowired
     EmployeeShiftManager employeeShiftManager;
@@ -36,8 +36,10 @@ public class EmployeeClientCompatibilityManager {
      * @param client
      * @return boolean Is this employee allowed to work with this client?
      * @throws ProccessingException Null employee or client provided to isCompatibleWith
+     * @throws CorruptDataException 
+     * @Tested
      */
-    public boolean isCompatibleWith(Employee employee,Client client) throws ProccessingException{
+    public boolean isCompatibleWith(Employee employee,Client client) throws ProccessingException, CorruptDataException{
     	if(null==employee||null==client) {
 			throw new ProccessingException("Null employee or client provided to isCompatibleWith");
 		}
@@ -64,11 +66,17 @@ public class EmployeeClientCompatibilityManager {
     	}
     	
     	Iterable<CustomField> customFields = customFieldRepository.findAll();
-    	
     	if(null!=customFields) {
+    		System.out.println("Had a field");
 	    	for(CustomField customField : customFields){
-	    		boolean clientData = customDataManager.getCustomFieldDataOrCreateIfMissing(client,customField);
-	    		boolean employeeData = customDataManager.getCustomFieldDataOrCreateIfMissing(employee,customField);
+	    		System.out.println("customField"+customField.toString());
+	    		System.out.println(employee.toString() + client.toString());
+	    		boolean clientData = customDataManager.getCustomFieldDatasValueOrCreateIfMissing(client,customField);
+	    		System.out.println("past this");
+	    		boolean employeeData = customDataManager.getCustomFieldDatasValueOrCreateIfMissing(employee,customField);
+	    		System.out.println(clientData+" "+employeeData);
+	    		
+	    		
 	    		
 	    		if(customField.getClientRequirement()){
 	    			if(clientData && !employeeData){

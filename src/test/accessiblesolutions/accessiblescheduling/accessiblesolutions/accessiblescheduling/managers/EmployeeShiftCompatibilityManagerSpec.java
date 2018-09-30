@@ -11,12 +11,14 @@ import java.util.ArrayList;
 import javax.annotation.Resource;
 
 import org.cloudfoundry.samples.music.managers.CustomDataManager;
+import org.cloudfoundry.samples.music.managers.EmployeeClientCompatibilityManager;
 import org.cloudfoundry.samples.music.managers.EmployeeShiftCompatibilityManager;
 import org.cloudfoundry.samples.music.managers.EmployeeShiftManager;
 import org.cloudfoundry.samples.music.managers.EmployeeShiftMapManager;
 import org.cloudfoundry.samples.music.managers.ShiftGenerationManager;
 import org.cloudfoundry.samples.music.managers.ShiftManager;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoClientRepository;
+import org.cloudfoundry.samples.music.repositories.mongodb.MongoCustomFieldRepository;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoShiftRepository;
 import org.junit.After;
 import org.junit.Before;
@@ -29,9 +31,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.repository.CrudRepository;
 
 import accessiblesolutions.accessiblescheduling.domain.Client;
+import accessiblesolutions.accessiblescheduling.domain.CustomField;
+import accessiblesolutions.accessiblescheduling.domain.CustomFieldData;
 import accessiblesolutions.accessiblescheduling.domain.Employee;
 import accessiblesolutions.accessiblescheduling.domain.EmployeeShiftCompatibilities;
 import accessiblesolutions.accessiblescheduling.domain.EmployeeShiftCompatibility;
+import accessiblesolutions.accessiblescheduling.domain.Gender;
 import accessiblesolutions.accessiblescheduling.domain.Shift;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
@@ -53,10 +58,17 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	
 	@Mock
     CrudRepository<Employee,String> employeeCrud;
+
+	
+	@Mock
+	MongoCustomFieldRepository customFieldRepository;
 	
 	@Mock
     CrudRepository<Employee,String> employeeRepository;
     
+	@Mock
+	CrudRepository<CustomFieldData, String> customFieldDataRepository;
+	
 	@Mock
     CustomDataManager customDataManager;
     
@@ -213,11 +225,26 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	    when(employeeCrud.findOne("assignedFiveDay")).thenReturn(assignedFiveDay);
 	    when(employeeRepository.findOne("assignedFiveDay")).thenReturn(assignedFiveDay);
 	    
+	    CustomField woodField = new CustomField();
+		woodField.setClientRequirement(true);
+		woodField.setId("woodId");
+		Client onAlwaysClient = new Client("On","AlwaysClient");
+		onAlwaysClient.setId("onAlwaysClient");
+		CustomFieldData onAlwaysClientData = new CustomFieldData();
+		onAlwaysClientData.setOwnerId("onAlwaysClient");
+		onAlwaysClientData.setCustomFieldId("woodId");
+		onAlwaysClientData.setBooleanData(true);
+		
 	    EmployeeShiftManager customEmployeeShiftManager = new EmployeeShiftManager(employeeCrud, shiftRepository);
 	    customEmployeeShiftManager.shiftRepository=shiftRepository;
 	    when(employeeCrud.findAll()).thenReturn(itterable);
 	     fixture= new EmployeeShiftCompatibilityManager(clientRepository, employeeCrud);
 	     fixture.employeeShiftManager=customEmployeeShiftManager;
+	     fixture.employeeClientCompatibilityManager = new EmployeeClientCompatibilityManager(customFieldRepository);
+	     when(customDataManager.getCustomFieldDatasValueOrCreateIfMissing(onAlways,woodField)).thenReturn(false);
+		when(customDataManager.getCustomFieldDatasValueOrCreateIfMissing(onAlwaysClient,woodField)).thenReturn(true);
+		    
+		fixture.employeeClientCompatibilityManager.customDataManager = customDataManager;
 	}
 	
 	@After
@@ -1893,5 +1920,1663 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		
 		assertFalse(errored);
 		assertFalse(violates);
+	}
+	
+	@Test
+	public void isCompatibleWithThrowsProcessingExceptionForNullEmployee() {
+		boolean errored=false;
+		
+		try {
+			fixture.isCompatibleWith(null,new Shift());
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void isCompatibleWithThrowsProcessingExceptionForNullShift() {
+		boolean errored=false;
+		
+		try {
+			fixture.isCompatibleWith(new Employee(),null);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void isCompatibleWithReturnsFalseWithMissingMedpass() {
+		boolean errored=false;
+		boolean compatible = false;
+		Employee employee = new Employee();
+		Client client = new Client();
+		client.setMedPass(true);
+		Shift shift = new Shift();
+		try {
+			compatible = fixture.isCompatibleWith(new Employee(),shift);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertFalse(employee.getMedPassCertified());
+		assertFalse(compatible);
+	}
+	
+	@Test
+	public void isCompatibleWithReturnsFalseWithDisallowedFemale() {
+		boolean errored=false;
+		boolean compatible = false;
+		Employee employee = new Employee();
+		Client client = new Client();
+		client.setNoFemale(true);
+		Shift shift = new Shift();
+		try {
+			compatible = fixture.isCompatibleWith(new Employee(),shift);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertFalse(employee.getMedPassCertified());
+		assertFalse(compatible);
+	}
+	
+	@Test
+	public void isCompatibleWithReturnsFalseWithDisallowedMale() {
+		boolean errored=false;
+		boolean compatible = false;
+		Employee employee = new Employee();
+		employee.setGender(Gender.MALE);
+		Client client = new Client();
+		client.setNoMale(true);
+		Shift shift = new Shift();
+		try {
+			compatible = fixture.isCompatibleWith( employee,shift);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertFalse(employee.getMedPassCertified());
+		assertFalse(compatible);
+	}
+	
+	@Test
+	public void isCompatibleWithReturnsFalseWithForbiddenSmoker() {
+		boolean errored=false;
+		boolean compatible = false;
+		Employee employee = new Employee();
+		employee.setSmoker(true);
+		Client client = new Client();
+		client.setNoSmokers(true);
+		Shift shift = new Shift();
+		try {
+			compatible = fixture.isCompatibleWith(employee,shift);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertFalse(employee.getMedPassCertified());
+		assertFalse(compatible);
+	}
+	
+	@Test
+	public void isCompatibleWithReturnsFalseWithForbiddenCats() {
+		boolean errored=false;
+		boolean compatible = false;
+		Employee employee = new Employee();
+		employee.setNoCats(true);
+		Client client = new Client();
+		client.setOwnCats(true);
+		Shift shift = new Shift();
+		try {
+			compatible = fixture.isCompatibleWith(employee,shift);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertFalse(employee.getMedPassCertified());
+		assertFalse(compatible);
+	}
+	
+	@Test
+	public void isCompatibleWithReturnsFalseWithMissingSigning() {
+		boolean errored=false;
+		boolean compatible = false;
+		Employee employee = new Employee();
+		Client client = new Client();
+		client.setSigningOnly(true);
+		Shift shift = new Shift();
+		try {
+			compatible = fixture.isCompatibleWith(employee,shift);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertFalse(employee.getMedPassCertified());
+		assertFalse(compatible);
+	}
+
+	@Test
+	public void isCompatibleWithReturnsTrueForCompatibilePeopleWithNoCustomData1() {
+		boolean errored=false;
+		boolean compatible = false;
+		Employee employee = new Employee();
+		Client client = new Client();
+		Shift shift = new Shift();
+		shift.setStartDate("2018-10-10");
+		shift.setEndDate("2018-10-10");
+		shift.setStartTime("10:00");
+		shift.setEndTime("12:00");
+		shift.setClientId("inOvertimeClient");
+		
+		try {
+			compatible = fixture.isCompatibleWith(new Employee(),shift);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertFalse(employee.getMedPassCertified());
+		assertTrue(compatible);
+	}
+	
+	@Test
+	public void isCompatibleWithReturnsTrueForCompatibilePeopleWithNoCustomData2() {
+		boolean errored=false;
+		boolean compatible = false;
+		Employee employee = new Employee();
+		employee.setMedPassCertified(true);
+		Client client = new Client();
+		client.setMedPass(true);
+		Shift shift = new Shift();
+		shift.setStartDate("2018-10-10");
+		shift.setEndDate("2018-10-10");
+		shift.setStartTime("10:00");
+		shift.setEndTime("12:00");
+		shift.setClientId("inOvertimeClient");
+		when(clientRepository.findOne("inOvertimeClient")).thenReturn(client);
+		try {
+			compatible = fixture.isCompatibleWith(employee,shift);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(compatible);
+	}
+	
+	@Test
+	public void isCompatibleWithReturnsTrueForCompatibilePeopleWithNoCustomData3() {
+		boolean errored=false;
+		boolean compatible = false;
+		Employee employee = new Employee();
+		Client client = new Client();
+		client.setNoSmokers(true);
+		Shift shift = new Shift();
+		shift.setStartDate("2018-10-10");
+		shift.setEndDate("2018-10-10");
+		shift.setStartTime("10:00");
+		shift.setEndTime("12:00");
+		shift.setClientId("inOvertimeClient");
+		when(clientRepository.findOne("inOvertimeClient")).thenReturn(client);
+		try {
+			compatible = fixture.isCompatibleWith(employee,shift);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(compatible);
+	}
+	
+	@Test
+	public void isCompatibleWithReturnsTrueForCompatibilePeopleWithNoCustomData4() {
+		boolean errored=false;
+		boolean compatible = false;
+		Employee employee = new Employee();
+		Client client = new Client();
+		client.setNoMale(true);
+		Shift shift = new Shift();
+		shift.setStartDate("2018-10-10");
+		shift.setEndDate("2018-10-10");
+		shift.setStartTime("10:00");
+		shift.setEndTime("12:00");
+		shift.setClientId("inOvertimeClient");
+		when(clientRepository.findOne("inOvertimeClient")).thenReturn(client);
+		
+		try {
+			compatible = fixture.isCompatibleWith(employee,shift);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(compatible);
+	}
+	
+	@Test
+	public void isCompatibleWithReturnsTrueForCompatibilePeopleWithNoCustomData5() {
+		boolean errored=false;
+		boolean compatible = false;
+		Employee employee = new Employee();
+		Client client = new Client();
+		client.setNoMale(true);
+		Shift shift = new Shift();
+		shift.setStartDate("2018-10-10");
+		shift.setEndDate("2018-10-10");
+		shift.setStartTime("10:00");
+		shift.setEndTime("12:00");
+		shift.setClientId("inOvertimeClient");
+		when(clientRepository.findOne("inOvertimeClient")).thenReturn(client);
+		
+		try {
+			compatible = fixture.isCompatibleWith(employee,shift);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(compatible);
+	}
+	
+	@Test
+	public void isCompatibleWithReturnsTrueForCompatibilePeopleWithNoCustomData6() {
+		boolean errored=false;
+		boolean compatible = false;
+		Employee employee = new Employee();
+		employee.setGender(Gender.MALE);
+		Client client = new Client();
+		client.setNoFemale(true);
+		Shift shift = new Shift();
+		shift.setStartDate("2018-10-10");
+		shift.setEndDate("2018-10-10");
+		shift.setStartTime("10:00");
+		shift.setEndTime("12:00");
+		shift.setClientId("inOvertimeClient");
+		when(clientRepository.findOne("inOvertimeClient")).thenReturn(client);
+		
+		try {
+			compatible = fixture.isCompatibleWith(employee,shift);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(compatible);
+	}
+	public void isCompatibleWithReturnsTrueForCompatibilePeopleWithNoCustomData7() {
+		boolean errored=false;
+		boolean compatible = false;
+		Employee employee = new Employee();
+		employee.setNoCats(true);
+		Client client = new Client();
+		Shift shift = new Shift();
+		shift.setStartDate("2018-10-10");
+		shift.setEndDate("2018-10-10");
+		shift.setStartTime("10:00");
+		shift.setEndTime("12:00");
+		shift.setClientId("inOvertimeClient");
+		when(clientRepository.findOne("inOvertimeClient")).thenReturn(client);
+		
+		try {
+			compatible = fixture.isCompatibleWith(employee,shift);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(compatible);
+	}
+	
+	@Test
+	public void isCompatibleWithReturnsTrueForCompatibilePeopleWithNoCustomData8() {
+		boolean errored=false;
+		boolean compatible = false;
+		Employee employee = new Employee();
+		Client client = new Client();
+		client.setOwnCats(true);
+		Shift shift = new Shift();
+		shift.setStartDate("2018-10-10");
+		shift.setEndDate("2018-10-10");
+		shift.setStartTime("10:00");
+		shift.setEndTime("12:00");
+		shift.setClientId("inOvertimeClient");
+		when(clientRepository.findOne("inOvertimeClient")).thenReturn(client);
+		
+		try {
+			compatible = fixture.isCompatibleWith(employee,shift);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(compatible);
+	}
+	
+	@Test
+	public void isCompatibleWithReturnsTrueForCompatibilePeopleWithNoCustomData9() {
+		boolean errored=false;
+		boolean compatible = false;
+		Employee employee = new Employee();
+		employee.setSigning(true);
+		Client client = new Client();
+		client.setSigningOnly(true);	
+		Shift shift = new Shift();
+		shift.setStartDate("2018-10-10");
+		shift.setEndDate("2018-10-10");
+		shift.setStartTime("10:00");
+		shift.setEndTime("12:00");
+		shift.setClientId("inOvertimeClient");
+		when(clientRepository.findOne("inOvertimeClient")).thenReturn(client);
+		
+		try {
+			compatible = fixture.isCompatibleWith(employee,shift);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(compatible);
+	}
+	
+	@Test
+	public void isCompatibleWithReturnsTrueForCompatibilePeopleWithNoCustomData10() {
+		boolean errored=false;
+		boolean compatible = false;
+		Employee employee = new Employee();
+		employee.setSigning(true);
+		Client client = new Client();
+		Shift shift = new Shift();
+		shift.setStartDate("2018-10-10");
+		shift.setEndDate("2018-10-10");
+		shift.setStartTime("10:00");
+		shift.setEndTime("12:00");
+		shift.setClientId("inOvertimeClient");
+		when(clientRepository.findOne("inOvertimeClient")).thenReturn(client);
+		
+		try {
+			compatible = fixture.isCompatibleWith(employee,shift);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(compatible);
+	}
+	
+	@Test
+	public void isCompatibleWithReturnsFalseWithFailingCustomClientRequirement() throws ProccessingException, CorruptDataException {
+		boolean errored=false;
+		boolean compatible = false;
+		
+		Employee onAlways = new Employee("On","Always");
+		onAlways.setId("onAlways");
+		CustomFieldData onAlwaysData = new CustomFieldData();
+		onAlwaysData.setOwnerId("onAlways");
+		onAlwaysData.setCustomFieldId("woodId");
+		
+		
+		when(employeeCrud.findOne("onAlways")).thenReturn(onAlways);
+
+		Client onAlwaysClient = new Client("On","AlwaysClient");
+		onAlwaysClient.setId("onAlwaysClient");
+		CustomFieldData onAlwaysClientData = new CustomFieldData();
+		onAlwaysClientData.setOwnerId("onAlwaysClient");
+		onAlwaysClientData.setCustomFieldId("woodId");
+		onAlwaysClientData.setBooleanData(true);
+		
+		
+		CustomField woodField = new CustomField();
+		woodField.setClientRequirement(true);
+		woodField.setId("woodId");
+		
+		ArrayList<CustomField> customFields = new ArrayList<CustomField>();
+		customFields.add(woodField);
+		when(customFieldRepository.findAll()).thenReturn(customFields);
+		
+		when(customDataManager.getCustomFieldDatasValueOrCreateIfMissing(onAlways,woodField)).thenReturn(false);
+		when(customDataManager.getCustomFieldDatasValueOrCreateIfMissing(onAlwaysClient,woodField)).thenReturn(true);
+		
+		ArrayList<CustomFieldData> customFieldData = new ArrayList<CustomFieldData>();
+		customFieldData.add(onAlwaysData);
+
+		customFieldData = new ArrayList<CustomFieldData>();
+		customFieldData.add(onAlwaysClientData);
+		
+		Shift shift = new Shift();
+		shift.setStartDate("2018-10-10");
+		shift.setEndDate("2018-10-10");
+		shift.setStartTime("10:00");
+		shift.setEndTime("12:00");
+		shift.setClientId("onAlwaysClient");
+		when(clientRepository.findOne("onAlwaysClient")).thenReturn(onAlwaysClient);
+		
+		try {
+			compatible = fixture.isCompatibleWith(onAlways,shift);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertFalse(compatible);
+	}
+	
+	@Test
+	public void isCompatibleWithReturnsFalseWithFailingCustomEmployeeRequirement() throws ProccessingException, CorruptDataException {
+		boolean errored=false;
+		boolean compatible = false;
+		
+		Employee onAlways = new Employee("On","Always");
+		onAlways.setId("onAlways");
+		CustomFieldData onAlwaysData = new CustomFieldData();
+		onAlwaysData.setOwnerId("onAlways");
+		onAlwaysData.setCustomFieldId("woodId");
+		onAlwaysData.setBooleanData(true);
+		
+		when(employeeCrud.findOne("onAlways")).thenReturn(onAlways);
+
+		Client onAlwaysClient = new Client("On","AlwaysClient");
+		onAlwaysClient.setId("onAlwaysClient");
+		CustomFieldData onAlwaysClientData = new CustomFieldData();
+		onAlwaysClientData.setOwnerId("onAlwaysClient");
+		onAlwaysClientData.setCustomFieldId("woodId");
+		onAlwaysClientData.setBooleanData(false);
+		
+		
+		CustomField woodField = new CustomField();
+		woodField.setEmployeeRequirement(true);
+		woodField.setId("woodId");
+		
+		ArrayList<CustomField> customFields = new ArrayList<CustomField>();
+		customFields.add(woodField);
+		when(customFieldRepository.findAll()).thenReturn(customFields);
+		
+		when(customDataManager.getCustomFieldDatasValueOrCreateIfMissing(onAlways,woodField)).thenReturn(true);
+		when(customDataManager.getCustomFieldDatasValueOrCreateIfMissing(onAlwaysClient,woodField)).thenReturn(false);
+		
+		ArrayList<CustomFieldData> customFieldData = new ArrayList<CustomFieldData>();
+		customFieldData.add(onAlwaysData);
+
+		customFieldData = new ArrayList<CustomFieldData>();
+		customFieldData.add(onAlwaysClientData);
+		
+		Shift shift = new Shift();
+		shift.setStartDate("2018-10-10");
+		shift.setEndDate("2018-10-10");
+		shift.setStartTime("10:00");
+		shift.setEndTime("12:00");
+		shift.setClientId("onAlwaysClient");
+		when(clientRepository.findOne("onAlwaysClient")).thenReturn(onAlwaysClient);
+		
+		try {
+			compatible = fixture.isCompatibleWith(onAlways,shift);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertFalse(compatible);
+	}
+	
+	@Test
+	public void isCompatibleWithReturnsTrueWithCustomEmployeeRequirement() throws ProccessingException, CorruptDataException {
+		boolean errored=false;
+		boolean compatible = false;
+		
+		Employee onAlways = new Employee("On","Always");
+		onAlways.setId("onAlways");
+		CustomFieldData onAlwaysData = new CustomFieldData();
+		onAlwaysData.setOwnerId("onAlways");
+		onAlwaysData.setCustomFieldId("woodId");
+		onAlwaysData.setBooleanData(true);
+		
+		when(employeeCrud.findOne("onAlways")).thenReturn(onAlways);
+
+		Client onAlwaysClient = new Client("On","AlwaysClient");
+		onAlwaysClient.setId("onAlwaysClient");
+		CustomFieldData onAlwaysClientData = new CustomFieldData();
+		onAlwaysClientData.setOwnerId("onAlwaysClient");
+		onAlwaysClientData.setCustomFieldId("woodId");
+		onAlwaysClientData.setBooleanData(true);
+		
+		
+		CustomField woodField = new CustomField();
+		woodField.setEmployeeRequirement(true);
+		woodField.setId("woodId");
+		
+		ArrayList<CustomField> customFields = new ArrayList<CustomField>();
+		customFields.add(woodField);
+		when(customFieldRepository.findAll()).thenReturn(customFields);
+		
+		when(customDataManager.getCustomFieldDatasValueOrCreateIfMissing(onAlways,woodField)).thenReturn(true);
+		when(customDataManager.getCustomFieldDatasValueOrCreateIfMissing(onAlwaysClient,woodField)).thenReturn(true);
+		
+		ArrayList<CustomFieldData> customFieldData = new ArrayList<CustomFieldData>();
+		customFieldData.add(onAlwaysData);
+
+		customFieldData = new ArrayList<CustomFieldData>();
+		customFieldData.add(onAlwaysClientData);
+		
+		Shift shift = new Shift();
+		shift.setStartDate("2018-10-10");
+		shift.setEndDate("2018-10-10");
+		shift.setStartTime("10:00");
+		shift.setEndTime("12:00");
+		shift.setClientId("onAlwaysClient");
+		when(clientRepository.findOne("onAlwaysClient")).thenReturn(onAlwaysClient);
+		
+		try {
+			compatible = fixture.isCompatibleWith(onAlways,shift);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(compatible);
+	}
+	
+	@Test
+	public void isCompatibleWithReturnsTrueWithCustomClientRequirement() throws ProccessingException, CorruptDataException {
+		boolean errored=false;
+		boolean compatible = false;
+		
+		Employee onAlways = new Employee("On","Always");
+		onAlways.setId("onAlways");
+		CustomFieldData onAlwaysData = new CustomFieldData();
+		onAlwaysData.setOwnerId("onAlways");
+		onAlwaysData.setCustomFieldId("woodId");
+		onAlwaysData.setBooleanData(true);
+		
+		when(employeeCrud.findOne("onAlways")).thenReturn(onAlways);
+
+		Client onAlwaysClient = new Client("On","AlwaysClient");
+		onAlwaysClient.setId("onAlwaysClient");
+		CustomFieldData onAlwaysClientData = new CustomFieldData();
+		onAlwaysClientData.setOwnerId("onAlwaysClient");
+		onAlwaysClientData.setCustomFieldId("woodId");
+		onAlwaysClientData.setBooleanData(true);
+		
+		
+		CustomField woodField = new CustomField();
+		woodField.setClientRequirement(true);
+		woodField.setId("woodId");
+		
+		ArrayList<CustomField> customFields = new ArrayList<CustomField>();
+		customFields.add(woodField);
+		when(customFieldRepository.findAll()).thenReturn(customFields);
+		
+		when(customDataManager.getCustomFieldDatasValueOrCreateIfMissing(onAlways,woodField)).thenReturn(true);
+		when(customDataManager.getCustomFieldDatasValueOrCreateIfMissing(onAlwaysClient,woodField)).thenReturn(true);
+		
+		ArrayList<CustomFieldData> customFieldData = new ArrayList<CustomFieldData>();
+		customFieldData.add(onAlwaysData);
+
+		customFieldData = new ArrayList<CustomFieldData>();
+		customFieldData.add(onAlwaysClientData);
+		
+		Shift shift = new Shift();
+		shift.setStartDate("2018-10-10");
+		shift.setEndDate("2018-10-10");
+		shift.setStartTime("10:00");
+		shift.setEndTime("12:00");
+		shift.setClientId("onAlwaysClient");
+		when(clientRepository.findOne("onAlwaysClient")).thenReturn(onAlwaysClient);
+		
+		try {
+			compatible = fixture.isCompatibleWith(onAlways,shift);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(compatible);
+	}
+	
+	@Test
+	public void getCompatibleThrowsProcessingExceptionForNullEmployee() {
+		boolean errored=false;
+		EmployeeShiftCompatibility compatibility= new EmployeeShiftCompatibility(null,new Shift());
+		
+		try {
+			fixture.getCompatible(compatibility);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void getCompatibleThrowsProcessingExceptionForNullShift() {
+		boolean errored=false;
+		EmployeeShiftCompatibility compatibility= new EmployeeShiftCompatibility(new Employee(),null);
+		try {
+			fixture.getCompatible(compatibility);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void getCompatibleReturnsFalseWithMissingMedpass() {
+		boolean errored=false;
+		boolean compatible = false;
+		Employee employee = new Employee();
+		Client client = new Client();
+		client.setMedPass(true);
+		Shift shift = new Shift();
+		EmployeeShiftCompatibility compatibility= new EmployeeShiftCompatibility(employee,shift);
+		
+		try {
+			compatible = fixture.getCompatible(compatibility);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertFalse(employee.getMedPassCertified());
+		assertFalse(compatible);
+	}
+	
+	@Test
+	public void getCompatibleReturnsFalseWithDisallowedFemale() {
+		boolean errored=false;
+		boolean compatible = false;
+		Employee employee = new Employee();
+		Client client = new Client();
+		client.setNoFemale(true);
+		Shift shift = new Shift();
+		EmployeeShiftCompatibility compatibility= new EmployeeShiftCompatibility(employee,shift);
+		try {
+			compatible = fixture.getCompatible(compatibility);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertFalse(employee.getMedPassCertified());
+		assertFalse(compatible);
+	}
+	
+	@Test
+	public void getCompatibleReturnsFalseWithDisallowedMale() {
+		boolean errored=false;
+		boolean compatible = false;
+		Employee employee = new Employee();
+		employee.setGender(Gender.MALE);
+		Client client = new Client();
+		client.setNoMale(true);
+		Shift shift = new Shift();
+		EmployeeShiftCompatibility compatibility= new EmployeeShiftCompatibility(employee,shift);
+		try {
+			compatible = fixture.getCompatible(compatibility);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertFalse(employee.getMedPassCertified());
+		assertFalse(compatible);
+	}
+	
+	@Test
+	public void getCompatibleReturnsFalseWithForbiddenSmoker() {
+		boolean errored=false;
+		boolean compatible = false;
+		Employee employee = new Employee();
+		employee.setSmoker(true);
+		Client client = new Client();
+		client.setNoSmokers(true);
+		Shift shift = new Shift();
+		EmployeeShiftCompatibility compatibility= new EmployeeShiftCompatibility(employee,shift);
+		try {
+			compatible = fixture.getCompatible(compatibility);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertFalse(employee.getMedPassCertified());
+		assertFalse(compatible);
+	}
+	
+	@Test
+	public void getCompatibleReturnsFalseWithForbiddenCats() {
+		boolean errored=false;
+		boolean compatible = false;
+		Employee employee = new Employee();
+		employee.setNoCats(true);
+		Client client = new Client();
+		client.setOwnCats(true);
+		Shift shift = new Shift();
+		EmployeeShiftCompatibility compatibility= new EmployeeShiftCompatibility(employee,shift);
+		try {
+			compatible = fixture.getCompatible(compatibility);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertFalse(employee.getMedPassCertified());
+		assertFalse(compatible);
+	}
+	
+	@Test
+	public void getCompatibleReturnsFalseWithMissingSigning() {
+		boolean errored=false;
+		boolean compatible = false;
+		Employee employee = new Employee();
+		Client client = new Client();
+		client.setSigningOnly(true);
+		Shift shift = new Shift();
+		EmployeeShiftCompatibility compatibility= new EmployeeShiftCompatibility(employee,shift);
+		try {
+			compatible = fixture.getCompatible(compatibility);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertFalse(employee.getMedPassCertified());
+		assertFalse(compatible);
+	}
+
+	@Test
+	public void getCompatibleReturnsTrueForCompatibilePeopleWithNoCustomData1() {
+		boolean errored=false;
+		boolean compatible = false;
+		Employee employee = new Employee();
+		Client client = new Client();
+		Shift shift = new Shift();
+		shift.setStartDate("2018-10-10");
+		shift.setEndDate("2018-10-10");
+		shift.setStartTime("10:00");
+		shift.setEndTime("12:00");
+		shift.setClientId("inOvertimeClient");
+		EmployeeShiftCompatibility compatibility= new EmployeeShiftCompatibility(employee,shift);
+		
+		try {
+			compatible = fixture.getCompatible(compatibility);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertFalse(employee.getMedPassCertified());
+		assertTrue(compatible);
+	}
+	
+	@Test
+	public void getCompatibleReturnsTrueForCompatibilePeopleWithNoCustomData2() {
+		boolean errored=false;
+		boolean compatible = false;
+		Employee employee = new Employee();
+		employee.setMedPassCertified(true);
+		Client client = new Client();
+		client.setMedPass(true);
+		Shift shift = new Shift();
+		shift.setStartDate("2018-10-10");
+		shift.setEndDate("2018-10-10");
+		shift.setStartTime("10:00");
+		shift.setEndTime("12:00");
+		shift.setClientId("inOvertimeClient");
+		when(clientRepository.findOne("inOvertimeClient")).thenReturn(client);
+		EmployeeShiftCompatibility compatibility= new EmployeeShiftCompatibility(employee,shift);
+		try {
+			compatible = fixture.getCompatible(compatibility);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(compatible);
+	}
+	
+	@Test
+	public void getCompatibleReturnsTrueForCompatibilePeopleWithNoCustomData3() {
+		boolean errored=false;
+		boolean compatible = false;
+		Employee employee = new Employee();
+		Client client = new Client();
+		client.setNoSmokers(true);
+		Shift shift = new Shift();
+		shift.setStartDate("2018-10-10");
+		shift.setEndDate("2018-10-10");
+		shift.setStartTime("10:00");
+		shift.setEndTime("12:00");
+		shift.setClientId("inOvertimeClient");
+		when(clientRepository.findOne("inOvertimeClient")).thenReturn(client);
+		EmployeeShiftCompatibility compatibility= new EmployeeShiftCompatibility(employee,shift);
+		try {
+			compatible = fixture.getCompatible(compatibility);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(compatible);
+	}
+	
+	@Test
+	public void getCompatibleReturnsTrueForCompatibilePeopleWithNoCustomData4() {
+		boolean errored=false;
+		boolean compatible = false;
+		Employee employee = new Employee();
+		Client client = new Client();
+		client.setNoMale(true);
+		Shift shift = new Shift();
+		shift.setStartDate("2018-10-10");
+		shift.setEndDate("2018-10-10");
+		shift.setStartTime("10:00");
+		shift.setEndTime("12:00");
+		shift.setClientId("inOvertimeClient");
+		when(clientRepository.findOne("inOvertimeClient")).thenReturn(client);
+		EmployeeShiftCompatibility compatibility= new EmployeeShiftCompatibility(employee,shift);
+		
+		try {
+			compatible = fixture.getCompatible(compatibility);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(compatible);
+	}
+	
+	@Test
+	public void getCompatibleReturnsTrueForCompatibilePeopleWithNoCustomData5() {
+		boolean errored=false;
+		boolean compatible = false;
+		Employee employee = new Employee();
+		Client client = new Client();
+		client.setNoMale(true);
+		Shift shift = new Shift();
+		shift.setStartDate("2018-10-10");
+		shift.setEndDate("2018-10-10");
+		shift.setStartTime("10:00");
+		shift.setEndTime("12:00");
+		shift.setClientId("inOvertimeClient");
+		when(clientRepository.findOne("inOvertimeClient")).thenReturn(client);
+		EmployeeShiftCompatibility compatibility= new EmployeeShiftCompatibility(employee,shift);
+		
+		try {
+			compatible = fixture.getCompatible(compatibility);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(compatible);
+	}
+	
+	@Test
+	public void getCompatibleReturnsTrueForCompatibilePeopleWithNoCustomData6() {
+		boolean errored=false;
+		boolean compatible = false;
+		Employee employee = new Employee();
+		employee.setGender(Gender.MALE);
+		Client client = new Client();
+		client.setNoFemale(true);
+		Shift shift = new Shift();
+		shift.setStartDate("2018-10-10");
+		shift.setEndDate("2018-10-10");
+		shift.setStartTime("10:00");
+		shift.setEndTime("12:00");
+		shift.setClientId("inOvertimeClient");
+		when(clientRepository.findOne("inOvertimeClient")).thenReturn(client);
+		EmployeeShiftCompatibility compatibility= new EmployeeShiftCompatibility(employee,shift);
+		
+		try {
+			compatible = fixture.getCompatible(compatibility);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(compatible);
+	}
+	public void getCompatibleReturnsTrueForCompatibilePeopleWithNoCustomData7() {
+		boolean errored=false;
+		boolean compatible = false;
+		Employee employee = new Employee();
+		employee.setNoCats(true);
+		Client client = new Client();
+		Shift shift = new Shift();
+		shift.setStartDate("2018-10-10");
+		shift.setEndDate("2018-10-10");
+		shift.setStartTime("10:00");
+		shift.setEndTime("12:00");
+		shift.setClientId("inOvertimeClient");
+		when(clientRepository.findOne("inOvertimeClient")).thenReturn(client);
+		EmployeeShiftCompatibility compatibility= new EmployeeShiftCompatibility(employee,shift);
+		
+		try {
+			compatible = fixture.getCompatible(compatibility);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(compatible);
+	}
+	
+	@Test
+	public void getCompatibleReturnsTrueForCompatibilePeopleWithNoCustomData8() {
+		boolean errored=false;
+		boolean compatible = false;
+		Employee employee = new Employee();
+		Client client = new Client();
+		client.setOwnCats(true);
+		Shift shift = new Shift();
+		shift.setStartDate("2018-10-10");
+		shift.setEndDate("2018-10-10");
+		shift.setStartTime("10:00");
+		shift.setEndTime("12:00");
+		shift.setClientId("inOvertimeClient");
+		when(clientRepository.findOne("inOvertimeClient")).thenReturn(client);
+		EmployeeShiftCompatibility compatibility= new EmployeeShiftCompatibility(employee,shift);
+		
+		try {
+			compatible = fixture.getCompatible(compatibility);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(compatible);
+	}
+	
+	@Test
+	public void getCompatibleReturnsTrueForCompatibilePeopleWithNoCustomData9() {
+		boolean errored=false;
+		boolean compatible = false;
+		Employee employee = new Employee();
+		employee.setSigning(true);
+		Client client = new Client();
+		client.setSigningOnly(true);	
+		Shift shift = new Shift();
+		shift.setStartDate("2018-10-10");
+		shift.setEndDate("2018-10-10");
+		shift.setStartTime("10:00");
+		shift.setEndTime("12:00");
+		shift.setClientId("inOvertimeClient");
+		when(clientRepository.findOne("inOvertimeClient")).thenReturn(client);
+		EmployeeShiftCompatibility compatibility= new EmployeeShiftCompatibility(employee,shift);
+		
+		try {
+			compatible = fixture.getCompatible(compatibility);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(compatible);
+	}
+	
+	@Test
+	public void getCompatibleReturnsTrueForCompatibilePeopleWithNoCustomData10() {
+		boolean errored=false;
+		boolean compatible = false;
+		Employee employee = new Employee();
+		employee.setSigning(true);
+		Client client = new Client();
+		Shift shift = new Shift();
+		shift.setStartDate("2018-10-10");
+		shift.setEndDate("2018-10-10");
+		shift.setStartTime("10:00");
+		shift.setEndTime("12:00");
+		shift.setClientId("inOvertimeClient");
+		when(clientRepository.findOne("inOvertimeClient")).thenReturn(client);
+		EmployeeShiftCompatibility compatibility= new EmployeeShiftCompatibility(employee,shift);
+		
+		try {
+			compatible = fixture.getCompatible(compatibility);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(compatible);
+	}
+	
+	@Test
+	public void getCompatibleReturnsFalseWithFailingCustomClientRequirement() throws ProccessingException, CorruptDataException {
+		boolean errored=false;
+		boolean compatible = false;
+		
+		Employee onAlways = new Employee("On","Always");
+		onAlways.setId("onAlways");
+		CustomFieldData onAlwaysData = new CustomFieldData();
+		onAlwaysData.setOwnerId("onAlways");
+		onAlwaysData.setCustomFieldId("woodId");
+		
+		
+		when(employeeCrud.findOne("onAlways")).thenReturn(onAlways);
+
+		Client onAlwaysClient = new Client("On","AlwaysClient");
+		onAlwaysClient.setId("onAlwaysClient");
+		CustomFieldData onAlwaysClientData = new CustomFieldData();
+		onAlwaysClientData.setOwnerId("onAlwaysClient");
+		onAlwaysClientData.setCustomFieldId("woodId");
+		onAlwaysClientData.setBooleanData(true);
+		
+		
+		CustomField woodField = new CustomField();
+		woodField.setClientRequirement(true);
+		woodField.setId("woodId");
+		
+		ArrayList<CustomField> customFields = new ArrayList<CustomField>();
+		customFields.add(woodField);
+		when(customFieldRepository.findAll()).thenReturn(customFields);
+		
+		when(customDataManager.getCustomFieldDatasValueOrCreateIfMissing(onAlways,woodField)).thenReturn(false);
+		when(customDataManager.getCustomFieldDatasValueOrCreateIfMissing(onAlwaysClient,woodField)).thenReturn(true);
+		
+		ArrayList<CustomFieldData> customFieldData = new ArrayList<CustomFieldData>();
+		customFieldData.add(onAlwaysData);
+
+		customFieldData = new ArrayList<CustomFieldData>();
+		customFieldData.add(onAlwaysClientData);
+		
+		Shift shift = new Shift();
+		shift.setStartDate("2018-10-10");
+		shift.setEndDate("2018-10-10");
+		shift.setStartTime("10:00");
+		shift.setEndTime("12:00");
+		shift.setClientId("onAlwaysClient");
+		when(clientRepository.findOne("onAlwaysClient")).thenReturn(onAlwaysClient);
+		EmployeeShiftCompatibility compatibility= new EmployeeShiftCompatibility(onAlways,shift);
+		
+		try {
+			compatible = fixture.getCompatible(compatibility);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertFalse(compatible);
+	}
+	
+	@Test
+	public void getCompatibleReturnsFalseWithFailingCustomEmployeeRequirement() throws ProccessingException, CorruptDataException {
+		boolean errored=false;
+		boolean compatible = false;
+		
+		Employee onAlways = new Employee("On","Always");
+		onAlways.setId("onAlways");
+		CustomFieldData onAlwaysData = new CustomFieldData();
+		onAlwaysData.setOwnerId("onAlways");
+		onAlwaysData.setCustomFieldId("woodId");
+		onAlwaysData.setBooleanData(true);
+		
+		when(employeeCrud.findOne("onAlways")).thenReturn(onAlways);
+
+		Client onAlwaysClient = new Client("On","AlwaysClient");
+		onAlwaysClient.setId("onAlwaysClient");
+		CustomFieldData onAlwaysClientData = new CustomFieldData();
+		onAlwaysClientData.setOwnerId("onAlwaysClient");
+		onAlwaysClientData.setCustomFieldId("woodId");
+		onAlwaysClientData.setBooleanData(false);
+		
+		
+		CustomField woodField = new CustomField();
+		woodField.setEmployeeRequirement(true);
+		woodField.setId("woodId");
+		
+		ArrayList<CustomField> customFields = new ArrayList<CustomField>();
+		customFields.add(woodField);
+		when(customFieldRepository.findAll()).thenReturn(customFields);
+		
+		when(customDataManager.getCustomFieldDatasValueOrCreateIfMissing(onAlways,woodField)).thenReturn(true);
+		when(customDataManager.getCustomFieldDatasValueOrCreateIfMissing(onAlwaysClient,woodField)).thenReturn(false);
+		
+		ArrayList<CustomFieldData> customFieldData = new ArrayList<CustomFieldData>();
+		customFieldData.add(onAlwaysData);
+
+		customFieldData = new ArrayList<CustomFieldData>();
+		customFieldData.add(onAlwaysClientData);
+		
+		Shift shift = new Shift();
+		shift.setStartDate("2018-10-10");
+		shift.setEndDate("2018-10-10");
+		shift.setStartTime("10:00");
+		shift.setEndTime("12:00");
+		shift.setClientId("onAlwaysClient");
+		when(clientRepository.findOne("onAlwaysClient")).thenReturn(onAlwaysClient);
+		EmployeeShiftCompatibility compatibility= new EmployeeShiftCompatibility(onAlways,shift);
+		
+		try {
+			compatible = fixture.getCompatible(compatibility);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertFalse(compatible);
+	}
+	
+	@Test
+	public void getCompatibleReturnsTrueWithCustomEmployeeRequirement() throws ProccessingException, CorruptDataException {
+		boolean errored=false;
+		boolean compatible = false;
+		
+		Employee onAlways = new Employee("On","Always");
+		onAlways.setId("onAlways");
+		CustomFieldData onAlwaysData = new CustomFieldData();
+		onAlwaysData.setOwnerId("onAlways");
+		onAlwaysData.setCustomFieldId("woodId");
+		onAlwaysData.setBooleanData(true);
+		
+		when(employeeCrud.findOne("onAlways")).thenReturn(onAlways);
+
+		Client onAlwaysClient = new Client("On","AlwaysClient");
+		onAlwaysClient.setId("onAlwaysClient");
+		CustomFieldData onAlwaysClientData = new CustomFieldData();
+		onAlwaysClientData.setOwnerId("onAlwaysClient");
+		onAlwaysClientData.setCustomFieldId("woodId");
+		onAlwaysClientData.setBooleanData(true);
+		
+		
+		CustomField woodField = new CustomField();
+		woodField.setEmployeeRequirement(true);
+		woodField.setId("woodId");
+		
+		ArrayList<CustomField> customFields = new ArrayList<CustomField>();
+		customFields.add(woodField);
+		when(customFieldRepository.findAll()).thenReturn(customFields);
+		
+		when(customDataManager.getCustomFieldDatasValueOrCreateIfMissing(onAlways,woodField)).thenReturn(true);
+		when(customDataManager.getCustomFieldDatasValueOrCreateIfMissing(onAlwaysClient,woodField)).thenReturn(true);
+		
+		ArrayList<CustomFieldData> customFieldData = new ArrayList<CustomFieldData>();
+		customFieldData.add(onAlwaysData);
+
+		customFieldData = new ArrayList<CustomFieldData>();
+		customFieldData.add(onAlwaysClientData);
+		
+		Shift shift = new Shift();
+		shift.setStartDate("2018-10-10");
+		shift.setEndDate("2018-10-10");
+		shift.setStartTime("10:00");
+		shift.setEndTime("12:00");
+		shift.setClientId("onAlwaysClient");
+		when(clientRepository.findOne("onAlwaysClient")).thenReturn(onAlwaysClient);
+		EmployeeShiftCompatibility compatibility= new EmployeeShiftCompatibility(onAlways,shift);
+		
+		try {
+			compatible = fixture.getCompatible(compatibility);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(compatible);
+	}
+	
+	@Test
+	public void getCompatibleReturnsTrueWithCustomClientRequirement() throws ProccessingException, CorruptDataException {
+		boolean errored=false;
+		boolean compatible = false;
+		
+		Employee onAlways = new Employee("On","Always");
+		onAlways.setId("onAlways");
+		CustomFieldData onAlwaysData = new CustomFieldData();
+		onAlwaysData.setOwnerId("onAlways");
+		onAlwaysData.setCustomFieldId("woodId");
+		onAlwaysData.setBooleanData(true);
+		
+		when(employeeCrud.findOne("onAlways")).thenReturn(onAlways);
+
+		Client onAlwaysClient = new Client("On","AlwaysClient");
+		onAlwaysClient.setId("onAlwaysClient");
+		CustomFieldData onAlwaysClientData = new CustomFieldData();
+		onAlwaysClientData.setOwnerId("onAlwaysClient");
+		onAlwaysClientData.setCustomFieldId("woodId");
+		onAlwaysClientData.setBooleanData(true);
+		
+		
+		CustomField woodField = new CustomField();
+		woodField.setClientRequirement(true);
+		woodField.setId("woodId");
+		
+		ArrayList<CustomField> customFields = new ArrayList<CustomField>();
+		customFields.add(woodField);
+		when(customFieldRepository.findAll()).thenReturn(customFields);
+		
+		when(customDataManager.getCustomFieldDatasValueOrCreateIfMissing(onAlways,woodField)).thenReturn(true);
+		when(customDataManager.getCustomFieldDatasValueOrCreateIfMissing(onAlwaysClient,woodField)).thenReturn(true);
+		
+		ArrayList<CustomFieldData> customFieldData = new ArrayList<CustomFieldData>();
+		customFieldData.add(onAlwaysData);
+
+		customFieldData = new ArrayList<CustomFieldData>();
+		customFieldData.add(onAlwaysClientData);
+		
+		Shift shift = new Shift();
+		shift.setStartDate("2018-10-10");
+		shift.setEndDate("2018-10-10");
+		shift.setStartTime("10:00");
+		shift.setEndTime("12:00");
+		shift.setClientId("onAlwaysClient");
+		when(clientRepository.findOne("onAlwaysClient")).thenReturn(onAlwaysClient);
+		EmployeeShiftCompatibility compatibility= new EmployeeShiftCompatibility(onAlways,shift);
+		
+		try {
+			compatible = fixture.getCompatible(compatibility);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(compatible);
+	}
+	
+	@Test
+	public void isAvailableForThrowsProccessingExceptionWithNullEmployee() {
+		Shift shift = new Shift();
+		boolean errored = false;
+		try {
+			fixture.isAvailableFor(null, shift);
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void isAvailableForThrowsProccessingExceptionWithNullShift() {
+		Shift shift = new Shift();
+		Employee employee = new Employee();
+		
+		boolean errored = false;
+		try {
+			fixture.isAvailableFor(employee,null);
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void isAvailableForThrowsCorruptDataExceptionWithInvalidShift() {
+		Shift shift = new Shift();
+		Employee employee = new Employee();
+		
+		boolean errored = false;
+		try {
+			fixture.isAvailableFor(employee,shift);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void isAvailableForReturnsFalseWithNoAvailability() {
+		Shift shift = new Shift();
+		shift.setStartDate("2018-10-10");
+		shift.setEndDate("2018-10-10");
+		shift.setStartTime("10:00");
+		shift.setEndTime("12:00");
+		shift.setClientId("onAlwaysClient");
+		
+		Employee employee = new Employee();
+		
+		boolean errored = false;
+		boolean available = false;
+		try {
+			available = fixture.isAvailableFor(employee,shift);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertFalse(available);
+	}
+	
+	@Test
+	public void isAvailableForReturnsTrueWhenAvailabile() {
+		Shift shift = new Shift();
+		shift.setStartDate("2018-10-10");
+		shift.setEndDate("2018-10-10");
+		shift.setStartTime("10:00");
+		shift.setEndTime("12:00");
+		shift.setClientId("onAlwaysClient");
+		
+		Employee employee = new Employee();
+		boolean[] availability = new boolean[24];
+		availability[10]=true;
+		availability[11]=true;
+		employee.setWednesdaysAvailability(availability);
+		boolean[] days= new boolean[7];
+		days[3]=true;
+		employee.setDaysAvailable(days);
+		
+		boolean errored = false;
+		boolean available = false;
+		try {
+			available = fixture.isAvailableFor(employee,shift);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(available);
+	}
+	
+	@Test
+	public void isAvailableForReturnsTrueWhenAvailabileOvernightCrossWeeks() {
+		Shift shift = new Shift();
+		shift.setStartDate("2018-10-13");
+		shift.setEndDate("2018-10-14");
+		shift.setStartTime("23:00");
+		shift.setEndTime("01:00");
+		shift.setClientId("onAlwaysClient");
+		
+		Employee employee = new Employee();
+		boolean[] availability = new boolean[24];
+		availability[23]=true;
+		availability[0]=true;
+		employee.setSaturdaysAvailability(availability);
+		employee.setSundaysAvailability(availability);
+		boolean[] days= new boolean[7];
+		days[6]=true;
+		days[0]=true;
+		employee.setDaysAvailable(days);
+		
+		boolean errored = false;
+		boolean available = false;
+		try {
+			available = fixture.isAvailableFor(employee,shift);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(available);
+	}
+	
+	@Test
+	public void isAvailableForReturnsFalseWhenPartlyAvailable1() {
+		Shift shift = new Shift();
+		shift.setStartDate("2018-10-13");
+		shift.setEndDate("2018-10-14");
+		shift.setStartTime("23:00");
+		shift.setEndTime("01:00");
+		shift.setClientId("onAlwaysClient");
+		
+		Employee employee = new Employee();
+		boolean[] availability = new boolean[24];
+		availability[23]=true;
+		availability[0]=true;
+		employee.setSaturdaysAvailability(availability);
+		employee.setSundaysAvailability(availability);
+		boolean[] days= new boolean[7];
+		days[6]=true;
+		employee.setDaysAvailable(days);
+		
+		boolean errored = false;
+		boolean available = false;
+		try {
+			available = fixture.isAvailableFor(employee,shift);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertFalse(available);
+	}
+	
+	@Test
+	public void isAvailableForReturnsFalseWhenPartlyAvailable2() {
+		Shift shift = new Shift();
+		shift.setStartDate("2018-10-13");
+		shift.setEndDate("2018-10-14");
+		shift.setStartTime("23:00");
+		shift.setEndTime("01:00");
+		shift.setClientId("onAlwaysClient");
+		
+		Employee employee = new Employee();
+		boolean[] availability = new boolean[24];
+		availability[23]=true;
+		availability[0]=true;
+		employee.setSaturdaysAvailability(availability);
+		boolean[] days= new boolean[7];
+		days[6]=true;
+		days[0]=true;
+		employee.setDaysAvailable(days);
+		
+		boolean errored = false;
+		boolean available = false;
+		try {
+			available = fixture.isAvailableFor(employee,shift);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertFalse(available);
 	}
 }

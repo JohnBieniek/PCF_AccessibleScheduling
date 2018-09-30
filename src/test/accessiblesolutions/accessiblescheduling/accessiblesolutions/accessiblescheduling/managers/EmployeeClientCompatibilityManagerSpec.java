@@ -18,6 +18,7 @@ import org.cloudfoundry.samples.music.managers.EmployeeShiftMapManager;
 import org.cloudfoundry.samples.music.managers.ShiftGenerationManager;
 import org.cloudfoundry.samples.music.managers.ShiftManager;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoClientRepository;
+import org.cloudfoundry.samples.music.repositories.mongodb.MongoCustomFieldRepository;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoShiftRepository;
 import org.junit.After;
 import org.junit.Before;
@@ -32,6 +33,7 @@ import org.springframework.data.repository.CrudRepository;
 import accessiblesolutions.accessiblescheduling.constants.Constants;
 import accessiblesolutions.accessiblescheduling.domain.Client;
 import accessiblesolutions.accessiblescheduling.domain.CustomField;
+import accessiblesolutions.accessiblescheduling.domain.CustomFieldData;
 import accessiblesolutions.accessiblescheduling.domain.Employee;
 import accessiblesolutions.accessiblescheduling.domain.EmployeeShiftCompatibilities;
 import accessiblesolutions.accessiblescheduling.domain.EmployeeShiftCompatibility;
@@ -56,14 +58,17 @@ public class EmployeeClientCompatibilityManagerSpec {
     CrudRepository<Client,String> clientRepository;
 	
 	@Mock
-	CrudRepository<CustomField, String> customFieldRepository;
+	MongoCustomFieldRepository customFieldRepository;
 	@Mock
 	
     CrudRepository<Employee,String> employeeCrud;
 	
 	@Mock
     CrudRepository<Employee,String> employeeRepository;
-    
+	
+	@Mock
+	CrudRepository<CustomFieldData, String> customFieldDataRepository;
+	
 	@Mock
     CustomDataManager customDataManager;
     
@@ -223,8 +228,32 @@ public class EmployeeClientCompatibilityManagerSpec {
 	    EmployeeShiftManager customEmployeeShiftManager = new EmployeeShiftManager(employeeCrud, shiftRepository);
 	    customEmployeeShiftManager.shiftRepository=shiftRepository;
 	    when(employeeCrud.findAll()).thenReturn(itterable);
-	     
+	    
+		CustomFieldData onAlwaysData = new CustomFieldData();
+		onAlwaysData.setOwnerId("onAlways");
+		onAlwaysData.setCustomFieldId("woodId");
+		
+		Client onAlwaysClient = new Client("On","AlwaysClient");
+		onAlwaysClient.setId("onAlwaysClient");
+		CustomFieldData onAlwaysClientData = new CustomFieldData();
+		onAlwaysClientData.setOwnerId("onAlwaysClient");
+		onAlwaysClientData.setCustomFieldId("woodId");
+		onAlwaysClientData.setBooleanData(true);
+		
+		
+		CustomField woodField = new CustomField();
+		woodField.setClientRequirement(true);
+		woodField.setId("woodId");
+		
+		ArrayList<CustomField> customFields = new ArrayList<CustomField>();
+		customFields.add(woodField);
+		when(customFieldRepository.findAll()).thenReturn(customFields);
+		
+		when(customDataManager.getCustomFieldDatasValueOrCreateIfMissing(onAlways,woodField)).thenReturn(false);
+		when(customDataManager.getCustomFieldDatasValueOrCreateIfMissing(onAlwaysClient,woodField)).thenReturn(true);
+	    
 		fixture= new EmployeeClientCompatibilityManager(customFieldRepository);
+		fixture.customDataManager = customDataManager;
 	}
 	
 	@Test
@@ -235,6 +264,9 @@ public class EmployeeClientCompatibilityManagerSpec {
 			fixture.isCompatibleWith(null,new Client());
 		} catch (ProccessingException e) {
 			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -249,6 +281,9 @@ public class EmployeeClientCompatibilityManagerSpec {
 			fixture.isCompatibleWith(new Employee(),null);
 		} catch (ProccessingException e) {
 			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -266,6 +301,9 @@ public class EmployeeClientCompatibilityManagerSpec {
 			compatible = fixture.isCompatibleWith(new Employee(),client);
 		} catch (ProccessingException e) {
 			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -285,6 +323,9 @@ public class EmployeeClientCompatibilityManagerSpec {
 			compatible = fixture.isCompatibleWith(new Employee(),client);
 		} catch (ProccessingException e) {
 			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -306,6 +347,9 @@ public class EmployeeClientCompatibilityManagerSpec {
 		} catch (ProccessingException e) {
 			errored=true;
 			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
 		assertFalse(errored);
@@ -325,6 +369,9 @@ public class EmployeeClientCompatibilityManagerSpec {
 			compatible = fixture.isCompatibleWith(employee,client);
 		} catch (ProccessingException e) {
 			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -346,6 +393,9 @@ public class EmployeeClientCompatibilityManagerSpec {
 		} catch (ProccessingException e) {
 			errored=true;
 			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
 		assertFalse(errored);
@@ -365,6 +415,9 @@ public class EmployeeClientCompatibilityManagerSpec {
 		} catch (ProccessingException e) {
 			errored=true;
 			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
 		assertFalse(errored);
@@ -383,6 +436,9 @@ public class EmployeeClientCompatibilityManagerSpec {
 			compatible = fixture.isCompatibleWith(new Employee(),client);
 		} catch (ProccessingException e) {
 			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -404,6 +460,9 @@ public class EmployeeClientCompatibilityManagerSpec {
 		} catch (ProccessingException e) {
 			errored=true;
 			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
 		assertFalse(errored);
@@ -422,6 +481,9 @@ public class EmployeeClientCompatibilityManagerSpec {
 			compatible = fixture.isCompatibleWith(employee,client);
 		} catch (ProccessingException e) {
 			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -443,6 +505,9 @@ public class EmployeeClientCompatibilityManagerSpec {
 		} catch (ProccessingException e) {
 			errored=true;
 			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
 		assertFalse(errored);
@@ -462,6 +527,9 @@ public class EmployeeClientCompatibilityManagerSpec {
 			compatible = fixture.isCompatibleWith(employee,client);
 		} catch (ProccessingException e) {
 			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -483,6 +551,9 @@ public class EmployeeClientCompatibilityManagerSpec {
 		} catch (ProccessingException e) {
 			errored=true;
 			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
 		assertFalse(errored);
@@ -499,6 +570,9 @@ public class EmployeeClientCompatibilityManagerSpec {
 			compatible = fixture.isCompatibleWith(employee,client);
 		} catch (ProccessingException e) {
 			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -518,6 +592,9 @@ public class EmployeeClientCompatibilityManagerSpec {
 			compatible = fixture.isCompatibleWith(employee,client);
 		} catch (ProccessingException e) {
 			errored=true;
+			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -539,6 +616,9 @@ public class EmployeeClientCompatibilityManagerSpec {
 		} catch (ProccessingException e) {
 			errored=true;
 			e.printStackTrace();
+		}catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
 		assertFalse(errored);
@@ -558,61 +638,224 @@ public class EmployeeClientCompatibilityManagerSpec {
 		} catch (ProccessingException e) {
 			errored=true;
 			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
 		assertFalse(errored);
 		assertTrue(compatible);
 	}
 	
-	//TODO isCompatibleWithReturnsFalseCasesWithCustomFieldData after dependencies tested
-//	@Test
-//	public void isCompatibleWithReturnsFalseWithFailingClientRequirement() {
-//		boolean errored=false;
-//		boolean compatible = false;
-//		
-//		Employee onAlways = new Employee("On","Always");
-//		onAlways.setId("onAlways");
-//		
-//		when(employeeCrud.findOne("onAlways")).thenReturn(onAlways);
-//
-//		Client onAlwaysClient = new Client("On","AlwaysClient");
-//		
-//		CustomField woodField = new CustomField();
-//		woodField.setClientRequirement(true);
-//		
-//		ArrayList<CustomField> customFields = new ArrayList<CustomField>();
-//		customFields.add(woodField);
-//		when(customFieldRepository.findAll()).thenReturn(customFields);
-//		
-//		try {
-//			compatible = fixture.isCompatibleWith(onAlways,onAlwaysClient);
-//		} catch (ProccessingException e) {
-//			errored=true;
-//			e.printStackTrace();
-//		}
-//		
-//		assertFalse(errored);
-//		assertFalse(compatible);
-//	}
-	
-//	@Test
-//	public void isCompatibleWithReturnsTrueCasesWithCustomFieldData() {
-//		boolean errored=false;
-//		boolean compatible = false;
-//		Employee employee = new Employee();
-//		Client client = new Client();
-//		client.setSigningOnly(true);
-//		try {
-//			compatible = fixture.isCompatibleWith(employee,client);
-//		} catch (ProccessingException e) {
-//			errored=true;
-//			e.printStackTrace();
-//		}
-//		
-//		assertFalse(errored);
-//		assertFalse(employee.getMedPassCertified());
-//		assertTrue(compatible);
-//	}
-//	
+	@Test
+	public void isCompatibleWithReturnsFalseWithFailingCustomClientRequirement() throws ProccessingException, CorruptDataException {
+		boolean errored=false;
+		boolean compatible = false;
+		
+		Employee onAlways = new Employee("On","Always");
+		onAlways.setId("onAlways");
+		CustomFieldData onAlwaysData = new CustomFieldData();
+		onAlwaysData.setOwnerId("onAlways");
+		onAlwaysData.setCustomFieldId("woodId");
+		
+		
+		when(employeeCrud.findOne("onAlways")).thenReturn(onAlways);
 
+		Client onAlwaysClient = new Client("On","AlwaysClient");
+		onAlwaysClient.setId("onAlwaysClient");
+		CustomFieldData onAlwaysClientData = new CustomFieldData();
+		onAlwaysClientData.setOwnerId("onAlwaysClient");
+		onAlwaysClientData.setCustomFieldId("woodId");
+		onAlwaysClientData.setBooleanData(true);
+		
+		
+		CustomField woodField = new CustomField();
+		woodField.setClientRequirement(true);
+		woodField.setId("woodId");
+		
+		ArrayList<CustomField> customFields = new ArrayList<CustomField>();
+		customFields.add(woodField);
+		when(customFieldRepository.findAll()).thenReturn(customFields);
+		
+		when(customDataManager.getCustomFieldDatasValueOrCreateIfMissing(onAlways,woodField)).thenReturn(false);
+		when(customDataManager.getCustomFieldDatasValueOrCreateIfMissing(onAlwaysClient,woodField)).thenReturn(true);
+		
+		ArrayList<CustomFieldData> customFieldData = new ArrayList<CustomFieldData>();
+		customFieldData.add(onAlwaysData);
+
+		customFieldData = new ArrayList<CustomFieldData>();
+		customFieldData.add(onAlwaysClientData);
+		
+		try {
+			compatible = fixture.isCompatibleWith(onAlways,onAlwaysClient);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertFalse(compatible);
+	}
+	
+	@Test
+	public void isCompatibleWithReturnsFalseWithFailingCustomEmployeeRequirement() throws ProccessingException, CorruptDataException {
+		boolean errored=false;
+		boolean compatible = false;
+		
+		Employee onAlways = new Employee("On","Always");
+		onAlways.setId("onAlways");
+		CustomFieldData onAlwaysData = new CustomFieldData();
+		onAlwaysData.setOwnerId("onAlways");
+		onAlwaysData.setCustomFieldId("woodId");
+		onAlwaysData.setBooleanData(true);
+		
+		when(employeeCrud.findOne("onAlways")).thenReturn(onAlways);
+
+		Client onAlwaysClient = new Client("On","AlwaysClient");
+		onAlwaysClient.setId("onAlwaysClient");
+		CustomFieldData onAlwaysClientData = new CustomFieldData();
+		onAlwaysClientData.setOwnerId("onAlwaysClient");
+		onAlwaysClientData.setCustomFieldId("woodId");
+		onAlwaysClientData.setBooleanData(false);
+		
+		
+		CustomField woodField = new CustomField();
+		woodField.setEmployeeRequirement(true);
+		woodField.setId("woodId");
+		
+		ArrayList<CustomField> customFields = new ArrayList<CustomField>();
+		customFields.add(woodField);
+		when(customFieldRepository.findAll()).thenReturn(customFields);
+		
+		when(customDataManager.getCustomFieldDatasValueOrCreateIfMissing(onAlways,woodField)).thenReturn(true);
+		when(customDataManager.getCustomFieldDatasValueOrCreateIfMissing(onAlwaysClient,woodField)).thenReturn(false);
+		
+		ArrayList<CustomFieldData> customFieldData = new ArrayList<CustomFieldData>();
+		customFieldData.add(onAlwaysData);
+
+		customFieldData = new ArrayList<CustomFieldData>();
+		customFieldData.add(onAlwaysClientData);
+		
+		try {
+			compatible = fixture.isCompatibleWith(onAlways,onAlwaysClient);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertFalse(compatible);
+	}
+	
+	@Test
+	public void isCompatibleWithReturnsTrueWithCustomEmployeeRequirement() throws ProccessingException, CorruptDataException {
+		boolean errored=false;
+		boolean compatible = false;
+		
+		Employee onAlways = new Employee("On","Always");
+		onAlways.setId("onAlways");
+		CustomFieldData onAlwaysData = new CustomFieldData();
+		onAlwaysData.setOwnerId("onAlways");
+		onAlwaysData.setCustomFieldId("woodId");
+		onAlwaysData.setBooleanData(true);
+		
+		when(employeeCrud.findOne("onAlways")).thenReturn(onAlways);
+
+		Client onAlwaysClient = new Client("On","AlwaysClient");
+		onAlwaysClient.setId("onAlwaysClient");
+		CustomFieldData onAlwaysClientData = new CustomFieldData();
+		onAlwaysClientData.setOwnerId("onAlwaysClient");
+		onAlwaysClientData.setCustomFieldId("woodId");
+		onAlwaysClientData.setBooleanData(true);
+		
+		
+		CustomField woodField = new CustomField();
+		woodField.setEmployeeRequirement(true);
+		woodField.setId("woodId");
+		
+		ArrayList<CustomField> customFields = new ArrayList<CustomField>();
+		customFields.add(woodField);
+		when(customFieldRepository.findAll()).thenReturn(customFields);
+		
+		when(customDataManager.getCustomFieldDatasValueOrCreateIfMissing(onAlways,woodField)).thenReturn(true);
+		when(customDataManager.getCustomFieldDatasValueOrCreateIfMissing(onAlwaysClient,woodField)).thenReturn(true);
+		
+		ArrayList<CustomFieldData> customFieldData = new ArrayList<CustomFieldData>();
+		customFieldData.add(onAlwaysData);
+
+		customFieldData = new ArrayList<CustomFieldData>();
+		customFieldData.add(onAlwaysClientData);
+		
+		try {
+			compatible = fixture.isCompatibleWith(onAlways,onAlwaysClient);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(compatible);
+	}
+	
+	@Test
+	public void isCompatibleWithReturnsTrueWithCustomClientRequirement() throws ProccessingException, CorruptDataException {
+		boolean errored=false;
+		boolean compatible = false;
+		
+		Employee onAlways = new Employee("On","Always");
+		onAlways.setId("onAlways");
+		CustomFieldData onAlwaysData = new CustomFieldData();
+		onAlwaysData.setOwnerId("onAlways");
+		onAlwaysData.setCustomFieldId("woodId");
+		onAlwaysData.setBooleanData(true);
+		
+		when(employeeCrud.findOne("onAlways")).thenReturn(onAlways);
+
+		Client onAlwaysClient = new Client("On","AlwaysClient");
+		onAlwaysClient.setId("onAlwaysClient");
+		CustomFieldData onAlwaysClientData = new CustomFieldData();
+		onAlwaysClientData.setOwnerId("onAlwaysClient");
+		onAlwaysClientData.setCustomFieldId("woodId");
+		onAlwaysClientData.setBooleanData(true);
+		
+		
+		CustomField woodField = new CustomField();
+		woodField.setClientRequirement(true);
+		woodField.setId("woodId");
+		
+		ArrayList<CustomField> customFields = new ArrayList<CustomField>();
+		customFields.add(woodField);
+		when(customFieldRepository.findAll()).thenReturn(customFields);
+		
+		when(customDataManager.getCustomFieldDatasValueOrCreateIfMissing(onAlways,woodField)).thenReturn(true);
+		when(customDataManager.getCustomFieldDatasValueOrCreateIfMissing(onAlwaysClient,woodField)).thenReturn(true);
+		
+		ArrayList<CustomFieldData> customFieldData = new ArrayList<CustomFieldData>();
+		customFieldData.add(onAlwaysData);
+
+		customFieldData = new ArrayList<CustomFieldData>();
+		customFieldData.add(onAlwaysClientData);
+		
+		try {
+			compatible = fixture.isCompatibleWith(onAlways,onAlwaysClient);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(compatible);
+	}
 }

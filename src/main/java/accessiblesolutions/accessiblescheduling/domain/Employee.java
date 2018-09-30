@@ -296,7 +296,6 @@ public class Employee {
 		return gender.equals(Gender.MALE);
 	}
 
-	//TODO factor this out into EmployeeShiftManager
 	public boolean requestedOff(Shift shift) {
 		boolean off = false;
 
