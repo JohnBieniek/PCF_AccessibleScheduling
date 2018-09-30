@@ -264,7 +264,7 @@ public class CompatibilityController {
     	return to;
     }
     @RequestMapping(method = RequestMethod.POST, value= "/requestedOff")
-    public @ResponseBody EmployeeUpdateTO getRequestedOff(HttpServletRequest request){
+    public @ResponseBody EmployeeUpdateTO getRequestedOff(HttpServletRequest request) throws ProccessingException, CorruptDataException{
     	Employee employee =null;
     	Shift shift =null;
 
@@ -476,7 +476,7 @@ public class CompatibilityController {
     }
     
     @RequestMapping(method = RequestMethod.POST, value= "/availability")
-    public @ResponseBody EmployeeUpdateTO getAvailability(HttpServletRequest request) throws CorruptDataException{
+    public @ResponseBody EmployeeUpdateTO getAvailability(HttpServletRequest request) throws CorruptDataException, ProccessingException{
     	Employee employee =null;
     	Shift shift =null;
 
