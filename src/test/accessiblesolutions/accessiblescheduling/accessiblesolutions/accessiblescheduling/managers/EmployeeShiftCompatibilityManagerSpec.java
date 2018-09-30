@@ -107,6 +107,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 
 	    Employee assignedOneDay = new Employee("Assigned","OneDay");
 	    assignedOneDay.setId("assignedOneDay");
+	    
 	    ArrayList<Shift> assignedOneDayShifts = new ArrayList<Shift>();
 	    Shift assignedOneDayShift1 = new Shift();
 	    assignedOneDayShift1.setStaffId("assignedOneDay");
@@ -3578,5 +3579,507 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		
 		assertFalse(errored);
 		assertFalse(available);
+	}
+	
+	@Test
+	public void isAssignableForThrowsProccessingExceptionForNullEmployee() {
+		Shift shift = new Shift();
+		boolean errored = false;
+		
+		try {
+			fixture.isAssignableFor(null, shift);
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void isAssignableForThrowsProccessingExceptionForNullShift() {
+		Shift shift = new Shift();
+		Employee employee = new Employee();
+		boolean errored = false;
+		
+		try {
+			fixture.isAssignableFor(employee, null);
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void isAssignableForThrowsCorruptDataExceptionForInvalidShift() {
+		Shift shift = new Shift();
+		Employee employee = new Employee();
+		boolean errored = false;
+		
+		try {
+			fixture.isAssignableFor(employee, shift);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void isAssignableForReturnsFalseWithNoAvailability() {
+		Shift shift = new Shift();
+		shift.setStartDate("2018-10-10");
+		shift.setEndDate("2018-10-10");
+		shift.setStartTime("10:00");
+		shift.setEndTime("12:00");
+		shift.setClientId("onAlwaysClient");
+		
+		Employee employee = new Employee();
+		
+		boolean errored = false;
+		boolean available = false;
+		try {
+			available = fixture.isAssignableFor(employee,shift);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertFalse(available);
+	}
+	
+	@Test
+	public void isAssignableForReturnsTrueWhenAvailabile() {
+		Shift shift = new Shift();
+		shift.setStartDate("2018-10-10");
+		shift.setEndDate("2018-10-10");
+		shift.setStartTime("10:00");
+		shift.setEndTime("12:00");
+		shift.setClientId("onAlwaysClient");
+		
+		Employee employee = new Employee();
+		boolean[] availability = new boolean[24];
+		availability[10]=true;
+		availability[11]=true;
+		employee.setWednesdaysAvailability(availability);
+		boolean[] days= new boolean[7];
+		days[3]=true;
+		employee.setDaysAvailable(days);
+		
+		boolean errored = false;
+		boolean available = false;
+		try {
+			available = fixture.isAssignableFor(employee,shift);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(available);
+	}
+	
+	@Test
+	public void isAssignableForReturnsTrueWhenAvailabileOvernightCrossWeeks() {
+		Shift shift = new Shift();
+		shift.setStartDate("2018-10-13");
+		shift.setEndDate("2018-10-14");
+		shift.setStartTime("23:00");
+		shift.setEndTime("01:00");
+		shift.setClientId("onAlwaysClient");
+		
+		Employee employee = new Employee();
+		boolean[] availability = new boolean[24];
+		availability[23]=true;
+		availability[0]=true;
+		employee.setSaturdaysAvailability(availability);
+		employee.setSundaysAvailability(availability);
+		boolean[] days= new boolean[7];
+		days[6]=true;
+		days[0]=true;
+		employee.setDaysAvailable(days);
+		
+		boolean errored = false;
+		boolean available = false;
+		try {
+			available = fixture.isAssignableFor(employee,shift);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(available);
+	}
+	
+	@Test
+	public void isAssignableForReturnsFalseWhenPartlyAvailable1() {
+		Shift shift = new Shift();
+		shift.setStartDate("2018-10-13");
+		shift.setEndDate("2018-10-14");
+		shift.setStartTime("23:00");
+		shift.setEndTime("01:00");
+		shift.setClientId("onAlwaysClient");
+		
+		Employee employee = new Employee();
+		boolean[] availability = new boolean[24];
+		availability[23]=true;
+		availability[0]=true;
+		employee.setSaturdaysAvailability(availability);
+		employee.setSundaysAvailability(availability);
+		boolean[] days= new boolean[7];
+		days[6]=true;
+		employee.setDaysAvailable(days);
+		
+		boolean errored = false;
+		boolean available = false;
+		try {
+			available = fixture.isAssignableFor(employee,shift);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertFalse(available);
+	}
+	
+	@Test
+	public void isAssignableForReturnsFalseWhenPartlyAvailable2() {
+		Shift shift = new Shift();
+		shift.setStartDate("2018-10-13");
+		shift.setEndDate("2018-10-14");
+		shift.setStartTime("23:00");
+		shift.setEndTime("01:00");
+		shift.setClientId("onAlwaysClient");
+		
+		Employee employee = new Employee();
+		boolean[] availability = new boolean[24];
+		availability[23]=true;
+		availability[0]=true;
+		employee.setSaturdaysAvailability(availability);
+		boolean[] days= new boolean[7];
+		days[6]=true;
+		days[0]=true;
+		employee.setDaysAvailable(days);
+		
+		boolean errored = false;
+		boolean available = false;
+		try {
+			available = fixture.isAssignableFor(employee,shift);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertFalse(available);
+	}
+	
+	@Test
+	public void isAssignableForReturnsTrueForShiftlessEmployee() {
+		Employee assignedOneDay = new Employee("Assigned","OneDay");
+		assignedOneDay.setId("assignedOneDay");
+		 Shift inOvertimeShift1 = new Shift();
+		    inOvertimeShift1.setStaffId("inOvertime");
+		    inOvertimeShift1.setClientId("inOvertimeClient");
+		    inOvertimeShift1.setStartDate("2018-07-01");
+		    inOvertimeShift1.setEndDate("2018-07-01");
+		    inOvertimeShift1.setStartTime("10:00");
+		    inOvertimeShift1.setEndTime("20:00");
+		    inOvertimeShift1.setStartMonth(7);
+		boolean errored=false;
+		boolean unassigned = false;
+		 boolean[] daysAvailability = new boolean[24];
+		    boolean[] availability = new boolean[7];
+		    for(int i=0 ; i<24;i++) {
+			    daysAvailability[i]=true;
+			    if(i<7) {
+			    	availability[i]=true;
+			    }
+		    }
+		    assignedOneDay.setSundaysAvailability(daysAvailability);
+		    assignedOneDay.setMondaysAvailability(daysAvailability);
+		    assignedOneDay.setTuesdaysAvailability(daysAvailability);
+		    assignedOneDay.setWednesdaysAvailability(daysAvailability);
+		    assignedOneDay.setThursdaysAvailability(daysAvailability);
+		    assignedOneDay.setFridaysAvailability(daysAvailability);
+		    assignedOneDay.setSaturdaysAvailability(daysAvailability);
+		    assignedOneDay.setDaysAvailable(availability);
+		try {
+			unassigned = fixture.isAssignableFor(assignedOneDay,inOvertimeShift1);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(unassigned);
+	}
+	
+	@Test
+	public void isAssignableForReturnsTrueForAlternateClientAfter30Minutes() {
+		Employee assignedOneDay = new Employee("In","Overtime");
+		assignedOneDay.setId("inOvertime");
+		 Shift inOvertimeShift1 = new Shift();
+		    inOvertimeShift1.setStaffId("inOvertime");
+		    inOvertimeShift1.setClientId("inOvertimeClient2");
+		    inOvertimeShift1.setStartDate("2018-07-01");
+		    inOvertimeShift1.setEndDate("2018-07-01");
+		    inOvertimeShift1.setStartTime("20:30");
+		    inOvertimeShift1.setEndTime("22:00");
+		    inOvertimeShift1.setStartMonth(7);
+		boolean errored=false;
+		boolean unassigned = false;
+		
+		 boolean[] daysAvailability = new boolean[24];
+		    boolean[] availability = new boolean[7];
+		    for(int i=0 ; i<24;i++) {
+			    daysAvailability[i]=true;
+			    if(i<7) {
+			    	availability[i]=true;
+			    }
+		    }
+		    assignedOneDay.setSundaysAvailability(daysAvailability);
+		    assignedOneDay.setMondaysAvailability(daysAvailability);
+		    assignedOneDay.setTuesdaysAvailability(daysAvailability);
+		    assignedOneDay.setWednesdaysAvailability(daysAvailability);
+		    assignedOneDay.setThursdaysAvailability(daysAvailability);
+		    assignedOneDay.setFridaysAvailability(daysAvailability);
+		    assignedOneDay.setSaturdaysAvailability(daysAvailability);
+		    assignedOneDay.setDaysAvailable(availability);
+		try {
+			unassigned = fixture.isAssignableFor(assignedOneDay,inOvertimeShift1);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(unassigned);
+	}
+	
+	@Test
+	public void isAssignableForReturnsFalseForOverlappingShift() {
+		Employee assignedOneDay = new Employee("In","Overtime");
+		assignedOneDay.setId("inOvertime");
+		 Shift inOvertimeShift1 = new Shift();
+		    inOvertimeShift1.setStaffId("inOvertime");
+		    inOvertimeShift1.setClientId("inOvertimeClient");
+		    inOvertimeShift1.setStartDate("2018-07-01");
+		    inOvertimeShift1.setEndDate("2018-07-01");
+		    inOvertimeShift1.setStartTime("10:00");
+		    inOvertimeShift1.setEndTime("20:00");
+		    inOvertimeShift1.setStartMonth(7);
+		boolean errored=false;
+		boolean unassigned = false;
+		try {
+			unassigned = fixture.isAssignableFor(assignedOneDay,inOvertimeShift1);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertFalse(unassigned);
+	}
+	
+	@Test
+	public void isAssignableForReturnsFalseForAlmostOverlappingShift() {
+		Employee assignedOneDay = new Employee("In","Overtime");
+		assignedOneDay.setId("inOvertime");
+		 Shift inOvertimeShift1 = new Shift();
+		    inOvertimeShift1.setStaffId("inOvertime");
+		    inOvertimeShift1.setClientId("inOvertimeClient2");
+		    inOvertimeShift1.setStartDate("2018-07-01");
+		    inOvertimeShift1.setEndDate("2018-07-01");
+		    inOvertimeShift1.setStartTime("20:29");
+		    inOvertimeShift1.setEndTime("22:00");
+		    inOvertimeShift1.setStartMonth(7);
+		boolean errored=false;
+		boolean unassigned = false;
+		try {
+			unassigned = fixture.isAssignableFor(assignedOneDay,inOvertimeShift1);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertFalse(unassigned);
+	}
+	
+	@Test
+	public void isAssignableForReturnsTrueForAlmostOverlappingShiftOfSameClient() {
+		Employee assignedOneDay = new Employee("In","Overtime");
+		assignedOneDay.setId("inOvertime");
+		 Shift inOvertimeShift1 = new Shift();
+		    inOvertimeShift1.setStaffId("inOvertime");
+		    inOvertimeShift1.setClientId("inOvertimeClient");
+		    inOvertimeShift1.setStartDate("2018-07-01");
+		    inOvertimeShift1.setEndDate("2018-07-01");
+		    inOvertimeShift1.setStartTime("20:29");
+		    inOvertimeShift1.setEndTime("22:00");
+		    inOvertimeShift1.setStartMonth(7);
+		boolean errored=false;
+		boolean unassigned = false;
+		
+		 boolean[] daysAvailability = new boolean[24];
+		    boolean[] availability = new boolean[7];
+		    for(int i=0 ; i<24;i++) {
+			    daysAvailability[i]=true;
+			    if(i<7) {
+			    	availability[i]=true;
+			    }
+		    }
+		    assignedOneDay.setSundaysAvailability(daysAvailability);
+		    assignedOneDay.setMondaysAvailability(daysAvailability);
+		    assignedOneDay.setTuesdaysAvailability(daysAvailability);
+		    assignedOneDay.setWednesdaysAvailability(daysAvailability);
+		    assignedOneDay.setThursdaysAvailability(daysAvailability);
+		    assignedOneDay.setFridaysAvailability(daysAvailability);
+		    assignedOneDay.setSaturdaysAvailability(daysAvailability);
+		    assignedOneDay.setDaysAvailable(availability);
+		try {
+			unassigned = fixture.isAssignableFor(assignedOneDay,inOvertimeShift1);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(unassigned);
+	}
+	
+	@Test
+	public void isAssignableForShowsOffWhenAShiftStartsTheDayOff() throws ProccessingException, CorruptDataException {
+		Employee employee = new Employee();
+		String[] requestedDays = new String[]{"2017-06-04"};
+		employee.setRequestedOff(requestedDays);
+		boolean[] daysAvailability = new boolean[24];
+	    boolean[] availability = new boolean[7];
+	    for(int i=0 ; i<24;i++) {
+		    daysAvailability[i]=true;
+		    if(i<7) {
+		    	availability[i]=true;
+		    }
+	    }
+	    employee.setSundaysAvailability(daysAvailability);
+	    employee.setMondaysAvailability(daysAvailability);
+	    employee.setTuesdaysAvailability(daysAvailability);
+	    employee.setWednesdaysAvailability(daysAvailability);
+	    employee.setThursdaysAvailability(daysAvailability);
+	    employee.setFridaysAvailability(daysAvailability);
+	    employee.setSaturdaysAvailability(daysAvailability);
+	    employee.setDaysAvailable(availability);
+		Shift shift = new Shift();
+		shift.setStartDate("2017-06-04");
+		shift.setEndDate("2017-06-04");
+		shift.setStartTime("10:00");
+		shift.setEndTime("14:00");
+		shift.setClientId("generic");
+		assertFalse(fixture.isAssignableFor(employee,shift));
+	}
+	
+	@Test
+	public void isAssignableForShowsOffWhenAShiftEndsTheDayOff() throws ProccessingException, CorruptDataException {
+		Employee employee = new Employee();
+		String[] requestedDays = new String[]{"2017-06-04"};
+		employee.setRequestedOff(requestedDays);
+		boolean[] daysAvailability = new boolean[24];
+	    boolean[] availability = new boolean[7];
+	    for(int i=0 ; i<24;i++) {
+		    daysAvailability[i]=true;
+		    if(i<7) {
+		    	availability[i]=true;
+		    }
+	    }
+	    employee.setSundaysAvailability(daysAvailability);
+	    employee.setMondaysAvailability(daysAvailability);
+	    employee.setTuesdaysAvailability(daysAvailability);
+	    employee.setWednesdaysAvailability(daysAvailability);
+	    employee.setThursdaysAvailability(daysAvailability);
+	    employee.setFridaysAvailability(daysAvailability);
+	    employee.setSaturdaysAvailability(daysAvailability);
+	    employee.setDaysAvailable(availability);
+		Shift shift = new Shift();
+		shift.setStartDate("2017-06-03");
+		shift.setEndDate("2017-06-04");
+		shift.setStartTime("22:00");
+		shift.setEndTime("14:00");
+		shift.setClientId("generic");
+		assertFalse(fixture.isAssignableFor(employee,shift));
+	}
+	
+	@Test
+	public void isAssignableForShowsOnWhenADayIsntVacation() throws ProccessingException, CorruptDataException {
+		Employee employee = new Employee();
+		String[] requestedDays = new String[]{"2017-06-04"};
+		employee.setRequestedOff(requestedDays);
+		boolean[] daysAvailability = new boolean[24];
+	    boolean[] availability = new boolean[7];
+	    for(int i=0 ; i<24;i++) {
+		    daysAvailability[i]=true;
+		    if(i<7) {
+		    	availability[i]=true;
+		    }
+	    }
+	    employee.setSundaysAvailability(daysAvailability);
+	    employee.setMondaysAvailability(daysAvailability);
+	    employee.setTuesdaysAvailability(daysAvailability);
+	    employee.setWednesdaysAvailability(daysAvailability);
+	    employee.setThursdaysAvailability(daysAvailability);
+	    employee.setFridaysAvailability(daysAvailability);
+	    employee.setSaturdaysAvailability(daysAvailability);
+	    employee.setDaysAvailable(availability);
+		Shift shift = new Shift();
+		shift.setStartDate("2017-05-04");
+		shift.setEndDate("2017-05-04");
+		shift.setStartTime("10:00");
+		shift.setEndTime("14:00");
+		shift.setClientId("generic");
+		assertTrue(fixture.isAssignableFor(employee,shift));
 	}
 }

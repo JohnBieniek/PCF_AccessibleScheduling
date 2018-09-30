@@ -39,6 +39,7 @@ public class EmployeeShiftCompatibilityManager {
         this.employeeRepository = employeeRepository;
     }
     
+    //TODO Test
     public EmployeeShiftCompatibilities getValidUnfixedCompatibilities(EmployeeShiftCompatibilities compatibilities) throws CorruptDataException, ProccessingException{
 		ArrayList<EmployeeShiftCompatibility> validCompatibilities = new ArrayList<EmployeeShiftCompatibility>();
     	compatibilities= getValidCompatibilities(compatibilities);
@@ -87,6 +88,7 @@ public class EmployeeShiftCompatibilityManager {
 		return new EmployeeShiftCompatibilities(compatibility);
 	}
 
+  //TODO Test
     public boolean getAssignable(EmployeeShiftCompatibility compatibility) throws CorruptDataException, ProccessingException {
     	Employee employee = compatibility.getEmployee();
 		Shift shift = compatibility.getShift();
@@ -94,6 +96,7 @@ public class EmployeeShiftCompatibilityManager {
 		return isAssignableFor(employee,shift);
 	}
     
+  //TODO Test
     public Employee getEmployeeWithMostTimeBeforeOvertimeAfterAssignment(EmployeeShiftCompatibilities compatibilities) throws CorruptDataException, ProccessingException {
     	//System.out.println("Getting the employee with the most time for " + compatibilities.compatibilities.get(0).getShift().toString());
 		Employee employee = null;
@@ -166,6 +169,7 @@ public class EmployeeShiftCompatibilityManager {
 //		return violatesAlternateWeekendsOff;
 //	}
 	
+	//TODO Test
 	public boolean getAssignmentWouldViolateAlternateWeekendsOff(EmployeeShiftCompatibility compatibility) throws CorruptDataException {
 		Employee employee =compatibility.getEmployee();
 
@@ -241,6 +245,7 @@ public class EmployeeShiftCompatibilityManager {
 		return violatesAlternateWeekendsOff;
 	}
 	
+	//TODO Test
 	public boolean getResting(EmployeeShiftCompatibility compatibility) throws CorruptDataException, ProccessingException{
 		boolean resting = false;
 		
@@ -256,6 +261,8 @@ public class EmployeeShiftCompatibilityManager {
 		
 		return resting;
 	}
+	
+	//TODO Test
 	public Employee getEmployeeWithMostTime(EmployeeShiftCompatibilities compatibilities) throws CorruptDataException, ProccessingException {
     	Employee employee = null;
 		float time = 0;
@@ -372,7 +379,7 @@ public class EmployeeShiftCompatibilityManager {
 							daysWorked++;
 						}
 					}
-					System.out.println("days worked"+daysWorked);
+					
 					if(daysWorked>MAX_WEEKLY_WORK_DAYS){
 						violatesMaxWeeklyWorkDays=true;
 					}
@@ -481,6 +488,7 @@ public class EmployeeShiftCompatibilityManager {
 		return hoursNeededWeekOfShift(compatibility.getEmployee(),compatibility.getShift());
 	}
 	
+	//TODO Test
 	public Employee getEmployeeWithMostTimeAfterAssignment(EmployeeShiftCompatibilities compatibilties) throws CorruptDataException, ProccessingException {
 		Employee employee = null;
 		float time = 0;
@@ -526,6 +534,7 @@ public class EmployeeShiftCompatibilityManager {
 //		return new EmployeeShiftCompatibilities(validCompatibilities);
 //	}
 	
+	//TODO Test
 	public EmployeeShiftCompatibilities getValidCompatibilities(EmployeeShiftCompatibilities compatibilities) throws CorruptDataException, ProccessingException{
 		ArrayList<EmployeeShiftCompatibility> validCompatibilities = new ArrayList<EmployeeShiftCompatibility>();
 		//System.out.println("getting valid compatibilities for "+compatibilities.compatibilities.get(0).getShift().toString());
@@ -556,6 +565,7 @@ public class EmployeeShiftCompatibilityManager {
 		return new EmployeeShiftCompatibilities(validCompatibilities);
 	}
 	    
+	//TODO Test
 	public boolean isValidFor(Employee employee, Shift shift) throws CorruptDataException, ProccessingException{
 		boolean validity=false;
 		
@@ -675,21 +685,36 @@ public class EmployeeShiftCompatibilityManager {
 		return hoursNeeded;
 	}
 	
+	/** Available, Unassigned, not requested off. 
+	 * For this shift the employee hasn't requested off, 
+	 * isn't scheduled to be working elsewhere, 
+	 * and is generally willing to work this time of day for the shifts day of the week.
+	 * 
+	 * @param employee
+	 * @param shift a valid shift
+	 * @return boolean Available, Unassigned, not requested off
+	 * @throws CorruptDataException invalid shift
+	 * @throws ProccessingException null employee or shift
+	 * @Tested
+	 */
 	public boolean isAssignableFor(Employee employee,Shift shift) throws CorruptDataException, ProccessingException{
-    	if(!employee.requestedOff(shift)){
+		boolean assignable=false;
+		if(null==employee||null==shift) {
+			throw new ProccessingException("Null employee or shift provided to isUnassignedFor");
+		}
+		else if(!shift.isValid()) {
+			throw new CorruptDataException("Invalid shift provided to isUnassignedFor");
+		}
+		
+		if(!employee.requestedOff(shift)){
     		if(isUnassignedFor(employee,shift)){
-    			if(!isAvailableFor(employee,shift)){
-    				return false;
+    			if(isAvailableFor(employee,shift)){
+    				assignable=true;
     			}
     		}
-    		else{
-    			return false;
-    		}
-    	}
-    	else{
-    		return false;
-    	}
-    	return true;//Ya ran the gauntlet
+		}
+		
+		return assignable;
     }
 	
 	/** Returns if the employee has no shift currently scheduled at the same time as the selected shift and
@@ -731,6 +756,7 @@ public class EmployeeShiftCompatibilityManager {
 	 * @throws CorruptDataException invalid shift
 	 * @throws ProccessingException null employee or shift
 	 * @Tested
+	 * @Refactor to be cleaner after availability has been updated
 	 */
 	public boolean isAvailableFor(Employee employee, Shift shift) throws CorruptDataException, ProccessingException{
 		boolean available = true;
@@ -748,9 +774,12 @@ public class EmployeeShiftCompatibilityManager {
 		if(dayInt==7){
 			dayInt=0;
 		}
+		System.out.println("day:"+dayInt);
 		
 		if(!shift.getOvernight()){
+			System.out.println("not overnight");
 			if(employee.getDaysAvailable()[dayInt]){
+				System.out.println("available day");
 				boolean[] availability = employee.getAvailabilityFor(dayInt);
 				
 				String start = shift.getStartTime();

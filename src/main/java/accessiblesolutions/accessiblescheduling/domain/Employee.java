@@ -1,17 +1,18 @@
 package accessiblesolutions.accessiblescheduling.domain;
 
-import accessiblesolutions.accessiblescheduling.domain.Shift;
-import org.hibernate.annotations.GenericGenerator;
-import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import java.time.DayOfWeek;
-import java.time.LocalDate;
 import java.util.ArrayList;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+
+import org.hibernate.annotations.GenericGenerator;
+import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
+import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
 
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -296,9 +297,24 @@ public class Employee {
 		return gender.equals(Gender.MALE);
 	}
 
-	public boolean requestedOff(Shift shift) {
+	/**Returns if the employee has requested the day/days of the shift off regarless of their normal schedule
+	 * 
+	 * @param shift a valid shift
+	 * @return boolean if the employee has requested the day/days of the shift off
+	 * @throws ProccessingException null shift
+	 * @throws CorruptDataException invalid shift
+	 * @Tested
+	 */
+	public boolean requestedOff(Shift shift) throws ProccessingException, CorruptDataException {
 		boolean off = false;
-
+		
+		if(null==shift) {
+			throw new ProccessingException("Null shift provided to requestedOff");
+		}
+		else if(!shift.isValid()) {
+			throw new CorruptDataException("Invalid shift provided to requestedOff");
+		}
+		
 		for (String dayOff : requestedOff) {
 			if (shift.getStartDate().equals(dayOff) || shift.getEndDate().equals(dayOff)) {
 				off = true;

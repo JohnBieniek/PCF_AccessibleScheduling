@@ -67,7 +67,7 @@ public class ShiftAssignmentManager {
 //    }
 
     //@Tested
-    public ArrayList<Shift> getOnPrestaffedShifts(ArrayList<Shift> shifts){
+    public ArrayList<Shift> getOnPrestaffedShifts(ArrayList<Shift> shifts) throws ProccessingException, CorruptDataException{
     	ArrayList<Shift> onShifts = new ArrayList<Shift>();
     	
     	if(null!=shifts) {
