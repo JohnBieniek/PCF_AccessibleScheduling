@@ -259,9 +259,32 @@ public class EmployeeShiftCompatibilityManager {
 		return violatesAlternateWeekendsOff;
 	}
 	
-	//TODO Test
+	/**Returns true if assignment would violate max shifts per day, week, or alternate weekends off
+	 * 
+	 * @param compatibility
+	 * @return
+	 * @throws CorruptDataException invalid shift
+	 * @throws ProccessingException null compatibility, employee, or shift
+	 * @Tested
+	 */
 	public boolean getResting(EmployeeShiftCompatibility compatibility) throws CorruptDataException, ProccessingException{
 		boolean resting = false;
+		Employee employee = null;
+		Shift shift = null; 
+		
+		if(null==compatibility ){
+			throw new ProccessingException("Null compatibility provided to getResting");
+		}
+		
+		employee = compatibility.getEmployee();
+		shift = compatibility.getShift();
+		
+		if(null==employee || null==shift) {
+			throw new ProccessingException("Null employee or shift provided to getResting");
+		}
+		else if(!shift.isValid()) {
+			throw new CorruptDataException("Invalid shift provided to getResting");
+		}
 		
 		if(getAssignmentWouldViolateMaxShiftsPerDay(compatibility)){
 			resting= true;

@@ -4271,4 +4271,190 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		assertFalse(errored);
 		assertFalse(result);
 	}
+	
+	@Test
+	public void getRestingThrowsProccessingExceptionWithNullCompatibility() {
+		EmployeeShiftCompatibility compatibility = null;
+		boolean errored = false;
+		try {
+			fixture.getResting(compatibility);
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void getRestingThrowsProccessingExceptionWithNullShift() {
+		Employee employee = new Employee();
+		Shift shift = null;
+		
+		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,shift);
+		boolean errored = false;
+		try {
+			fixture.getResting(compatibility);
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void getRestingThrowsProccessingExceptionWithNullEmployee() {
+		Employee employee = null;
+		Shift shift = new Shift();
+		
+		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,shift);
+		boolean errored = false;
+		try {
+			fixture.getResting(compatibility);
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void getRestingThrowsCorruptDataExceptionWithInvalidShift() {
+		Employee employee = new Employee();
+		Shift shift = new Shift();
+		
+		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,shift);
+		boolean errored = false;
+		try {
+			fixture.getResting(compatibility);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void getRestingReturnsTrueViolatingAlternateWeekendsOff() {
+		Employee employee = new Employee();
+		employee.setOffAlternateWeekends(true);
+		employee.setId("assignedOneDay");
+		Shift shift = new Shift();
+		shift.setStartDate("2018-03-25");
+		shift.setEndDate("2018-03-25");
+		shift.setStartTime("10:00");
+		shift.setEndTime("14:00");
+		shift.setClientId("generic");
+		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,shift);
+		boolean errored = false;
+		boolean result = false;
+		try {
+			result = fixture.getResting(compatibility);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(result);
+	}
+	
+	@Test
+	public void getRestingReturnsTrueViolatingMaxDailyShifts() {
+		Employee employee = new Employee();
+		employee.setId("assignedOneDay");
+		Shift shift = new Shift();
+		shift.setStartDate("2018-04-02");
+		shift.setEndDate("2018-04-02");
+		shift.setStartTime("10:00");
+		shift.setEndTime("14:00");
+		shift.setClientId("generic");
+		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,shift);
+		boolean errored = false;
+		boolean result = false;
+		try {
+			result = fixture.getResting(compatibility);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(result);
+	}
+	
+	@Test
+	public void getRestingReturnsTrueViolatingMaxWeeklyShifts() {
+		Employee employee = new Employee();
+		employee.setId("assignedFiveDay");
+		Shift shift = new Shift();
+		shift.setStartDate("2018-02-04");
+		shift.setEndDate("2018-02-04");
+		shift.setStartTime("10:00");
+		shift.setEndTime("14:00");
+		shift.setClientId("generic");
+		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,shift);
+		boolean errored = false;
+		boolean result = false;
+		try {
+			result = fixture.getResting(compatibility);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(result);
+	}
+	
+	@Test
+	public void getRestingReturnsFalseWhenUnconflicted() {
+		Employee employee = new Employee();
+		employee.setId("assignedFiveDay");
+		Shift shift = new Shift();
+		shift.setStartDate("2018-01-04");
+		shift.setEndDate("2018-01-04");
+		shift.setStartTime("10:00");
+		shift.setEndTime("14:00");
+		shift.setClientId("generic");
+		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,shift);
+		boolean errored = false;
+		boolean result = false;
+		try {
+			result = fixture.getResting(compatibility);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertFalse(result);
+	}
 }
