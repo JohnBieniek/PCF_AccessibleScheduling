@@ -541,64 +541,44 @@ public class EmployeeShiftCompatibilityManager {
 		return employee;
 	}
 	
-//    public EmployeeShiftCompatibilities getValidCompatibilities(EmployeeShiftCompatibilities compatibilities){
-//		ArrayList<EmployeeShiftCompatibility> validCompatibilities = new ArrayList<EmployeeShiftCompatibility>();
-//
-//		for(EmployeeShiftCompatibility compatibility :compatibilities.compatibilities){
-//			Employee employee = null;
-//			employee=compatibility.getEmployee();
-//			boolean compatible = false;
-//			Client client = null;
-//			client = compatibility.client;
-//			if(employee!=null && client!=null){
-//				compatible = employeeClientCompatibilityManager.isCompatibleWith(employee,compatibility.client);
-//			}
-//			
-//			if(compatible){
-//				//System.out.println(employee.getFirst() + " is compatible with "+client.getFirst());
-//				validCompatibilities.add(compatibility);
-//			}
-//			else{
-//				//System.out.println(employee.getFirst() + " is incompatible with "+client.getFirst());
-//			}
-//		}
-//		if(validCompatibilities.isEmpty()){
-//			System.out.println("No valid compatibilites found for " + compatibilities.compatibilities.get(0).getShift());
-//		}
-//		else{
-////				System.out.println(validCompatibilities.size()+" valid compatibilites found for " + compatibilities.compatibilities.get(0).getShift());
-//		}
-//		return new EmployeeShiftCompatibilities(validCompatibilities);
-//	}
 	
-	//TODO Test
+	/**Returns All Valid pairings of employees and shifts
+	 * 
+	 * @param compatibilities A group of EmployeeShiftCompatibility objects
+	 * @return ArrayList<EmployeeShiftCompatibility> EmployeeShiftCompatibility All Valid pairings
+	 * @throws CorruptDataException invalid shift
+	 * @throws ProccessingException null compatibilities, compatibility, employee, client, or shift
+	 * @Tested
+	 */
 	public EmployeeShiftCompatibilities getValidCompatibilities(EmployeeShiftCompatibilities compatibilities) throws CorruptDataException, ProccessingException{
+		Employee employee = null;
+		Shift shift = null;
 		ArrayList<EmployeeShiftCompatibility> validCompatibilities = new ArrayList<EmployeeShiftCompatibility>();
-		//System.out.println("getting valid compatibilities for "+compatibilities.compatibilities.get(0).getShift().toString());
+		
+		if(null==compatibilities||null == compatibilities.compatibilities) {
+			throw new ProccessingException("Null compatibilities provided to getValidCompatibilities");
+		}
+		
 		for(EmployeeShiftCompatibility compatibility :compatibilities.compatibilities){
-			Employee employee = null;
-			employee=compatibility.getEmployee();
-			boolean compatible = false;
-			Client client = null;
-			client = compatibility.client;
-			if(employee!=null && client!=null){
-				compatible = isValidFor(employee,compatibility.getShift());
+			if(null==compatibility) {
+				throw new ProccessingException("Null compatibility provided to getValidCompatibilities");
 			}
 			
-			if(compatible){
-				//System.out.println(employee.getFirst() + " is compatible with "+client.getFirst());
+			employee=null;
+			employee=compatibility.getEmployee();
+			
+			shift = null;
+			shift = compatibility.getShift();
+
+			if(null == employee || null == shift) {
+				throw new ProccessingException("Null shift or employee provided to getValidCompatibilities");
+			}
+			
+			if(isValidFor(employee,shift)){
 				validCompatibilities.add(compatibility);
 			}
-			else{
-				//System.out.println(employee.getFirst() + " is incompatible with "+client.getFirst());
-			}
 		}
-		if(validCompatibilities.isEmpty()){
-			System.out.println("No valid compatibilites found for " + compatibilities.compatibilities.get(0).getShift());
-		}
-		else{
-//			System.out.println(validCompatibilities.size()+" valid compatibilites found for " + compatibilities.compatibilities.get(0).getShift());
-		}
+		
 		return new EmployeeShiftCompatibilities(validCompatibilities);
 	}
 	    

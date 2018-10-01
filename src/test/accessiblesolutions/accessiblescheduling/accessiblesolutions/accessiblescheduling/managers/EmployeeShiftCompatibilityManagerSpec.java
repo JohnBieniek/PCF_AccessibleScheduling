@@ -4941,4 +4941,188 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		assertFalse(errored);
 		assertFalse(result);
 	}
+	
+	@Test
+	public void getValidCompatibilitiesThrowsProccessingExceptionForNullCompatibilities() {
+		EmployeeShiftCompatibilities compatibilities = null;
+		boolean errored = true;
+		
+		try {
+			fixture.getValidCompatibilities(compatibilities);
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void getValidCompatibilitiesThrowsProccessingExceptionForNullInnerCompatibilities() {
+		EmployeeShiftCompatibilities compatibilities = new EmployeeShiftCompatibilities();
+		ArrayList<EmployeeShiftCompatibility> innerCompatibilities = null;
+		compatibilities.compatibilities=innerCompatibilities;
+		boolean errored = true;
+		
+		try {
+			fixture.getValidCompatibilities(compatibilities);
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void getValidCompatibilitiesThrowsProccessingExceptionForNullCompatibilitity() {
+		EmployeeShiftCompatibilities compatibilities = new EmployeeShiftCompatibilities();
+		ArrayList<EmployeeShiftCompatibility> innerCompatibilities = new ArrayList<EmployeeShiftCompatibility>();
+		innerCompatibilities.add(null);
+		compatibilities.compatibilities=innerCompatibilities;
+		boolean errored = true;
+		
+		try {
+			fixture.getValidCompatibilities(compatibilities);
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void getValidCompatibilitiesThrowsProccessingExceptionForNullShift() {
+		EmployeeShiftCompatibilities compatibilities = new EmployeeShiftCompatibilities();
+		ArrayList<EmployeeShiftCompatibility> innerCompatibilities = new ArrayList<EmployeeShiftCompatibility>();
+		Employee employee = new Employee();
+		Client client =new Client();
+		Shift shift = new Shift();
+		innerCompatibilities.add(new EmployeeShiftCompatibility(employee,null,client));
+		compatibilities.compatibilities=innerCompatibilities;
+		boolean errored = true;
+		
+		try {
+			fixture.getValidCompatibilities(compatibilities);
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void getValidCompatibilitiesThrowsProccessingExceptionForNullEmployee() {
+		EmployeeShiftCompatibilities compatibilities = new EmployeeShiftCompatibilities();
+		ArrayList<EmployeeShiftCompatibility> innerCompatibilities = new ArrayList<EmployeeShiftCompatibility>();
+		Employee employee = new Employee();
+		Client client =new Client();
+		Shift shift = new Shift();
+		innerCompatibilities.add(new EmployeeShiftCompatibility(null,shift,client));
+		compatibilities.compatibilities=innerCompatibilities;
+		boolean errored = true;
+		
+		try {
+			fixture.getValidCompatibilities(compatibilities);
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void getValidCompatibilitiesDoesNotAddInvalidItems() {
+		EmployeeShiftCompatibilities compatibilities = new EmployeeShiftCompatibilities();
+		ArrayList<EmployeeShiftCompatibility> innerCompatibilities = new ArrayList<EmployeeShiftCompatibility>();
+		Employee employee = new Employee();
+		Client client =new Client();
+		Shift shift = new Shift();
+		shift.setStartDate("2018-02-04");
+		shift.setEndDate("2018-02-04");
+		shift.setStartTime("10:00");
+		shift.setEndTime("14:00");
+		shift.setClientId("onAlwaysClient");
+		innerCompatibilities.add(new EmployeeShiftCompatibility( employee,shift,client));
+		compatibilities.compatibilities=innerCompatibilities;
+		boolean errored = true;
+		EmployeeShiftCompatibilities result= null;
+		try {
+			result = fixture.getValidCompatibilities(compatibilities);
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+		assertNotNull(result);
+		assertTrue(result.compatibilities.size()==0);
+	}
+	
+	@Test
+	public void getValidCompatibilitiesAddsValidItems() {
+		EmployeeShiftCompatibilities compatibilities = new EmployeeShiftCompatibilities();
+		ArrayList<EmployeeShiftCompatibility> innerCompatibilities = new ArrayList<EmployeeShiftCompatibility>();
+		Employee employee = new Employee();
+		boolean[] daysAvailability = new boolean[24];
+	    boolean[] availability = new boolean[7];
+	    for(int i=0 ; i<24;i++) {
+		    daysAvailability[i]=true;
+		    if(i<7) {
+		    	availability[i]=true;
+		    }
+	    }
+	    employee.setSundaysAvailability(daysAvailability);
+	    employee.setMondaysAvailability(daysAvailability);
+	    employee.setTuesdaysAvailability(daysAvailability);
+	    employee.setWednesdaysAvailability(daysAvailability);
+	    employee.setThursdaysAvailability(daysAvailability);
+	    employee.setFridaysAvailability(daysAvailability);
+	    employee.setSaturdaysAvailability(daysAvailability);
+	    employee.setDaysAvailable(availability);
+		Shift shift = new Shift();
+		shift.setStartDate("2018-01-04");
+		shift.setEndDate("2018-01-04");
+		shift.setStartTime("10:00");
+		shift.setEndTime("14:00");
+		shift.setClientId("onAlwaysClient");
+		innerCompatibilities.add(new EmployeeShiftCompatibility( employee,shift,null));
+		compatibilities.compatibilities=innerCompatibilities;
+		boolean errored = true;
+		EmployeeShiftCompatibilities result= null;
+		try {
+			result = fixture.getValidCompatibilities(compatibilities);
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+		assertNotNull(result);
+		assertTrue(result.compatibilities.size()==1);
+	}
 }
