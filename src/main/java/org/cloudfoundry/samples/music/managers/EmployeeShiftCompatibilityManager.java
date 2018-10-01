@@ -602,23 +602,35 @@ public class EmployeeShiftCompatibilityManager {
 		return new EmployeeShiftCompatibilities(validCompatibilities);
 	}
 	    
-	//TODO Test
+	/** Returns if the employee/shift are compatible,
+	 *  assignable (available, unassigned,not called off),
+	 *  active, without fixed scheduling, 
+	 *  and not resting (exceeds max shifts per days, days per week, or alternate weekends)
+	 * 
+	 * @param employee
+	 * @param shift a valid shift
+	 * @return boolean compatible,assignable, active, unfixed, and not resting
+	 * @throws ProccessingException Coding failure, null employee, shift or client
+	 * @throws CorruptDataException The Shift provided is invalid
+	 * @Tested
+	 */
 	public boolean isValidFor(Employee employee, Shift shift) throws CorruptDataException, ProccessingException{
 		boolean validity=false;
 		
+		if(null==employee||null==shift) {
+			throw new ProccessingException("Null employee or shift provided to isCompatibleWith");
+		}
+		else if(!shift.isValid()) {
+			throw new CorruptDataException("Invalid shift provided to isCompatibleWith");
+		}
+		
 		if(isCompatibleWith(employee,shift)){
 			if(isAssignableFor(employee,shift)){
-				if(!employee.requestedOff(shift)){
-					if(!employee.getInactive()){
-						if(!employee.getFixedSchedule()){
-							EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,shift);
-							if(!getAssignmentWouldViolateAlternateWeekendsOff(compatibility)){
-								if(!getResting(compatibility)){
-									validity=true;
-								}
-							}
+				if(!employee.getInactive()){
+					if(!employee.getFixedSchedule()){
+						if(!getResting(new EmployeeShiftCompatibility(employee,shift))){
+							validity=true;
 						}
-						//else if(employee.getRequestsOvertime()){validity=true;}
 					}
 				}
 			}
@@ -744,7 +756,9 @@ public class EmployeeShiftCompatibilityManager {
 		}
 		
 		if(!employee.requestedOff(shift)){
+			System.out.println("not requested off");
     		if(isUnassignedFor(employee,shift)){
+    			System.out.println("unassinged");
     			if(isAvailableFor(employee,shift)){
     				assignable=true;
     			}
