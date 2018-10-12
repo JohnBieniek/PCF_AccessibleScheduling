@@ -684,7 +684,7 @@ public class CleaningManager {
 			Employee previousEmployee = employeeCrud.findOne(shift.getStaffId());
     		output+="Attempting to assign " +shift.toString();
     		System.out.println("Attempitng to assign " + shift.toString());
-			EmployeeShiftCompatibilities shiftCompatibilities = employeeShiftCompatibilityManager.getValidUnfixedCompatibilities(employeeShiftCompatibilityManager.getEmployeeShiftCompatibilitiesForShift(shift));
+			EmployeeShiftCompatibilities shiftCompatibilities = employeeShiftCompatibilityManager.getValidCompatibilities(employeeShiftCompatibilityManager.getEmployeeShiftCompatibilitiesForShift(shift));
 			output+=shiftCompatibilities.compatibilities.toString();
 			Employee employee=null;
 			//attemptAssigningOnlyCompatibility

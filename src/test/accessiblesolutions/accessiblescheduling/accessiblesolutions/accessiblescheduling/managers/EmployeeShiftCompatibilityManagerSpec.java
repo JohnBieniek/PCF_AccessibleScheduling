@@ -133,9 +133,34 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	    assignedOneDayShifts.add(assignedOneDayShift1);
 	    assignedOneDayShifts.add(assignedOneDayShift2);
 	    assignedOneDayShifts.add(assignedOneDayShift3);
-	    when(shiftRepository.findByStartMonth(4)).thenReturn(assignedOneDayShifts);
+	    assignedOneDay.setMinHours(70);
 	    when(employeeCrud.findOne("assignedOneDay")).thenReturn(assignedOneDay);
 	    when(employeeRepository.findOne("assignedOneDay")).thenReturn(assignedOneDay);
+	    
+	    ArrayList<Shift> month4Shifts = assignedOneDayShifts;
+	    Employee mostTime = new Employee("mostTime","1Day");
+	    mostTime.setId("mostTime"); 
+	   
+	    ArrayList<Shift> mostTimeShifts = new ArrayList<Shift>();
+	    Shift mostTimeShift1 = new Shift();
+	    mostTimeShift1.setStaffId("mostTime");
+	    mostTimeShift1.setStartDate("2018-04-01");
+	    mostTimeShift1.setEndDate("2018-04-02");
+	    mostTimeShift1.setStartTime("20:00");
+	    mostTimeShift1.setEndTime("10:00");
+	    mostTimeShift1.setClientId("generic");
+	    Shift mostTimeShift2 = new Shift();
+	    mostTimeShift2.setStaffId("mostTime");
+	    mostTimeShift2.setStartDate("2018-04-02");
+	    mostTimeShift2.setEndDate("2018-04-02");
+	    mostTimeShift2.setStartTime("10:00");
+	    mostTimeShift2.setEndTime("18:00");
+	    mostTimeShift2.setClientId("generic");
+	    month4Shifts.add(mostTimeShift1);
+	    month4Shifts.add(mostTimeShift2);
+	    when(shiftRepository.findByStartMonth(4)).thenReturn(month4Shifts);
+	    when(employeeCrud.findOne("mostTime")).thenReturn(mostTime);
+	    when(employeeRepository.findOne("mostTime")).thenReturn(mostTime);
 	    
 	    Employee crossMonthEmployee = new Employee("Cross","Month");
 	    ArrayList<Shift> crossMonthShifts = new ArrayList<Shift>();
@@ -5124,5 +5149,181 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		assertTrue(errored);
 		assertNotNull(result);
 		assertTrue(result.compatibilities.size()==1);
+	}
+	
+	@Test
+	public void getEmployeeWithMostTimeThrowsProccessingExceptionWithNullCompatibilities() {
+		boolean errored=false;
+		
+		try {
+			fixture.getEmployeeWithMostTime(null);
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void getEmployeeWithMostTimeThrowsProccessingExceptionWithNullInnerCompatibilities() {
+		boolean errored=false;
+		
+		EmployeeShiftCompatibilities compatiblities = new EmployeeShiftCompatibilities();
+
+		try {
+			fixture.getEmployeeWithMostTime(compatiblities);
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void getEmployeeWithMostTimeThrowsProccessingExceptionWithNullCompatibility() {
+		boolean errored=false;
+		
+		EmployeeShiftCompatibilities compatiblities = new EmployeeShiftCompatibilities();
+		ArrayList<EmployeeShiftCompatibility> inner = new ArrayList<EmployeeShiftCompatibility>();
+		inner.add(null);
+		compatiblities.compatibilities =inner;
+		try {
+			fixture.getEmployeeWithMostTime(compatiblities);
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void getEmployeeWithMostTimeThrowsProccessingExceptionWithNullShift() {
+		boolean errored=false;
+		
+		EmployeeShiftCompatibilities compatiblities = new EmployeeShiftCompatibilities();
+		ArrayList<EmployeeShiftCompatibility> inner = new ArrayList<EmployeeShiftCompatibility>();
+		Shift shift = new Shift();
+		Employee employee = new Employee();
+		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,null);
+		
+		inner.add(compatibility);
+		compatiblities.compatibilities =inner;
+		try {
+			fixture.getEmployeeWithMostTime(compatiblities);
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void getEmployeeWithMostTimeThrowsProccessingExceptionWithNullEmployee() {
+		boolean errored=false;
+		
+		EmployeeShiftCompatibilities compatiblities = new EmployeeShiftCompatibilities();
+		ArrayList<EmployeeShiftCompatibility> inner = new ArrayList<EmployeeShiftCompatibility>();
+		Shift shift = new Shift();
+		Employee employee = new Employee();
+		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(null,shift);
+		
+		inner.add(compatibility);
+		compatiblities.compatibilities =inner;
+		try {
+			fixture.getEmployeeWithMostTime(compatiblities);
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+
+	@Test
+	public void getEmployeeWithMostTimeThrowsCorruptDataExceptionWithInvalidEmployee() {
+		boolean errored=false;
+		
+		EmployeeShiftCompatibilities compatiblities = new EmployeeShiftCompatibilities();
+		ArrayList<EmployeeShiftCompatibility> inner = new ArrayList<EmployeeShiftCompatibility>();
+		Shift shift = new Shift();
+		Employee employee = new Employee();
+		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,shift);
+		
+		inner.add(compatibility);
+		compatiblities.compatibilities =inner;
+		try {
+			fixture.getEmployeeWithMostTime(compatiblities);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void getEmployeeWithMostTimeReturnsEmployeeFarthestFromMeetingMinimumHours() {
+		boolean errored=false;
+		
+		EmployeeShiftCompatibilities compatiblities = new EmployeeShiftCompatibilities();
+		ArrayList<EmployeeShiftCompatibility> inner = new ArrayList<EmployeeShiftCompatibility>();
+		Employee employee = new Employee();
+		employee.setId("mostTime");
+		Employee assignedOneDay = new Employee("Assigned","OneDay");
+	    assignedOneDay.setId("assignedOneDay");
+	    employee.setMinHours(50);
+		 Shift assignedFiveDayShift5 = new Shift();
+		    assignedFiveDayShift5.setStaffId("assignedFiveDay");
+		    assignedFiveDayShift5.setStartDate("2018-04-02");
+		    assignedFiveDayShift5.setEndDate("2018-04-02");
+		    assignedFiveDayShift5.setStartTime("02:00");
+		    assignedFiveDayShift5.setEndTime("10:00");
+		    assignedFiveDayShift5.setClientId("Test");
+		    assignedFiveDayShift5.setStartMonth(4);
+		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,assignedFiveDayShift5);
+		
+		inner.add(compatibility);
+		compatibility = new EmployeeShiftCompatibility(assignedOneDay,assignedFiveDayShift5);
+		inner.add(compatibility);
+		compatiblities.compatibilities =inner;
+
+		Employee result= null;
+		
+		try {
+			result = fixture.getEmployeeWithMostTime(compatiblities);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertNotNull(result);
+		assertTrue(result.getId().contains("mostTime"));
 	}
 }
