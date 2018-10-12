@@ -115,26 +115,52 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	    assignedOneDayShift1.setEndDate("2018-04-02");
 	    assignedOneDayShift1.setStartTime("20:00");
 	    assignedOneDayShift1.setEndTime("10:00");
-	    
+	    assignedOneDayShift1.setClientId("generic");
 	    Shift assignedOneDayShift2 = new Shift();
 	    assignedOneDayShift2.setStaffId("assignedOneDay");
 	    assignedOneDayShift2.setStartDate("2018-04-02");
 	    assignedOneDayShift2.setEndDate("2018-04-02");
 	    assignedOneDayShift2.setStartTime("10:00");
 	    assignedOneDayShift2.setEndTime("18:00");
-	    
+	    assignedOneDayShift2.setClientId("generic");
 	    Shift assignedOneDayShift3 = new Shift();
 	    assignedOneDayShift3.setStaffId("assignedOneDay");
 	    assignedOneDayShift3.setStartDate("2018-04-02");
 	    assignedOneDayShift3.setEndDate("2018-04-03");
 	    assignedOneDayShift3.setStartTime("20:00");
 	    assignedOneDayShift3.setEndTime("10:00");
+	    assignedOneDayShift3.setClientId("generic");
 	    assignedOneDayShifts.add(assignedOneDayShift1);
 	    assignedOneDayShifts.add(assignedOneDayShift2);
 	    assignedOneDayShifts.add(assignedOneDayShift3);
-	    when(shiftRepository.findByStartMonth(4)).thenReturn(assignedOneDayShifts);
+	    assignedOneDay.setMinHours(70);
 	    when(employeeCrud.findOne("assignedOneDay")).thenReturn(assignedOneDay);
 	    when(employeeRepository.findOne("assignedOneDay")).thenReturn(assignedOneDay);
+	    
+	    ArrayList<Shift> month4Shifts = assignedOneDayShifts;
+	    Employee mostTime = new Employee("mostTime","1Day");
+	    mostTime.setId("mostTime"); 
+	   
+	    ArrayList<Shift> mostTimeShifts = new ArrayList<Shift>();
+	    Shift mostTimeShift1 = new Shift();
+	    mostTimeShift1.setStaffId("mostTime");
+	    mostTimeShift1.setStartDate("2018-04-01");
+	    mostTimeShift1.setEndDate("2018-04-02");
+	    mostTimeShift1.setStartTime("20:00");
+	    mostTimeShift1.setEndTime("10:00");
+	    mostTimeShift1.setClientId("generic");
+	    Shift mostTimeShift2 = new Shift();
+	    mostTimeShift2.setStaffId("mostTime");
+	    mostTimeShift2.setStartDate("2018-04-02");
+	    mostTimeShift2.setEndDate("2018-04-02");
+	    mostTimeShift2.setStartTime("10:00");
+	    mostTimeShift2.setEndTime("18:00");
+	    mostTimeShift2.setClientId("generic");
+	    month4Shifts.add(mostTimeShift1);
+	    month4Shifts.add(mostTimeShift2);
+	    when(shiftRepository.findByStartMonth(4)).thenReturn(month4Shifts);
+	    when(employeeCrud.findOne("mostTime")).thenReturn(mostTime);
+	    when(employeeRepository.findOne("mostTime")).thenReturn(mostTime);
 	    
 	    Employee crossMonthEmployee = new Employee("Cross","Month");
 	    ArrayList<Shift> crossMonthShifts = new ArrayList<Shift>();
@@ -231,11 +257,12 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		woodField.setId("woodId");
 		Client onAlwaysClient = new Client("On","AlwaysClient");
 		onAlwaysClient.setId("onAlwaysClient");
+		onAlwaysClient.setOwnCats(true);
 		CustomFieldData onAlwaysClientData = new CustomFieldData();
 		onAlwaysClientData.setOwnerId("onAlwaysClient");
 		onAlwaysClientData.setCustomFieldId("woodId");
 		onAlwaysClientData.setBooleanData(true);
-		
+		when(clientRepository.findOne("onAlwaysClient")).thenReturn(onAlwaysClient);
 	    EmployeeShiftManager customEmployeeShiftManager = new EmployeeShiftManager(employeeCrud, shiftRepository);
 	    customEmployeeShiftManager.shiftRepository=shiftRepository;
 	    when(employeeCrud.findAll()).thenReturn(itterable);
@@ -4081,5 +4108,1222 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		shift.setEndTime("14:00");
 		shift.setClientId("generic");
 		assertTrue(fixture.isAssignableFor(employee,shift));
+	}
+	
+	@Test
+	public void getAssignmentWouldViolateAlternateWeekendsOffThrowsProccessingExceptionForNullCompatibility() {
+		boolean errored=true;
+		
+		try {
+			fixture.getAssignmentWouldViolateAlternateWeekendsOff(null);
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void getAssignmentWouldViolateAlternateWeekendsOffThrowsProccessingExceptionForNullEmployee() {
+		boolean errored=true;
+		Employee employee = new Employee();
+		Shift shift = new Shift();
+		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(null,shift);
+		
+		try {
+			fixture.getAssignmentWouldViolateAlternateWeekendsOff(compatibility);
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+
+	@Test
+	public void getAssignmentWouldViolateAlternateWeekendsOffThrowsProccessingExceptionForNullShift() {
+		boolean errored=true;
+		Employee employee = new Employee();
+		Shift shift = new Shift();
+		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,null);
+		
+		try {
+			fixture.getAssignmentWouldViolateAlternateWeekendsOff(compatibility);
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void getAssignmentWouldViolateAlternateWeekendsOffThrowsCorruptDataExceptionForInvalidShift() {
+		boolean errored=true;
+		Employee employee = new Employee();
+		Shift shift = new Shift();
+		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,shift);
+		
+		try {
+			fixture.getAssignmentWouldViolateAlternateWeekendsOff(compatibility);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void getAssignmentWouldViolateAlternateWeekendsOffReturnsTrueWorkingPreviousWeekend() {
+		boolean errored=false;
+		Employee employee = new Employee();
+		employee.setOffAlternateWeekends(true);
+		employee.setId("assignedOneDay");
+		Shift shift = new Shift();
+		shift.setStartDate("2018-04-07");
+		shift.setEndDate("2018-04-07");
+		shift.setStartTime("10:00");
+		shift.setEndTime("14:00");
+		shift.setClientId("generic");
+		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,shift);
+		boolean result = false;
+		try {
+			result = fixture.getAssignmentWouldViolateAlternateWeekendsOff(compatibility);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(result);
+	}
+	
+	@Test
+	public void getAssignmentWouldViolateAlternateWeekendsOffReturnsTrueWorkingNextWeekend() {
+		boolean errored=false;
+		Employee employee = new Employee();
+		employee.setOffAlternateWeekends(true);
+		employee.setId("assignedOneDay");
+		Shift shift = new Shift();
+		shift.setStartDate("2018-03-25");
+		shift.setEndDate("2018-03-25");
+		shift.setStartTime("10:00");
+		shift.setEndTime("14:00");
+		shift.setClientId("generic");
+		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,shift);
+		boolean result = false;
+		try {
+			result = fixture.getAssignmentWouldViolateAlternateWeekendsOff(compatibility);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(result);
+	}
+	
+	@Test
+	public void getAssignmentWouldViolateAlternateWeekendsOffReturnsFalseNotWorking() {
+		boolean errored=false;
+		Employee employee = new Employee();
+		employee.setOffAlternateWeekends(true);
+		employee.setId("assignedOneDay");
+		Shift shift = new Shift();
+		shift.setStartDate("2018-06-25");
+		shift.setEndDate("2018-06-25");
+		shift.setStartTime("10:00");
+		shift.setEndTime("14:00");
+		shift.setClientId("generic");
+		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,shift);
+		boolean result = false;
+		try {
+			result = fixture.getAssignmentWouldViolateAlternateWeekendsOff(compatibility);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertFalse(result);
+	}
+	
+	@Test
+	public void getAssignmentWouldViolateAlternateWeekendsOffReturnsFalseWhenAlternateWeekendsAllowed() {
+		boolean errored=false;
+		Employee employee = new Employee();
+		employee.setId("assignedOneDay");
+		Shift shift = new Shift();
+		shift.setStartDate("2018-03-25");
+		shift.setEndDate("2018-03-25");
+		shift.setStartTime("10:00");
+		shift.setEndTime("14:00");
+		shift.setClientId("generic");
+		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,shift);
+		boolean result = false;
+		try {
+			result = fixture.getAssignmentWouldViolateAlternateWeekendsOff(compatibility);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertFalse(result);
+	}
+	
+	@Test
+	public void getRestingThrowsProccessingExceptionWithNullCompatibility() {
+		EmployeeShiftCompatibility compatibility = null;
+		boolean errored = false;
+		try {
+			fixture.getResting(compatibility);
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void getRestingThrowsProccessingExceptionWithNullShift() {
+		Employee employee = new Employee();
+		Shift shift = null;
+		
+		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,shift);
+		boolean errored = false;
+		try {
+			fixture.getResting(compatibility);
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void getRestingThrowsProccessingExceptionWithNullEmployee() {
+		Employee employee = null;
+		Shift shift = new Shift();
+		
+		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,shift);
+		boolean errored = false;
+		try {
+			fixture.getResting(compatibility);
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void getRestingThrowsCorruptDataExceptionWithInvalidShift() {
+		Employee employee = new Employee();
+		Shift shift = new Shift();
+		
+		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,shift);
+		boolean errored = false;
+		try {
+			fixture.getResting(compatibility);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void getRestingReturnsTrueViolatingAlternateWeekendsOff() {
+		Employee employee = new Employee();
+		employee.setOffAlternateWeekends(true);
+		employee.setId("assignedOneDay");
+		Shift shift = new Shift();
+		shift.setStartDate("2018-03-25");
+		shift.setEndDate("2018-03-25");
+		shift.setStartTime("10:00");
+		shift.setEndTime("14:00");
+		shift.setClientId("generic");
+		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,shift);
+		boolean errored = false;
+		boolean result = false;
+		try {
+			result = fixture.getResting(compatibility);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(result);
+	}
+	
+	@Test
+	public void getRestingReturnsTrueViolatingMaxDailyShifts() {
+		Employee employee = new Employee();
+		employee.setId("assignedOneDay");
+		Shift shift = new Shift();
+		shift.setStartDate("2018-04-02");
+		shift.setEndDate("2018-04-02");
+		shift.setStartTime("10:00");
+		shift.setEndTime("14:00");
+		shift.setClientId("generic");
+		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,shift);
+		boolean errored = false;
+		boolean result = false;
+		try {
+			result = fixture.getResting(compatibility);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(result);
+	}
+	
+	@Test
+	public void getRestingReturnsTrueViolatingMaxWeeklyShifts() {
+		Employee employee = new Employee();
+		employee.setId("assignedFiveDay");
+		Shift shift = new Shift();
+		shift.setStartDate("2018-02-04");
+		shift.setEndDate("2018-02-04");
+		shift.setStartTime("10:00");
+		shift.setEndTime("14:00");
+		shift.setClientId("generic");
+		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,shift);
+		boolean errored = false;
+		boolean result = false;
+		try {
+			result = fixture.getResting(compatibility);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(result);
+	}
+	
+	@Test
+	public void getRestingReturnsFalseWhenUnconflicted() {
+		Employee employee = new Employee();
+		employee.setId("assignedFiveDay");
+		Shift shift = new Shift();
+		shift.setStartDate("2018-01-04");
+		shift.setEndDate("2018-01-04");
+		shift.setStartTime("10:00");
+		shift.setEndTime("14:00");
+		shift.setClientId("generic");
+		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,shift);
+		boolean errored = false;
+		boolean result = false;
+		try {
+			result = fixture.getResting(compatibility);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertFalse(result);
+	}
+	
+	@Test
+	public void isValidForThrowsProccessingExceptionWithNullEmployee() {
+		Employee employee = new Employee();
+		Shift shift = new Shift();
+		employee=null;
+		boolean errored = false;
+		try {
+			fixture.isValidFor(employee, shift);
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void isValidForThrowsProccessingExceptionWithNullShift() {
+		Employee employee = new Employee();
+		Shift shift = new Shift();
+		shift=null;
+		boolean errored = false;
+		try {
+			fixture.isValidFor(employee, shift);
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+
+	@Test
+	public void isValidForThrowsCorruptDataExceptionWithInvalidShift() {
+		Employee employee = new Employee();
+		Shift shift = new Shift();
+		boolean errored = false;
+		try {
+			fixture.isValidFor(employee, shift);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void isValidReturnsTrueWhenAvailableAndCompatible() {
+		Employee employee = new Employee();
+		boolean[] daysAvailability = new boolean[24];
+	    boolean[] availability = new boolean[7];
+	    for(int i=0 ; i<24;i++) {
+		    daysAvailability[i]=true;
+		    if(i<7) {
+		    	availability[i]=true;
+		    }
+	    }
+	    employee.setSundaysAvailability(daysAvailability);
+	    employee.setMondaysAvailability(daysAvailability);
+	    employee.setTuesdaysAvailability(daysAvailability);
+	    employee.setWednesdaysAvailability(daysAvailability);
+	    employee.setThursdaysAvailability(daysAvailability);
+	    employee.setFridaysAvailability(daysAvailability);
+	    employee.setSaturdaysAvailability(daysAvailability);
+	    employee.setDaysAvailable(availability);
+		Shift shift = new Shift();
+		shift.setStartDate("2018-01-04");
+		shift.setEndDate("2018-01-04");
+		shift.setStartTime("10:00");
+		shift.setEndTime("14:00");
+		shift.setClientId("onAlwaysClient");
+		boolean errored = false;
+		boolean result = false;
+		
+		try {
+			result = fixture.isValidFor(employee, shift);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(result);
+	}
+	
+	@Test
+	public void isValidReturnsFalseWhenAvailableAndIncompatible() {
+		Employee employee = new Employee();
+		boolean[] daysAvailability = new boolean[24];
+	    boolean[] availability = new boolean[7];
+	    for(int i=0 ; i<24;i++) {
+		    daysAvailability[i]=true;
+		    if(i<7) {
+		    	availability[i]=true;
+		    }
+	    }
+	    employee.setNoCats(true);
+	    employee.setSundaysAvailability(daysAvailability);
+	    employee.setMondaysAvailability(daysAvailability);
+	    employee.setTuesdaysAvailability(daysAvailability);
+	    employee.setWednesdaysAvailability(daysAvailability);
+	    employee.setThursdaysAvailability(daysAvailability);
+	    employee.setFridaysAvailability(daysAvailability);
+	    employee.setSaturdaysAvailability(daysAvailability);
+	    employee.setDaysAvailable(availability);
+		Shift shift = new Shift();
+		shift.setStartDate("2018-01-04");
+		shift.setEndDate("2018-01-04");
+		shift.setStartTime("10:00");
+		shift.setEndTime("14:00");
+		shift.setClientId("onAlwaysClient");
+		boolean errored = false;
+		boolean result = false;
+		
+		try {
+			result = fixture.isValidFor(employee, shift);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertFalse(result);
+	}
+	
+	@Test
+	public void isValidReturnsFalseWhenAssignedAndCompatible() {
+		Employee employee = new Employee();
+		employee.setId("inOvertime");
+		boolean[] daysAvailability = new boolean[24];
+	    boolean[] availability = new boolean[7];
+	    for(int i=0 ; i<24;i++) {
+		    daysAvailability[i]=true;
+		    if(i<7) {
+		    	availability[i]=true;
+		    }
+	    }
+	    employee.setSundaysAvailability(daysAvailability);
+	    employee.setMondaysAvailability(daysAvailability);
+	    employee.setTuesdaysAvailability(daysAvailability);
+	    employee.setWednesdaysAvailability(daysAvailability);
+	    employee.setThursdaysAvailability(daysAvailability);
+	    employee.setFridaysAvailability(daysAvailability);
+	    employee.setSaturdaysAvailability(daysAvailability);
+	    employee.setDaysAvailable(availability);
+		Shift shift = new Shift();
+		shift.setStartDate("2018-07-01");
+		shift.setEndDate("2018-07-01");
+		shift.setStartTime("10:00");
+		shift.setEndTime("14:00");
+		shift.setClientId("onAlwaysClient");
+		boolean errored = false;
+		boolean result = false;
+		
+		try {
+			result = fixture.isValidFor(employee, shift);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertFalse(result);
+	}
+	
+	@Test
+	public void isValidReturnsFalseWhenUnavailableAndCompatible() {
+		Employee employee = new Employee();
+		employee.setId("inOvertime");
+		boolean[] daysAvailability = new boolean[24];
+	    boolean[] availability = new boolean[7];
+	    for(int i=0 ; i<24;i++) {
+		    daysAvailability[i]=true;
+		    if(i<7) {
+		    	availability[i]=true;
+		    }
+	    }
+		Shift shift = new Shift();
+		shift.setStartDate("2018-04-01");
+		shift.setEndDate("2018-04-01");
+		shift.setStartTime("10:00");
+		shift.setEndTime("14:00");
+		shift.setClientId("onAlwaysClient");
+		boolean errored = false;
+		boolean result = false;
+		
+		try {
+			result = fixture.isValidFor(employee, shift);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertFalse(result);
+	}
+	
+	@Test
+	public void isValidReturnsFalseWhenRequestedOff() {
+		Employee employee = new Employee();
+		employee.setId("inOvertime");
+		 String[] requestedOff = {"2018-05-01"};
+		    employee.setRequestedOff(requestedOff);
+		boolean[] daysAvailability = new boolean[24];
+	    boolean[] availability = new boolean[7];
+	    for(int i=0 ; i<24;i++) {
+		    daysAvailability[i]=true;
+		    if(i<7) {
+		    	availability[i]=true;
+		    }
+	    }
+	    employee.setSundaysAvailability(daysAvailability);
+	    employee.setMondaysAvailability(daysAvailability);
+	    employee.setTuesdaysAvailability(daysAvailability);
+	    employee.setWednesdaysAvailability(daysAvailability);
+	    employee.setThursdaysAvailability(daysAvailability);
+	    employee.setFridaysAvailability(daysAvailability);
+	    employee.setSaturdaysAvailability(daysAvailability);
+	    employee.setDaysAvailable(availability);
+		Shift shift = new Shift();
+		shift.setStartDate("2018-05-01");
+		shift.setEndDate("2018-05-01");
+		shift.setStartTime("10:00");
+		shift.setEndTime("14:00");
+		shift.setClientId("onAlwaysClient");
+		boolean errored = false;
+		boolean result = false;
+		
+		try {
+			result = fixture.isValidFor(employee, shift);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertFalse(result);
+	}
+	
+	@Test
+	public void isValidReturnsFalseWhenInactive() {
+		Employee employee = new Employee();
+		employee.setId("inOvertime");
+		employee.setInactive(true);
+		boolean[] daysAvailability = new boolean[24];
+	    boolean[] availability = new boolean[7];
+	    for(int i=0 ; i<24;i++) {
+		    daysAvailability[i]=true;
+		    if(i<7) {
+		    	availability[i]=true;
+		    }
+	    }
+	    employee.setSundaysAvailability(daysAvailability);
+	    employee.setMondaysAvailability(daysAvailability);
+	    employee.setTuesdaysAvailability(daysAvailability);
+	    employee.setWednesdaysAvailability(daysAvailability);
+	    employee.setThursdaysAvailability(daysAvailability);
+	    employee.setFridaysAvailability(daysAvailability);
+	    employee.setSaturdaysAvailability(daysAvailability);
+	    employee.setDaysAvailable(availability);
+		Shift shift = new Shift();
+		shift.setStartDate("2018-05-01");
+		shift.setEndDate("2018-05-01");
+		shift.setStartTime("10:00");
+		shift.setEndTime("14:00");
+		shift.setClientId("onAlwaysClient");
+		boolean errored = false;
+		boolean result = false;
+		
+		try {
+			result = fixture.isValidFor(employee, shift);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertFalse(result);
+	}
+	
+	@Test
+	public void isValidReturnsFalseWhenUsingAFixedSchedule() {
+		Employee employee = new Employee();
+		employee.setId("inOvertime");
+		employee.setFixedSchedule(true);
+		boolean[] daysAvailability = new boolean[24];
+	    boolean[] availability = new boolean[7];
+	    for(int i=0 ; i<24;i++) {
+		    daysAvailability[i]=true;
+		    if(i<7) {
+		    	availability[i]=true;
+		    }
+	    }
+	    employee.setSundaysAvailability(daysAvailability);
+	    employee.setMondaysAvailability(daysAvailability);
+	    employee.setTuesdaysAvailability(daysAvailability);
+	    employee.setWednesdaysAvailability(daysAvailability);
+	    employee.setThursdaysAvailability(daysAvailability);
+	    employee.setFridaysAvailability(daysAvailability);
+	    employee.setSaturdaysAvailability(daysAvailability);
+	    employee.setDaysAvailable(availability);
+		Shift shift = new Shift();
+		shift.setStartDate("2018-05-01");
+		shift.setEndDate("2018-05-01");
+		shift.setStartTime("10:00");
+		shift.setEndTime("14:00");
+		shift.setClientId("onAlwaysClient");
+		boolean errored = false;
+		boolean result = false;
+		
+		try {
+			result = fixture.isValidFor(employee, shift);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertFalse(result);
+	}
+	
+	@Test
+	public void isValidReturnsFalseWhenAssignmentViolatesAlternateWeekendsOff() {
+		boolean errored=false;
+		Employee employee = new Employee();
+		boolean[] daysAvailability = new boolean[24];
+	    boolean[] availability = new boolean[7];
+	    for(int i=0 ; i<24;i++) {
+		    daysAvailability[i]=true;
+		    if(i<7) {
+		    	availability[i]=true;
+		    }
+	    }
+	    employee.setSundaysAvailability(daysAvailability);
+	    employee.setMondaysAvailability(daysAvailability);
+	    employee.setTuesdaysAvailability(daysAvailability);
+	    employee.setWednesdaysAvailability(daysAvailability);
+	    employee.setThursdaysAvailability(daysAvailability);
+	    employee.setFridaysAvailability(daysAvailability);
+	    employee.setSaturdaysAvailability(daysAvailability);
+	    employee.setDaysAvailable(availability);
+		employee.setOffAlternateWeekends(true);
+		employee.setId("assignedOneDay");
+		Shift shift = new Shift();
+		shift.setStartDate("2018-04-07");
+		shift.setEndDate("2018-04-07");
+		shift.setStartTime("10:00");
+		shift.setEndTime("14:00");
+		shift.setClientId("onAlwaysClient");
+		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,shift);
+		boolean result = false;
+		try {
+			result = fixture.isValidFor(employee,shift);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertFalse(result);
+	}
+	
+	@Test
+	public void isValidReturnsFalseWhenAssignmentViolatesMaxShiftsPerDay() {
+		boolean errored=false;
+		Employee employee = new Employee();
+		boolean[] daysAvailability = new boolean[24];
+	    boolean[] availability = new boolean[7];
+	    for(int i=0 ; i<24;i++) {
+		    daysAvailability[i]=true;
+		    if(i<7) {
+		    	availability[i]=true;
+		    }
+	    }
+	    employee.setSundaysAvailability(daysAvailability);
+	    employee.setMondaysAvailability(daysAvailability);
+	    employee.setTuesdaysAvailability(daysAvailability);
+	    employee.setWednesdaysAvailability(daysAvailability);
+	    employee.setThursdaysAvailability(daysAvailability);
+	    employee.setFridaysAvailability(daysAvailability);
+	    employee.setSaturdaysAvailability(daysAvailability);
+	    employee.setDaysAvailable(availability);
+		employee.setOffAlternateWeekends(true);
+		employee.setId("assignedOneDay");
+		Shift shift = new Shift();
+		shift.setStartDate("2018-04-02");
+		shift.setEndDate("2018-04-02");
+		shift.setStartTime("10:00");
+		shift.setEndTime("14:00");
+		shift.setClientId("onAlwaysClient");
+		boolean result = false;
+		try {
+			result = fixture.isValidFor(employee,shift);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertFalse(result);
+	}
+	
+	@Test
+	public void isValidReturnsFalseWhenAssignmentViolatesMaxDaysPerWeek() {
+		boolean errored=false;
+		Employee employee = new Employee();
+		boolean[] daysAvailability = new boolean[24];
+	    boolean[] availability = new boolean[7];
+	    for(int i=0 ; i<24;i++) {
+		    daysAvailability[i]=true;
+		    if(i<7) {
+		    	availability[i]=true;
+		    }
+	    }
+	    employee.setSundaysAvailability(daysAvailability);
+	    employee.setMondaysAvailability(daysAvailability);
+	    employee.setTuesdaysAvailability(daysAvailability);
+	    employee.setWednesdaysAvailability(daysAvailability);
+	    employee.setThursdaysAvailability(daysAvailability);
+	    employee.setFridaysAvailability(daysAvailability);
+	    employee.setSaturdaysAvailability(daysAvailability);
+	    employee.setDaysAvailable(availability);
+		employee.setOffAlternateWeekends(true);
+		employee.setId("assignedFiveDay");
+		Shift shift = new Shift();
+		shift.setStartDate("2018-02-04");
+		shift.setEndDate("2018-02-04");
+		shift.setStartTime("10:00");
+		shift.setEndTime("14:00");
+		shift.setClientId("onAlwaysClient");
+		boolean result = false;
+		try {
+			result = fixture.isValidFor(employee,shift);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertFalse(result);
+	}
+	
+	@Test
+	public void getValidCompatibilitiesThrowsProccessingExceptionForNullCompatibilities() {
+		EmployeeShiftCompatibilities compatibilities = null;
+		boolean errored = true;
+		
+		try {
+			fixture.getValidCompatibilities(compatibilities);
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void getValidCompatibilitiesThrowsProccessingExceptionForNullInnerCompatibilities() {
+		EmployeeShiftCompatibilities compatibilities = new EmployeeShiftCompatibilities();
+		ArrayList<EmployeeShiftCompatibility> innerCompatibilities = null;
+		compatibilities.compatibilities=innerCompatibilities;
+		boolean errored = true;
+		
+		try {
+			fixture.getValidCompatibilities(compatibilities);
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void getValidCompatibilitiesThrowsProccessingExceptionForNullCompatibilitity() {
+		EmployeeShiftCompatibilities compatibilities = new EmployeeShiftCompatibilities();
+		ArrayList<EmployeeShiftCompatibility> innerCompatibilities = new ArrayList<EmployeeShiftCompatibility>();
+		innerCompatibilities.add(null);
+		compatibilities.compatibilities=innerCompatibilities;
+		boolean errored = true;
+		
+		try {
+			fixture.getValidCompatibilities(compatibilities);
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void getValidCompatibilitiesThrowsProccessingExceptionForNullShift() {
+		EmployeeShiftCompatibilities compatibilities = new EmployeeShiftCompatibilities();
+		ArrayList<EmployeeShiftCompatibility> innerCompatibilities = new ArrayList<EmployeeShiftCompatibility>();
+		Employee employee = new Employee();
+		Client client =new Client();
+		Shift shift = new Shift();
+		innerCompatibilities.add(new EmployeeShiftCompatibility(employee,null,client));
+		compatibilities.compatibilities=innerCompatibilities;
+		boolean errored = true;
+		
+		try {
+			fixture.getValidCompatibilities(compatibilities);
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void getValidCompatibilitiesThrowsProccessingExceptionForNullEmployee() {
+		EmployeeShiftCompatibilities compatibilities = new EmployeeShiftCompatibilities();
+		ArrayList<EmployeeShiftCompatibility> innerCompatibilities = new ArrayList<EmployeeShiftCompatibility>();
+		Employee employee = new Employee();
+		Client client =new Client();
+		Shift shift = new Shift();
+		innerCompatibilities.add(new EmployeeShiftCompatibility(null,shift,client));
+		compatibilities.compatibilities=innerCompatibilities;
+		boolean errored = true;
+		
+		try {
+			fixture.getValidCompatibilities(compatibilities);
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void getValidCompatibilitiesDoesNotAddInvalidItems() {
+		EmployeeShiftCompatibilities compatibilities = new EmployeeShiftCompatibilities();
+		ArrayList<EmployeeShiftCompatibility> innerCompatibilities = new ArrayList<EmployeeShiftCompatibility>();
+		Employee employee = new Employee();
+		Client client =new Client();
+		Shift shift = new Shift();
+		shift.setStartDate("2018-02-04");
+		shift.setEndDate("2018-02-04");
+		shift.setStartTime("10:00");
+		shift.setEndTime("14:00");
+		shift.setClientId("onAlwaysClient");
+		innerCompatibilities.add(new EmployeeShiftCompatibility( employee,shift,client));
+		compatibilities.compatibilities=innerCompatibilities;
+		boolean errored = true;
+		EmployeeShiftCompatibilities result= null;
+		try {
+			result = fixture.getValidCompatibilities(compatibilities);
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+		assertNotNull(result);
+		assertTrue(result.compatibilities.size()==0);
+	}
+	
+	@Test
+	public void getValidCompatibilitiesAddsValidItems() {
+		EmployeeShiftCompatibilities compatibilities = new EmployeeShiftCompatibilities();
+		ArrayList<EmployeeShiftCompatibility> innerCompatibilities = new ArrayList<EmployeeShiftCompatibility>();
+		Employee employee = new Employee();
+		boolean[] daysAvailability = new boolean[24];
+	    boolean[] availability = new boolean[7];
+	    for(int i=0 ; i<24;i++) {
+		    daysAvailability[i]=true;
+		    if(i<7) {
+		    	availability[i]=true;
+		    }
+	    }
+	    employee.setSundaysAvailability(daysAvailability);
+	    employee.setMondaysAvailability(daysAvailability);
+	    employee.setTuesdaysAvailability(daysAvailability);
+	    employee.setWednesdaysAvailability(daysAvailability);
+	    employee.setThursdaysAvailability(daysAvailability);
+	    employee.setFridaysAvailability(daysAvailability);
+	    employee.setSaturdaysAvailability(daysAvailability);
+	    employee.setDaysAvailable(availability);
+		Shift shift = new Shift();
+		shift.setStartDate("2018-01-04");
+		shift.setEndDate("2018-01-04");
+		shift.setStartTime("10:00");
+		shift.setEndTime("14:00");
+		shift.setClientId("onAlwaysClient");
+		innerCompatibilities.add(new EmployeeShiftCompatibility( employee,shift,null));
+		compatibilities.compatibilities=innerCompatibilities;
+		boolean errored = true;
+		EmployeeShiftCompatibilities result= null;
+		try {
+			result = fixture.getValidCompatibilities(compatibilities);
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+		assertNotNull(result);
+		assertTrue(result.compatibilities.size()==1);
+	}
+	
+	@Test
+	public void getEmployeeWithMostTimeThrowsProccessingExceptionWithNullCompatibilities() {
+		boolean errored=false;
+		
+		try {
+			fixture.getEmployeeWithMostTime(null);
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void getEmployeeWithMostTimeThrowsProccessingExceptionWithNullInnerCompatibilities() {
+		boolean errored=false;
+		
+		EmployeeShiftCompatibilities compatiblities = new EmployeeShiftCompatibilities();
+
+		try {
+			fixture.getEmployeeWithMostTime(compatiblities);
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void getEmployeeWithMostTimeThrowsProccessingExceptionWithNullCompatibility() {
+		boolean errored=false;
+		
+		EmployeeShiftCompatibilities compatiblities = new EmployeeShiftCompatibilities();
+		ArrayList<EmployeeShiftCompatibility> inner = new ArrayList<EmployeeShiftCompatibility>();
+		inner.add(null);
+		compatiblities.compatibilities =inner;
+		try {
+			fixture.getEmployeeWithMostTime(compatiblities);
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void getEmployeeWithMostTimeThrowsProccessingExceptionWithNullShift() {
+		boolean errored=false;
+		
+		EmployeeShiftCompatibilities compatiblities = new EmployeeShiftCompatibilities();
+		ArrayList<EmployeeShiftCompatibility> inner = new ArrayList<EmployeeShiftCompatibility>();
+		Shift shift = new Shift();
+		Employee employee = new Employee();
+		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,null);
+		
+		inner.add(compatibility);
+		compatiblities.compatibilities =inner;
+		try {
+			fixture.getEmployeeWithMostTime(compatiblities);
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void getEmployeeWithMostTimeThrowsProccessingExceptionWithNullEmployee() {
+		boolean errored=false;
+		
+		EmployeeShiftCompatibilities compatiblities = new EmployeeShiftCompatibilities();
+		ArrayList<EmployeeShiftCompatibility> inner = new ArrayList<EmployeeShiftCompatibility>();
+		Shift shift = new Shift();
+		Employee employee = new Employee();
+		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(null,shift);
+		
+		inner.add(compatibility);
+		compatiblities.compatibilities =inner;
+		try {
+			fixture.getEmployeeWithMostTime(compatiblities);
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+
+	@Test
+	public void getEmployeeWithMostTimeThrowsCorruptDataExceptionWithInvalidEmployee() {
+		boolean errored=false;
+		
+		EmployeeShiftCompatibilities compatiblities = new EmployeeShiftCompatibilities();
+		ArrayList<EmployeeShiftCompatibility> inner = new ArrayList<EmployeeShiftCompatibility>();
+		Shift shift = new Shift();
+		Employee employee = new Employee();
+		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,shift);
+		
+		inner.add(compatibility);
+		compatiblities.compatibilities =inner;
+		try {
+			fixture.getEmployeeWithMostTime(compatiblities);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void getEmployeeWithMostTimeReturnsEmployeeFarthestFromMeetingMinimumHours() {
+		boolean errored=false;
+		
+		EmployeeShiftCompatibilities compatiblities = new EmployeeShiftCompatibilities();
+		ArrayList<EmployeeShiftCompatibility> inner = new ArrayList<EmployeeShiftCompatibility>();
+		Employee employee = new Employee();
+		employee.setId("mostTime");
+		Employee assignedOneDay = new Employee("Assigned","OneDay");
+	    assignedOneDay.setId("assignedOneDay");
+	    employee.setMinHours(50);
+		 Shift assignedFiveDayShift5 = new Shift();
+		    assignedFiveDayShift5.setStaffId("assignedFiveDay");
+		    assignedFiveDayShift5.setStartDate("2018-04-02");
+		    assignedFiveDayShift5.setEndDate("2018-04-02");
+		    assignedFiveDayShift5.setStartTime("02:00");
+		    assignedFiveDayShift5.setEndTime("10:00");
+		    assignedFiveDayShift5.setClientId("Test");
+		    assignedFiveDayShift5.setStartMonth(4);
+		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,assignedFiveDayShift5);
+		
+		inner.add(compatibility);
+		compatibility = new EmployeeShiftCompatibility(assignedOneDay,assignedFiveDayShift5);
+		inner.add(compatibility);
+		compatiblities.compatibilities =inner;
+
+		Employee result= null;
+		
+		try {
+			result = fixture.getEmployeeWithMostTime(compatiblities);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertNotNull(result);
+		assertTrue(result.getId().contains("mostTime"));
 	}
 }
