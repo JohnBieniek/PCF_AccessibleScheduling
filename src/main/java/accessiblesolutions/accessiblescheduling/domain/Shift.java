@@ -82,29 +82,21 @@ public class Shift {
 		
 		setTime(getStartTime()+"-"+getEndTime());
     }
+
     public boolean isValid(){
     	boolean valid=true;
-    	float duration = 0;
+
     	try{
-    		duration = getDuration();
+    		getDuration();
     	}
     	catch(CorruptDataException e){
     		valid=false;
     	}
+    	
     	if(!event&& null==clientId){
     		valid=false;
     	}
-//    	if( null == startDate ||//Time Set
-//    		null == startTime ||
-//    		null == endDate   ||
-//    		null == endTime)
-//    	{
-//    		valid=false;
-//    	}
-//    	if((isAssigned() && staffId==null) || (isAssigned() && staffName==Null)){//TODO
-//    		valid=false;
-//    	}
-    	System.out.println("Shift:"+toString()+" validity? "+valid);
+
     	return valid;
     }
     

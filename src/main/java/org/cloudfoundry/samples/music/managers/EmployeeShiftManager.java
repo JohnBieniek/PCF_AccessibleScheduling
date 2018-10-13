@@ -1,15 +1,14 @@
 package org.cloudfoundry.samples.music.managers;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 
-import accessiblesolutions.accessiblescheduling.domain.Shift;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoShiftRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
 
 import accessiblesolutions.accessiblescheduling.domain.Employee;
+import accessiblesolutions.accessiblescheduling.domain.Shift;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
 import accessiblesolutions.accessiblescheduling.util.Util;
@@ -158,7 +157,6 @@ public class EmployeeShiftManager {
   	 */
   	public ArrayList<Shift> getAssignedShiftsForEmployeeForMonth(String employeeId, int month){
 		ArrayList<Shift> assignedShiftsForEmployeeForMonth = new ArrayList<Shift>();
-		System.out.println("finding by month" +month);
 		if(null!=employeeId) {
 			for(Shift shift: shiftRepository.findByStartMonth(month)){
 				if(shift!=null&& shift.getStaffId()!=null&&shift.getStaffId().equals(employeeId)){
@@ -179,11 +177,11 @@ public class EmployeeShiftManager {
 				}
 			}
 		}
-		System.out.println("found shifts for month:"+assignedShiftsForEmployeeForMonth.size());
 		return assignedShiftsForEmployeeForMonth;
 	}
   
 
+  	//TODO Test
   	public ArrayList<Shift> getAssignedOvernightShiftsForEmployeForTheLastDayOfMonthBefore(String employeeId, int month) throws CorruptDataException, ProccessingException{
   		ArrayList<Shift> assignedOvernightShiftsForEmployeForTheLastDayOfMonthBefore = new ArrayList<Shift>();
   		
@@ -199,6 +197,7 @@ public class EmployeeShiftManager {
   		return assignedOvernightShiftsForEmployeForTheLastDayOfMonthBefore;
   	}
   	
+  	//TODO test
 	public ArrayList<Shift> getAssignedOvernightShiftsForEmployeForTheLastDayOfMonth(String employeeId, int month) throws CorruptDataException, ProccessingException{
 		ArrayList<Shift> assignedOvernightShiftsForEmployeForTheLastDayOfMonth = new ArrayList<Shift>();
 		
@@ -278,7 +277,6 @@ public class EmployeeShiftManager {
 		String[] endTime = null;//For  a shift on the last day of the week going overnight
 		int hoursThisWeek = 0;//For  a shift on the last day of the week going overnight
 		int minutesThisWeek = 0;//For  a shift on the last day of the week going overnight
-		System.out.println("really getting those hours");
 		if(null!=employee){
 			shiftsForWeek = getAssignedShiftsForEmployeeForWeekOfMonth(employee.getId(), week, month);
 			
