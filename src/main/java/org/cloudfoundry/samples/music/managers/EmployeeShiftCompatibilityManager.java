@@ -404,6 +404,7 @@ public class EmployeeShiftCompatibilityManager {
      * @return employee has the most time before their min hours is met
      * @throws CorruptDataException invalid shift
      * @throws ProccessingException null compatibility, employee, or shift
+     * @Tested
      */
 	public Employee getEmployeeWithMostTime(EmployeeShiftCompatibilities compatibilities) throws CorruptDataException, ProccessingException {
     	Employee employee = null;
@@ -423,43 +424,66 @@ public class EmployeeShiftCompatibilityManager {
 		return employee;
 	}
 	
-	//TODO Test
-	public Employee getEmployeeWithMostTimeAfterAssignment(EmployeeShiftCompatibilities compatibilties) throws CorruptDataException, ProccessingException {
+	 /**Returns the employee of the group that would have the most time until min hours is met
+     * for the week of their shift if they were assigned the shift they are being considered for
+     * 
+     * @param compatibilities Employees coupled with shifts they are being considered for
+     * @return employee has the most time before their min hours is met
+     * @throws CorruptDataException invalid shift
+     * @throws ProccessingException null compatibility, employee, or shift
+     * @Tested
+     */
+	public Employee getEmployeeWithMostTimeAfterAssignment(EmployeeShiftCompatibilities compatibilities) throws CorruptDataException, ProccessingException {
 		Employee employee = null;
 		float time = 0;
 		
-		for(EmployeeShiftCompatibility compatibility :compatibilties.compatibilities){
-			if(getHoursNeededAfterAssignment(compatibility)>time){
+		if(null==compatibilities || compatibilities.compatibilities==null) {
+			throw new ProccessingException("Null EmployeeShiftCompatibilities provided for assesment to getEmployeeWithMostTime");
+		}
+		
+		for(EmployeeShiftCompatibility compatibility :compatibilities.compatibilities){
+			if(getHoursNeededAfterAssignment(compatibility)>=time){
 				time=getHoursNeededAfterAssignment(compatibility);
 				employee=compatibility.getEmployee();
 			}
 		}
 		
-		
 		return employee;
 	}
 	
-	//TODO Test
+	 /**Returns the employee of the group that would have the most time until max hours are met
+     * for the week of their shift if they were assigned the shift they are being considered for
+     * 
+     * @param compatibilities Employees coupled with shifts they are being considered for
+     * @return employee has the most time before their max hours is met
+     * @throws CorruptDataException invalid shift
+     * @throws ProccessingException null compatibility, employee, or shift
+     * @Tested
+     */
     public Employee getEmployeeWithMostTimeBeforeOvertimeAfterAssignment(EmployeeShiftCompatibilities compatibilities) throws CorruptDataException, ProccessingException {
-    	//System.out.println("Getting the employee with the most time for " + compatibilities.compatibilities.get(0).getShift().toString());
 		Employee employee = null;
 		float time = 0;
+		float timeUntilOvertimeForShift = 0;
+		
+		if(null==compatibilities || compatibilities.compatibilities==null) {
+			throw new ProccessingException("Null EmployeeShiftCompatibilities provided for assesment to getEmployeeWithMostTime");
+		}
 		
 		for(EmployeeShiftCompatibility compatibility :compatibilities.compatibilities){
-			float timeUntilOvertimeForShift = compatibility.getEmployee().getMaxHoursAvailable();
-			System.out.println(compatibility.getEmployee().getFirst() + " has "+ timeUntilOvertimeForShift + " hours available per week");
-			System.out.println(compatibility.getShift().getDuration() + " is the length of "+compatibility.getShift().toString());
-			timeUntilOvertimeForShift-=compatibility.getShift().getDuration();
-			System.out.println(compatibility.getEmployee().getFirst() + " is scheduled" +getHoursScheduledWeekOfShift(compatibility.getEmployee(),compatibility.getShift()) + " the week of shift " + compatibility.getShift().toString());
-			timeUntilOvertimeForShift-=getHoursScheduledWeekOfShift(compatibility.getEmployee(),compatibility.getShift());
-			System.out.println(compatibility.getEmployee().getFirst() + " would have "+ timeUntilOvertimeForShift + " time till overtime");
-			if(timeUntilOvertimeForShift>time && !getAssignmentWouldViolateAlternateWeekendsOff(compatibility)){
-				System.out.println(compatibility.getEmployee().getFirst() + " at "+timeUntilOvertimeForShift+" has more time till overtime than anyone "+employee + " at " + time);
+			if(null == compatibility || null == compatibility.getShift() || null==compatibility.getEmployee()) {
+				throw new ProccessingException("Null EmployeeShiftCompatibility provided for assesment to getEmployeeWithMostTime");
+			}
+			
+			timeUntilOvertimeForShift = compatibility.getEmployee().getMaxHoursAvailable();
+			timeUntilOvertimeForShift-= compatibility.getShift().getDuration();
+			timeUntilOvertimeForShift-= getHoursScheduledWeekOfShift(compatibility.getEmployee(),compatibility.getShift());
+			
+			if(timeUntilOvertimeForShift>=time){
 				time=timeUntilOvertimeForShift;
 				employee=compatibility.getEmployee();
 			}
 		}
-		//System.out.println(employee.getFirst() + " has more time till overtime than anyone for "+compatibilities.compatibilities.get(0).getShift().toString());
+		
 		return employee;
 	}
 
