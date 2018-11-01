@@ -54,17 +54,6 @@ public class ShiftAssignmentManager {
     		    	
 		return result;
     }
-//    public void saveAssignedUnconflictedPrestaffedRecuringShiftsToTableForMonth(int selectedMonth){
-//    	ArrayList<Shift> prestaffedRecuringShifts = shiftManager.getPrestaffedRecurringShiftsForMonth(selectedMonth);
-//
-//    	HashMap<String,ArrayList<Shift>> prestaffedRecuringShiftsPerEmployee =ShiftWorker.getEmployeeShiftMap(prestaffedRecuringShifts);
-//
-//    	HashMap<String,ArrayList<Shift>> unconflictedPrestaffedRecuringShiftsPerEmployee = ShiftWorker.getNonoverlapingShiftsPerEmployee(prestaffedRecuringShiftsPerEmployee);
-//    	
-//    	ArrayList<Shift> assignedUnconflictedPrestaffedRecuringShifts = assignRequestedStaff(unconflictedPrestaffedRecuringShiftsPerEmployee);
-//
-//    	shiftCrud.save(assignedUnconflictedPrestaffedRecuringShifts);
-//    }
 
     //@Tested
     public ArrayList<Shift> getOnPrestaffedShifts(ArrayList<Shift> shifts) throws ProccessingException, CorruptDataException{
