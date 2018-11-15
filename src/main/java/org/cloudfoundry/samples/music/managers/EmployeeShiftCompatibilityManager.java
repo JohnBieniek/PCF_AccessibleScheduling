@@ -406,7 +406,7 @@ public class EmployeeShiftCompatibilityManager {
      * @throws ProccessingException null compatibility, employee, or shift
      * @Tested
      */
-	public Employee getEmployeeWithMostTime(EmployeeShiftCompatibilities compatibilities) throws CorruptDataException, ProccessingException {
+	public Employee getEmployeeWithMostNeeded(EmployeeShiftCompatibilities compatibilities) throws CorruptDataException, ProccessingException {
     	Employee employee = null;
 		float time = 0;
 		
@@ -451,6 +451,40 @@ public class EmployeeShiftCompatibilityManager {
 		return employee;
 	}
 	
+	/**Returns the employee of the group that has the most time until max hours are met
+     * for the week of their shift if they were assigned the shift they are being considered for
+     * 
+     * @param compatibilities Employees coupled with shifts they are being considered for
+     * @return employee has the most time before their max hours is met or null if none is outside overtime
+     * @throws CorruptDataException invalid shift
+     * @throws ProccessingException null compatibility, employee, or shift
+     */
+    public Employee getEmployeeWithMostTimeSafely(EmployeeShiftCompatibilities compatibilities) throws CorruptDataException, ProccessingException {
+		Employee employee = null;
+		float time = 0;
+		float timeUntilOvertimeForShift = 0;
+		
+		if(null==compatibilities || compatibilities.compatibilities==null) {
+			throw new ProccessingException("Null EmployeeShiftCompatibilities provided for assesment to getEmployeeWithMostTime");
+		}
+		
+		for(EmployeeShiftCompatibility compatibility :compatibilities.compatibilities){
+			if(null == compatibility || null == compatibility.getShift() || null==compatibility.getEmployee()) {
+				throw new ProccessingException("Null EmployeeShiftCompatibility provided for assesment to getEmployeeWithMostTime");
+			}
+			
+			timeUntilOvertimeForShift = compatibility.getEmployee().getMaxHoursAvailable();
+			timeUntilOvertimeForShift-= getHoursScheduledWeekOfShift(compatibility.getEmployee(),compatibility.getShift());
+			
+			if(timeUntilOvertimeForShift>time){
+				time=timeUntilOvertimeForShift;
+				employee=compatibility.getEmployee();
+			}
+		}
+		
+		return employee;
+	}
+    
 	 /**Returns the employee of the group that would have the most time until max hours are met
      * for the week of their shift if they were assigned the shift they are being considered for
      * 
