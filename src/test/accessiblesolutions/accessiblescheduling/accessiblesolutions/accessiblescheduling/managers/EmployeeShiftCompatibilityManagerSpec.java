@@ -5156,7 +5156,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		boolean errored=false;
 		
 		try {
-			fixture.getEmployeeWithMostTime(null);
+			fixture.getEmployeeWithMostNeeded(null);
 		} catch (CorruptDataException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -5175,7 +5175,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		EmployeeShiftCompatibilities compatiblities = new EmployeeShiftCompatibilities();
 
 		try {
-			fixture.getEmployeeWithMostTime(compatiblities);
+			fixture.getEmployeeWithMostNeeded(compatiblities);
 		} catch (CorruptDataException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -5196,7 +5196,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		inner.add(null);
 		compatiblities.compatibilities =inner;
 		try {
-			fixture.getEmployeeWithMostTime(compatiblities);
+			fixture.getEmployeeWithMostNeeded(compatiblities);
 		} catch (CorruptDataException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -5221,7 +5221,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		inner.add(compatibility);
 		compatiblities.compatibilities =inner;
 		try {
-			fixture.getEmployeeWithMostTime(compatiblities);
+			fixture.getEmployeeWithMostNeeded(compatiblities);
 		} catch (CorruptDataException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -5246,7 +5246,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		inner.add(compatibility);
 		compatiblities.compatibilities =inner;
 		try {
-			fixture.getEmployeeWithMostTime(compatiblities);
+			fixture.getEmployeeWithMostNeeded(compatiblities);
 		} catch (CorruptDataException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -5272,7 +5272,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		inner.add(compatibility);
 		compatiblities.compatibilities =inner;
 		try {
-			fixture.getEmployeeWithMostTime(compatiblities);
+			fixture.getEmployeeWithMostNeeded(compatiblities);
 		} catch (CorruptDataException e) {
 			errored=true;
 			e.printStackTrace();
@@ -5313,7 +5313,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		Employee result= null;
 		
 		try {
-			result = fixture.getEmployeeWithMostTime(compatiblities);
+			result = fixture.getEmployeeWithMostNeeded(compatiblities);
 		} catch (CorruptDataException e) {
 			errored=true;
 			e.printStackTrace();
