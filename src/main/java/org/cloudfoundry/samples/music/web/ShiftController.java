@@ -41,10 +41,10 @@ public class ShiftController {
         this.repository = repository;
     }
     
-    @RequestMapping(value = "/{month}", method = RequestMethod.DELETE)
-    public List<Shift> deleteById(@PathVariable int month) {
+    @RequestMapping(value = "/byMonth/{month}", method = RequestMethod.DELETE)
+    public long deleteByMonth(@PathVariable int month) {
         logger.info("Deleting shifts for " + month);
-        return mongoRepository.removeByStartMonth(month);
+        return mongoRepository.deleteByStartMonth(month);
     }
     
     @RequestMapping(value = "/set", method = RequestMethod.POST)
