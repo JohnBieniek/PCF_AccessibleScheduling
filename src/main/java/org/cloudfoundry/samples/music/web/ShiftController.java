@@ -4,6 +4,7 @@ import accessiblesolutions.accessiblescheduling.domain.Shift;
 import accessiblesolutions.accessiblescheduling.domain.ShiftRequest;
 
 import org.cloudfoundry.samples.music.managers.ScheduleManager;
+import org.cloudfoundry.samples.music.repositories.mongodb.MongoShiftRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,9 +32,19 @@ public class ShiftController {
     
     private CrudRepository<Shift, String> repository;
 
+    
+    @Autowired
+    private MongoShiftRepository mongoRepository;
+    
     @Autowired
     public ShiftController(CrudRepository<Shift, String> repository) {
         this.repository = repository;
+    }
+    
+    @RequestMapping(value = "/{month}", method = RequestMethod.DELETE)
+    public List<Shift> deleteById(@PathVariable int month) {
+        logger.info("Deleting shifts for " + month);
+        return mongoRepository.removeByStartMonth(month);
     }
     
     @RequestMapping(value = "/set", method = RequestMethod.POST)
