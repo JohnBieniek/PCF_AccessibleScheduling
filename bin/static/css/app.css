@@ -3,9 +3,10 @@
 }
 
 .navbar {
-    background-color: white;
+   background-color: #6a0000;
     border: 0;
     margin-bottom: 20px;
+    font-size: 30;
 }
 /* button recolor */
 .nav-pills > li.active > a, .btn-primary {
@@ -13,9 +14,6 @@
   // feeling like it's a rounded corners kind of day
   border-color: #6C6C6C !important;
   border-radius: 25px; 
-}
-.navbar .container {
-    background-color: #6a0000;
 }
 
 .navbar .navbar-brand {
@@ -33,3 +31,10 @@
 .icon-white {
     color: white;
 }
+
+.navigation{
+    background-color: #babdb6;
+    font-size: 20;
+    text-color: #6a0000;
+}
+

@@ -68,11 +68,11 @@ angular.module('mainNavigation', ['ngResource', 'ui.bootstrap']).
 
 function MainNavigationController($scope, $modal, $http, Status) {
 	 $scope.init = function() {
-        $scope.setPage("splash");
+        $scope.setPage("mobileHome");
         $scope.sortDescending = false;
         
  
-        $scope.selectedMonth=5;
+        $scope.selectedMonth=12;
 	   	$scope.selectedYear=2018;
 	   	$scope.sortField="startDate";
 	   	$scope.selectedWeek=null;

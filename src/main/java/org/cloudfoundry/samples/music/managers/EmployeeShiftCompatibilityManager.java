@@ -455,7 +455,7 @@ public class EmployeeShiftCompatibilityManager {
      * for the week of their shift if they were assigned the shift they are being considered for
      * 
      * @param compatibilities Employees coupled with shifts they are being considered for
-     * @return employee has the most time before their max hours is met or null if none is outside overtime
+     * @return employee has the most time before their max hours is met or null if none is outside overtime -3
      * @throws CorruptDataException invalid shift
      * @throws ProccessingException null compatibility, employee, or shift
      */
@@ -463,6 +463,9 @@ public class EmployeeShiftCompatibilityManager {
 		Employee employee = null;
 		float time = 0;
 		float timeUntilOvertimeForShift = 0;
+		float maxOvertimeHours = 3;
+		
+		time-=maxOvertimeHours;
 		
 		if(null==compatibilities || compatibilities.compatibilities==null) {
 			throw new ProccessingException("Null EmployeeShiftCompatibilities provided for assesment to getEmployeeWithMostTime");
@@ -598,7 +601,7 @@ public class EmployeeShiftCompatibilityManager {
 	 * @return
 	 * @throws CorruptDataException invalid shift
 	 * @throws ProccessingException null compatibility, employee, or shift
-	 * @Tested
+	 * @Tested Updates have happened since
 	 */
 	public boolean getResting(EmployeeShiftCompatibility compatibility) throws CorruptDataException, ProccessingException{
 		boolean resting = false;
@@ -628,11 +631,93 @@ public class EmployeeShiftCompatibilityManager {
 		else if(getAssignmentWouldViolateAlternateWeekendsOff(compatibility)){
 			resting=true;
 		}
+		else if(getAssignmentWouldViolateMaxConcecutiveHours(compatibility)) {
+			resting=true;
+		}
 		
 		return resting;
 	}
 	    
-	/**Returns All Valid pairings of employees and shifts
+	private boolean getAssignmentWouldViolateMaxConcecutiveHours(EmployeeShiftCompatibility compatibility) throws CorruptDataException {
+		boolean violationFound = false;
+		Shift shift = compatibility.getShift();
+		Employee employee = compatibility.getEmployee();
+		Shift previousShift = null;
+		ArrayList<Shift> shifts = employeeShiftManager.getAssignedShiftsForEmployeeForWeekOfShift(employee.getId(),shift);
+	
+		ArrayList<Shift> adjacentShifts =new ArrayList<Shift>();
+		ArrayList<Shift> previousAdjacentShifts =new ArrayList<Shift>();
+		adjacentShifts.add(shift);
+		
+		for(int itteration = 1; itteration<15;itteration++) {
+			for(int index = 0; index<shifts.size();index++) {
+				Shift earliestShift = adjacentShifts.get(0);
+				Shift latestShift = adjacentShifts.get(adjacentShifts.size());
+				
+				Shift previousEarliestShift = previousAdjacentShifts.get(0);
+				Shift previousLatestShift = previousAdjacentShifts.get(previousAdjacentShifts.size());
+				
+				Shift selectedShift = shifts.get(index);
+				
+				if(selectedShift.getEndsLocalDateTime().isEqual(earliestShift.getStartsLocalDateTime())) {
+					adjacentShifts.add(0, selectedShift);
+				}
+				else if(selectedShift.getStartsLocalDateTime().isEqual(latestShift.getEndsLocalDateTime())) {
+					adjacentShifts.add(adjacentShifts.size(),selectedShift);
+				}
+				
+				if(selectedShift.getEndsLocalDateTime().isEqual(previousEarliestShift.getStartsLocalDateTime())) {
+					previousAdjacentShifts.add(0, selectedShift);
+				}
+				else if(selectedShift.getStartsLocalDateTime().isEqual(previousLatestShift.getEndsLocalDateTime())) {
+					previousAdjacentShifts.add(previousAdjacentShifts.size(),selectedShift);
+				}
+				
+				if(previousShift==null) {
+					if(selectedShift.getEndsLocalDateTime().isBefore(shift.getStartsLocalDateTime())) {
+						previousShift=selectedShift;
+					}
+				}
+				else if(previousShift.getEndsLocalDateTime().isBefore(selectedShift.getEndsLocalDateTime()) &&
+						selectedShift.getEndsLocalDateTime().isBefore(shift.getStartsLocalDateTime())) {
+					previousShift=selectedShift;
+				}
+			}
+			
+			if(itteration==2 && previousShift!=null) {
+				adjacentShifts.add(previousShift);
+			}
+		}
+		
+		float adjacencyDuration = 0;
+		
+		for(Shift selectedShift : adjacentShifts) {
+			adjacencyDuration +=selectedShift.getDuration();
+		}
+		
+		if(adjacencyDuration>17) {
+			violationFound=true;
+		}
+		
+		float previousAdjacencyDuration = 0;
+		
+		for(Shift selectedShift : previousAdjacentShifts) {
+			previousAdjacencyDuration +=selectedShift.getDuration();
+		}
+		
+		if(previousAdjacencyDuration>=17 && 
+		   previousShift.getEndsLocalDateTime().isAfter(shift.getStartsLocalDateTime().minusHours(3))) {
+			violationFound=true;
+		}
+		
+				
+		return violationFound;
+	}
+
+
+	/**Returns All Valid pairings of employees and shifts. Pairing are valid if the employee/shift 
+	 * are compatible, assignable (available, unassigned,not called off), active, without fixed scheduling, 
+	 * and not resting (exceeds max shifts per days, days per week, or alternate weekends)
 	 * 
 	 * @param compatibilities A group of EmployeeShiftCompatibility objects
 	 * @return ArrayList<EmployeeShiftCompatibility> EmployeeShiftCompatibility All Valid pairings

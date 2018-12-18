@@ -1,0 +1,19 @@
+<div ng-controller="HomeController"  ng-init="listEmployees()">
+  <form name="myForm">
+    <label for="mySelect" style="font-size:18px">Select an employee for call offs:</label>
+    <select name="mySelect" id="mySelect"
+     	ng-options='employee.first for employee in employees | orderBy:"first" track by employee.id'
+	    ng-model="selectedEmployee"
+	    ng-value="{{employee.first}}">
+    </select>
+  </form>
+  <div ng-if="selectedEmployee">
+	  <h3>{{selectedEmployee.first}} {{selectedEmployee.initial}}s Schedule</h3>
+	  </br>
+	  <p>Your next shift in in X hours</p>
+	  <p>Your next shift is with X Y from A-B.<p>
+	     
+	  <p>Your next week's schedule:</p>
+   </div>
+   <script type="text/javascript" src="js/page/homePage.js"></script>
+</div>

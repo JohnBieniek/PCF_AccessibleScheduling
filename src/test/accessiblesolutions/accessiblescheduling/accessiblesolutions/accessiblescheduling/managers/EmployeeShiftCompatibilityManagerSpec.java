@@ -5681,4 +5681,9 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		assertNotNull(result);
 		assertTrue(result.getId().contains("mostTime"));
 	}
+	
+	@Test
+	public void getAssignmentWouldViolateMaxConcecutiveHoursReturnsFalseAssigning17Hours() {
+		
+	}
 }

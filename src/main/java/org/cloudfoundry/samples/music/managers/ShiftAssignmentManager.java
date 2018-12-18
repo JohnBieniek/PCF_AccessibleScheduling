@@ -71,6 +71,56 @@ public class ShiftAssignmentManager {
     	}
     }
     
+    public Shift getMostAssignableShiftForWeek(ArrayList<Shift> shifts) throws CorruptDataException, ProccessingException {
+    	Shift shiftToAssign = null;
+    	boolean prioritizeSecondShift =true;
+    	
+    	ArrayList<EmployeeShiftCompatibilities> compatibilitiesPerShift = new ArrayList<EmployeeShiftCompatibilities>();
+    	int minCompatibilities = 9001;
+    	ArrayList<EmployeeShiftCompatibilities> fewestCompatibilities = new ArrayList<EmployeeShiftCompatibilities>();
+    	
+    	if(null!=shifts) {
+	    	for(int index = 0;index<shifts.size();index++){
+	    		Shift shift = shifts.get(index);
+				EmployeeShiftCompatibilities compatibilities = employeeShiftCompatibilityManager.getValidCompatibilities(employeeShiftCompatibilityManager.getEmployeeShiftCompatibilitiesForShift(shift));
+				
+				compatibilitiesPerShift.set(index, compatibilities);
+				
+				if(compatibilities.compatibilities.size()<minCompatibilities){
+					minCompatibilities = compatibilities.compatibilities.size();
+					
+					fewestCompatibilities = new ArrayList<EmployeeShiftCompatibilities>();
+					fewestCompatibilities.add(compatibilities);
+				}else if(compatibilities.compatibilities.size()==minCompatibilities) {
+					fewestCompatibilities.add(compatibilities);
+				}
+			}
+	    	
+	    	if(fewestCompatibilities.size()>1) {
+	    		if(prioritizeSecondShift) {
+	    			for(int index = 0;index<fewestCompatibilities.size();index++){
+		    			EmployeeShiftCompatibilities selectedCompatibilities = fewestCompatibilities.get(index);
+		    			Shift selectedShift = selectedCompatibilities.compatibilities.get(0).getShift();
+		    			
+	    				if(selectedShift.getStartsLocalDateTime().getHour()<21&&selectedShift.getEndsLocalDateTime().getHour()>=12){
+	    					shiftToAssign = selectedShift;//Prioritize shifts from noon to 9 pm
+	    				}
+	    			}
+	    		}
+	    		
+	    		if(shiftToAssign == null) {//If we aren't prioritizing noon to 9 we don't care which of the lowest we get... yet
+	    			shiftToAssign =fewestCompatibilities.get(0).compatibilities.get(0).getShift();
+	    		}
+	    	}
+	    	else if(fewestCompatibilities.size()==1) {
+	    		shiftToAssign = fewestCompatibilities.get(0).compatibilities.get(0).getShift();
+	    	}
+	    	
+    	}
+    	
+    	return shiftToAssign;
+    }
+    
     public void scheduleWeekdayShifts(int week, int month,int year) throws ProccessingException, CorruptDataException {
     	ArrayList<Shift> shifts = shiftManager.getUnassignedNonEventShiftsForMonth(month);
 		ArrayList<Shift> unassignedShiftsForWeek = ShiftWorker.getShiftsStartingWeekOfMonth(shifts, week, month,year);
@@ -88,13 +138,32 @@ public class ShiftAssignmentManager {
     }
     
     public void scheduleShifts(ArrayList<Shift> unassignedShifts, int week, int month, int year) throws CorruptDataException, ProccessingException {
-	    for(int i= 0;i<unassignedShifts.size();i++){
-			if(unassignedShifts!=null && unassignedShifts.size()>0) {
-				Shift shift = getWeekendShiftStartingWeekOfMonth(week,month,year);
-				unassignedShifts.remove(shift);
-				scheduleShiftSafely(shift);
+    	if(unassignedShifts!=null && unassignedShifts.size()>0) {
+	    	for(int i= 0;i<unassignedShifts.size();i++){
+	    		if(unassignedShifts!=null && unassignedShifts.size()>0) {
+					Shift shift = getWeekendShiftStartingWeekOfMonth(week,month,year);
+					if(null!=shift) {
+						unassignedShifts.remove(shift);
+						scheduleShiftSafely(shift);
+					}
+				}
 			}
-		}
+	    	for(int i= 0;i<unassignedShifts.size();i++){
+	    		if(unassignedShifts!=null && unassignedShifts.size()>0) {
+					Shift shift = getWeekdayShiftStartingWeekOfMonth(week,month,year);
+					if(null!=shift) {
+						unassignedShifts.remove(shift);
+						scheduleShiftSafely(shift);
+					}
+				}
+			}
+		    for(int i= 0;i<unassignedShifts.size();i++){
+		    	Shift shift =unassignedShifts.get(i);
+		    	if(null!=shift) {
+		    		scheduleShiftSafely(shift);
+		    	}
+		    }
+    	}
     }
     
     public ArrayList<Shift> assignRequestedStaff(HashMap<String, ArrayList<Shift>> prestaffedShiftsPerEmployee,boolean safe) throws ProccessingException, CorruptDataException {

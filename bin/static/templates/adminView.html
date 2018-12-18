@@ -1,17 +1,12 @@
 <div id="adminView" ng-init="init()">
-    <div class="page-header">
-        <h1>Administrative view</h1>
+    <div class="navigation page-header">
         <div>
-            <span> [ view : </span>
-            <a href="" ng-click="setPage('dashboard')">Dashboard</a>
-            <a href="" ng-click="setPage('clientList')">Clients</a>
-            <a href="" ng-click="setPage('scheduling')">Scheduling</a>
-            <a href="" ng-click="setPage('employeeList')">Employees</a>
-            <a href="" ng-click="setPage('vacation')">Vacation/Sickness</a>
-            <a href="" ng-click="setPage('eventList')">Events</a>
-            <a href="" ng-click="setPage('shiftList')">Shifts</a>
-            <a href="" ng-click="setPage('settings')">Settings</a>
-            <span> ] </span>
+        	<button>
+            	<a href="" ng-click="setPage('mobileHome')">Home</a>
+            </button>
+          	<button>
+	            <a href="" ng-click="setPage('assignment')">Assignment</a>
+            </button>
         </div>
     </div>
 
