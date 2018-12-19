@@ -95,7 +95,7 @@ public class ShiftGenerationManager {
     
     public String generateRequestedSingleShifts(String selectedMonth) throws CorruptDataException {
     	Iterable<ShiftRequest> requests = shiftRequestRepository.findAll();
-    	
+    	System.out.println("generating requested single shifts");
     	ArrayList<Shift> shifts =new ArrayList<Shift>();  
     	if(null!=requests && null!=selectedMonth){
     		System.out.println(((ArrayList<ShiftRequest>)requests).size() + " single shift requests to consider for month "+selectedMonth);
@@ -112,7 +112,7 @@ public class ShiftGenerationManager {
 			    			year=splitDate[0];
 			    		}
 			    		System.out.println("Checking if request is for this month" + year + " " + month + " " + request.toString());
-			    		if(Integer.parseInt(selectedMonth)==Integer.parseInt(month) && year.contains("2019")){
+			    		if(Integer.parseInt(selectedMonth)==Integer.parseInt(month) ){//&& year.contains("2019")
 			    			System.out.println("Request confirmed to be for this month");
 			    			Shift shift = new Shift();
 			    			

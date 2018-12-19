@@ -1,9 +1,14 @@
 package org.cloudfoundry.samples.music.web;
 
-import accessiblesolutions.accessiblescheduling.domain.Shift;
-import accessiblesolutions.accessiblescheduling.domain.ShiftRequest;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 import org.cloudfoundry.samples.music.managers.ScheduleManager;
+import org.cloudfoundry.samples.music.managers.ShiftManager;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoShiftRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,15 +17,15 @@ import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.core.JsonPar
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.databind.JsonMappingException;
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
+import accessiblesolutions.accessiblescheduling.domain.Shift;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
-
-import java.io.IOException;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 
 @RestController
 @RequestMapping(value = "/shifts")
@@ -32,6 +37,8 @@ public class ShiftController {
     
     private CrudRepository<Shift, String> repository;
 
+    @Autowired
+    ShiftManager shiftManager;
     
     @Autowired
     private MongoShiftRepository mongoRepository;
@@ -42,9 +49,9 @@ public class ShiftController {
     }
     
     @RequestMapping(value = "/byMonth/{month}", method = RequestMethod.DELETE)
-    public long deleteByMonth(@PathVariable int month) {
+    public ArrayList<Shift> deleteByMonth(@PathVariable int month) {
         logger.info("Deleting shifts for " + month);
-        return mongoRepository.deleteByStartMonth(month);
+        return shiftManager.deleteShiftsForMonth(month);
     }
     
     @RequestMapping(value = "/set", method = RequestMethod.POST)

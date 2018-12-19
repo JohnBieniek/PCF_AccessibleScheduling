@@ -38,6 +38,15 @@ public class ShiftManager {
 		return (ArrayList<Shift>) shiftRepository.findByStartMonth(month);
 	}
     
+    public ArrayList<Shift> deleteShiftsForMonth(int month){
+		ArrayList<Shift> shifts = (ArrayList<Shift>) shiftRepository.findByStartMonth(month);
+		
+		for(Shift shift:shifts) {
+			shiftRepository.delete(shift);
+		}
+		return shifts;
+	}
+    
   	public ArrayList<Shift> getPrestaffedRecurringShiftsForMonth(int selectedMonth) throws ProccessingException {
     	Iterable<Shift> shiftsForMonth = shiftRepository.findByStartMonth(selectedMonth);
     	ArrayList<Shift> recurringShiftsForMonth = ShiftWorker.getRecurringShifts(shiftsForMonth);
