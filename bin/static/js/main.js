@@ -72,8 +72,8 @@ function MainNavigationController($scope, $modal, $http, Status) {
         $scope.sortDescending = false;
         
  
-        $scope.selectedMonth=5;
-	   	$scope.selectedYear=2018;
+        $scope.selectedMonth=1;
+	   	$scope.selectedYear=2019;
 	   	$scope.sortField="startDate";
 	   	$scope.selectedWeek=null;
 	   	$scope.assignedFilter=false;
