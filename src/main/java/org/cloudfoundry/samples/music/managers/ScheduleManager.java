@@ -21,6 +21,12 @@ public class ScheduleManager {
     	return eventResponse + requestResponse;
     }
     
+    public String generateSingleShifts(String selectedMonth) throws CorruptDataException {
+    	String requestResponse = shiftGenerationManager.generateRequestedSingleShifts(selectedMonth);
+
+    	return requestResponse;
+    }
+    
     public String staffShifts(String selectedMonth, String selectedYear) throws CorruptDataException, ProccessingException {
     	String result = "";
     	if(null!=selectedMonth){

@@ -81,6 +81,11 @@ public class ScheduleController {
         return manager.generateShifts(month);
     }
     
+    @RequestMapping(value = "/generateSingleShifts", method = RequestMethod.GET)
+    public String generateSingleShifts(@RequestParam("month") String month) throws CorruptDataException {
+        return manager.generateSingleShifts(month);
+    }
+    
     @RequestMapping(value = "/staffShifts", method = RequestMethod.GET)
     public String staffShifts(@RequestParam("month") String month,@RequestParam("year") String year) throws CorruptDataException, ProccessingException {
         return manager.staffShifts(month,year);
