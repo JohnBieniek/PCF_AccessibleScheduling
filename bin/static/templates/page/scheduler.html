@@ -1,0 +1,120 @@
+<div ng-controller="SchedulingController" ng-init="listClients()">
+	<divstyle="display:inline-block;">
+	 	<div style="display:inline-block;">
+			<ul>
+				<div class="monthSelector">
+					<div class = "myTab" ng-class="{ active: isSet(1) }">
+				    	<div >
+				       		<p ng-click="setTab(1)">Jan</p>
+				    	</div>
+			    	</div>
+			    	<div class = "myTab" ng-class="{ active: isSet(2) }">
+			    		<div >
+					       	<p ng-click="setTab(2)">Feb</p>
+				    	</div>
+			    	</div>
+			    	<div class = "myTab" ng-class="{ active: isSet(3) }">
+			    		<div >
+					       	<p ng-click="setTab(3)">Mar</p>
+				    	</div>
+			    	</div>
+			    	<div class = "myTab" ng-class="{ active: isSet(4) }">
+			    		<div >
+					       	<p ng-click="setTab(4)">Apr</p>
+				    	</div>
+			    	</div>
+			    	<div class = "myTab" ng-class="{ active: isSet(5) }">
+			    		<div>
+					       	<p ng-click="setTab(5)">May</p>
+				    	</div>
+			    	</div>
+			    	<div class = "myTab" ng-class="{ active: isSet(6) }">
+			    		<div >
+					       	<p ng-click="setTab(6)">Jun</p>
+				    	</div>
+			    	</div>
+			    	<div class = "myTab" ng-class="{ active: isSet(7) }">
+			    		<div >
+					       	<p ng-click="setTab(7)">Jul</p>
+				    	</div>
+			    	</div>
+			    	<div class = "myTab" ng-class="{ active: isSet(8) }">
+			    		<div >
+					       	<p href ng-click="setTab(8)">Aug</p>
+				    	</div>
+			    	</div>
+			    	<div class = "myTab" ng-class="{ active: isSet(9) }">
+			    		<div >
+					       	<p href ng-click="setTab(9)">Sep</p>
+				    	</div>
+			    	</div>
+			    	<div class = "myTab" ng-class="{ active: isSet(10) }">
+			    		<div >
+					       	<p ng-click="setTab(10)">Oct</p>
+				    	</div>
+			    	</div>
+			    	<div class = "myTab" ng-class="{ active: isSet(11) }">
+			    		<div >
+			    		   	<p ng-click="setTab(11)">Nov</p>
+			    		</div>
+			    	</div>
+			    	<div class = "myTab" ng-class="{ active: isSet(12) }">
+			    		<div >
+					       	<p ng-click="setTab(12)">Dec</p>
+				    	</div>
+			    	</div>
+		    	</div>
+	    	</ul>
+	   	</div>
+	   	<div style="display:inline-block; vertical-align: top; width:70%">
+			<div class="scheduler" >
+				<h2 style="font-size:45px">{{monthName}}</h2>
+				<br>
+				<div style="display:inline-block">
+					<p class = "complete" style="display:inline-block"> {{generated}} </p><p align="right" class = "incomplete" style="display:inline-block"> {{assigned}} </p>
+				</div>
+					<br>
+					<br>
+					<br>
+				<button class="scheduleButton"type="button" onclick="generateShifts()">Generate</button>
+				
+				<button align="right"  class="scheduleButton"type="button" onclick="assignShifts()">Assign</button>
+			</div>
+			<br>
+			<br>
+			<br>
+			<div class = "scheduleOptions">
+				<div style="horizontal-align:right;" class = "scheduleOptions">
+				    <label style="font-size:38px">Allow overtime</label>
+				    <input type="checkbox" style="height:40px;width:40px" ng-model="allowOvertime">
+			    </div>
+			    <br>
+			    <div class = "scheduleOptions">
+				    <label style="font-size:38px">Use daily shift maximum</label>
+				    <input type="checkbox" style="height:40px;width:40px" ng-model="useDailyMax">
+			    </div>
+			    <br>
+			    <div class = "scheduleOptions">
+				    <label style="font-size:38px">Use weekly work day maximum</label>
+				    <input type="checkbox" style="height:40px;width:40px" ng-model="useWeeklyMax">
+			    </div>
+			    <br>
+			    <div class = "scheduleOptions">
+				    <label style="font-size:38px">Prioritize second Shift</label>
+				    <input type="checkbox" style="height:40px;width:40px" ng-model="prioritizeSecondShift">
+			    </div>
+			    <br>
+			    <div class = "scheduleOptions">
+				    <label style="font-size:38px">Allow unavailable</label>
+				    <input type="checkbox" style="height:40px;width:40px" ng-model="allowUnavailable">
+			    </div>
+			    <br>
+				<div class = "scheduleOptions">
+				    <label style="font-size:38px">Allow inactive</label>
+				    <input type="checkbox" style="height:40px;width:40px" ng-model="allowInactive">
+			    </div>
+		    </div>
+		 <div>
+    </div>
+    <script type="text/javascript" src="js/page/schedulerPage.js"></script>
+</div>

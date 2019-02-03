@@ -3,8 +3,10 @@
 }
 
 .navbar {
-    background-color: white;
+   background-color: #6a0000;
     border: 0;
+    margin-left:0px;
+    margin-right:0px;
     margin-bottom: 20px;
 }
 /* button recolor */
@@ -15,9 +17,76 @@
   border-radius: 25px; 
 }
 .navbar .container {
-    background-color: #6a0000;
+    
 }
 
+.scheduleButton{
+	font-size: 35px;
+	margin-left:20px;
+    margin-right:20px;
+    width: 215px;
+}
+
+.scheduleOptions{
+	vertical-align: top;
+	text-align: right;
+	margin-right:25px;
+}
+
+.scheduler{
+	vertical-align: top;
+	text-align: center;
+	margin-left: auto;
+  margin-right: auto;
+}
+
+.complete{
+	border-color: #4e9a06;
+	background-color: #4e9a06;
+	border-radius: 25px; 
+	font-size: 30px;
+	margin-left:20px;
+    margin-right:20px;
+    padding: 15px;
+     width: 200px;
+}
+
+.incomplete{
+	background-color: #fce94f;
+	border-color: #fce94f;
+	border-radius: 25px; 
+	font-size: 30px;
+	margin-left:20px;
+    margin-right:20px;
+	padding: 15px;
+	 width: 200px;
+}
+
+.titleText{
+	background-color: #6a0000;
+	font-size: 50px;
+	color: white !important;
+	text-align: center;
+	margin-left: auto;
+  margin-right: auto;
+}
+.active{
+	background-color: #729fcf!important;
+	 border-color: #729fcf!important;
+ 	 border-radius: 25px; 
+ 	 padding-left:20px;
+    padding-right:20px;
+}
+
+.head{
+	background-color: #6a0000;
+    border: 0;
+    margin-left:0px;
+    margin-right:0px;
+    margin-bottom: 30px;
+    font-size: 20px;
+    color: white;
+}
 .navbar .navbar-brand {
     color: white;
 }
@@ -32,4 +101,22 @@
 
 .icon-white {
     color: white;
+}
+.myTab{
+	 background-color: #d3d7cf;
+  border-color: #6C6C6C ;
+  border-radius: 25px; 
+  color: black;
+  margin-left:20px;
+    margin-right:20px;
+    margin-bottom: 20px;
+    margin-top: 15px;
+    font-size:35px;
+    padding-left:20px;
+    padding-right:20px;
+}
+
+.centered{
+	 margin-left: auto; 
+	 margin-right: auto;
 }
