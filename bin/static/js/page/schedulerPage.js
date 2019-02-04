@@ -30,12 +30,31 @@ angular.module('vacation', ['ngResource', 'ui.bootstrap']).
 function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
 	 $scope.multiTableEditing=false;
 	 $scope.month=1;
+	 $scope.generatedBool = false;
 	 $scope.generated="Generated";
 	 $scope.assigned="Unassigned";
 	 $scope.tab=1;
 	 $scope.monthName="January";
+	 $scope.statusList=[];
 	 $scope.setTab = function(newTab){
+	  $scope.generatedBool = $scope.statusList[$scope.tab-1].generated;
       $scope.tab = newTab;
+      console.log("month:"+$scope.month);
+      console.log("generated:"+$scope.statusList[$scope.tab-1].generated);
+      if($scope.statusList[$scope.tab-1].generated){
+    	  $scope.generated="Generated";
+      }
+      else{
+    	  $scope.generated="Ungenerated";
+      }
+      
+      if($scope.statusList[$scope.tab-1].assigned){
+    	  $scope.assigned="Assigned";
+      }
+      else{
+    	  $scope.assigned="Unassigned";
+      }
+      
       switch(newTab){
     	  case 1:
     		  $scope.monthName="January";
@@ -75,11 +94,18 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
     		  break;
       }
     };
-	 
+    $scope.isGenerated = function(month){
+        return $scope.statusList[$scope.tab-1].generated;
+      };
+      
+      $scope.isAssigned = function(month){
+          return $scope.statusList[$scope.tab-1].assigned;
+        };
+      
 	 $scope.isSet = function(tabNum){
       return $scope.tab === tabNum;
     };
-	    
+    
 	 function clone (obj) {
 	        return JSON.parse(JSON.stringify(obj));
      }
@@ -89,5 +115,37 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
 	    }
     $scope.listClients = function listClients() {
         $scope.clients = Clients.query();
+    }
+    
+    $scope.listStatusItems = function(){
+    	$http({
+            url: '/schedule/statusList',
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            params: {
+            }
+        })
+        .then(function(response) {
+    		$scope.statusList = response.data;
+    		console.log(response.data);
+    		console.log($scope.statusList[0].generated);
+        });
+    }
+    
+    $scope.generateShifts = function(month){
+    	$http({
+            url: '/schedule/generateShifts',
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            params: {
+                month: month
+            }
+        })
+        .then(function(response) {
+        });
     }
 }

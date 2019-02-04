@@ -1,4 +1,4 @@
-<div ng-controller="SchedulingController" ng-init="listClients()">
+<div ng-controller="SchedulingController" ng-init="listStatusItems()">
 	<divstyle="display:inline-block;">
 	 	<div style="display:inline-block;">
 			<ul>
@@ -71,14 +71,19 @@
 				<h2 style="font-size:45px">{{monthName}}</h2>
 				<br>
 				<div style="display:inline-block">
-					<p class = "complete" style="display:inline-block"> {{generated}} </p><p align="right" class = "incomplete" style="display:inline-block"> {{assigned}} </p>
+					<div style="display:inline-block" class = "incomplete" ng-class="{ complete: isGenerated(month) }">
+						<p style="display:inline-block"> {{generated}} </p>
+					</div>
+					<div class = "incomplete" style="display:inline-block" ng-class="{ complete: isAssigned(month) }">
+						<p align="right"   style="display:inline-block"> {{assigned}} </p>
+					</div>
 				</div>
 					<br>
 					<br>
 					<br>
-				<button class="scheduleButton"type="button" onclick="generateShifts()">Generate</button>
+				<button class="scheduleButton" ng-class="{ disabled: isGenerated(month) }" type="button" ng-click="generateShifts(month)">Generate</button>
 				
-				<button align="right"  class="scheduleButton"type="button" onclick="assignShifts()">Assign</button>
+				<button align="right" ng-class="{ disabled: !isGenerated(month) }" class="scheduleButton"type="button" onclick="assignShifts()">Assign</button>
 			</div>
 			<br>
 			<br>

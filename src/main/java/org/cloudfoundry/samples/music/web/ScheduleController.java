@@ -2,17 +2,19 @@ package org.cloudfoundry.samples.music.web;//Ignore complaints
 
 import java.util.ArrayList;
 
-import accessiblesolutions.accessiblescheduling.domain.Shift;
 import org.cloudfoundry.samples.music.managers.EmployeeShiftMapManager;
 import org.cloudfoundry.samples.music.managers.ScheduleManager;
 import org.cloudfoundry.samples.music.managers.ShiftAssignmentManager;
 import org.cloudfoundry.samples.music.managers.ShiftManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import accessiblesolutions.accessiblescheduling.domain.ScheduleStatus;
+import accessiblesolutions.accessiblescheduling.domain.Shift;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
 
@@ -29,6 +31,12 @@ public class ScheduleController {
     
     @Autowired
     EmployeeShiftMapManager employeeShiftMapManager;
+    
+    @Autowired
+    private CrudRepository<ScheduleStatus, String> scheduleStatusCrud;
+    
+    @Autowired
+    ScheduleManager scheduleManager;
     
     @Autowired
     public ScheduleController(ScheduleManager manager) {
@@ -74,6 +82,17 @@ public class ScheduleController {
     public String staffShiftsSafely(@RequestParam("month") String month,@RequestParam("year") String year) throws CorruptDataException, ProccessingException {
     	assignmentManager.scheduleShifts(month,year);
     	return "";
+    }
+    
+    @RequestMapping(value = "/statusList", method = RequestMethod.GET)
+    public Iterable<ScheduleStatus> scheduleStatusList() {
+        return scheduleStatusCrud.findAll();
+    }
+    
+    @RequestMapping(value = "/generateStatusList", method = RequestMethod.GET)
+    public Iterable<ScheduleStatus> generateStatusList() {
+    	scheduleManager.generateStatusList();
+        return scheduleStatusCrud.findAll();
     }
     
     @RequestMapping(value = "/generateShifts", method = RequestMethod.GET)

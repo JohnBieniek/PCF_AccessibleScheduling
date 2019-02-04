@@ -5,16 +5,17 @@ import java.time.temporal.TemporalAdjuster;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 
-import accessiblesolutions.accessiblescheduling.domain.Event;
-import accessiblesolutions.accessiblescheduling.domain.Shift;
-
+import org.cloudfoundry.samples.music.repositories.mongodb.ScheduleStatusRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
 
+import accessiblesolutions.accessiblescheduling.domain.Event;
 import accessiblesolutions.accessiblescheduling.domain.RecurringShiftNeed;
+import accessiblesolutions.accessiblescheduling.domain.ScheduleStatus;
+import accessiblesolutions.accessiblescheduling.domain.Shift;
 import accessiblesolutions.accessiblescheduling.domain.ShiftRequest;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 import accessiblesolutions.accessiblescheduling.util.Util;
@@ -24,6 +25,13 @@ public class ShiftGenerationManager {
 	private static final Logger logger = LoggerFactory.getLogger(ShiftGenerationManager.class);
     private CrudRepository<Event, String> eventRepository;//TODO switch to autowired
     private CrudRepository<Shift, String> shiftCrud;
+    
+    @Autowired
+    private CrudRepository<ScheduleStatus, String> scheduleStatusCrud;
+    
+    @Autowired
+    private ScheduleStatusRepository scheduleStatusRepository;    
+    
     @Autowired
     private CrudRepository<ShiftRequest, String> shiftRequestCrud;
     private CrudRepository<ShiftRequest, String> shiftRequestRepository;    
@@ -89,6 +97,18 @@ public class ShiftGenerationManager {
     public String generateRequestedShifts(String selectedMonth) throws CorruptDataException {
     	String singleResponse = generateRequestedSingleShifts(selectedMonth);
     	String recurringResponse = generateRequestedRecurringShifts(selectedMonth);
+    	
+    	ScheduleStatus status = scheduleStatusCrud.findOne(selectedMonth);
+    	
+    	if(null==status) {
+    		status= new ScheduleStatus();
+    		status.setMonth(selectedMonth);
+    	}
+    	
+    	scheduleStatusRepository.deleteByMonth(selectedMonth);
+    	
+    	status.setGenerated(true);
+    	scheduleStatusCrud.save(status);
     	
     	return singleResponse+recurringResponse;
     }
