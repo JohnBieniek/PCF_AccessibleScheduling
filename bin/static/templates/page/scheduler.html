@@ -3,62 +3,62 @@
 	 	<div style="display:inline-block;">
 			<ul>
 				<div class="monthSelector">
-					<div class = "myTab" ng-class="{ active: isSet(1) }">
+					<div class = "myTab" ng-class="{ active: isSet(1) , generated: isTabGenerated(1), assigned: isTabAssigned(1), working: isWorking(1) }">
 				    	<div >
 				       		<p ng-click="setTab(1)">Jan</p>
 				    	</div>
 			    	</div>
-			    	<div class = "myTab" ng-class="{ active: isSet(2) }">
+			    	<div class = "myTab" ng-class="{ active: isSet(2), generated: isTabGenerated(2), assigned: isTabAssigned(2), working: isWorking(2) }">
 			    		<div >
 					       	<p ng-click="setTab(2)">Feb</p>
 				    	</div>
 			    	</div>
-			    	<div class = "myTab" ng-class="{ active: isSet(3) }">
+			    	<div class = "myTab" ng-class="{ active: isSet(3), generated: isTabGenerated(3), assigned: isTabAssigned(3), working: isWorking(3) }">
 			    		<div >
 					       	<p ng-click="setTab(3)">Mar</p>
 				    	</div>
 			    	</div>
-			    	<div class = "myTab" ng-class="{ active: isSet(4) }">
+			    	<div class = "myTab" ng-class="{ active: isSet(4), generated: isTabGenerated(4), assigned: isTabAssigned(4), working: isWorking(4) }">
 			    		<div >
 					       	<p ng-click="setTab(4)">Apr</p>
 				    	</div>
 			    	</div>
-			    	<div class = "myTab" ng-class="{ active: isSet(5) }">
+			    	<div class = "myTab" ng-class="{ active: isSet(5), generated: isTabGenerated(5), assigned: isTabAssigned(5), working: isWorking(5) }">
 			    		<div>
 					       	<p ng-click="setTab(5)">May</p>
 				    	</div>
 			    	</div>
-			    	<div class = "myTab" ng-class="{ active: isSet(6) }">
+			    	<div class = "myTab" ng-class="{ active: isSet(6), generated: isTabGenerated(6), assigned: isTabAssigned(6), working: isWorking(6) }">
 			    		<div >
 					       	<p ng-click="setTab(6)">Jun</p>
 				    	</div>
 			    	</div>
-			    	<div class = "myTab" ng-class="{ active: isSet(7) }">
+			    	<div class = "myTab" ng-class="{ active: isSet(7), generated: isTabGenerated(7), assigned: isTabAssigned(7), working: isWorking(7) }">
 			    		<div >
 					       	<p ng-click="setTab(7)">Jul</p>
 				    	</div>
 			    	</div>
-			    	<div class = "myTab" ng-class="{ active: isSet(8) }">
+			    	<div class = "myTab" ng-class="{ active: isSet(8), generated: isTabGenerated(8), assigned: isTabAssigned(8), working: isWorking(8) }">
 			    		<div >
 					       	<p href ng-click="setTab(8)">Aug</p>
 				    	</div>
 			    	</div>
-			    	<div class = "myTab" ng-class="{ active: isSet(9) }">
+			    	<div class = "myTab" ng-class="{ active: isSet(9), generated: isTabGenerated(9), assigned: isTabAssigned(9), working: isWorking(9) }">
 			    		<div >
 					       	<p href ng-click="setTab(9)">Sep</p>
 				    	</div>
 			    	</div>
-			    	<div class = "myTab" ng-class="{ active: isSet(10) }">
+			    	<div class = "myTab" ng-class="{ active: isSet(10), generated: isTabGenerated(10), assigned: isTabAssigned(10), working: isWorking(10) }">
 			    		<div >
 					       	<p ng-click="setTab(10)">Oct</p>
 				    	</div>
 			    	</div>
-			    	<div class = "myTab" ng-class="{ active: isSet(11) }">
+			    	<div class = "myTab" ng-class="{ active: isSet(11), generated: isTabGenerated(11), assigned: isTabAssigned(11), working: isWorking(11) }">
 			    		<div >
 			    		   	<p ng-click="setTab(11)">Nov</p>
 			    		</div>
 			    	</div>
-			    	<div class = "myTab" ng-class="{ active: isSet(12) }">
+			    	<div class = "myTab" ng-class="{ active: isSet(12), generated: isTabGenerated(12), assigned: isTabAssigned(12),working: isWorking(12) }">
 			    		<div >
 					       	<p ng-click="setTab(12)">Dec</p>
 				    	</div>
@@ -71,24 +71,24 @@
 				<h2 style="font-size:45px">{{monthName}}</h2>
 				<br>
 				<div style="display:inline-block">
-					<div style="display:inline-block" class = "incomplete" ng-class="{ complete: isGenerated(month) }">
-						<p style="display:inline-block"> {{generated}} </p>
+					<div style="display:inline-block" class = "incomplete" ng-class="{ complete: isGenerated(tab) }">
+						<p style="display:inline-block"> <b> {{generated}} </b> </p>
 					</div>
-					<div class = "incomplete" style="display:inline-block" ng-class="{ complete: isAssigned(month) }">
-						<p align="right"   style="display:inline-block"> {{assigned}} </p>
+					<div class = "incomplete" style="display:inline-block" ng-class="{ complete: isAssigned(tab), working: isWorking(tab) }">
+						<p align="right"   style="display:inline-block"> <b> {{assigned}} </b> </p>
 					</div>
 				</div>
 					<br>
 					<br>
 					<br>
-				<button class="scheduleButton" ng-class="{ disabled: isGenerated(month) }" type="button" ng-click="generateShifts(month)">Generate</button>
+				<button class="scheduleButton" ng-class="{ disabled: isGenerated(tab) }" type="button" ng-click="generateShifts(tab)">Generate</button>
 				
-				<button align="right" ng-class="{ disabled: !isGenerated(month) }" class="scheduleButton"type="button" onclick="assignShifts()">Assign</button>
+				<button align="right" ng-class="{ disabled: isAssignable(tab) }" class="scheduleButton"type="button" ng-click="assignShifts(tab)">Assign</button>
 			</div>
 			<br>
 			<br>
 			<br>
-			<div class = "scheduleOptions">
+			<div hidden class = "scheduleOptions">
 				<div style="horizontal-align:right;" class = "scheduleOptions">
 				    <label style="font-size:38px">Allow overtime</label>
 				    <input type="checkbox" style="height:40px;width:40px" ng-model="allowOvertime">

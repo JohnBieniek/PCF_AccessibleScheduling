@@ -79,9 +79,9 @@ public class ScheduleController {
     }
     
     @RequestMapping(value = "/staffShiftsSafely", method = RequestMethod.GET)
-    public String staffShiftsSafely(@RequestParam("month") String month,@RequestParam("year") String year) throws CorruptDataException, ProccessingException {
+    public Iterable<ScheduleStatus> staffShiftsSafely(@RequestParam("month") String month,@RequestParam("year") String year) throws CorruptDataException, ProccessingException {
     	assignmentManager.scheduleShifts(month,year);
-    	return "";
+    	return scheduleStatusCrud.findAll();
     }
     
     @RequestMapping(value = "/statusList", method = RequestMethod.GET)
@@ -96,8 +96,9 @@ public class ScheduleController {
     }
     
     @RequestMapping(value = "/generateShifts", method = RequestMethod.GET)
-    public String generateShifts(@RequestParam("month") String month) throws CorruptDataException {
-        return manager.generateShifts(month);
+    public Iterable<ScheduleStatus> generateShifts(@RequestParam("month") String month) throws CorruptDataException {
+        manager.generateShifts(month);
+        return scheduleStatusCrud.findAll();
     }
     
     @RequestMapping(value = "/generateSingleShifts", method = RequestMethod.GET)

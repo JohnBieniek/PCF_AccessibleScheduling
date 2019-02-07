@@ -36,11 +36,15 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
 	 $scope.tab=1;
 	 $scope.monthName="January";
 	 $scope.statusList=[];
+	 
+	 
 	 $scope.setTab = function(newTab){
 	  $scope.generatedBool = $scope.statusList[$scope.tab-1].generated;
       $scope.tab = newTab;
-      console.log("month:"+$scope.month);
+      console.log("month:"+$scope.tab);
       console.log("generated:"+$scope.statusList[$scope.tab-1].generated);
+      console.log("scope.statusList"+$scope.statusList[$scope.tab-1].toString());
+      
       if($scope.statusList[$scope.tab-1].generated){
     	  $scope.generated="Generated";
       }
@@ -94,13 +98,29 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
     		  break;
       }
     };
+    
+    $scope.isTabGenerated = function(month){
+        return $scope.statusList[month-1].generated && $scope.tab != month && !$scope.statusList[month-1].assigned&& !$scope.statusList[month-1].assigning;
+      };
+      $scope.isTabAssigned = function(month){
+          return $scope.statusList[month-1].assigned && $scope.tab != month&& !$scope.statusList[month-1].assigning ;
+        };
     $scope.isGenerated = function(month){
-        return $scope.statusList[$scope.tab-1].generated;
+        return $scope.statusList[month-1].generated;
       };
       
-      $scope.isAssigned = function(month){
-          return $scope.statusList[$scope.tab-1].assigned;
+      $scope.isWorking = function(month){
+          return $scope.statusList[month-1].assigning  && $scope.tab != month;
         };
+      
+      $scope.isAssigned = function(month){
+          return $scope.statusList[month-1].assigned;
+        };
+        
+        $scope.isAssignable = function(month){
+        	console.log("scope.assigning"+!$scope.statusList[month-1].assigning)
+            return ($scope.statusList[month-1].assigned || !$scope.statusList[month-1].generated) && !$scope.statusList[month-1].assigning;
+          };
       
 	 $scope.isSet = function(tabNum){
       return $scope.tab === tabNum;
@@ -117,6 +137,7 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
         $scope.clients = Clients.query();
     }
     
+    
     $scope.listStatusItems = function(){
     	$http({
             url: '/schedule/statusList',
@@ -128,9 +149,10 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
             }
         })
         .then(function(response) {
-    		$scope.statusList = response.data;
+    		$scope.statusList = response.data.sort(function(a, b){return a.month-b.month});
     		console.log(response.data);
     		console.log($scope.statusList[0].generated);
+    		$scope.setTab($scope.tab);
         });
     }
     
@@ -146,6 +168,35 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
             }
         })
         .then(function(response) {
+        	$scope.statusList = response.data.sort(function(a, b){return a.month-b.month});
+    		console.log(response.data);
+    		console.log($scope.statusList[0].generated);
+    		$scope.setTab($scope.tab);
         });
     }
+    
+    $scope.assignShifts = function(month){
+    	$scope.statusList[month].assigned=true;
+    	$scope.statusList[month].assigning=true;
+    	console.log("allow overtime" +$scope.allowOvertime);
+    	$http({
+            url: '/schedule/staffShiftsSafely',
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            params: {
+                month: month,
+                year: '2019'
+            }
+        })
+        .then(function(response) {
+        	
+        	$scope.statusList = response.data.sort(function(a, b){return a.month-b.month});
+    		console.log(response.data);
+    		console.log($scope.statusList[0].generated);
+    		$scope.setTab($scope.tab);
+        });
+    }
+    window.setInterval($scope.listStatusItems(),30000);
 }

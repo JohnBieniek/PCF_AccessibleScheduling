@@ -4,8 +4,10 @@ import java.util.HashMap;
 
 import accessiblesolutions.accessiblescheduling.domain.EmployeeShiftCompatibilities;
 import accessiblesolutions.accessiblescheduling.domain.EmployeeShiftCompatibility;
+import accessiblesolutions.accessiblescheduling.domain.ScheduleStatus;
 import accessiblesolutions.accessiblescheduling.domain.Shift;
 
+import org.cloudfoundry.samples.music.repositories.mongodb.ScheduleStatusRepository;
 import org.junit.experimental.theories.suppliers.TestedOn;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
@@ -38,6 +40,11 @@ public class ShiftAssignmentManager {
     
     @Autowired
     ShiftGenerationManager shiftGenerationManager;
+    @Autowired
+    private CrudRepository<ScheduleStatus, String> scheduleStatusCrud;
+    
+    @Autowired
+    private ScheduleStatusRepository scheduleStatusRepository;  
     
     public ShiftAssignmentManager() {
     }
@@ -62,6 +69,19 @@ public class ShiftAssignmentManager {
     public void scheduleShifts(String selectedMonth,String selectedYear) throws ProccessingException, CorruptDataException {
     	int month = Integer.parseInt(selectedMonth);
     	int year = Integer.parseInt(selectedYear);
+    	
+    	ScheduleStatus status = scheduleStatusCrud.findOne(selectedMonth);
+    	
+    	if(null==status) {
+    		status= new ScheduleStatus();
+    		status.setMonth(selectedMonth);
+    	}
+    	
+    	scheduleStatusRepository.deleteByMonth(selectedMonth);
+    	
+    	status.setGenerated(true);
+    	status.setAssigned(true);
+    	scheduleStatusCrud.save(status);
     	
     	staffPreassignedShifts(selectedMonth,selectedYear,true);
     	
