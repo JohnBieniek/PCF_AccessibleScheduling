@@ -24,14 +24,24 @@
 	font-size: 35px;
 	margin-left:20px;
     margin-right:20px;
-    width: 215px;
+    width: 245px;
 }
 
 .scheduleButton.disabled {
-  opacity: 0.65; 
+  opacity: 0.55; 
   cursor: not-allowed;
   pointer-events: none;
   text-decoration: none;
+}
+
+.deleteButton{
+	border-color: #cc0000!important;
+	background-color: #cc0000!important;
+	color: white;
+	text-align: center;
+	margin-left: auto;
+  	margin-right: auto;
+  	 margin: 0 auto;
 }
 
 .scheduleOptions{
@@ -48,8 +58,8 @@
 }
 
 .complete{
-	border-color: #3d9e03!important;
-	background-color: #3d9e03!important;
+	border-color: #2db93d!important;
+	background-color: #2db93d!important;
 }
 
 .incomplete{
@@ -60,14 +70,14 @@
 	margin-left:20px;
     margin-right:20px;
 	padding: 15px;
-	 width: 200px;
+	 width: 230px;
 }
 
 .titleText{
 	background-color: #6a0000;
 	font-size: 50px;
 	color: white !important;
-	margin-left:60px;
+	margin-left:15px;
 }
 .active{
 	background-color: #729fcf!important;
@@ -94,8 +104,8 @@
 }
 
 .assigned{
-	background-color: #3d9e03!important;
-	 border-color: #3d9e03!important;
+	background-color: #2db93d!important;
+	 border-color: #2db93d!important;
  	 border-radius: 25px; 
  	 padding-left:20px;
     padding-right:20px;
@@ -122,8 +132,9 @@
     background-color: white;
 }
 
-.icon-white {
-    color: white;
+.micon {
+     font-size:30px;
+     margin-left:30px;
 }
 .myTab{
 	 background-color: #d3d7cf;
@@ -132,7 +143,7 @@
   color: black;
   margin-left:20px;
     margin-right:20px;
-    margin-bottom: 20px;
+    margin-bottom: 17px;
     margin-top: 15px;
     font-size:35px;
     padding-left:20px;
@@ -140,6 +151,8 @@
 }
 
 .centered{
-	 margin-left: auto; 
-	 margin-right: auto;
+	 text-align: center;
+	margin-left: auto;
+  	margin-right: auto;
+  	 margin: 0 auto;
 }

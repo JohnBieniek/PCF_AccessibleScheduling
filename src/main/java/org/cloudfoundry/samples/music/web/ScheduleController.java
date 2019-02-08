@@ -6,6 +6,7 @@ import org.cloudfoundry.samples.music.managers.EmployeeShiftMapManager;
 import org.cloudfoundry.samples.music.managers.ScheduleManager;
 import org.cloudfoundry.samples.music.managers.ShiftAssignmentManager;
 import org.cloudfoundry.samples.music.managers.ShiftManager;
+import org.cloudfoundry.samples.music.repositories.mongodb.ScheduleStatusRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,10 +40,25 @@ public class ScheduleController {
     ScheduleManager scheduleManager;
     
     @Autowired
+    private ScheduleStatusRepository scheduleStatusRepository;   
+    
+    @Autowired
     public ScheduleController(ScheduleManager manager) {
         this.manager=manager;
     }
 
+    @RequestMapping(value = "/byMonth", method = RequestMethod.DELETE)
+    public ArrayList<Shift> deleteByMonth(@RequestParam("month") String  month) {
+        ScheduleStatus status = new ScheduleStatus();
+        
+    	status.setMonth(month);
+    	    	
+    	scheduleStatusRepository.deleteByMonth(month);
+    	scheduleStatusCrud.save(status);
+    	
+        return shiftManager.deleteShiftsForMonth(Integer.parseInt(month));
+    }
+    
     @RequestMapping(value = "/durationOfWeeksShifts", method = RequestMethod.GET)
     public float durationOfWeeksShifts(@RequestParam("week") String week,@RequestParam("month") String month,@RequestParam("year") String year) throws CorruptDataException, ProccessingException {
         return shiftManager.getDurationOfShiftsStartingWeekOfMonth(Integer.parseInt(week),Integer.parseInt(month),Integer.parseInt(year));

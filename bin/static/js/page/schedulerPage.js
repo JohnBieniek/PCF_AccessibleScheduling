@@ -59,6 +59,10 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
     	  $scope.assigned="Unassigned";
       }
       
+      if($scope.statusList[$scope.tab-1].assigning){
+    	  $scope.assigned="Assigning";
+      }
+      
       switch(newTab){
     	  case 1:
     		  $scope.monthName="January";
@@ -117,10 +121,36 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
           return $scope.statusList[month-1].assigned;
         };
         
-        $scope.isAssignable = function(month){
-        	console.log("scope.assigning"+!$scope.statusList[month-1].assigning)
-            return ($scope.statusList[month-1].assigned || !$scope.statusList[month-1].generated) && !$scope.statusList[month-1].assigning;
-          };
+    $scope.isAssigning = function(month){
+    	return $scope.statusList[month-1].assigning 
+      };
+          
+      $scope.isNotAssignable = function(month){
+    	  assignable = true;
+    	  
+    	  console.log("assignable:"+assignable);
+    	  if($scope.statusList[month-1].generated=="false"){
+    		  assignable=false;
+    	  }
+    	  
+	   	  console.log("assignable:"+assignable);
+	   	  
+	   	if($scope.statusList[month-1].assigning=="true"){
+  		  assignable=false;
+  	  }
+  	  
+	   	  console.log("assignable:"+assignable);
+	   	  
+	   	if($scope.statusList[month-1].assigned=="true"){
+  		  assignable=false;
+  	  }
+  	  unassignable = !assignable;
+	   	  console.log("unassignable:"+unassignable);
+    	  console.log("$scope.statusList[month-1].generated" + $scope.statusList[month-1].generated);
+    	  console.log("$scope.statusList[month-1].assigning "+$scope.statusList[month-1].assigning );
+    	  console.log("$scope.statusList[month-1].assigned"+$scope.statusList[month-1].assigned);
+      	return unassignable;
+       };
       
 	 $scope.isSet = function(tabNum){
       return $scope.tab === tabNum;
@@ -137,8 +167,23 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
         $scope.clients = Clients.query();
     }
     
+    $scope.deleteShifts = function(month){
+    	$http({
+            url: '/schedule/byMonth',
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            params: {
+            	month: month
+            }
+        })
+        .then(function(response) {
+        	$scope.listStatusItems();
+        });
+    }
     
-    $scope.listStatusItems = function(){
+    $scope.listStatusItems = function listStatusItems(){
     	$http({
             url: '/schedule/statusList',
             method: 'GET',
@@ -153,6 +198,7 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
     		console.log(response.data);
     		console.log($scope.statusList[0].generated);
     		$scope.setTab($scope.tab);
+    		setTimeout(listStatusItems,30000);
         });
     }
     
@@ -172,13 +218,13 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
     		console.log(response.data);
     		console.log($scope.statusList[0].generated);
     		$scope.setTab($scope.tab);
+    		
         });
     }
     
     $scope.assignShifts = function(month){
-    	$scope.statusList[month].assigned=true;
-    	$scope.statusList[month].assigning=true;
-    	console.log("allow overtime" +$scope.allowOvertime);
+    	$scope.statusList[month-1].assigning=true;
+    	console.log("$scope.statusList" +$scope.statusList.toString());
     	$http({
             url: '/schedule/staffShiftsSafely',
             method: 'GET',
@@ -198,5 +244,4 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
     		$scope.setTab($scope.tab);
         });
     }
-    window.setInterval($scope.listStatusItems(),30000);
 }

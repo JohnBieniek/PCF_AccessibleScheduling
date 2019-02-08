@@ -80,7 +80,7 @@ public class ShiftAssignmentManager {
     	scheduleStatusRepository.deleteByMonth(selectedMonth);
     	
     	status.setGenerated(true);
-    	status.setAssigned(true);
+    	status.setAssigning(true);
     	scheduleStatusCrud.save(status);
     	
     	staffPreassignedShifts(selectedMonth,selectedYear,true);
@@ -89,6 +89,12 @@ public class ShiftAssignmentManager {
     		scheduleWeekendShifts(week,month,year);
     		scheduleWeekdayShifts(week,month,year);
     	}
+    	
+    	scheduleStatusRepository.deleteByMonth(selectedMonth);
+    	
+    	status.setAssigning(false);
+    	status.setAssigned(true);
+    	scheduleStatusCrud.save(status);
     }
     
     public void scheduleWeekdayShifts(int week, int month,int year) throws ProccessingException, CorruptDataException {
