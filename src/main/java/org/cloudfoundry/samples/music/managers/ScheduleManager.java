@@ -1,7 +1,9 @@
 package org.cloudfoundry.samples.music.managers;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
 
+import accessiblesolutions.accessiblescheduling.domain.ScheduleStatus;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
 @Component
@@ -12,12 +14,23 @@ public class ScheduleManager {
     @Autowired
     ShiftAssignmentManager shiftAssignmentManager;
     
+    @Autowired
+    private CrudRepository<ScheduleStatus, String> scheduleStatusCrud;
+    
     public ScheduleManager() {}
 
+    public void generateStatusList() {
+    	for(int month=1;month<13;month++) {
+    		ScheduleStatus status = new ScheduleStatus();
+    		status.setMonth(month+"");
+    		scheduleStatusCrud.save(status);
+    	}
+    }
+    
     public String generateShifts(String selectedMonth) throws CorruptDataException {
     	String eventResponse = shiftGenerationManager.generateEventShifts(selectedMonth);
     	String requestResponse = shiftGenerationManager.generateRequestedShifts(selectedMonth);
-
+    	
     	return eventResponse + requestResponse;
     }
     

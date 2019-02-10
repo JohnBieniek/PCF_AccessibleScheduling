@@ -10,6 +10,7 @@ import javax.validation.Valid;
 import org.cloudfoundry.samples.music.managers.ScheduleManager;
 import org.cloudfoundry.samples.music.managers.ShiftManager;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoShiftRepository;
+import org.cloudfoundry.samples.music.repositories.mongodb.ScheduleStatusRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +22,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import accessiblesolutions.accessiblescheduling.domain.ScheduleStatus;
 import accessiblesolutions.accessiblescheduling.domain.Shift;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 
@@ -41,17 +44,14 @@ public class ShiftController {
     ShiftManager shiftManager;
     
     @Autowired
-    private MongoShiftRepository mongoRepository;
+    private CrudRepository<ScheduleStatus, String> scheduleStatusCrud;
+    
+    @Autowired
+    private ScheduleStatusRepository scheduleStatusRepository;   
     
     @Autowired
     public ShiftController(CrudRepository<Shift, String> repository) {
         this.repository = repository;
-    }
-    
-    @RequestMapping(value = "/byMonth/{month}", method = RequestMethod.DELETE)
-    public ArrayList<Shift> deleteByMonth(@PathVariable int month) {
-        logger.info("Deleting shifts for " + month);
-        return shiftManager.deleteShiftsForMonth(month);
     }
     
     @RequestMapping(value = "/set", method = RequestMethod.POST)

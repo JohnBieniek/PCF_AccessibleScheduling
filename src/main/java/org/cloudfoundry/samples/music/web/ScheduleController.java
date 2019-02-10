@@ -2,17 +2,20 @@ package org.cloudfoundry.samples.music.web;//Ignore complaints
 
 import java.util.ArrayList;
 
-import accessiblesolutions.accessiblescheduling.domain.Shift;
 import org.cloudfoundry.samples.music.managers.EmployeeShiftMapManager;
 import org.cloudfoundry.samples.music.managers.ScheduleManager;
 import org.cloudfoundry.samples.music.managers.ShiftAssignmentManager;
 import org.cloudfoundry.samples.music.managers.ShiftManager;
+import org.cloudfoundry.samples.music.repositories.mongodb.ScheduleStatusRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import accessiblesolutions.accessiblescheduling.domain.ScheduleStatus;
+import accessiblesolutions.accessiblescheduling.domain.Shift;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
 
@@ -31,10 +34,31 @@ public class ScheduleController {
     EmployeeShiftMapManager employeeShiftMapManager;
     
     @Autowired
+    private CrudRepository<ScheduleStatus, String> scheduleStatusCrud;
+    
+    @Autowired
+    ScheduleManager scheduleManager;
+    
+    @Autowired
+    private ScheduleStatusRepository scheduleStatusRepository;   
+    
+    @Autowired
     public ScheduleController(ScheduleManager manager) {
         this.manager=manager;
     }
 
+    @RequestMapping(value = "/byMonth", method = RequestMethod.DELETE)
+    public ArrayList<Shift> deleteByMonth(@RequestParam("month") String  month) {
+        ScheduleStatus status = new ScheduleStatus();
+        
+    	status.setMonth(month);
+    	    	
+    	scheduleStatusRepository.deleteByMonth(month);
+    	scheduleStatusCrud.save(status);
+    	
+        return shiftManager.deleteShiftsForMonth(Integer.parseInt(month));
+    }
+    
     @RequestMapping(value = "/durationOfWeeksShifts", method = RequestMethod.GET)
     public float durationOfWeeksShifts(@RequestParam("week") String week,@RequestParam("month") String month,@RequestParam("year") String year) throws CorruptDataException, ProccessingException {
         return shiftManager.getDurationOfShiftsStartingWeekOfMonth(Integer.parseInt(week),Integer.parseInt(month),Integer.parseInt(year));
@@ -71,14 +95,53 @@ public class ScheduleController {
     }
     
     @RequestMapping(value = "/staffShiftsSafely", method = RequestMethod.GET)
-    public String staffShiftsSafely(@RequestParam("month") String month,@RequestParam("year") String year) throws CorruptDataException, ProccessingException {
-    	assignmentManager.scheduleShifts(month,year);
-    	return "";
+    public Iterable<ScheduleStatus> staffShiftsSafely(@RequestParam("month") String month,@RequestParam("year") String year) {
+    	ScheduleStatus status = scheduleStatusCrud.findOne(month);
+    	scheduleStatusRepository.deleteByMonth(month);
+    	
+    	if(null==status) {
+    		status= new ScheduleStatus();
+    		status.setMonth(month);
+    	}
+    	
+    	if(status.isGenerated()) {
+    		status.setAssigning(true);
+        	scheduleStatusCrud.save(status);
+    	}
+    	
+    	try {
+			assignmentManager.scheduleShifts(month,year);
+		} catch (ProccessingException | CorruptDataException e) {
+			status = scheduleStatusCrud.findOne(month);
+	    	scheduleStatusRepository.deleteByMonth(month);
+	    	
+	    	if(null==status) {
+	    		status= new ScheduleStatus();
+	    		status.setMonth(month);
+	    	}
+	    	
+    		status.setAssigning(false);
+    		status.setErrored(true);
+        	scheduleStatusCrud.save(status);
+		}
+    	return scheduleStatusCrud.findAll();
+    }
+    
+    @RequestMapping(value = "/statusList", method = RequestMethod.GET)
+    public Iterable<ScheduleStatus> scheduleStatusList() {
+        return scheduleStatusCrud.findAll();
+    }
+    
+    @RequestMapping(value = "/generateStatusList", method = RequestMethod.GET)
+    public Iterable<ScheduleStatus> generateStatusList() {
+    	scheduleManager.generateStatusList();
+        return scheduleStatusCrud.findAll();
     }
     
     @RequestMapping(value = "/generateShifts", method = RequestMethod.GET)
-    public String generateShifts(@RequestParam("month") String month) throws CorruptDataException {
-        return manager.generateShifts(month);
+    public Iterable<ScheduleStatus> generateShifts(@RequestParam("month") String month) throws CorruptDataException {
+        manager.generateShifts(month);
+        return scheduleStatusCrud.findAll();
     }
     
     @RequestMapping(value = "/generateSingleShifts", method = RequestMethod.GET)
