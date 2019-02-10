@@ -67,12 +67,23 @@ public class ScheduleController {
     
     @RequestMapping(value = "/staffPreassignedShifts", method = RequestMethod.GET)
     public String staffPreassignedShifts(@RequestParam("month") String month,@RequestParam("year") String year) throws CorruptDataException, ProccessingException {
-        return assignmentManager.staffPreassignedShifts(month,year);
+        return assignmentManager.staffPreassignedShifts(month,year,false);
+    }
+    
+    @RequestMapping(value = "/staffShiftsSafely", method = RequestMethod.GET)
+    public String staffShiftsSafely(@RequestParam("month") String month,@RequestParam("year") String year) throws CorruptDataException, ProccessingException {
+    	assignmentManager.scheduleShifts(month,year);
+    	return "";
     }
     
     @RequestMapping(value = "/generateShifts", method = RequestMethod.GET)
     public String generateShifts(@RequestParam("month") String month) throws CorruptDataException {
         return manager.generateShifts(month);
+    }
+    
+    @RequestMapping(value = "/generateSingleShifts", method = RequestMethod.GET)
+    public String generateSingleShifts(@RequestParam("month") String month) throws CorruptDataException {
+        return manager.generateSingleShifts(month);
     }
     
     @RequestMapping(value = "/staffShifts", method = RequestMethod.GET)

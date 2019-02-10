@@ -95,7 +95,7 @@ public class ShiftGenerationManager {
     
     public String generateRequestedSingleShifts(String selectedMonth) throws CorruptDataException {
     	Iterable<ShiftRequest> requests = shiftRequestRepository.findAll();
-    	
+    	System.out.println("generating requested single shifts");
     	ArrayList<Shift> shifts =new ArrayList<Shift>();  
     	if(null!=requests && null!=selectedMonth){
     		System.out.println(((ArrayList<ShiftRequest>)requests).size() + " single shift requests to consider for month "+selectedMonth);
@@ -112,7 +112,7 @@ public class ShiftGenerationManager {
 			    			year=splitDate[0];
 			    		}
 			    		System.out.println("Checking if request is for this month" + year + " " + month + " " + request.toString());
-			    		if(Integer.parseInt(selectedMonth)==Integer.parseInt(month) && year.contains("2018")){
+			    		if(Integer.parseInt(selectedMonth)==Integer.parseInt(month) ){//&& year.contains("2019")
 			    			System.out.println("Request confirmed to be for this month");
 			    			Shift shift = new Shift();
 			    			
@@ -156,7 +156,7 @@ public class ShiftGenerationManager {
 	    		int endDay = Util.getDayInt(request.getEndDay());
 	    		boolean overnight = startDay!=endDay;
 
-	    		LocalDate currentDay = LocalDate.of(2018, Integer.parseInt(selectedMonth), 01);
+	    		LocalDate currentDay = LocalDate.of(2019, Integer.parseInt(selectedMonth), 01);
 	    		DayOfWeek monthStartDay = currentDay.getDayOfWeek();
 	    		
 	            TemporalAdjuster startAdj = TemporalAdjusters.next(DayOfWeek.of(startDay));
@@ -201,7 +201,7 @@ public class ShiftGenerationManager {
 	    			shift.setEndTime(request.getEndTime());
 	    			shift.setStartWeek(shift.getStartWeek());
 	    			shift.setStartMonth(Integer.parseInt(selectedMonth));
-	    			shift.setStartYear(2018);//TODO update this to get the real value
+	    			shift.setStartYear(2019);//TODO update this to get the real value
 	    			String creationReason = request.getClientName() + " requested a reccurring shift every ";
 	    			creationReason+= request.getStartDay() + " from "+request.getStartTime() + " to " +request.getEndTime();
 	    			creationReason+= ". This is the #" + (i+1) + " shift for this request for month "+selectedMonth;

@@ -1,4 +1,4 @@
-package managers;
+package accessiblesolutions.accessiblescheduling.managers;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
@@ -22,6 +22,8 @@ import org.springframework.data.repository.CrudRepository;
 
 import accessiblesolutions.accessiblescheduling.domain.Employee;
 import accessiblesolutions.accessiblescheduling.domain.Shift;
+import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
+import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
 
 public class ShiftAssignmentManagerSpec {
 	@Mock
@@ -70,7 +72,16 @@ public class ShiftAssignmentManagerSpec {
 	
 	@Test
 	public void getOnPrestaffedShiftsReturnsEmptyListForNull() {
-		ArrayList<Shift> availableShifts  = fixture.getOnPrestaffedShifts(null);
+		ArrayList<Shift> availableShifts = null;
+		try {
+			availableShifts = fixture.getOnPrestaffedShifts(null);
+		} catch (ProccessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		assertEquals(availableShifts.size(),0);
 	}
 	
@@ -82,9 +93,21 @@ public class ShiftAssignmentManagerSpec {
 		shift.setStartDate("2018-04-01");
 		shift.setEndDate("2018-04-01");
 		shift.setRequestedStaffId("nonExistantEmployee");
+		shift.setStartTime("10:00");
+		shift.setEndTime("14:00");
+		shift.setClientId("generic");
 		shifts.add(shift);
 		
-		ArrayList<Shift> availableShifts  = fixture.getOnPrestaffedShifts(shifts);
+		ArrayList<Shift> availableShifts = null;
+		try {
+			availableShifts = fixture.getOnPrestaffedShifts(shifts);
+		} catch (ProccessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		assertEquals(availableShifts.size(),0);
 	}
 	
@@ -96,9 +119,21 @@ public class ShiftAssignmentManagerSpec {
 		shift.setStartDate("2018-04-01");
 		shift.setEndDate("2018-04-01");
 		shift.setRequestedStaffId("offOnce");
+		shift.setStartTime("10:00");
+		shift.setEndTime("14:00");
+		shift.setClientId("generic");
 		shifts.add(shift);
 		
-		ArrayList<Shift> availableShifts  = fixture.getOnPrestaffedShifts(shifts);
+		ArrayList<Shift> availableShifts = null;
+		try {
+			availableShifts = fixture.getOnPrestaffedShifts(shifts);
+		} catch (ProccessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		assertEquals(availableShifts.size(),0);
 	}
 	
@@ -111,15 +146,29 @@ public class ShiftAssignmentManagerSpec {
 		shift.setStartDate("2018-04-01");
 		shift.setEndDate("2018-04-01");
 		shift.setRequestedStaffId("offOnce");
+		shift.setStartTime("10:00");
+		shift.setEndTime("14:00");
+		shift.setClientId("generic");
 		shifts.add(shift);
 		
 		shift = new Shift();
 		shift.setStartDate("2018-04-01");
 		shift.setEndDate("2018-04-01");
 		shift.setRequestedStaffId("onAlways");
+		shift.setStartTime("10:00");
+		shift.setEndTime("14:00");
+		shift.setClientId("generic");
 		shifts.add(shift);
 		
-		availableShifts  = fixture.getOnPrestaffedShifts(shifts);
+		try {
+			availableShifts  = fixture.getOnPrestaffedShifts(shifts);
+		} catch (ProccessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		assertEquals(availableShifts.size(),1);
 	}

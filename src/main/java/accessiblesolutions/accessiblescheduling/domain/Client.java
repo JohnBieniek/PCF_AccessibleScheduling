@@ -1,15 +1,13 @@
 package accessiblesolutions.accessiblescheduling.domain;
 
-import org.hibernate.annotations.GenericGenerator;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-import accessiblesolutions.accessiblescheduling.domain.Employee;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+
+import org.hibernate.annotations.GenericGenerator;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true) 
 public class Client {
@@ -21,7 +19,6 @@ public class Client {
 
     private String first;
     private String initial;
-//    private Employee preferedStaff;
     private String favoriteStaffId;
     private boolean ownsCats;
     private boolean noSmokers;
@@ -72,14 +69,6 @@ public class Client {
         this.initial = initial;
     }
     
-//    public void setPreferedStaff(Employee employees){
-//    	this.preferedStaff=employees;
-//    }
-//    
-//    public Employee getPreferedStaff(){
-//    	return preferedStaff;
-//    }
-//    
     public void setFavoriteStaffId(String id){
     	this.favoriteStaffId=id;
     }

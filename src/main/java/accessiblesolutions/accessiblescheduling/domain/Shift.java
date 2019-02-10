@@ -82,29 +82,21 @@ public class Shift {
 		
 		setTime(getStartTime()+"-"+getEndTime());
     }
+
     public boolean isValid(){
     	boolean valid=true;
-    	float duration = 0;
+
     	try{
-    		duration = getDuration();
+    		getDuration();
     	}
     	catch(CorruptDataException e){
     		valid=false;
     	}
+    	
     	if(!event&& null==clientId){
     		valid=false;
     	}
-//    	if( null == startDate ||//Time Set
-//    		null == startTime ||
-//    		null == endDate   ||
-//    		null == endTime)
-//    	{
-//    		valid=false;
-//    	}
-//    	if((isAssigned() && staffId==null) || (isAssigned() && staffName==Null)){//TODO
-//    		valid=false;
-//    	}
-    	System.out.println("Shift:"+toString()+" validity? "+valid);
+
     	return valid;
     }
     
@@ -290,7 +282,7 @@ public class Shift {
     }
 
     public int getStartMonth() {
-        return startMonth;
+        return (int) Integer.parseInt(startDate.split("-")[1]);
     }
     
     public LocalDate getStartsLocalDate() throws CorruptDataException{
@@ -399,7 +391,7 @@ public class Shift {
     }
 
     public int getStartYear() {
-        return startYear;
+        return (int) Integer.parseInt(startDate.split("-")[0]);
     }
 
     public boolean isWeekend() throws CorruptDataException{

@@ -6,13 +6,15 @@ import org.springframework.stereotype.Component;
 import accessiblesolutions.accessiblescheduling.domain.Client;
 import accessiblesolutions.accessiblescheduling.domain.CustomField;
 import accessiblesolutions.accessiblescheduling.domain.Employee;
+import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
+import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
 
 @Component
 public class EmployeeClientCompatibilityManager {
     private CrudRepository<CustomField, String> customFieldRepository;
     
     @Autowired
-    private CustomDataManager customDataManager;
+    public CustomDataManager customDataManager;
     
     @Autowired
     EmployeeShiftManager employeeShiftManager;
@@ -22,14 +24,28 @@ public class EmployeeClientCompatibilityManager {
         this.customFieldRepository=customFieldRepository;
     }
     
-    public boolean isCompatibleWith(Employee employee,Client client){
-    	//if(client!=null)logger.error("checking "+employee.getFirst() +" compatibility with "+client.toString());
+    /**Returns if this employee allowed to work with this client.
+     * Clients requiring medpass must have employees that are medpass certified.
+     * Clients must have staff of the proper gender.
+     * Clients must not be paired with smokers upon request.
+     * Clients with cats must not be paired with employees who have cat allergies.
+     * Clients must be paired with signing staff when required.
+     * Clients and employees must be properly aligned with custom requirements.
+     * 
+     * @param employee
+     * @param client
+     * @return boolean Is this employee allowed to work with this client?
+     * @throws ProccessingException Null employee or client provided to isCompatibleWith
+     * @throws CorruptDataException 
+     * @Tested
+     */
+    public boolean isCompatibleWith(Employee employee,Client client) throws ProccessingException, CorruptDataException{
+    	if(null==employee||null==client) {
+			throw new ProccessingException("Null employee or client provided to isCompatibleWith");
+		}
+
     	boolean compatible = true;
-    	
-    	if(client==null){
-    		return false;
-    	}
-    	
+
     	if(client.getMedPass() && !employee.getMedPassCertified()){
     		compatible=false;
     	}
@@ -50,20 +66,22 @@ public class EmployeeClientCompatibilityManager {
     	}
     	
     	Iterable<CustomField> customFields = customFieldRepository.findAll();
-    	for(CustomField customField : customFields){
-    		boolean clientData = customDataManager.getClientCustomFieldData(client,customField);
-    		boolean employeeData = customDataManager.getCustomFieldData(employee,customField);
-    		
-    		if(customField.getClientRequirement()){
-    			if(clientData && !employeeData){
-    				compatible=false;
-    			}
-    		}
-    		if(customField.getEmployeeRequirement()){
-    			if(employeeData && !clientData){
-    				compatible=false;
-    			}
-    		}
+    	if(null!=customFields) {
+	    	for(CustomField customField : customFields){
+	    		boolean clientData = customDataManager.getCustomFieldDatasValueOrCreateIfMissing(client,customField);
+	    		boolean employeeData = customDataManager.getCustomFieldDatasValueOrCreateIfMissing(employee,customField);
+	    		
+	    		if(customField.getClientRequirement()){
+	    			if(clientData && !employeeData){
+	    				compatible=false;
+	    			}
+	    		}
+	    		if(customField.getEmployeeRequirement()){
+	    			if(employeeData && !clientData){
+	    				compatible=false;
+	    			}
+	    		}
+	    	}
     	}
     	
     	return compatible;

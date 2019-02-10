@@ -3,6 +3,7 @@ package accessiblesolutions.accessiblescheduling.util;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.time.LocalDate;
@@ -13,10 +14,78 @@ import java.util.ArrayList;
 import org.json.JSONArray;
 import org.junit.Test;
 
+import accessiblesolutions.accessiblescheduling.domain.Client;
+import accessiblesolutions.accessiblescheduling.domain.Employee;
 import accessiblesolutions.accessiblescheduling.domain.Event;
 import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
 
 public class UtilSpec {
+	@Test
+	public void getIdFromEmployeeOrClientThrowsProccessingExceptionWithNullInput() {
+		boolean errored =false;
+		
+		try {
+			Util.getIdFromEmployeeOrClient(null);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void getIdFromEmployeeOrClientThrowsProccessingExceptionWithInvalidInput() {
+		boolean errored =false;
+		
+		try {
+			Util.getIdFromEmployeeOrClient("Invlalid");
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void getIdFromEmployeeOrClientReturnsIdForClient() {
+		boolean errored =false;
+		Client client = new Client();
+		client.setId("client");
+		
+		String result = null;
+		
+		try {
+			result = Util.getIdFromEmployeeOrClient(client);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue("client".contentEquals(result));
+	}
+	
+	@Test
+	public void getIdFromEmployeeOrClientReturnsIdForEmployee() {
+		boolean errored =false;
+		Employee employee = new Employee();
+		employee.setId("employee");
+		
+		String result = null;
+		
+		try {
+			result = Util.getIdFromEmployeeOrClient(employee);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue("employee".contentEquals(result));
+	}
+	
 	@Test
 	public void eventArrayListContainsEventReturnsTrueIfPresent() {
 		String targetId = "Something";
@@ -507,5 +576,41 @@ public class UtilSpec {
 		}
 		
 		assertFalse(exception);
+	}
+	
+
+	@Test
+	public void getLocalDateOfDayInWeekReturnsNullForInvalidYear(){
+		LocalDate date = Util.getLocalDateOfDayInWeek(201,6,1);
+		
+		assertNull(date);
+	}
+	
+	@Test
+	public void getLocalDateOfDayInWeekReturnsNullForInvalidMonth(){
+		LocalDate date = Util.getLocalDateOfDayInWeek(2018,13,1);
+		
+		assertNull(date);
+	}
+	
+	@Test
+	public void getLocalDateOfDayInWeekReturnsNullForInvalidWeek(){
+		LocalDate date = Util.getLocalDateOfDayInWeek(2018,10,9);
+		
+		assertNull(date);
+	}
+	
+	@Test
+	public void getLocalDateOfDayInWeekReturnsLastDayOfWeek0(){
+		LocalDate date = Util.getLocalDateOfDayInWeek(2018,6,0);
+	
+		assertEquals(2,date.getDayOfMonth());
+	}
+	
+	@Test
+	public void getLocalDateOfDayInWeekReturnsLastDayOfWeek1(){
+		LocalDate date = Util.getLocalDateOfDayInWeek(2018,6,1);
+
+		assertEquals(9,date.getDayOfMonth());
 	}
 }

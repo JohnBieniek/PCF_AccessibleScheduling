@@ -23,6 +23,10 @@ public class ShiftManager {
     	return  ShiftWorker.getRecurringShifts(shiftRepository.findByStartMonth(selectedMonth));
 	}
     
+    public ArrayList<Shift> getPrestaffedShiftsForMonth(int selectedMonth) throws ProccessingException{
+    	return  ShiftWorker.getPrestaffedShifts(shiftRepository.findByStartMonth(selectedMonth));
+	}
+    
     public ArrayList<Shift> getPrestaffedSingleShiftsForMonth(int selectedMonth) throws ProccessingException {
     	ArrayList<Shift> singleShifts = ShiftWorker.getSingleShifts(shiftRepository.findByStartMonth(selectedMonth));
     	ArrayList<Shift> prestaffedSingleShifts = ShiftWorker.getPrestaffedShifts(singleShifts);
@@ -32,6 +36,15 @@ public class ShiftManager {
     
     public ArrayList<Shift> getShiftsForMonth(int month){
 		return (ArrayList<Shift>) shiftRepository.findByStartMonth(month);
+	}
+    
+    public ArrayList<Shift> deleteShiftsForMonth(int month){
+		ArrayList<Shift> shifts = (ArrayList<Shift>) shiftRepository.findByStartMonth(month);
+		
+		for(Shift shift:shifts) {
+			shiftRepository.delete(shift);
+		}
+		return shifts;
 	}
     
   	public ArrayList<Shift> getPrestaffedRecurringShiftsForMonth(int selectedMonth) throws ProccessingException {

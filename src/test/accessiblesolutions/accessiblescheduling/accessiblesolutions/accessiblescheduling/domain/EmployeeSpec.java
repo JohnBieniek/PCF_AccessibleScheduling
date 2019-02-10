@@ -7,6 +7,9 @@ import static org.junit.Assert.assertTrue;
 import java.time.DayOfWeek;
 
 import org.junit.Test;
+
+import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
+import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
 public class EmployeeSpec {
 	@Test
 	public void emptyConstructorInitializesVariables() {
@@ -386,7 +389,53 @@ public class EmployeeSpec {
 	}
 	
 	@Test
-	public void requestedOffShowsOffWhenAShiftStartsTheDayOff() {
+	public void requestedOffThrowsCorruptDataExceptionForInvalidShift() {
+		Employee employee = new Employee();
+		String[] requestedDays = new String[]{"2017-06-04"};
+		employee.setRequestedOff(requestedDays);
+		boolean errored =false;
+		Shift shift = new Shift();
+		shift.setStartDate("2017-06-04");
+		shift.setEndDate("2017-06-04");
+		
+		try {
+			assertTrue(employee.requestedOff(shift));
+		} catch (ProccessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void requestedOffThrowsProccessingExceptionForNullShift() {
+		Employee employee = new Employee();
+		String[] requestedDays = new String[]{"2017-06-04"};
+		employee.setRequestedOff(requestedDays);
+		boolean errored =false;
+		Shift shift = new Shift();
+		shift.setStartDate("2017-06-04");
+		shift.setEndDate("2017-06-04");
+		
+		try {
+			assertTrue(employee.requestedOff(null));
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void requestedOffShowsOffWhenAShiftStartsTheDayOff() throws ProccessingException, CorruptDataException {
 		Employee employee = new Employee();
 		String[] requestedDays = new String[]{"2017-06-04"};
 		employee.setRequestedOff(requestedDays);
@@ -394,12 +443,14 @@ public class EmployeeSpec {
 		Shift shift = new Shift();
 		shift.setStartDate("2017-06-04");
 		shift.setEndDate("2017-06-04");
-		
+		shift.setStartTime("10:00");
+		shift.setEndTime("14:00");
+		shift.setClientId("generic");
 		assertTrue(employee.requestedOff(shift));
 	}
 	
 	@Test
-	public void requestedOffShowsOffWhenAShiftEndsTheDayOff() {
+	public void requestedOffShowsOffWhenAShiftEndsTheDayOff() throws ProccessingException, CorruptDataException {
 		Employee employee = new Employee();
 		String[] requestedDays = new String[]{"2017-06-04"};
 		employee.setRequestedOff(requestedDays);
@@ -407,12 +458,14 @@ public class EmployeeSpec {
 		Shift shift = new Shift();
 		shift.setStartDate("2017-06-03");
 		shift.setEndDate("2017-06-04");
-		
+		shift.setStartTime("22:00");
+		shift.setEndTime("14:00");
+		shift.setClientId("generic");
 		assertTrue(employee.requestedOff(shift));
 	}
 	
 	@Test
-	public void requestedOffShowsOnWhenADayIsntVacation() {
+	public void requestedOffShowsOnWhenADayIsntVacation() throws ProccessingException, CorruptDataException {
 		Employee employee = new Employee();
 		String[] requestedDays = new String[]{"2017-06-04"};
 		employee.setRequestedOff(requestedDays);
@@ -420,7 +473,9 @@ public class EmployeeSpec {
 		Shift shift = new Shift();
 		shift.setStartDate("2017-05-04");
 		shift.setEndDate("2017-05-04");
-		
+		shift.setStartTime("10:00");
+		shift.setEndTime("14:00");
+		shift.setClientId("generic");
 		assertFalse(employee.requestedOff(shift));
 	}
 }

@@ -2970,4 +2970,174 @@ public class ShiftWorkerSpec {
 		}
 		assertTrue(error);
 	}
+	
+	@Test
+	public void isAlmostOverlappingThrowsProccessingExceptionWithNullTime() {
+		LocalDateTime localDateTime = LocalDateTime.now();
+		boolean errored =false;
+		try {
+			ShiftWorker.isAlmostOverlapping(null, localDateTime,localDateTime,localDateTime);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void isAlmostOverlappingReturnsFalseBeyond29Minutes() {
+		LocalDateTime localDateTime = LocalDateTime.now();
+		boolean errored =false;
+		boolean almostOverlapping = true;
+		try {
+			almostOverlapping =ShiftWorker.isAlmostOverlapping(localDateTime.minusHours(3), localDateTime,localDateTime.plusMinutes(30),localDateTime.plusHours(3));
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertFalse(almostOverlapping);
+	}
+	
+	@Test
+	public void isAlmostOverlappingReturnsTrueBelow30Minutes1() {
+		LocalDateTime localDateTime = LocalDateTime.now();
+		boolean errored =false;
+		boolean almostOverlapping = false;
+		try {
+			almostOverlapping =ShiftWorker.isAlmostOverlapping(localDateTime.minusHours(3), localDateTime,localDateTime.plusMinutes(29),localDateTime.plusHours(3));
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(almostOverlapping);
+	}
+	
+	@Test
+	public void isAlmostOverlappingReturnsTrueBelow30Minutes2() {
+		LocalDateTime localDateTime = LocalDateTime.now();
+		boolean errored =false;
+		boolean almostOverlapping = false;
+		try {
+			almostOverlapping =ShiftWorker.isAlmostOverlapping(localDateTime.plusMinutes(29),localDateTime.plusHours(3),localDateTime.minusHours(3), localDateTime);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(almostOverlapping);
+	}
+	
+
+	@Test
+	public void isAlmostOverlappingThrowsProccessingExceptionWithNullShift() {
+		Shift shift = new Shift();
+		boolean errored =false;
+		try {
+			ShiftWorker.isAlmostOverlapping(null,shift);
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void isAlmostOverlappingThrowsCorruptDataExceptionWithInvalidShift() {
+		Shift shift = new Shift();
+		boolean errored =false;
+		try {
+			ShiftWorker.isAlmostOverlapping(shift,shift);
+		} catch (ProccessingException e) {
+			e.printStackTrace();
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertTrue(errored);
+	}
+	
+	@Test
+	public void isAlmostOverlappingReturnsFalseWithShiftsBeyond29Minutes() {
+		Shift shift1 = new Shift();
+		Shift shift2 = new Shift();
+		shift1.setStartDate("2018-05-01");
+		shift1.setEndDate("2018-05-01");
+		shift2.setStartDate("2018-05-01");
+		shift2.setEndDate("2018-05-01");
+		shift1.setStartTime("12:00");
+		shift1.setEndTime("13:00");
+		shift2.setStartTime("13:30");
+		shift2.setEndTime("18:00");
+		boolean errored =false;
+		boolean almostOverlapping = true;
+		try {
+			almostOverlapping =ShiftWorker.isAlmostOverlapping(shift1,shift2);
+		} catch (ProccessingException | CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertFalse(almostOverlapping);
+	}
+	
+	@Test
+	public void isAlmostOverlappingReturnsTrueWithShiftsBelow30Minutes1() {
+		Shift shift1 = new Shift();
+		Shift shift2 = new Shift();
+		shift1.setStartDate("2018-05-01");
+		shift1.setEndDate("2018-05-01");
+		shift2.setStartDate("2018-05-01");
+		shift2.setEndDate("2018-05-01");
+		shift1.setStartTime("12:00");
+		shift1.setEndTime("13:00");
+		shift2.setStartTime("13:29");
+		shift2.setEndTime("18:00");
+		boolean errored =false;
+		boolean almostOverlapping = true;
+		try {
+			almostOverlapping =ShiftWorker.isAlmostOverlapping(shift1,shift2);
+		} catch (ProccessingException | CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(almostOverlapping);
+	}
+	
+	@Test
+	public void isAlmostOverlappingReturnsTrueWithShiftsBelow30Minutes2() {
+		Shift shift1 = new Shift();
+		Shift shift2 = new Shift();
+		shift1.setStartDate("2018-05-01");
+		shift1.setEndDate("2018-05-01");
+		shift2.setStartDate("2018-05-01");
+		shift2.setEndDate("2018-05-01");
+		shift1.setStartTime("12:00");
+		shift1.setEndTime("13:00");
+		shift2.setStartTime("13:29");
+		shift2.setEndTime("18:00");
+		boolean errored =false;
+		boolean almostOverlapping = true;
+		try {
+			almostOverlapping =ShiftWorker.isAlmostOverlapping(shift2,shift1);
+		} catch (ProccessingException | CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(almostOverlapping);
+	}
 }

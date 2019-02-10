@@ -7,58 +7,66 @@ import javax.persistence.Id;
 import org.hibernate.annotations.GenericGenerator;
 
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CustomFieldData {
-    @Id
-    @Column(length=40)
-    @GeneratedValue(generator="randomId")
-    @GenericGenerator(name="randomId", strategy="org.cloudfoundry.samples.music.domain.RandomIdGenerator")
-    private String id;
-    
-    private String customFieldId;
-    
-    private String ownerId;
-    
-    public String getCustomFieldId() {
-		return customFieldId;
-	}
+	@Id
+	@Column(length = 40)
+	@GeneratedValue(generator = "randomId")
+	@GenericGenerator(name = "randomId", strategy = "org.cloudfoundry.samples.music.domain.RandomIdGenerator")
+	private String id;
+	
+	private boolean booleanData;
 
-	public void setCustomFieldId(String customFieldId) {
-		this.customFieldId = customFieldId;
-	}
+	private String customFieldId;
 
-	public String getOwnerId() {
-		return ownerId;
-	}
+	private String ownerId;
 
-	public void setOwnerId(String ownerId) {
-		this.ownerId = ownerId;
+	private String variableType = "boolean";
+
+	public CustomFieldData() {
 	}
 
 	public boolean getBooleanData() {
 		return booleanData;
 	}
 
+	public String getCustomFieldId() {
+		return customFieldId;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public String getOwnerId() {
+		return ownerId;
+	}
+
+	public String getVariableType() {
+		return variableType;
+	}
+
 	public void setBooleanData(boolean booleanData) {
 		this.booleanData = booleanData;
+	}
+
+	public void setCustomFieldId(String customFieldId) {
+		this.customFieldId = customFieldId;
 	}
 
 	public void setId(String id) {
 		this.id = id;
 	}
 
-	private boolean booleanData;
-    
-    private String variableType = "boolean";
-    
-    public String getVariableType(){
-    	return variableType;
-    }
-    public CustomFieldData() {
-    }
-    
-	public String getId() {
-		return id;
+	public void setOwnerId(String ownerId) {
+		this.ownerId = ownerId;
+	}
+
+	@Override
+	public String toString() {
+		return "CustomFieldData [id=" + id + ", booleanData=" + booleanData + ", customFieldId=" + customFieldId
+				+ ", ownerId=" + ownerId + ", variableType=" + variableType + "]";
 	}
 }

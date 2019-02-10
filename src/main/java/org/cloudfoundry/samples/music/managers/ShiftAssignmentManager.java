@@ -42,32 +42,126 @@ public class ShiftAssignmentManager {
     public ShiftAssignmentManager() {
     }
    
-    public String staffPreassignedShifts(String month, String year) throws CorruptDataException, ProccessingException{
+    //Assigned Unconflicted Recuring
+    //Assigned Unconflicted Single
+    //Each week 
+    	//Each Weekend
+    		//Shift with the fewest valid
+    		//Each Shift(safely)
+    			//Only available
+    			//Most needed
+    			//Most time
+    	//Each Weekday
+			//Shift with the fewest valid
+			//Each Shift(safely)
+				//Only available
+				//Most needed
+				//Most time
+    
+    
+    public void scheduleShifts(String selectedMonth,String selectedYear) throws ProccessingException, CorruptDataException {
+    	int month = Integer.parseInt(selectedMonth);
+    	int year = Integer.parseInt(selectedYear);
+    	
+    	staffPreassignedShifts(selectedMonth,selectedYear,true);
+    	
+    	for(int week = 0; week<6;week++){
+    		scheduleWeekendShifts(week,month,year);
+    		scheduleWeekdayShifts(week,month,year);
+    	}
+    }
+    
+    public void scheduleWeekdayShifts(int week, int month,int year) throws ProccessingException, CorruptDataException {
+    	ArrayList<Shift> shifts = shiftManager.getUnassignedNonEventShiftsForMonth(month);
+		ArrayList<Shift> unassignedShiftsForWeek = ShiftWorker.getShiftsStartingWeekOfMonth(shifts, week, month,year);
+		ArrayList<Shift> unassignedShiftsForWeekdays= ShiftWorker.getWeekdayShifts(unassignedShiftsForWeek);
+		
+		scheduleShifts(unassignedShiftsForWeekdays,week,month,year);
+    }
+    
+    public void scheduleWeekendShifts(int week, int month,int year) throws ProccessingException, CorruptDataException {
+    	ArrayList<Shift> shifts = shiftManager.getUnassignedNonEventShiftsForMonth(month);
+		ArrayList<Shift> unassignedShiftsForWeek = ShiftWorker.getShiftsStartingWeekOfMonth(shifts, week, month,year);
+		ArrayList<Shift> unassignedShiftsForWeekends= ShiftWorker.getWeekendShifts(unassignedShiftsForWeek);
+		
+		scheduleShifts(unassignedShiftsForWeekends,week,month,year);
+    }
+    
+    public void scheduleShifts(ArrayList<Shift> unassignedShifts, int week, int month, int year) throws CorruptDataException, ProccessingException {
+	    for(int i= 0;i<unassignedShifts.size();i++){
+			if(unassignedShifts!=null && unassignedShifts.size()>0) {
+				Shift shift = getWeekendShiftStartingWeekOfMonth(week,month,year);
+				unassignedShifts.remove(shift);
+				scheduleShiftSafely(shift);
+			}
+		}
+    }
+    
+    public ArrayList<Shift> assignRequestedStaff(HashMap<String, ArrayList<Shift>> prestaffedShiftsPerEmployee,boolean safe) throws ProccessingException, CorruptDataException {
+    	ArrayList<Shift> assignedPrestaffedShifts = new ArrayList<Shift>();
+ 
+    	if(null == prestaffedShiftsPerEmployee || prestaffedShiftsPerEmployee.isEmpty()){
+    		return assignedPrestaffedShifts;
+    	}
+    	
+    	for(String employeeId:prestaffedShiftsPerEmployee.keySet()){
+    		ArrayList<Shift> prestaffedShiftsForSelectedEmployee = prestaffedShiftsPerEmployee.get(employeeId);
+    		Employee employee = employeeCrud.findOne(employeeId);
+    		
+    		if(null != prestaffedShiftsForSelectedEmployee && !prestaffedShiftsForSelectedEmployee.isEmpty()){
+	    		for(Shift prestaffedShift:prestaffedShiftsForSelectedEmployee){
+	    			if( null == prestaffedShift.getRequestedStaffId() || 
+	    				null == prestaffedShift.getRequestedStaffName() || 
+	    				!prestaffedShift.getRequestedStaffId().equalsIgnoreCase(employeeId)){
+	    				throw new ProccessingException(Shift.class,prestaffedShift);//This method only for prestaffed, if here, these aren't prestaffed. 
+	    			}
+	    			
+	    			//TODO add logic to ensure they have proper qualification to work with this client on this shift, perhaps in a helper method
+	    			if(!safe || (
+	    					employeeShiftCompatibilityManager.isValidFor(employee, prestaffedShift) &&
+	    					!(employeeShiftCompatibilityManager.getHoursScheduledWeekOfShift(employee,prestaffedShift)+prestaffedShift.getDuration()>employee.getMaxHours())
+	    					)) {
+		    			prestaffedShift.setStaffId(prestaffedShift.getRequestedStaffId());
+		    			prestaffedShift.setStaffName(prestaffedShift.getRequestedStaffName());
+		    			prestaffedShift.setAssignmentReason("Prestaffed shift with an available employee");
+		    			prestaffedShift.setAssigned(true);
+		    			
+		    			assignedPrestaffedShifts.add(prestaffedShift);
+	    			}
+	    			else{
+	    				employeeShiftCompatibilityManager.isValidFor(employee, prestaffedShift);
+	    			}
+	    		}
+	    		
+	    		prestaffedShiftsPerEmployee.put(employeeId, prestaffedShiftsForSelectedEmployee);//TODO can this go?
+    		}
+    	}
+    	
+		return assignedPrestaffedShifts;
+	}
+
+    public String staffPreassignedShifts(String month, String year,boolean safe) throws CorruptDataException, ProccessingException{
     	String result = "";
     	
     	if(null!=month){
     		int monthInt = Integer.parseInt(month);
-	    	result +=saveAssignedUnconflictedPrestaffedRecuringShiftsToTableForMonth(monthInt);
+	    	result +=saveAssignedUnconflictedPrestaffedRecuringShiftsToTableForMonth(monthInt,safe);
 	    	
-	    	result+=saveAssignedUnconflictedPrestaffedSingleShiftsToTableForMonth(monthInt);
+	    	result+=saveAssignedUnconflictedPrestaffedSingleShiftsToTableForMonth(monthInt,safe);
     	}
     		    	
 		return result;
     }
-//    public void saveAssignedUnconflictedPrestaffedRecuringShiftsToTableForMonth(int selectedMonth){
-//    	ArrayList<Shift> prestaffedRecuringShifts = shiftManager.getPrestaffedRecurringShiftsForMonth(selectedMonth);
-//
-//    	HashMap<String,ArrayList<Shift>> prestaffedRecuringShiftsPerEmployee =ShiftWorker.getEmployeeShiftMap(prestaffedRecuringShifts);
-//
-//    	HashMap<String,ArrayList<Shift>> unconflictedPrestaffedRecuringShiftsPerEmployee = ShiftWorker.getNonoverlapingShiftsPerEmployee(prestaffedRecuringShiftsPerEmployee);
-//    	
-//    	ArrayList<Shift> assignedUnconflictedPrestaffedRecuringShifts = assignRequestedStaff(unconflictedPrestaffedRecuringShiftsPerEmployee);
-//
-//    	shiftCrud.save(assignedUnconflictedPrestaffedRecuringShifts);
-//    }
 
-    //@Tested
-    public ArrayList<Shift> getOnPrestaffedShifts(ArrayList<Shift> shifts){
+    /**
+     * 
+     * @param shifts
+     * @return
+     * @throws ProccessingException
+     * @throws CorruptDataException
+     * @Tested
+     */
+    public ArrayList<Shift> getOnPrestaffedShifts(ArrayList<Shift> shifts) throws ProccessingException, CorruptDataException{
     	ArrayList<Shift> onShifts = new ArrayList<Shift>();
     	
     	if(null!=shifts) {
@@ -83,7 +177,7 @@ public class ShiftAssignmentManager {
     	return onShifts;
     }
     
-    public String saveAssignedUnconflictedPrestaffedRecuringShiftsToTableForMonth(int selectedMonth) throws CorruptDataException, ProccessingException{
+    public String saveAssignedUnconflictedPrestaffedRecuringShiftsToTableForMonth(int selectedMonth,boolean safe) throws CorruptDataException, ProccessingException{
     	ArrayList<Shift> prestaffedRecuringShifts = shiftManager.getPrestaffedRecurringShiftsForMonth(selectedMonth);
     	ArrayList<Shift> onPrestaffedRecuringShifts =getOnPrestaffedShifts(prestaffedRecuringShifts);
     	System.out.println("Staffing " + prestaffedRecuringShifts.size() +" prestaffed shifts that have no conflicts.");
@@ -91,7 +185,7 @@ public class ShiftAssignmentManager {
 
     	HashMap<String,ArrayList<Shift>> unconflictedPrestaffedRecuringShiftsPerEmployee = ShiftWorker.getNonoverlapingShiftsPerEmployee(onPrestaffedRecuringShiftsPerEmployee);
     	
-    	ArrayList<Shift> assignedUnconflictedPrestaffedRecuringShifts = ShiftWorker.assignRequestedStaff(unconflictedPrestaffedRecuringShiftsPerEmployee);
+    	ArrayList<Shift> assignedUnconflictedPrestaffedRecuringShifts = assignRequestedStaff(unconflictedPrestaffedRecuringShiftsPerEmployee,safe);
 
     	//    	logger.error(assignedUnconflictedPrestaffedRecuringShifts.size() + " assignedUnconflictedPrestaffedRecuringShifts");
     	shiftCrud.save(assignedUnconflictedPrestaffedRecuringShifts);
@@ -99,7 +193,7 @@ public class ShiftAssignmentManager {
     }
     
 
-    public String saveAssignedUnconflictedPrestaffedSingleShiftsToTableForMonth(int month) throws CorruptDataException, ProccessingException {
+    public String saveAssignedUnconflictedPrestaffedSingleShiftsToTableForMonth(int month,boolean safe) throws CorruptDataException, ProccessingException {
     	ArrayList<Shift> prestaffedSingleShifts = shiftManager.getPrestaffedSingleShiftsForMonth(month);
     	//logger.error("prestaffedSingleShifts " +prestaffedSingleShifts.size());
     	ArrayList<Shift> onPrestaffedSingleShifts =getOnPrestaffedShifts(prestaffedSingleShifts);
@@ -111,7 +205,7 @@ public class ShiftAssignmentManager {
 	    //check to see if any conflicts exist in requested staff	    		
 	    //add conflict info somewhere
     	//add conflicted shifts into array for later staff assignment->
-    	ArrayList<Shift> assignedUnconflictedPrestaffedSingleShifts = ShiftWorker.assignRequestedStaff(unconflictedPrestaffedSingleShiftsPerEmployee);
+    	ArrayList<Shift> assignedUnconflictedPrestaffedSingleShifts = assignRequestedStaff(unconflictedPrestaffedSingleShiftsPerEmployee,safe);
     	//logger.error("prestaffedSingleShifts " +assignedUnconflictedPrestaffedSingleShifts.size());
     	shiftCrud.save(assignedUnconflictedPrestaffedSingleShifts);
     	return "Assigned " + assignedUnconflictedPrestaffedSingleShifts.size() +" prestaffed single shfits.";
@@ -141,7 +235,7 @@ public class ShiftAssignmentManager {
 		int possible = 9001;
 		Shift selected = null;
 		for(Shift shift : unassignedShiftsForWeekends){
-			EmployeeShiftCompatibilities compatibilities = employeeShiftCompatibilityManager.getValidUnfixedCompatibilities(employeeShiftCompatibilityManager.getEmployeeShiftCompatibilitiesFor(shift));
+			EmployeeShiftCompatibilities compatibilities = employeeShiftCompatibilityManager.getValidCompatibilities(employeeShiftCompatibilityManager.getEmployeeShiftCompatibilitiesForShift(shift));
 			if(compatibilities.compatibilities.size()<possible&&compatibilities.compatibilities.size()>0){
 				possible=compatibilities.compatibilities.size();
 				selected=shift;
@@ -157,7 +251,7 @@ public class ShiftAssignmentManager {
 		int possible = 9001;
 		Shift selected = null;
 		for(Shift shift : unassignedShiftsForWeekdays){
-			EmployeeShiftCompatibilities compatibilities = employeeShiftCompatibilityManager.getValidUnfixedCompatibilities(employeeShiftCompatibilityManager.getEmployeeShiftCompatibilitiesFor(shift));
+			EmployeeShiftCompatibilities compatibilities = employeeShiftCompatibilityManager.getValidCompatibilities(employeeShiftCompatibilityManager.getEmployeeShiftCompatibilitiesForShift(shift));
 			if(compatibilities.compatibilities.size()<possible&&compatibilities.compatibilities.size()>0){
 				possible=compatibilities.compatibilities.size();
 				selected=shift;
@@ -180,42 +274,121 @@ public class ShiftAssignmentManager {
     	String result = "";
 		Shift shift = getWeekendShiftStartingWeekOfMonth(week,month,year);
 		if(null!=shift){
-			result+=scheduleWeekendShiftStartingWeekOfMonth(shift, month, year);
+			result+=scheduleWeekendShiftStartingWeekOfMonth(shift);
 		}
 		else{
 			result+="No weekend shifts remain to schedule for week "+week + " of month " + month;
 		}
     	return result;
 	}
-    public String scheduleWeekendShiftStartingWeekOfMonth(Shift shift,  int month, int year) throws CorruptDataException, ProccessingException{
+    
+    /**Schedules the selected shift without incurring overtime
+     * Priority:
+     * Only available
+     * Most needed
+     * Most time
+     * 
+     * @param shift
+     * @return boolean assigned
+     * @throws CorruptDataException Invalid shift
+     * @throws ProccessingException Null Shift
+     */
+    public boolean scheduleShiftSafely(Shift shift) throws CorruptDataException,ProccessingException{
+    	boolean assigned = false;
+    	Employee employee=null;
+    	EmployeeShiftCompatibilities shiftCompatibilities;
+    	
+    	if(null == shift) {
+    		throw new ProccessingException("Null shift provided to scheduleShift");
+    	}
+    	else if(!shift.isValid()) {
+    		throw new CorruptDataException("Null shift provided to scheduleShift");
+    	}
+    	
+    	//Get all those valid to work this shift
+    	shiftCompatibilities = employeeShiftCompatibilityManager.getValidCompatibilities(employeeShiftCompatibilityManager.getEmployeeShiftCompatibilitiesForShift(shift));
+
+    	//If we have at least one valid employee for this shift
+    	if(null!=shiftCompatibilities && null != shiftCompatibilities.compatibilities && 
+    	   shiftCompatibilities.compatibilities.size() >0) {
+    		//If we have only 1 valid employee give them the shift regardless
+    		if(shiftCompatibilities.compatibilities.size()==1 && 
+    		   !employeeShiftCompatibilityManager.getAssignmentWouldIncurOvertime(shiftCompatibilities.compatibilities.get(0))) {
+    			employee=shiftCompatibilities.compatibilities.get(0).getEmployee();
+    			if(employee!=null) {
+	    			shift.setAssignmentReason("Only " + employee.getFirst() +" was compatible and available. ");
+	    			scheduleShift(shift,employee);
+	    			assigned=true;
+    			}
+    		}
+    		
+    		//Assign to the person with the most time needed to meet their minimum
+    		if(!assigned) {
+    			employee = employeeShiftCompatibilityManager.getEmployeeWithMostNeeded(shiftCompatibilities);
+    			if(employeeShiftCompatibilityManager.hoursNeededWeekOfShift(employee, shift)>0) {
+    				shift.setAssignmentReason(employee.getFirst() +" needed the most hours.");
+	    			scheduleShift(shift,employee);
+	    			assigned=true;
+    			}
+    		}
+    		
+    		//Assign to the person with the most time
+    		if(!assigned) {
+    			employee=employeeShiftCompatibilityManager.getEmployeeWithMostTimeSafely(shiftCompatibilities);
+    			if(null!=employee) {
+    				shift.setAssignmentReason(employee.getFirst() +" had the most time before overtime");
+    				scheduleShift(shift,employee);
+	    			assigned=true;
+    			}
+			}
+    	}
+    	
+    	return assigned;
+    }
+    
+    public void scheduleShift(Shift shift, Employee employee) throws ProccessingException {
+    	if(null == shift || null == employee) {
+    		throw new ProccessingException("Null shift or employee provided to scheduleShift");
+    	}
+    	
+    	shift.setStaffId(employee.getId());
+		shift.setStaffName(employee.getFirst());
+		shift.setAssigned(true);
+		shiftCrud.save(shift);
+    }
+    
+    public String scheduleWeekendShiftStartingWeekOfMonth(Shift shift) throws CorruptDataException, ProccessingException{
     	String result="";
     	if(null!=shift){
     		result+="Attempting to assign "+shift.toString();
     	
 			System.out.println("Attempitng to assign " + shift.toString());
-			EmployeeShiftCompatibilities shiftCompatibilities = employeeShiftCompatibilityManager.getValidUnfixedCompatibilities(employeeShiftCompatibilityManager.getEmployeeShiftCompatibilitiesFor(shift));
+			EmployeeShiftCompatibilities shiftCompatibilities = employeeShiftCompatibilityManager.getValidCompatibilities(employeeShiftCompatibilityManager.getEmployeeShiftCompatibilitiesForShift(shift));
 			result+=". Shift compatibilities: "+ shiftCompatibilities.toString();
 			Employee employee=null;
-			//attemptAssigningOnlyCompatibility
+			
+			//If only one person is assignable give them the shift
 			if(null!=shiftCompatibilities && shiftCompatibilities.compatibilities.size()==1){
 				employee=shiftCompatibilities.compatibilities.get(0).getEmployee();
 				shift.setAssignmentReason("Only " + employee.getFirst() +" was compatible and available. ");
 			}
-			//end attemptAssigningOnlyCompatibility
+			
 			if(employee==null){
-				employee = employeeShiftCompatibilityManager.getEmployeeWithMostTime(shiftCompatibilities);
+				employee = employeeShiftCompatibilityManager.getEmployeeWithMostNeeded(shiftCompatibilities);
 			}
 			
 			
+			//replace with getEmployeeWithMostTime(shiftCompatibilities); or remove entirely?
 			if(employee==null){
 				for(EmployeeShiftCompatibility compatibility :shiftCompatibilities.compatibilities){
-					if(employeeShiftCompatibilityManager.getHoursScheduledWeekOf(compatibility.getEmployee(),compatibility.getShift())<compatibility.getEmployee().getMinHours()){
+					if(employeeShiftCompatibilityManager.getHoursScheduledWeekOfShift(compatibility.getEmployee(),compatibility.getShift())<compatibility.getEmployee().getMinHours()){
 						employee=compatibility.getEmployee();
 						shift.setAssignmentReason("Min");
 					}
 				}
 			}
 			
+			//repace with most before overtime
 			if(employee==null){
 				employee=employeeShiftCompatibilityManager.getEmployeeWithMostTimeBeforeOvertimeAfterAssignment(shiftCompatibilities);
 				/*System.out.println("likely assigning " + employee.getFirst() + " to shift " +
@@ -229,26 +402,29 @@ public class ShiftAssignmentManager {
 			
 			if(employee==null &&shiftCompatibilities!=null&&shiftCompatibilities.compatibilities!=null&&shiftCompatibilities.compatibilities.size()>0){
 				float hours = 80;
+				//Least hours that requested extra shifts
 				for(EmployeeShiftCompatibility compatibility :shiftCompatibilities.compatibilities){
 					if(compatibility.getEmployee().getRequestsExtraShifts()){
-						if(employeeShiftCompatibilityManager.getHoursScheduledWeekOf(compatibility.getEmployee(),compatibility.getShift())<hours){
-							hours=employeeShiftCompatibilityManager.getHoursScheduledWeekOf(compatibility.getEmployee(),compatibility.getShift());
+						if(employeeShiftCompatibilityManager.getHoursScheduledWeekOfShift(compatibility.getEmployee(),compatibility.getShift())<hours){
+							hours=employeeShiftCompatibilityManager.getHoursScheduledWeekOfShift(compatibility.getEmployee(),compatibility.getShift());
 							employee=compatibility.getEmployee();
 							shift.setAssignmentReason("All in overtime, they requested it and have least hours");
 						}
 					}
 				}
 				
+				//Shit attempt at min hours, replace with the real min hours funciton
 				if(employee==null){
 					for(EmployeeShiftCompatibility compatibility :shiftCompatibilities.compatibilities){
 						if(compatibility.getEmployee().getRequestsExtraShifts()){
-							if(employeeShiftCompatibilityManager.getHoursScheduledWeekOf(compatibility.getEmployee(),compatibility.getShift())<compatibility.getEmployee().getMinHours()){
+							if(employeeShiftCompatibilityManager.getHoursScheduledWeekOfShift(compatibility.getEmployee(),compatibility.getShift())<compatibility.getEmployee().getMinHours()){
 								employee=compatibility.getEmployee();
 								shift.setAssignmentReason("Min");
 							}
 						}
 					}
 				}
+				//random employee
 				if(employee==null){
 					employee=shiftCompatibilities.compatibilities.get(0).getEmployee();
 					shift.setAssignmentReason("One of those in overtime who was available");
@@ -281,7 +457,7 @@ public class ShiftAssignmentManager {
 		result+= unassignedShiftsForWeekends.size() + " weekends shifts will be assigned.";
 		for(int i= 0;i<unassignedShiftsForWeekends.size()+20;i++){
 			Shift shift = getWeekendShiftStartingWeekOfMonth(week,month,year);
-			result+=scheduleWeekendShiftStartingWeekOfMonth(shift,month,year);
+			result+=scheduleWeekendShiftStartingWeekOfMonth(shift);
 		}
 //		for(Shift shift : unassignedShiftsForWeekends){
 //			result+= scheduleWeekendShiftStartingWeekOfMonth(shift,week,month,year);
@@ -300,23 +476,27 @@ public class ShiftAssignmentManager {
     	if(null!=shift){
     		result+="Attempting to assign " +shift.toString();
     		System.out.println("Attempitng to assign " + shift.toString());
-			EmployeeShiftCompatibilities shiftCompatibilities = employeeShiftCompatibilityManager.getValidUnfixedCompatibilities(employeeShiftCompatibilityManager.getEmployeeShiftCompatibilitiesFor(shift));
+			EmployeeShiftCompatibilities shiftCompatibilities = employeeShiftCompatibilityManager.getValidCompatibilities(employeeShiftCompatibilityManager.getEmployeeShiftCompatibilitiesForShift(shift));
 			result+=shiftCompatibilities.compatibilities.toString();
 			Employee employee=null;
-			//attemptAssigningOnlyCompatibility
+
+			
+			//If only one person is assignable give them the shift
 			if(null!=shiftCompatibilities && shiftCompatibilities.compatibilities.size()==1){
 				employee=shiftCompatibilities.compatibilities.get(0).getEmployee();
 				shift.setAssignmentReason("Only " + employee.getFirst() +" was compatible and available. ");
 			}
-			//end attemptAssigningOnlyCompatibility
+
+			//replace with getEmployeeWithMostTime(shiftCompatibilities) or have it go first
 			if(employee==null){
 				for(EmployeeShiftCompatibility compatibility :shiftCompatibilities.compatibilities){
-					if(employeeShiftCompatibilityManager.getHoursScheduledWeekOf(compatibility.getEmployee(),compatibility.getShift())<compatibility.getEmployee().getMinHours()){
+					if(employeeShiftCompatibilityManager.getHoursScheduledWeekOfShift(compatibility.getEmployee(),compatibility.getShift())<compatibility.getEmployee().getMinHours()){
 						employee=compatibility.getEmployee();
 						shift.setAssignmentReason("Min");
 					}
 				}
 			}
+			
 			if(employee==null){
 				employee=employeeShiftCompatibilityManager.getEmployeeWithMostTimeBeforeOvertimeAfterAssignment(shiftCompatibilities);
 				shift.setAssignmentReason("Employee had the most time before overtime after assignment");
@@ -329,8 +509,8 @@ public class ShiftAssignmentManager {
 				float hours = 80;
 				for(EmployeeShiftCompatibility compatibility :shiftCompatibilities.compatibilities){
 					if(compatibility.getEmployee().getRequestsExtraShifts()){
-						if(employeeShiftCompatibilityManager.getHoursScheduledWeekOf(compatibility.getEmployee(),compatibility.getShift())<hours){
-							hours=employeeShiftCompatibilityManager.getHoursScheduledWeekOf(compatibility.getEmployee(),compatibility.getShift());
+						if(employeeShiftCompatibilityManager.getHoursScheduledWeekOfShift(compatibility.getEmployee(),compatibility.getShift())<hours){
+							hours=employeeShiftCompatibilityManager.getHoursScheduledWeekOfShift(compatibility.getEmployee(),compatibility.getShift());
 							employee=compatibility.getEmployee();
 							shift.setAssignmentReason("All in overtime, they requested it and have least hours");
 						}
