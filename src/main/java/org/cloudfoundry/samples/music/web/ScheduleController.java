@@ -95,8 +95,35 @@ public class ScheduleController {
     }
     
     @RequestMapping(value = "/staffShiftsSafely", method = RequestMethod.GET)
-    public Iterable<ScheduleStatus> staffShiftsSafely(@RequestParam("month") String month,@RequestParam("year") String year) throws CorruptDataException, ProccessingException {
-    	assignmentManager.scheduleShifts(month,year);
+    public Iterable<ScheduleStatus> staffShiftsSafely(@RequestParam("month") String month,@RequestParam("year") String year) {
+    	ScheduleStatus status = scheduleStatusCrud.findOne(month);
+    	scheduleStatusRepository.deleteByMonth(month);
+    	
+    	if(null==status) {
+    		status= new ScheduleStatus();
+    		status.setMonth(month);
+    	}
+    	
+    	if(status.isGenerated()) {
+    		status.setAssigning(true);
+        	scheduleStatusCrud.save(status);
+    	}
+    	
+    	try {
+			assignmentManager.scheduleShifts(month,year);
+		} catch (ProccessingException | CorruptDataException e) {
+			status = scheduleStatusCrud.findOne(month);
+	    	scheduleStatusRepository.deleteByMonth(month);
+	    	
+	    	if(null==status) {
+	    		status= new ScheduleStatus();
+	    		status.setMonth(month);
+	    	}
+	    	
+    		status.setAssigning(false);
+    		status.setErrored(true);
+        	scheduleStatusCrud.save(status);
+		}
     	return scheduleStatusCrud.findAll();
     }
     

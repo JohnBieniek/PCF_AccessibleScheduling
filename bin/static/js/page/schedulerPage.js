@@ -120,7 +120,9 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
       $scope.isAssigned = function(month){
           return $scope.statusList[month-1].assigned;
         };
-        
+    $scope.isErrored = function(month){
+        return $scope.statusList[month-1].errored;
+      };
     $scope.isAssigning = function(month){
     	return $scope.statusList[month-1].assigning 
       };
@@ -168,19 +170,21 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
     }
     
     $scope.deleteShifts = function(month){
-    	$http({
-            url: '/schedule/byMonth',
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            params: {
-            	month: month
-            }
-        })
-        .then(function(response) {
-        	$scope.listStatusItems();
-        });
+    	if(confirm("Are you sure to delete the shifts for "+$scope.monthName+"?")) {
+	    	$http({
+	            url: '/schedule/byMonth',
+	            method: 'DELETE',
+	            headers: {
+	                'Content-Type': 'application/x-www-form-urlencoded'
+	            },
+	            params: {
+	            	month: month
+	            }
+	        })
+	        .then(function(response) {
+	        	$scope.listStatusItems();
+	        });
+    	}
     }
     
     $scope.listStatusItems = function listStatusItems(){
@@ -198,7 +202,7 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
     		console.log(response.data);
     		console.log($scope.statusList[0].generated);
     		$scope.setTab($scope.tab);
-    		setTimeout(listStatusItems,30000);
+    		setTimeout(listStatusItems,10000);
         });
     }
     
@@ -224,6 +228,7 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
     
     $scope.assignShifts = function(month){
     	$scope.statusList[month-1].assigning=true;
+    	$scope.assigned="Assigning";
     	console.log("$scope.statusList" +$scope.statusList.toString());
     	$http({
             url: '/schedule/staffShiftsSafely',

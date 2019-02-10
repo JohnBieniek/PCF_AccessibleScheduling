@@ -34,6 +34,18 @@
   text-decoration: none;
 }
 
+.errored{
+	border-color: #cc0000!important;
+	background-color: #cc0000!important;
+	color: white;
+	border-radius: 25px; 
+	font-size: 30px;
+	margin-left:20px;
+    margin-right:20px;
+	padding: 15px;
+	 width: 230px;
+}
+
 .deleteButton{
 	border-color: #cc0000!important;
 	background-color: #cc0000!important;

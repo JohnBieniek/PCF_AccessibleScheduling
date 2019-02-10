@@ -95,20 +95,23 @@ public class ShiftGenerationManager {
     }
 
     public String generateRequestedShifts(String selectedMonth) throws CorruptDataException {
-    	String singleResponse = generateRequestedSingleShifts(selectedMonth);
-    	String recurringResponse = generateRequestedRecurringShifts(selectedMonth);
-    	
+    	String singleResponse = "";
+    	String recurringResponse = "";
     	ScheduleStatus status = scheduleStatusCrud.findOne(selectedMonth);
+    	scheduleStatusRepository.deleteByMonth(selectedMonth);
     	
     	if(null==status) {
     		status= new ScheduleStatus();
     		status.setMonth(selectedMonth);
     	}
     	
-    	scheduleStatusRepository.deleteByMonth(selectedMonth);
-    	
-    	status.setGenerated(true);
-    	scheduleStatusCrud.save(status);
+    	if(!status.isGenerated()) {
+    		status.setGenerated(true);
+        	scheduleStatusCrud.save(status);
+        	
+    		singleResponse = generateRequestedSingleShifts(selectedMonth);
+        	recurringResponse = generateRequestedRecurringShifts(selectedMonth);
+    	}
     	
     	return singleResponse+recurringResponse;
     }

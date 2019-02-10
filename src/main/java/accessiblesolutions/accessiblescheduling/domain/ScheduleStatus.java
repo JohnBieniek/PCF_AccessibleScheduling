@@ -10,6 +10,7 @@ public class ScheduleStatus {
 	private boolean generated;
 	private boolean assigned;
 	private boolean assigning;
+	private boolean errored;
 	
 	public String getMonth() {
 		return month;
@@ -36,9 +37,15 @@ public class ScheduleStatus {
 	public void setAssigning(boolean assigning) {
 		this.assigning = assigning;
 	}
+	public boolean isErrored() {
+		return errored;
+	}
+	public void setErrored(boolean errored) {
+		this.errored = errored;
+	}
 	@Override
 	public String toString() {
 		return "ScheduleStatus [month=" + month + ", generated=" + generated + ", assigned=" + assigned + ", assigning="
-				+ assigning + "]";
+				+ assigning + ", errored=" + errored + "]";
 	}
 }

@@ -117,8 +117,11 @@ public class ShiftAssignmentManager {
 	    for(int i= 0;i<unassignedShifts.size();i++){
 			if(unassignedShifts!=null && unassignedShifts.size()>0) {
 				Shift shift = getWeekendShiftStartingWeekOfMonth(week,month,year);
-				unassignedShifts.remove(shift);
-				scheduleShiftSafely(shift);
+				if(null!=shift) {
+					unassignedShifts.remove(shift);
+				
+					scheduleShiftSafely(shift);
+				}
 			}
 		}
     }

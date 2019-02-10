@@ -74,7 +74,7 @@
 					<div style="display:inline-block" class = "incomplete" ng-class="{ complete: isGenerated(tab) }">
 						<p style="display:inline-block"> <b> {{generated}} </b> </p>
 					</div>
-					<div class = "incomplete" style="display:inline-block" ng-class="{ complete: isAssigned(tab), working: isAssigning(tab) }">
+					<div class = "incomplete" style="display:inline-block" ng-class="{ complete: isAssigned(tab), working: isAssigning(tab), errored: isErrored(tab) }">
 						<p align="right"   style="display:inline-block"> <b> {{assigned}} </b> </p>
 					</div>
 				</div>
@@ -83,7 +83,7 @@
 					<br>
 				<button class="scheduleButton" ng-class="{ disabled: isGenerated(tab) }" type="button" ng-click="generateShifts(tab)">Generate</button>
 				
-				<button align="right" ng-class="{ disabled: isNotAssignable(tab) }" class="scheduleButton"type="button" ng-click="assignShifts(tab)">Assign</button>
+				<button align="right" ng-class="{ disabled:  !isGenerated(tab) || isAssigning(tab) ||  isAssigned(tab)}" class="scheduleButton"type="button" ng-click="assignShifts(tab)">Assign</button>
 			</div>
 			<br>
 			<br>
@@ -125,7 +125,7 @@
 			<br>
 			<br>
 			<div class="centered">
-				<button class="deleteButton scheduleButton" ng-class="{ disabled: !isGenerated(tab) }" type="button" ng-click="deleteShifts(tab)">Delete</button>
+				<button class="deleteButton scheduleButton" ng-class="{ disabled: !isGenerated(tab) || isAssigning(tab) }" type="button" ng-click="deleteShifts(tab)">Delete</button>
 			</div>
 		 <div>
     </div>
