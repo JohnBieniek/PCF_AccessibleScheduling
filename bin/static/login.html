@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+    <head>
+	    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	    <meta name="description" content="Accessible Scheduling">
+	    <meta name="title" content="Accessible Scheduling">
+	    <link rel="shortcut icon" href="favicon.ico">
+	    <title>Schedule Access</title>
+		<div style="display:inline-block" class="">
+	           	 	<br>
+	           	 	<br>
+	                <p style="display:inline-block; font-size: 50px;  font-weight: bold;"  class="titleText">Accessible Scheduling</p>
+	                <i style="display:inline-block" class="glyphicon glyphicon-calendar micon"></i>
+	                 <!--<ul class="navbar-nav">
+	                   <li></li>
+	                </ul>-->
+	            </div>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	    <link rel="stylesheet" type="text/css" href="webjars/bootstrap/3.1.1/css/bootstrap.css">
+	    <link rel="stylesheet" type="text/css" href="/css/app.css">
+	    <link rel="stylesheet" type="text/css" href="/css/multi-columns-row.css">
+	</head>
+    <body  style="background-color: #6a0000;
+				font-size: 40px;
+				color: white !important;
+				 text-align: center;
+				margin-left: auto;
+			  	margin-right: auto;
+			  	 margin: 0 auto;">
+        <!-- <div th:if="${param.error}">
+            Invalid username and password.
+        </div> 
+        <div th:if="${param.logout}">
+            You have been logged out.
+        </div>-->
+        <div>
+        	<div class="row">
+	            <div ng-include="'templates/util/header.html'"></div>
+	        </div>
+	
+	        <div id="body">
+				<br>
+	             <form th:action="@{/login}" method="post">
+		            <div><label> User Name : <input style="color: black !important; width: 420px;" "type="text" name="username"/> </label></div>
+		            <div><label> Password: <input style="color: black !important; width: 450px;"  type="password" name="password"/> </label></div>
+		            <br>
+		            <div style="color: black !important;"><input type="submit" value="Sign In"/></div>
+		        </form>
+	        </div>
+	
+	        <div class="row">
+	            <div ng-include="'templates/util/footer.html'"></div>
+	        </div>
+	    </div>
+        <script type="text/javascript" src="webjars/jquery/2.1.0/jquery.min.js"></script>
+
+	    <script type="text/javascript" src="webjars/angularjs/1.2.16/angular.js"></script>
+	    <script type="text/javascript" src="webjars/angularjs/1.2.16/angular-resource.js"></script>
+	    <script type="text/javascript" src="webjars/angularjs/1.2.16/angular-route.js"></script>
+	    <script type="text/javascript" src="webjars/angular-ui/0.4.0/angular-ui.js"></script>
+	    <script type="text/javascript" src="webjars/angular-ui-bootstrap/0.10.0/ui-bootstrap.js"></script>
+	    <script type="text/javascript" src="webjars/angular-ui-bootstrap/0.10.0/ui-bootstrap-tpls.js"></script>
+	
+	    <script type="text/javascript" src="webjars/bootstrap/3.1.1/js/bootstrap.js"></script>
+	
+	    <script type="text/javascript" src="js/app.js"></script>
+	    <script type="text/javascript" src="js/main.js"></script>
+	    <script type="text/javascript" src="js/errors.js"></script>
+	    <script type="text/javascript" src="js/info.js"></script>
+    	<script type="text/javascript" src="js/status.js"></script>
+    </body>
+</html>
