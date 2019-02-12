@@ -81,14 +81,18 @@
 					<br>
 					<br>
 					<br>
-				<button class="scheduleButton" ng-class="{ disabled: isGenerated(tab) }" type="button" ng-click="generateShifts(tab)">Generate</button>
-				
-				<button align="right" ng-class="{ disabled:  !isGenerated(tab) || isAssigning(tab) ||  isAssigned(tab)}" class="scheduleButton"type="button" ng-click="assignShifts(tab)">Assign</button>
+				<div style="display:inline-block;" ng-if="isGenerated(tab)">
+					<button class="deleteButton scheduleButton" ng-class="{ disabled: !isGenerated(tab) || isAssigning(tab) }" type="button" ng-click="deleteShifts(tab)">Delete</button>
+				</div>
+				<div style="display:inline-block;" ng-if="!isGenerated(tab)">
+					<button class="scheduleButton" ng-class="{ disabled: isGenerated(tab) }" type="button" ng-click="generateShifts(tab)">Generate</button>
+				</div>
+				<button style="display:inline-block;"  align="right" ng-class="{ disabled:  !isGenerated(tab) || isAssigning(tab) ||  isAssigned(tab)}" class="scheduleButton" type="button" ng-click="assignShifts(tab,allowOvertime,allowInactive,allowUnavailable,prioritizeSecondShift,dailyMax,weeklyMax)">Assign</button>
 			</div>
 			<br>
 			<br>
 			<br>
-			<div hidden class = "scheduleOptions">
+			<div class = "scheduleOptions">
 				<div style="horizontal-align:right;" class = "scheduleOptions">
 				    <label style="font-size:38px">Allow overtime</label>
 				    <input type="checkbox" style="height:40px;width:40px" ng-model="allowOvertime">
@@ -124,9 +128,6 @@
 			<br>
 			<br>
 			<br>
-			<div class="centered">
-				<button class="deleteButton scheduleButton" ng-class="{ disabled: !isGenerated(tab) || isAssigning(tab) }" type="button" ng-click="deleteShifts(tab)">Delete</button>
-			</div>
 		 <div>
     </div>
     <script type="text/javascript" src="js/page/schedulerPage.js"></script>

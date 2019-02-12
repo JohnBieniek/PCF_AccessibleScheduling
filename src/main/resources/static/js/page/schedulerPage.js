@@ -30,6 +30,12 @@ angular.module('vacation', ['ngResource', 'ui.bootstrap']).
 function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
 	 $scope.multiTableEditing=false;
 	 $scope.month=1;
+	 $scope.allowOvertime=false;
+	 $scope.allowUnavailable=false;
+	 $scope.prioritizeSecondShift=false;
+	 $scope.dailyMax=false;
+	 $scope.weeklyMax=false;
+	 $scope.allowInactive=false;
 	 $scope.generatedBool = false;
 	 $scope.generated="Generated";
 	 $scope.assigned="Unassigned";
@@ -226,7 +232,7 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
         });
     }
     
-    $scope.assignShifts = function(month){
+    $scope.assignShifts = function(month, allowOvertime,allowInactive,allowUnavailable,prioritizeSecondShift,dailyMax,weeklyMax){
     	$scope.statusList[month-1].assigning=true;
     	$scope.assigned="Assigning";
     	console.log("$scope.statusList" +$scope.statusList.toString());
@@ -238,7 +244,13 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
             },
             params: {
                 month: month,
-                year: '2019'
+                year: '2019',
+                allowOvertime: allowOvertime,
+                allowInactive: allowInactive,
+                allowUnavailable: allowUnavailable,
+                prioritizeSecondShift: prioritizeSecondShift,
+                dailyMax: dailyMax,
+                weeklyMax: weeklyMax
             }
         })
         .then(function(response) {

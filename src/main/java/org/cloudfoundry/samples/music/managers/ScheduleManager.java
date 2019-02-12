@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import accessiblesolutions.accessiblescheduling.domain.ScheduleStatus;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
+import accessiblesolutions.accessiblescheduling.to.ScheduleOptions;
 @Component
 public class ScheduleManager {
     @Autowired
@@ -40,16 +41,14 @@ public class ScheduleManager {
     	return requestResponse;
     }
     
-    public String staffShifts(String selectedMonth, String selectedYear) throws CorruptDataException, ProccessingException {
+    public String staffShifts(ScheduleOptions options) throws CorruptDataException, ProccessingException {
     	String result = "";
-    	if(null!=selectedMonth){
-    		int month = Integer.parseInt(selectedMonth);
-    		int year = Integer.parseInt(selectedYear);
-	    	shiftAssignmentManager.saveAssignedUnconflictedPrestaffedRecuringShiftsToTableForMonth(month,false);
+    	if(null!=options){
+	    	shiftAssignmentManager.saveAssignedUnconflictedPrestaffedRecuringShiftsToTableForMonth(options);
 	    	
-	    	shiftAssignmentManager.saveAssignedUnconflictedPrestaffedSingleShiftsToTableForMonth(month,false);
+	    	shiftAssignmentManager.saveAssignedUnconflictedPrestaffedSingleShiftsToTableForMonth(options);
 	    	
-	    	result =shiftAssignmentManager.scheduleUnassignedNonEventShiftsFor(month,year);
+	    	result =shiftAssignmentManager.scheduleUnassignedNonEventShiftsFor(options);
     	}
     	
         return result;

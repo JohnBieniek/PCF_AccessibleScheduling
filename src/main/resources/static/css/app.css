@@ -51,13 +51,9 @@
 	background-color: #cc0000!important;
 	color: white;
 	text-align: center;
-	margin-left: auto;
-  	margin-right: auto;
-  	 margin: 0 auto;
 }
 
 .scheduleOptions{
-	vertical-align: top;
 	text-align: right;
 	margin-right:25px;
 }

@@ -18,6 +18,7 @@ import accessiblesolutions.accessiblescheduling.domain.ScheduleStatus;
 import accessiblesolutions.accessiblescheduling.domain.Shift;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
+import accessiblesolutions.accessiblescheduling.to.ScheduleOptions;
 
 @RestController
 @RequestMapping(value = "/schedule")
@@ -91,11 +92,21 @@ public class ScheduleController {
     
     @RequestMapping(value = "/staffPreassignedShifts", method = RequestMethod.GET)
     public String staffPreassignedShifts(@RequestParam("month") String month,@RequestParam("year") String year) throws CorruptDataException, ProccessingException {
-        return assignmentManager.staffPreassignedShifts(month,year,false);
+    	ScheduleOptions options = new ScheduleOptions();
+    	options.setMonth(month);
+    	options.setYear(year);
+    	return assignmentManager.staffPreassignedShifts(options);
     }
     
     @RequestMapping(value = "/staffShiftsSafely", method = RequestMethod.GET)
-    public Iterable<ScheduleStatus> staffShiftsSafely(@RequestParam("month") String month,@RequestParam("year") String year) {
+    public Iterable<ScheduleStatus> staffShiftsSafely(@RequestParam("month") String month
+    													,@RequestParam("year") String year
+    													,@RequestParam("allowOvertime") boolean allowOvertime
+    													,@RequestParam("allowInactive") boolean allowInactive
+    													,@RequestParam("allowUnavailable") boolean allowUnavailable
+    													,@RequestParam("prioritizeSecondShift") boolean prioritizeSecondShift
+    													,@RequestParam("dailyMax") boolean dailyMax
+    													,@RequestParam("weeklyMax") boolean weeklyMax) {
     	ScheduleStatus status = scheduleStatusCrud.findOne(month);
     	scheduleStatusRepository.deleteByMonth(month);
     	
@@ -109,8 +120,11 @@ public class ScheduleController {
         	scheduleStatusCrud.save(status);
     	}
     	
+    	ScheduleOptions options = new ScheduleOptions(month, year, allowOvertime, allowInactive,allowUnavailable, 
+    													prioritizeSecondShift, dailyMax,weeklyMax);
+    	
     	try {
-			assignmentManager.scheduleShifts(month,year);
+			assignmentManager.scheduleShifts(options);
 		} catch (ProccessingException | CorruptDataException e) {
 			status = scheduleStatusCrud.findOne(month);
 	    	scheduleStatusRepository.deleteByMonth(month);
@@ -151,7 +165,10 @@ public class ScheduleController {
     
     @RequestMapping(value = "/staffShifts", method = RequestMethod.GET)
     public String staffShifts(@RequestParam("month") String month,@RequestParam("year") String year) throws CorruptDataException, ProccessingException {
-        return manager.staffShifts(month,year);
+        ScheduleOptions options = new ScheduleOptions();
+        options.setMonth(month);
+        options.setYear(year);
+    	return manager.staffShifts(options);
     }
     
     @RequestMapping(value = "/getShiftsForMonth", method = RequestMethod.GET)
