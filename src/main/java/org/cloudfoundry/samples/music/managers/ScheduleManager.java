@@ -41,16 +41,16 @@ public class ScheduleManager {
     	return requestResponse;
     }
     
-    public String staffShifts(ScheduleOptions options) throws CorruptDataException, ProccessingException {
-    	String result = "";
-    	if(null!=options){
-	    	shiftAssignmentManager.saveAssignedUnconflictedPrestaffedRecuringShiftsToTableForMonth(options);
-	    	
-	    	shiftAssignmentManager.saveAssignedUnconflictedPrestaffedSingleShiftsToTableForMonth(options);
-	    	
-	    	result =shiftAssignmentManager.scheduleUnassignedNonEventShiftsFor(options);
-    	}
-    	
-        return result;
-    }
+//    public String staffShifts(ScheduleOptions options) throws CorruptDataException, ProccessingException {
+//    	String result = "";
+//    	if(null!=options){
+//	    	shiftAssignmentManager.saveAssignedUnconflictedPrestaffedRecuringShiftsToTableForMonth(options);
+//	    	
+//	    	shiftAssignmentManager.saveAssignedUnconflictedPrestaffedSingleShiftsToTableForMonth(options);
+//	    	
+//	    	result =shiftAssignmentManager.scheduleUnassignedNonEventShiftsFor(options);
+//    	}
+//    	
+//        return result;
+//    }
 }

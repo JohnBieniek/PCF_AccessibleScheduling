@@ -87,14 +87,19 @@
 				<div style="display:inline-block;" ng-if="!isGenerated(tab)">
 					<button class="scheduleButton" ng-class="{ disabled: isGenerated(tab) }" type="button" ng-click="generateShifts(tab)">Generate</button>
 				</div>
-				<button style="display:inline-block;"  align="right" ng-class="{ disabled:  !isGenerated(tab) || isAssigning(tab) ||  isAssigned(tab)}" class="scheduleButton" type="button" ng-click="assignShifts(tab,allowOvertime,allowInactive,allowUnavailable,prioritizeSecondShift,dailyMax,weeklyMax)">Assign</button>
+				<div style="display:inline-block;" ng-if="isAssigning(tab)">
+					<button style="display:inline-block;"  align="right" ng-class="{ disabled:  !isAssigning(tab)}" class="deleteButton scheduleButton" type="button" ng-click="stopAssignment(tab)">Stop</button>
+				</div>
+				<div style="display:inline-block;" ng-if="!isAssigning(tab)">
+					<button style="display:inline-block;"  align="right" ng-class="{ disabled:  !isGenerated(tab) || isAssigning(tab) ||  isAssigned(tab)}" class="scheduleButton" type="button" ng-click="assignShifts(tab,allowOvertime,allowInactive,allowUnavailable,prioritizeSecondShift,dailyMax,weeklyMax)">Assign</button>
+				</div>
 			</div>
 			<br>
 			<br>
 			<br>
 			<div class = "scheduleOptions">
 				<div style="horizontal-align:right;" class = "scheduleOptions">
-				    <label style="font-size:38px">Allow overtime</label>
+				    <label style="font-size:38px">Allow unlimited overtime</label>
 				    <input type="checkbox" style="height:40px;width:40px" ng-model="allowOvertime">
 			    </div>
 			    <br>
@@ -107,8 +112,8 @@
 				    <label style="font-size:38px">Use weekly work day maximum</label>
 				    <input type="checkbox" style="height:40px;width:40px" ng-model="useWeeklyMax">
 			    </div>
-			    <br>
-			    <div class = "scheduleOptions">
+			    <br hidden>
+			    <div hidden class = "scheduleOptions">
 				    <label style="font-size:38px">Prioritize second Shift</label>
 				    <input type="checkbox" style="height:40px;width:40px" ng-model="prioritizeSecondShift">
 			    </div>

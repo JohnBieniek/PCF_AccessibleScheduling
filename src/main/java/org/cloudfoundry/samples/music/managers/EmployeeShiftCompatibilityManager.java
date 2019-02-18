@@ -595,18 +595,19 @@ public class EmployeeShiftCompatibilityManager {
 	/**Returns true if assignment would violate max shifts per day, week, or alternate weekends off
 	 * 
 	 * @param compatibility
+	 * @param options 
 	 * @return
 	 * @throws CorruptDataException invalid shift
 	 * @throws ProccessingException null compatibility, employee, or shift
 	 * @Tested
 	 */
-	public boolean getResting(EmployeeShiftCompatibility compatibility) throws CorruptDataException, ProccessingException{
+	public boolean getResting(EmployeeShiftCompatibility compatibility, ScheduleOptions options) throws CorruptDataException, ProccessingException{
 		boolean resting = false;
 		Employee employee = null;
 		Shift shift = null; 
 		
-		if(null==compatibility ){
-			throw new ProccessingException("Null compatibility provided to getResting");
+		if(null==compatibility || null == options){
+			throw new ProccessingException("Null options or compatibility provided to getResting");
 		}
 		
 		employee = compatibility.getEmployee();
@@ -619,10 +620,10 @@ public class EmployeeShiftCompatibilityManager {
 			throw new CorruptDataException("Invalid shift provided to getResting");
 		}
 		
-		if(getAssignmentWouldViolateMaxShiftsPerDay(compatibility)){
+		if(options.isDailyMax() && getAssignmentWouldViolateMaxShiftsPerDay(compatibility)){
 			resting= true;
 		}
-		else if(getAssignmentWouldViolateMaxWeeklyWorkDays(compatibility)){
+		else if(options.isWeeklyMax() &&getAssignmentWouldViolateMaxWeeklyWorkDays(compatibility)){
 			resting=true;
 		}
 		else if(getAssignmentWouldViolateAlternateWeekendsOff(compatibility)){
@@ -728,15 +729,16 @@ public class EmployeeShiftCompatibilityManager {
 	 * 
 	 * @param employee
 	 * @param shift a valid shift
+	 * @param options 
 	 * @return boolean Available, Unassigned, not requested off
 	 * @throws CorruptDataException invalid shift
 	 * @throws ProccessingException null employee or shift
 	 * @Tested
 	 */
-	public boolean isAssignableFor(Employee employee,Shift shift) throws CorruptDataException, ProccessingException{
+	public boolean isAssignableFor(Employee employee,Shift shift, ScheduleOptions options) throws CorruptDataException, ProccessingException{
 		boolean assignable=false;
-		if(null==employee||null==shift) {
-			throw new ProccessingException("Null employee or shift provided to isUnassignedFor");
+		if(null==employee||null==shift || null ==options) {
+			throw new ProccessingException("Null options,employee or shift provided to isUnassignedFor");
 		}
 		else if(!shift.isValid()) {
 			throw new CorruptDataException("Invalid shift provided to isUnassignedFor");
@@ -746,7 +748,7 @@ public class EmployeeShiftCompatibilityManager {
 			System.out.println("not requested off");
     		if(isUnassignedFor(employee,shift)){
     			System.out.println("unassinged");
-    			if(isAvailableFor(employee,shift)){
+    			if(options.isAllowUnavailable() || isAvailableFor(employee,shift)){
     				assignable=true;
     			}
     		}
@@ -963,10 +965,10 @@ public class EmployeeShiftCompatibilityManager {
 		}
 		
 		if(isCompatibleWith(employee,shift)){
-			if(isAssignableFor(employee,shift)){
+			if(isAssignableFor(employee,shift,options)){
 				if(options.isAllowInactive() || !employee.getInactive()){
 					if(!employee.getFixedSchedule()){
-						if(!getResting(new EmployeeShiftCompatibility(employee,shift))){
+						if(!getResting(new EmployeeShiftCompatibility(employee,shift),options)){
 							validity=true;
 						}
 					}

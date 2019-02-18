@@ -212,6 +212,26 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
         });
     }
     
+    $scope.stopAssignment = function(month){
+    	$http({
+            url: '/schedule/stopAssignment',
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            params: {
+                month: month
+            }
+        })
+        .then(function(response) {
+        	$scope.statusList = response.data.sort(function(a, b){return a.month-b.month});
+    		console.log(response.data);
+    		console.log($scope.statusList[0].generated);
+    		$scope.setTab($scope.tab);
+    		
+        });
+    }
+    
     $scope.generateShifts = function(month){
     	$http({
             url: '/schedule/generateShifts',

@@ -40,6 +40,7 @@ import accessiblesolutions.accessiblescheduling.domain.Gender;
 import accessiblesolutions.accessiblescheduling.domain.Shift;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
+import accessiblesolutions.accessiblescheduling.to.ScheduleOptions;
 
 //@RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -619,7 +620,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	
 	@Test
 	public void hoursNeededWeekOfShiftThrowsProccessingExceptionWithNullEmployee() {
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		boolean exception=false;
 		
 		try {
@@ -654,7 +656,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	@Test
 	public void hoursNeededWeekOfShiftThrowsCorruptDataExceptionWithInvalidShift() {
 		Employee employee = new Employee();
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		boolean exception=false;
 		
 		try {
@@ -728,7 +731,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	
 	@Test
 	public void hoursAvailableWeekOfShiftThrowsProccessingExceptionWithNullEmployee() {
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		boolean exception=false;
 		
 		try {
@@ -763,7 +767,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	@Test
 	public void hoursAvailableWeekOfShiftThrowsCorruptDataExceptionWithInvalidShift() {
 		Employee employee = new Employee();
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		boolean exception=false;
 		
 		try {
@@ -838,7 +843,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	
 	@Test
 	public void hoursAvailableAfterAssignmentThrowsProccessingExceptionWithNullEmployee() {
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		boolean exception=false;
 		
 		try {
@@ -873,7 +879,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	@Test
 	public void hoursAvailableAfterAssignmentThrowsCorruptDataExceptionWithInvalidShift() {
 		Employee employee = new Employee();
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		boolean exception=false;
 		
 		try {
@@ -947,7 +954,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	
 	@Test
 	public void isUnassignedForThrowsProccessingExceptionForNullEmployee() {
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		boolean errored=false;
 		
 		try {
@@ -984,7 +992,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	@Test
 	public void isUnassignedForThrowsCorruptDataExceptionForInvalidShift() {
 		Employee employee = new Employee();
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		boolean errored=false;
 		
 		try {
@@ -1310,7 +1319,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	
 	@Test
 	public void getHoursNeededAfterAssignmentThrowsProccessingExceptionWithNullEmployee() {
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		
 		boolean exception=false;
 		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(null,shift);
@@ -1347,7 +1357,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	@Test
 	public void getHoursNeededAfterAssignmentThrowsCorruptDataExceptionWithInvalidShift() {
 		Employee employee = new Employee();
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,shift);
 		boolean exception=false;
 		
@@ -1441,7 +1452,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	
 	@Test
 	public void getHoursNeededThrowsProccessingExceptionWithNullEmployee() {
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		
 		boolean exception=false;
 		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(null,shift);
@@ -1478,7 +1490,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	@Test
 	public void getHoursNeededThrowsCorruptDataExceptionWithInvalidShift() {
 		Employee employee = new Employee();
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,shift);
 		boolean exception=false;
 		
@@ -1543,7 +1556,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	
 	@Test
 	public void getAssignmentWouldReachMinimumThrowsProccessingExceptionWithNullEmployee() {
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		
 		boolean exception=false;
 		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(null,shift);
@@ -1580,7 +1594,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	@Test
 	public void getAssignmentWouldReachMinimumThrowsCorruptDataExceptionWithInvalidShift() {
 		Employee employee = new Employee();
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,shift);
 		boolean exception=false;
 		
@@ -1677,7 +1692,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	public void getAssignmentWouldViolateMaxShiftsPerDayReturnsProccessingExceptionWithNullEmployee() {
 		boolean errored=false;
 		Employee employee = new Employee();
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(null,shift);
 		try {
 			fixture.getAssignmentWouldViolateMaxShiftsPerDay(compatibility);
@@ -1696,7 +1712,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	public void getAssignmentWouldViolateMaxShiftsPerDayReturnsProccessingExceptionWithNullShift() {
 		boolean errored=false;
 		Employee employee = new Employee();
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,null);
 		try {
 			fixture.getAssignmentWouldViolateMaxShiftsPerDay(compatibility);
@@ -1715,7 +1732,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	public void getAssignmentWouldViolateMaxShiftsPerDayReturnsCorruptDataExceptionWithInvalidShift() {
 		boolean errored=false;
 		Employee employee = new Employee();
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,shift);
 		try {
 			fixture.getAssignmentWouldViolateMaxShiftsPerDay(compatibility);
@@ -1809,7 +1827,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	public void getAssignmentWouldViolateMaxWeeklyWorkDaysReturnsProccessingExceptionWithNullEmployee() {
 		boolean errored=false;
 		Employee employee = new Employee();
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(null,shift);
 		try {
 			fixture.getAssignmentWouldViolateMaxWeeklyWorkDays(compatibility);
@@ -1828,7 +1847,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	public void getAssignmentWouldViolateMaxWeeklyWorkDaysReturnsProccessingExceptionWithNullShift() {
 		boolean errored=false;
 		Employee employee = new Employee();
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,null);
 		try {
 			fixture.getAssignmentWouldViolateMaxWeeklyWorkDays(compatibility);
@@ -1847,7 +1867,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	public void getAssignmentWouldViolateMaxWeeklyWorkDaysReturnsCorruptDataExceptionWithInvalidShift() {
 		boolean errored=false;
 		Employee employee = new Employee();
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,shift);
 		try {
 			fixture.getAssignmentWouldViolateMaxWeeklyWorkDays(compatibility);
@@ -1991,7 +2012,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		Employee employee = new Employee();
 		Client client = new Client();
 		client.setMedPass(true);
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		try {
 			compatible = fixture.isCompatibleWith(new Employee(),shift);
 		} catch (ProccessingException e) {
@@ -2014,7 +2036,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		Employee employee = new Employee();
 		Client client = new Client();
 		client.setNoFemale(true);
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		try {
 			compatible = fixture.isCompatibleWith(new Employee(),shift);
 		} catch (ProccessingException e) {
@@ -2038,7 +2061,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		employee.setGender(Gender.MALE);
 		Client client = new Client();
 		client.setNoMale(true);
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		try {
 			compatible = fixture.isCompatibleWith( employee,shift);
 		} catch (ProccessingException e) {
@@ -2062,7 +2086,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		employee.setSmoker(true);
 		Client client = new Client();
 		client.setNoSmokers(true);
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		try {
 			compatible = fixture.isCompatibleWith(employee,shift);
 		} catch (ProccessingException e) {
@@ -2086,7 +2111,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		employee.setNoCats(true);
 		Client client = new Client();
 		client.setOwnCats(true);
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		try {
 			compatible = fixture.isCompatibleWith(employee,shift);
 		} catch (ProccessingException e) {
@@ -2109,7 +2135,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		Employee employee = new Employee();
 		Client client = new Client();
 		client.setSigningOnly(true);
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		try {
 			compatible = fixture.isCompatibleWith(employee,shift);
 		} catch (ProccessingException e) {
@@ -2131,7 +2158,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		boolean compatible = false;
 		Employee employee = new Employee();
 		Client client = new Client();
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-10-10");
 		shift.setEndDate("2018-10-10");
 		shift.setStartTime("10:00");
@@ -2161,7 +2189,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		employee.setMedPassCertified(true);
 		Client client = new Client();
 		client.setMedPass(true);
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-10-10");
 		shift.setEndDate("2018-10-10");
 		shift.setStartTime("10:00");
@@ -2189,7 +2218,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		Employee employee = new Employee();
 		Client client = new Client();
 		client.setNoSmokers(true);
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-10-10");
 		shift.setEndDate("2018-10-10");
 		shift.setStartTime("10:00");
@@ -2217,7 +2247,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		Employee employee = new Employee();
 		Client client = new Client();
 		client.setNoMale(true);
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-10-10");
 		shift.setEndDate("2018-10-10");
 		shift.setStartTime("10:00");
@@ -2246,7 +2277,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		Employee employee = new Employee();
 		Client client = new Client();
 		client.setNoMale(true);
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-10-10");
 		shift.setEndDate("2018-10-10");
 		shift.setStartTime("10:00");
@@ -2276,7 +2308,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		employee.setGender(Gender.MALE);
 		Client client = new Client();
 		client.setNoFemale(true);
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-10-10");
 		shift.setEndDate("2018-10-10");
 		shift.setStartTime("10:00");
@@ -2303,7 +2336,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		Employee employee = new Employee();
 		employee.setNoCats(true);
 		Client client = new Client();
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-10-10");
 		shift.setEndDate("2018-10-10");
 		shift.setStartTime("10:00");
@@ -2332,7 +2366,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		Employee employee = new Employee();
 		Client client = new Client();
 		client.setOwnCats(true);
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-10-10");
 		shift.setEndDate("2018-10-10");
 		shift.setStartTime("10:00");
@@ -2362,7 +2397,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		employee.setSigning(true);
 		Client client = new Client();
 		client.setSigningOnly(true);	
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-10-10");
 		shift.setEndDate("2018-10-10");
 		shift.setStartTime("10:00");
@@ -2391,7 +2427,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		Employee employee = new Employee();
 		employee.setSigning(true);
 		Client client = new Client();
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-10-10");
 		shift.setEndDate("2018-10-10");
 		shift.setStartTime("10:00");
@@ -2452,7 +2489,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		customFieldData = new ArrayList<CustomFieldData>();
 		customFieldData.add(onAlwaysClientData);
 		
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-10-10");
 		shift.setEndDate("2018-10-10");
 		shift.setStartTime("10:00");
@@ -2513,7 +2551,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		customFieldData = new ArrayList<CustomFieldData>();
 		customFieldData.add(onAlwaysClientData);
 		
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-10-10");
 		shift.setEndDate("2018-10-10");
 		shift.setStartTime("10:00");
@@ -2574,7 +2613,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		customFieldData = new ArrayList<CustomFieldData>();
 		customFieldData.add(onAlwaysClientData);
 		
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-10-10");
 		shift.setEndDate("2018-10-10");
 		shift.setStartTime("10:00");
@@ -2635,7 +2675,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		customFieldData = new ArrayList<CustomFieldData>();
 		customFieldData.add(onAlwaysClientData);
 		
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-10-10");
 		shift.setEndDate("2018-10-10");
 		shift.setStartTime("10:00");
@@ -2699,7 +2740,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		Employee employee = new Employee();
 		Client client = new Client();
 		client.setMedPass(true);
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		EmployeeShiftCompatibility compatibility= new EmployeeShiftCompatibility(employee,shift);
 		
 		try {
@@ -2724,7 +2766,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		Employee employee = new Employee();
 		Client client = new Client();
 		client.setNoFemale(true);
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		EmployeeShiftCompatibility compatibility= new EmployeeShiftCompatibility(employee,shift);
 		try {
 			compatible = fixture.getCompatible(compatibility);
@@ -2749,7 +2792,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		employee.setGender(Gender.MALE);
 		Client client = new Client();
 		client.setNoMale(true);
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		EmployeeShiftCompatibility compatibility= new EmployeeShiftCompatibility(employee,shift);
 		try {
 			compatible = fixture.getCompatible(compatibility);
@@ -2774,7 +2818,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		employee.setSmoker(true);
 		Client client = new Client();
 		client.setNoSmokers(true);
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		EmployeeShiftCompatibility compatibility= new EmployeeShiftCompatibility(employee,shift);
 		try {
 			compatible = fixture.getCompatible(compatibility);
@@ -2799,7 +2844,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		employee.setNoCats(true);
 		Client client = new Client();
 		client.setOwnCats(true);
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		EmployeeShiftCompatibility compatibility= new EmployeeShiftCompatibility(employee,shift);
 		try {
 			compatible = fixture.getCompatible(compatibility);
@@ -2823,7 +2869,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		Employee employee = new Employee();
 		Client client = new Client();
 		client.setSigningOnly(true);
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		EmployeeShiftCompatibility compatibility= new EmployeeShiftCompatibility(employee,shift);
 		try {
 			compatible = fixture.getCompatible(compatibility);
@@ -2846,7 +2893,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		boolean compatible = false;
 		Employee employee = new Employee();
 		Client client = new Client();
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-10-10");
 		shift.setEndDate("2018-10-10");
 		shift.setStartTime("10:00");
@@ -2877,7 +2925,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		employee.setMedPassCertified(true);
 		Client client = new Client();
 		client.setMedPass(true);
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-10-10");
 		shift.setEndDate("2018-10-10");
 		shift.setStartTime("10:00");
@@ -2906,7 +2955,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		Employee employee = new Employee();
 		Client client = new Client();
 		client.setNoSmokers(true);
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-10-10");
 		shift.setEndDate("2018-10-10");
 		shift.setStartTime("10:00");
@@ -2935,7 +2985,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		Employee employee = new Employee();
 		Client client = new Client();
 		client.setNoMale(true);
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-10-10");
 		shift.setEndDate("2018-10-10");
 		shift.setStartTime("10:00");
@@ -2965,7 +3016,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		Employee employee = new Employee();
 		Client client = new Client();
 		client.setNoMale(true);
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-10-10");
 		shift.setEndDate("2018-10-10");
 		shift.setStartTime("10:00");
@@ -2996,7 +3048,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		employee.setGender(Gender.MALE);
 		Client client = new Client();
 		client.setNoFemale(true);
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-10-10");
 		shift.setEndDate("2018-10-10");
 		shift.setStartTime("10:00");
@@ -3024,7 +3077,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		Employee employee = new Employee();
 		employee.setNoCats(true);
 		Client client = new Client();
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-10-10");
 		shift.setEndDate("2018-10-10");
 		shift.setStartTime("10:00");
@@ -3054,7 +3108,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		Employee employee = new Employee();
 		Client client = new Client();
 		client.setOwnCats(true);
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-10-10");
 		shift.setEndDate("2018-10-10");
 		shift.setStartTime("10:00");
@@ -3085,7 +3140,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		employee.setSigning(true);
 		Client client = new Client();
 		client.setSigningOnly(true);	
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-10-10");
 		shift.setEndDate("2018-10-10");
 		shift.setStartTime("10:00");
@@ -3115,7 +3171,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		Employee employee = new Employee();
 		employee.setSigning(true);
 		Client client = new Client();
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-10-10");
 		shift.setEndDate("2018-10-10");
 		shift.setStartTime("10:00");
@@ -3177,7 +3234,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		customFieldData = new ArrayList<CustomFieldData>();
 		customFieldData.add(onAlwaysClientData);
 		
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-10-10");
 		shift.setEndDate("2018-10-10");
 		shift.setStartTime("10:00");
@@ -3239,7 +3297,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		customFieldData = new ArrayList<CustomFieldData>();
 		customFieldData.add(onAlwaysClientData);
 		
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-10-10");
 		shift.setEndDate("2018-10-10");
 		shift.setStartTime("10:00");
@@ -3301,7 +3360,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		customFieldData = new ArrayList<CustomFieldData>();
 		customFieldData.add(onAlwaysClientData);
 		
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-10-10");
 		shift.setEndDate("2018-10-10");
 		shift.setStartTime("10:00");
@@ -3363,7 +3423,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		customFieldData = new ArrayList<CustomFieldData>();
 		customFieldData.add(onAlwaysClientData);
 		
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-10-10");
 		shift.setEndDate("2018-10-10");
 		shift.setStartTime("10:00");
@@ -3388,7 +3449,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	
 	@Test
 	public void isAvailableForThrowsProccessingExceptionWithNullEmployee() {
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		boolean errored = false;
 		try {
 			fixture.isAvailableFor(null, shift);
@@ -3405,7 +3467,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	
 	@Test
 	public void isAvailableForThrowsProccessingExceptionWithNullShift() {
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		Employee employee = new Employee();
 		
 		boolean errored = false;
@@ -3424,7 +3487,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	
 	@Test
 	public void isAvailableForThrowsCorruptDataExceptionWithInvalidShift() {
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		Employee employee = new Employee();
 		
 		boolean errored = false;
@@ -3443,7 +3507,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	
 	@Test
 	public void isAvailableForReturnsFalseWithNoAvailability() {
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-10-10");
 		shift.setEndDate("2018-10-10");
 		shift.setStartTime("10:00");
@@ -3470,7 +3535,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	
 	@Test
 	public void isAvailableForReturnsTrueWhenAvailabile() {
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-10-10");
 		shift.setEndDate("2018-10-10");
 		shift.setStartTime("10:00");
@@ -3504,7 +3570,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	
 	@Test
 	public void isAvailableForReturnsTrueWhenAvailabileOvernightCrossWeeks() {
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-10-13");
 		shift.setEndDate("2018-10-14");
 		shift.setStartTime("23:00");
@@ -3540,7 +3607,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	
 	@Test
 	public void isAvailableForReturnsFalseWhenPartlyAvailable1() {
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-10-13");
 		shift.setEndDate("2018-10-14");
 		shift.setStartTime("23:00");
@@ -3575,7 +3643,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	
 	@Test
 	public void isAvailableForReturnsFalseWhenPartlyAvailable2() {
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-10-13");
 		shift.setEndDate("2018-10-14");
 		shift.setStartTime("23:00");
@@ -3610,11 +3679,12 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	
 	@Test
 	public void isAssignableForThrowsProccessingExceptionForNullEmployee() {
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		boolean errored = false;
 		
 		try {
-			fixture.isAssignableFor(null, shift);
+			fixture.isAssignableFor(null, shift,options);
 		} catch (CorruptDataException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -3628,12 +3698,13 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	
 	@Test
 	public void isAssignableForThrowsProccessingExceptionForNullShift() {
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		Employee employee = new Employee();
 		boolean errored = false;
 		
 		try {
-			fixture.isAssignableFor(employee, null);
+			fixture.isAssignableFor(employee, null,options);
 		} catch (CorruptDataException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -3647,12 +3718,12 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	
 	@Test
 	public void isAssignableForThrowsCorruptDataExceptionForInvalidShift() {
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		Employee employee = new Employee();
 		boolean errored = false;
-		
 		try {
-			fixture.isAssignableFor(employee, shift);
+			fixture.isAssignableFor(employee, shift,options);
 		} catch (CorruptDataException e) {
 			errored=true;
 			e.printStackTrace();
@@ -3665,7 +3736,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	
 	@Test
 	public void isAssignableForReturnsFalseWithNoAvailability() {
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-10-10");
 		shift.setEndDate("2018-10-10");
 		shift.setStartTime("10:00");
@@ -3677,7 +3749,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		boolean errored = false;
 		boolean available = false;
 		try {
-			available = fixture.isAssignableFor(employee,shift);
+			available = fixture.isAssignableFor(employee,shift,options);
 		} catch (CorruptDataException e) {
 			errored=true;
 			e.printStackTrace();
@@ -3692,7 +3764,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	
 	@Test
 	public void isAssignableForReturnsTrueWhenAvailabile() {
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-10-10");
 		shift.setEndDate("2018-10-10");
 		shift.setStartTime("10:00");
@@ -3711,7 +3784,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		boolean errored = false;
 		boolean available = false;
 		try {
-			available = fixture.isAssignableFor(employee,shift);
+			available = fixture.isAssignableFor(employee,shift,options);
 		} catch (CorruptDataException e) {
 			errored=true;
 			e.printStackTrace();
@@ -3726,7 +3799,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	
 	@Test
 	public void isAssignableForReturnsTrueWhenAvailabileOvernightCrossWeeks() {
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-10-13");
 		shift.setEndDate("2018-10-14");
 		shift.setStartTime("23:00");
@@ -3747,7 +3821,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		boolean errored = false;
 		boolean available = false;
 		try {
-			available = fixture.isAssignableFor(employee,shift);
+			available = fixture.isAssignableFor(employee,shift,options);
 		} catch (CorruptDataException e) {
 			errored=true;
 			e.printStackTrace();
@@ -3762,7 +3836,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	
 	@Test
 	public void isAssignableForReturnsFalseWhenPartlyAvailable1() {
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-10-13");
 		shift.setEndDate("2018-10-14");
 		shift.setStartTime("23:00");
@@ -3782,7 +3857,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		boolean errored = false;
 		boolean available = false;
 		try {
-			available = fixture.isAssignableFor(employee,shift);
+			available = fixture.isAssignableFor(employee,shift,options);
 		} catch (CorruptDataException e) {
 			errored=true;
 			e.printStackTrace();
@@ -3797,7 +3872,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	
 	@Test
 	public void isAssignableForReturnsFalseWhenPartlyAvailable2() {
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-10-13");
 		shift.setEndDate("2018-10-14");
 		shift.setStartTime("23:00");
@@ -3817,7 +3893,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		boolean errored = false;
 		boolean available = false;
 		try {
-			available = fixture.isAssignableFor(employee,shift);
+			available = fixture.isAssignableFor(employee,shift,options);
 		} catch (CorruptDataException e) {
 			errored=true;
 			e.printStackTrace();
@@ -3833,6 +3909,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	@Test
 	public void isAssignableForReturnsTrueForShiftlessEmployee() {
 		Employee assignedOneDay = new Employee("Assigned","OneDay");
+		ScheduleOptions options = new ScheduleOptions();
 		assignedOneDay.setId("assignedOneDay");
 		 Shift inOvertimeShift1 = new Shift();
 		    inOvertimeShift1.setStaffId("inOvertime");
@@ -3861,7 +3938,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		    assignedOneDay.setSaturdaysAvailability(daysAvailability);
 		    assignedOneDay.setDaysAvailable(availability);
 		try {
-			unassigned = fixture.isAssignableFor(assignedOneDay,inOvertimeShift1);
+			unassigned = fixture.isAssignableFor(assignedOneDay,inOvertimeShift1,options);
 		} catch (ProccessingException e) {
 			errored=true;
 			e.printStackTrace();
@@ -3905,8 +3982,9 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		    assignedOneDay.setFridaysAvailability(daysAvailability);
 		    assignedOneDay.setSaturdaysAvailability(daysAvailability);
 		    assignedOneDay.setDaysAvailable(availability);
+		    ScheduleOptions options = new ScheduleOptions();
 		try {
-			unassigned = fixture.isAssignableFor(assignedOneDay,inOvertimeShift1);
+			unassigned = fixture.isAssignableFor(assignedOneDay,inOvertimeShift1,options);
 		} catch (ProccessingException e) {
 			errored=true;
 			e.printStackTrace();
@@ -3933,8 +4011,9 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		    inOvertimeShift1.setStartMonth(7);
 		boolean errored=false;
 		boolean unassigned = false;
+		ScheduleOptions options = new ScheduleOptions();
 		try {
-			unassigned = fixture.isAssignableFor(assignedOneDay,inOvertimeShift1);
+			unassigned = fixture.isAssignableFor(assignedOneDay,inOvertimeShift1,options);
 		} catch (ProccessingException e) {
 			errored=true;
 			e.printStackTrace();
@@ -3961,8 +4040,9 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		    inOvertimeShift1.setStartMonth(7);
 		boolean errored=false;
 		boolean unassigned = false;
+		ScheduleOptions options = new ScheduleOptions();
 		try {
-			unassigned = fixture.isAssignableFor(assignedOneDay,inOvertimeShift1);
+			unassigned = fixture.isAssignableFor(assignedOneDay,inOvertimeShift1,options);
 		} catch (ProccessingException e) {
 			errored=true;
 			e.printStackTrace();
@@ -4006,8 +4086,9 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		    assignedOneDay.setFridaysAvailability(daysAvailability);
 		    assignedOneDay.setSaturdaysAvailability(daysAvailability);
 		    assignedOneDay.setDaysAvailable(availability);
+		    ScheduleOptions options = new ScheduleOptions();
 		try {
-			unassigned = fixture.isAssignableFor(assignedOneDay,inOvertimeShift1);
+			unassigned = fixture.isAssignableFor(assignedOneDay,inOvertimeShift1,options);
 		} catch (ProccessingException e) {
 			errored=true;
 			e.printStackTrace();
@@ -4041,13 +4122,14 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	    employee.setFridaysAvailability(daysAvailability);
 	    employee.setSaturdaysAvailability(daysAvailability);
 	    employee.setDaysAvailable(availability);
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2017-06-04");
 		shift.setEndDate("2017-06-04");
 		shift.setStartTime("10:00");
 		shift.setEndTime("14:00");
 		shift.setClientId("generic");
-		assertFalse(fixture.isAssignableFor(employee,shift));
+		assertFalse(fixture.isAssignableFor(employee,shift,options));
 	}
 	
 	@Test
@@ -4071,13 +4153,14 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	    employee.setFridaysAvailability(daysAvailability);
 	    employee.setSaturdaysAvailability(daysAvailability);
 	    employee.setDaysAvailable(availability);
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2017-06-03");
 		shift.setEndDate("2017-06-04");
 		shift.setStartTime("22:00");
 		shift.setEndTime("14:00");
 		shift.setClientId("generic");
-		assertFalse(fixture.isAssignableFor(employee,shift));
+		assertFalse(fixture.isAssignableFor(employee,shift,options));
 	}
 	
 	@Test
@@ -4101,13 +4184,14 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	    employee.setFridaysAvailability(daysAvailability);
 	    employee.setSaturdaysAvailability(daysAvailability);
 	    employee.setDaysAvailable(availability);
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2017-05-04");
 		shift.setEndDate("2017-05-04");
 		shift.setStartTime("10:00");
 		shift.setEndTime("14:00");
 		shift.setClientId("generic");
-		assertTrue(fixture.isAssignableFor(employee,shift));
+		assertTrue(fixture.isAssignableFor(employee,shift,options));
 	}
 	
 	@Test
@@ -4131,7 +4215,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	public void getAssignmentWouldViolateAlternateWeekendsOffThrowsProccessingExceptionForNullEmployee() {
 		boolean errored=true;
 		Employee employee = new Employee();
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(null,shift);
 		
 		try {
@@ -4152,7 +4237,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	public void getAssignmentWouldViolateAlternateWeekendsOffThrowsProccessingExceptionForNullShift() {
 		boolean errored=true;
 		Employee employee = new Employee();
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,null);
 		
 		try {
@@ -4172,7 +4258,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	public void getAssignmentWouldViolateAlternateWeekendsOffThrowsCorruptDataExceptionForInvalidShift() {
 		boolean errored=true;
 		Employee employee = new Employee();
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,shift);
 		
 		try {
@@ -4193,7 +4280,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		Employee employee = new Employee();
 		employee.setOffAlternateWeekends(true);
 		employee.setId("assignedOneDay");
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-04-07");
 		shift.setEndDate("2018-04-07");
 		shift.setStartTime("10:00");
@@ -4221,7 +4309,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		Employee employee = new Employee();
 		employee.setOffAlternateWeekends(true);
 		employee.setId("assignedOneDay");
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-03-25");
 		shift.setEndDate("2018-03-25");
 		shift.setStartTime("10:00");
@@ -4249,7 +4338,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		Employee employee = new Employee();
 		employee.setOffAlternateWeekends(true);
 		employee.setId("assignedOneDay");
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-06-25");
 		shift.setEndDate("2018-06-25");
 		shift.setStartTime("10:00");
@@ -4276,7 +4366,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		boolean errored=false;
 		Employee employee = new Employee();
 		employee.setId("assignedOneDay");
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-03-25");
 		shift.setEndDate("2018-03-25");
 		shift.setStartTime("10:00");
@@ -4302,8 +4393,9 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	public void getRestingThrowsProccessingExceptionWithNullCompatibility() {
 		EmployeeShiftCompatibility compatibility = null;
 		boolean errored = false;
+		ScheduleOptions options = new ScheduleOptions();
 		try {
-			fixture.getResting(compatibility);
+			fixture.getResting(compatibility,options);
 		} catch (CorruptDataException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -4322,8 +4414,9 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		
 		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,shift);
 		boolean errored = false;
+		ScheduleOptions options = new ScheduleOptions();
 		try {
-			fixture.getResting(compatibility);
+			fixture.getResting(compatibility,options);
 		} catch (CorruptDataException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -4338,12 +4431,13 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	@Test
 	public void getRestingThrowsProccessingExceptionWithNullEmployee() {
 		Employee employee = null;
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		
 		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,shift);
 		boolean errored = false;
 		try {
-			fixture.getResting(compatibility);
+			fixture.getResting(compatibility,options);
 		} catch (CorruptDataException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -4358,12 +4452,13 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	@Test
 	public void getRestingThrowsCorruptDataExceptionWithInvalidShift() {
 		Employee employee = new Employee();
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		
 		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,shift);
 		boolean errored = false;
 		try {
-			fixture.getResting(compatibility);
+			fixture.getResting(compatibility,options);
 		} catch (CorruptDataException e) {
 			errored=true;
 			e.printStackTrace();
@@ -4380,7 +4475,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		Employee employee = new Employee();
 		employee.setOffAlternateWeekends(true);
 		employee.setId("assignedOneDay");
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-03-25");
 		shift.setEndDate("2018-03-25");
 		shift.setStartTime("10:00");
@@ -4390,7 +4486,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		boolean errored = false;
 		boolean result = false;
 		try {
-			result = fixture.getResting(compatibility);
+			result = fixture.getResting(compatibility,options);
 		} catch (CorruptDataException e) {
 			errored=true;
 			e.printStackTrace();
@@ -4407,7 +4503,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	public void getRestingReturnsTrueViolatingMaxDailyShifts() {
 		Employee employee = new Employee();
 		employee.setId("assignedOneDay");
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-04-02");
 		shift.setEndDate("2018-04-02");
 		shift.setStartTime("10:00");
@@ -4417,7 +4514,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		boolean errored = false;
 		boolean result = false;
 		try {
-			result = fixture.getResting(compatibility);
+			result = fixture.getResting(compatibility,options);
 		} catch (CorruptDataException e) {
 			errored=true;
 			e.printStackTrace();
@@ -4434,7 +4531,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	public void getRestingReturnsTrueViolatingMaxWeeklyShifts() {
 		Employee employee = new Employee();
 		employee.setId("assignedFiveDay");
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-02-04");
 		shift.setEndDate("2018-02-04");
 		shift.setStartTime("10:00");
@@ -4444,7 +4542,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		boolean errored = false;
 		boolean result = false;
 		try {
-			result = fixture.getResting(compatibility);
+			result = fixture.getResting(compatibility,options);
 		} catch (CorruptDataException e) {
 			errored=true;
 			e.printStackTrace();
@@ -4461,7 +4559,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	public void getRestingReturnsFalseWhenUnconflicted() {
 		Employee employee = new Employee();
 		employee.setId("assignedFiveDay");
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-01-04");
 		shift.setEndDate("2018-01-04");
 		shift.setStartTime("10:00");
@@ -4471,7 +4570,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		boolean errored = false;
 		boolean result = false;
 		try {
-			result = fixture.getResting(compatibility);
+			result = fixture.getResting(compatibility,options);
 		} catch (CorruptDataException e) {
 			errored=true;
 			e.printStackTrace();
@@ -4487,11 +4586,12 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	@Test
 	public void isValidForThrowsProccessingExceptionWithNullEmployee() {
 		Employee employee = new Employee();
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		employee=null;
 		boolean errored = false;
 		try {
-			fixture.isValidFor(employee, shift);
+			fixture.isValidFor(employee, shift,options);
 		} catch (CorruptDataException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -4506,11 +4606,11 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	@Test
 	public void isValidForThrowsProccessingExceptionWithNullShift() {
 		Employee employee = new Employee();
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
 		shift=null;
 		boolean errored = false;
 		try {
-			fixture.isValidFor(employee, shift);
+			fixture.isValidFor(employee, shift,options);
 		} catch (CorruptDataException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -4526,10 +4626,11 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	@Test
 	public void isValidForThrowsCorruptDataExceptionWithInvalidShift() {
 		Employee employee = new Employee();
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		boolean errored = false;
 		try {
-			fixture.isValidFor(employee, shift);
+			fixture.isValidFor(employee, shift,options);
 		} catch (CorruptDataException e) {
 			errored=true;
 			e.printStackTrace();
@@ -4560,7 +4661,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	    employee.setFridaysAvailability(daysAvailability);
 	    employee.setSaturdaysAvailability(daysAvailability);
 	    employee.setDaysAvailable(availability);
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-01-04");
 		shift.setEndDate("2018-01-04");
 		shift.setStartTime("10:00");
@@ -4570,7 +4672,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		boolean result = false;
 		
 		try {
-			result = fixture.isValidFor(employee, shift);
+			result = fixture.isValidFor(employee, shift,options);
 		} catch (CorruptDataException e) {
 			errored=true;
 			e.printStackTrace();
@@ -4603,7 +4705,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	    employee.setFridaysAvailability(daysAvailability);
 	    employee.setSaturdaysAvailability(daysAvailability);
 	    employee.setDaysAvailable(availability);
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-01-04");
 		shift.setEndDate("2018-01-04");
 		shift.setStartTime("10:00");
@@ -4613,7 +4716,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		boolean result = false;
 		
 		try {
-			result = fixture.isValidFor(employee, shift);
+			result = fixture.isValidFor(employee, shift,options);
 		} catch (CorruptDataException e) {
 			errored=true;
 			e.printStackTrace();
@@ -4646,7 +4749,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	    employee.setFridaysAvailability(daysAvailability);
 	    employee.setSaturdaysAvailability(daysAvailability);
 	    employee.setDaysAvailable(availability);
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-07-01");
 		shift.setEndDate("2018-07-01");
 		shift.setStartTime("10:00");
@@ -4656,7 +4760,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		boolean result = false;
 		
 		try {
-			result = fixture.isValidFor(employee, shift);
+			result = fixture.isValidFor(employee, shift,options);
 		} catch (CorruptDataException e) {
 			errored=true;
 			e.printStackTrace();
@@ -4681,7 +4785,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		    	availability[i]=true;
 		    }
 	    }
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-04-01");
 		shift.setEndDate("2018-04-01");
 		shift.setStartTime("10:00");
@@ -4691,7 +4796,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		boolean result = false;
 		
 		try {
-			result = fixture.isValidFor(employee, shift);
+			result = fixture.isValidFor(employee, shift,options);
 		} catch (CorruptDataException e) {
 			errored=true;
 			e.printStackTrace();
@@ -4726,7 +4831,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	    employee.setFridaysAvailability(daysAvailability);
 	    employee.setSaturdaysAvailability(daysAvailability);
 	    employee.setDaysAvailable(availability);
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-05-01");
 		shift.setEndDate("2018-05-01");
 		shift.setStartTime("10:00");
@@ -4736,7 +4842,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		boolean result = false;
 		
 		try {
-			result = fixture.isValidFor(employee, shift);
+			result = fixture.isValidFor(employee, shift,options);
 		} catch (CorruptDataException e) {
 			errored=true;
 			e.printStackTrace();
@@ -4770,7 +4876,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	    employee.setFridaysAvailability(daysAvailability);
 	    employee.setSaturdaysAvailability(daysAvailability);
 	    employee.setDaysAvailable(availability);
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-05-01");
 		shift.setEndDate("2018-05-01");
 		shift.setStartTime("10:00");
@@ -4780,7 +4887,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		boolean result = false;
 		
 		try {
-			result = fixture.isValidFor(employee, shift);
+			result = fixture.isValidFor(employee, shift,options);
 		} catch (CorruptDataException e) {
 			errored=true;
 			e.printStackTrace();
@@ -4814,7 +4921,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	    employee.setFridaysAvailability(daysAvailability);
 	    employee.setSaturdaysAvailability(daysAvailability);
 	    employee.setDaysAvailable(availability);
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-05-01");
 		shift.setEndDate("2018-05-01");
 		shift.setStartTime("10:00");
@@ -4824,7 +4932,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		boolean result = false;
 		
 		try {
-			result = fixture.isValidFor(employee, shift);
+			result = fixture.isValidFor(employee, shift,options);
 		} catch (CorruptDataException e) {
 			errored=true;
 			e.printStackTrace();
@@ -4859,7 +4967,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	    employee.setDaysAvailable(availability);
 		employee.setOffAlternateWeekends(true);
 		employee.setId("assignedOneDay");
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-04-07");
 		shift.setEndDate("2018-04-07");
 		shift.setStartTime("10:00");
@@ -4868,7 +4977,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,shift);
 		boolean result = false;
 		try {
-			result = fixture.isValidFor(employee,shift);
+			result = fixture.isValidFor(employee,shift,options);
 		} catch (CorruptDataException e) {
 			errored=true;
 			e.printStackTrace();
@@ -4903,7 +5012,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	    employee.setDaysAvailable(availability);
 		employee.setOffAlternateWeekends(true);
 		employee.setId("assignedOneDay");
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-04-02");
 		shift.setEndDate("2018-04-02");
 		shift.setStartTime("10:00");
@@ -4911,7 +5021,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		shift.setClientId("onAlwaysClient");
 		boolean result = false;
 		try {
-			result = fixture.isValidFor(employee,shift);
+			result = fixture.isValidFor(employee,shift,options);
 		} catch (CorruptDataException e) {
 			errored=true;
 			e.printStackTrace();
@@ -4946,7 +5056,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	    employee.setDaysAvailable(availability);
 		employee.setOffAlternateWeekends(true);
 		employee.setId("assignedFiveDay");
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-02-04");
 		shift.setEndDate("2018-02-04");
 		shift.setStartTime("10:00");
@@ -4954,7 +5065,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		shift.setClientId("onAlwaysClient");
 		boolean result = false;
 		try {
-			result = fixture.isValidFor(employee,shift);
+			result = fixture.isValidFor(employee,shift,options);
 		} catch (CorruptDataException e) {
 			errored=true;
 			e.printStackTrace();
@@ -4971,9 +5082,9 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	public void getValidCompatibilitiesThrowsProccessingExceptionForNullCompatibilities() {
 		EmployeeShiftCompatibilities compatibilities = null;
 		boolean errored = true;
-		
+		ScheduleOptions options = new ScheduleOptions();
 		try {
-			fixture.getValidCompatibilities(compatibilities);
+			fixture.getValidCompatibilities(compatibilities,options);
 		} catch (CorruptDataException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -4991,9 +5102,9 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		ArrayList<EmployeeShiftCompatibility> innerCompatibilities = null;
 		compatibilities.compatibilities=innerCompatibilities;
 		boolean errored = true;
-		
+		ScheduleOptions options = new ScheduleOptions();
 		try {
-			fixture.getValidCompatibilities(compatibilities);
+			fixture.getValidCompatibilities(compatibilities,options);
 		} catch (CorruptDataException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -5012,9 +5123,9 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		innerCompatibilities.add(null);
 		compatibilities.compatibilities=innerCompatibilities;
 		boolean errored = true;
-		
+		ScheduleOptions options = new ScheduleOptions();
 		try {
-			fixture.getValidCompatibilities(compatibilities);
+			fixture.getValidCompatibilities(compatibilities,options);
 		} catch (CorruptDataException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -5032,13 +5143,14 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		ArrayList<EmployeeShiftCompatibility> innerCompatibilities = new ArrayList<EmployeeShiftCompatibility>();
 		Employee employee = new Employee();
 		Client client =new Client();
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		innerCompatibilities.add(new EmployeeShiftCompatibility(employee,null,client));
 		compatibilities.compatibilities=innerCompatibilities;
 		boolean errored = true;
 		
 		try {
-			fixture.getValidCompatibilities(compatibilities);
+			fixture.getValidCompatibilities(compatibilities,options);
 		} catch (CorruptDataException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -5056,13 +5168,14 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		ArrayList<EmployeeShiftCompatibility> innerCompatibilities = new ArrayList<EmployeeShiftCompatibility>();
 		Employee employee = new Employee();
 		Client client =new Client();
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		innerCompatibilities.add(new EmployeeShiftCompatibility(null,shift,client));
 		compatibilities.compatibilities=innerCompatibilities;
 		boolean errored = true;
 		
 		try {
-			fixture.getValidCompatibilities(compatibilities);
+			fixture.getValidCompatibilities(compatibilities,options);
 		} catch (CorruptDataException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -5080,7 +5193,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		ArrayList<EmployeeShiftCompatibility> innerCompatibilities = new ArrayList<EmployeeShiftCompatibility>();
 		Employee employee = new Employee();
 		Client client =new Client();
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-02-04");
 		shift.setEndDate("2018-02-04");
 		shift.setStartTime("10:00");
@@ -5091,7 +5205,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		boolean errored = true;
 		EmployeeShiftCompatibilities result= null;
 		try {
-			result = fixture.getValidCompatibilities(compatibilities);
+			result = fixture.getValidCompatibilities(compatibilities,options);
 		} catch (CorruptDataException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -5126,7 +5240,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	    employee.setFridaysAvailability(daysAvailability);
 	    employee.setSaturdaysAvailability(daysAvailability);
 	    employee.setDaysAvailable(availability);
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		shift.setStartDate("2018-01-04");
 		shift.setEndDate("2018-01-04");
 		shift.setStartTime("10:00");
@@ -5137,7 +5252,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		boolean errored = true;
 		EmployeeShiftCompatibilities result= null;
 		try {
-			result = fixture.getValidCompatibilities(compatibilities);
+			result = fixture.getValidCompatibilities(compatibilities,options);
 		} catch (CorruptDataException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -5214,7 +5329,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		
 		EmployeeShiftCompatibilities compatiblities = new EmployeeShiftCompatibilities();
 		ArrayList<EmployeeShiftCompatibility> inner = new ArrayList<EmployeeShiftCompatibility>();
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		Employee employee = new Employee();
 		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,null);
 		
@@ -5239,7 +5355,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		
 		EmployeeShiftCompatibilities compatiblities = new EmployeeShiftCompatibilities();
 		ArrayList<EmployeeShiftCompatibility> inner = new ArrayList<EmployeeShiftCompatibility>();
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		Employee employee = new Employee();
 		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(null,shift);
 		
@@ -5265,7 +5382,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		
 		EmployeeShiftCompatibilities compatiblities = new EmployeeShiftCompatibilities();
 		ArrayList<EmployeeShiftCompatibility> inner = new ArrayList<EmployeeShiftCompatibility>();
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		Employee employee = new Employee();
 		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,shift);
 		
@@ -5391,7 +5509,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		
 		EmployeeShiftCompatibilities compatiblities = new EmployeeShiftCompatibilities();
 		ArrayList<EmployeeShiftCompatibility> inner = new ArrayList<EmployeeShiftCompatibility>();
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		Employee employee = new Employee();
 		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,null);
 		
@@ -5416,7 +5535,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		
 		EmployeeShiftCompatibilities compatiblities = new EmployeeShiftCompatibilities();
 		ArrayList<EmployeeShiftCompatibility> inner = new ArrayList<EmployeeShiftCompatibility>();
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		Employee employee = new Employee();
 		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(null,shift);
 		
@@ -5442,7 +5562,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		
 		EmployeeShiftCompatibilities compatiblities = new EmployeeShiftCompatibilities();
 		ArrayList<EmployeeShiftCompatibility> inner = new ArrayList<EmployeeShiftCompatibility>();
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		Employee employee = new Employee();
 		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,shift);
 		
@@ -5569,7 +5690,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		
 		EmployeeShiftCompatibilities compatiblities = new EmployeeShiftCompatibilities();
 		ArrayList<EmployeeShiftCompatibility> inner = new ArrayList<EmployeeShiftCompatibility>();
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		Employee employee = new Employee();
 		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,null);
 		
@@ -5594,7 +5716,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		
 		EmployeeShiftCompatibilities compatiblities = new EmployeeShiftCompatibilities();
 		ArrayList<EmployeeShiftCompatibility> inner = new ArrayList<EmployeeShiftCompatibility>();
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		Employee employee = new Employee();
 		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(null,shift);
 		
@@ -5620,7 +5743,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		
 		EmployeeShiftCompatibilities compatiblities = new EmployeeShiftCompatibilities();
 		ArrayList<EmployeeShiftCompatibility> inner = new ArrayList<EmployeeShiftCompatibility>();
-		Shift shift = new Shift();
+		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		
 		Employee employee = new Employee();
 		EmployeeShiftCompatibility compatibility = new EmployeeShiftCompatibility(employee,shift);
 		
