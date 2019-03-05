@@ -63,7 +63,7 @@ public class ShiftAssignmentManager {
 				//Only available
 				//Most needed
 				//Most time
-    
+  
     //The real new one
     public void scheduleShifts(ScheduleOptions options) throws ProccessingException, CorruptDataException {
     	int month = Integer.parseInt(options.getMonth());
@@ -117,14 +117,7 @@ public class ShiftAssignmentManager {
 	    
     	for(int i= 0;i<unassignedShifts.size();i++){
     		if(!stopped) {
-	    		ScheduleStatus status = scheduleStatusCrud.findOne(month+"");
-	    		if(null!=status) {
-	    			System.out.println("got the status for the month"+status.toString());
-	    		}
-	    		else {
-	    			System.out.println("unable to get status for month"+month);
-	    		}
-	        	if(null != status && status.isStopped()) {
+	        	if(scheduleStatus(month+"").isStopped()) {
 	        		stopped=true;
 	        	}
 	        	else {
@@ -394,6 +387,17 @@ public class ShiftAssignmentManager {
 		shift.setStaffName(employee.getFirst());
 		shift.setAssigned(true);
 		shiftCrud.save(shift);
+    }
+    
+    public ScheduleStatus scheduleStatus(String month) {
+	    Iterable<ScheduleStatus> statusList = scheduleStatusCrud.findAll();
+		ScheduleStatus status = null;
+		for(ScheduleStatus selectedStatus:statusList) {
+			if(selectedStatus.getMonth().equalsIgnoreCase(month)) {
+				status=selectedStatus;
+			}
+		}
+	    return status;
     }
     
 //    public String scheduleWeekendShiftStartingWeekOfMonth(Shift shift) throws CorruptDataException, ProccessingException{

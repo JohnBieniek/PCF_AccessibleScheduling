@@ -113,6 +113,14 @@
     padding-right:20px;
 }
 
+.stopping{
+	background-color: #fcaf3e!important;
+	 border-color: #fcaf3e!important;
+ 	 border-radius: 25px; 
+ 	 padding-left:20px;
+    padding-right:20px;
+}
+
 .generated{
 	background-color: #fce94f!important;
 	 border-color: #fce94f!important;

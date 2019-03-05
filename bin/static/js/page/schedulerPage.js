@@ -44,7 +44,7 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
 	 $scope.statusList=[];
 	 
 	 
-	 $scope.setTab = function(newTab){
+	$scope.setTab = function(newTab){
 	  $scope.generatedBool = $scope.statusList[$scope.tab-1].generated;
       $scope.tab = newTab;
       console.log("month:"+$scope.tab);
@@ -61,12 +61,15 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
       if($scope.statusList[$scope.tab-1].assigned){
     	  $scope.assigned="Assigned";
       }
-      else{
+      else {
     	  $scope.assigned="Unassigned";
       }
       
       if($scope.statusList[$scope.tab-1].assigning){
     	  $scope.assigned="Assigning";
+    	  if($scope.statusList[$scope.tab-1].stopped){
+    		  $scope.assigned="Stopping";
+    	  }
       }
       
       switch(newTab){
@@ -130,8 +133,12 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
         return $scope.statusList[month-1].errored;
       };
     $scope.isAssigning = function(month){
-    	return $scope.statusList[month-1].assigning 
+    	return $scope.statusList[month-1].assigning
       };
+      
+      $scope.isStopped = function(month){
+      	return $scope.statusList[month-1].stopped
+        };
           
       $scope.isNotAssignable = function(month){
     	  assignable = true;
@@ -213,6 +220,7 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
     }
     
     $scope.stopAssignment = function(month){
+    	$scope.assigned="Stopping";
     	$http({
             url: '/schedule/stopAssignment',
             method: 'GET',
@@ -228,7 +236,6 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
     		console.log(response.data);
     		console.log($scope.statusList[0].generated);
     		$scope.setTab($scope.tab);
-    		
         });
     }
     

@@ -141,6 +141,11 @@ public class ScheduleController {
     	return scheduleStatusCrud.findAll();
     }
     
+    @RequestMapping(value = "/assigning", method = RequestMethod.GET)
+    public boolean assigning(@RequestParam("month") String month) {
+    	return assignmentManager.scheduleStatus(month).isAssigning();
+    }
+    
     @RequestMapping(value = "/statusList", method = RequestMethod.GET)
     public Iterable<ScheduleStatus> scheduleStatusList() {
         return scheduleStatusCrud.findAll();
@@ -163,7 +168,7 @@ public class ScheduleController {
     	}
     	
     	status.setGenerated(true);
-		status.setAssigning(false);
+		status.setAssigning(true);
 		status.setStopped(true);
     	scheduleStatusCrud.save(status);
     	
