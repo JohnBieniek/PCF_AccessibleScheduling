@@ -33,8 +33,8 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
 	 $scope.allowOvertime=false;
 	 $scope.allowUnavailable=false;
 	 $scope.prioritizeSecondShift=false;
-	 $scope.dailyMax=false;
-	 $scope.weeklyMax=false;
+	 $scope.useDailyMax=true;
+	 $scope.useWeeklyMax=true;
 	 $scope.allowInactive=false;
 	 $scope.generatedBool = false;
 	 $scope.generated="Generated";

@@ -68,8 +68,12 @@
 	   	</div>
 	   	<div style="display:inline-block; vertical-align: top; width:70%">
 			<div class="scheduler" >
-				<h2 style="font-size:45px">{{monthName}}</h2>
-				<p style="font-size:25px">Generate shifts from requests. Assign them to employees.</p>
+				<div>
+					<label style="font-size:43px">{{monthName}}</label>
+				</div>
+				<div>
+					<label style="font-size:24px">Generate shifts from requests. Assign them to employees.</label>
+				</div>
 				<div style="display:inline-block">
 					<div style="display:inline-block" class = "incomplete" ng-class="{ complete: isGenerated(tab) }">
 						<p style="display:inline-block"> <b> {{generated}} </b> </p>
@@ -95,37 +99,36 @@
 				</div>
 			</div>
 			<br>
-			<br>
-			<br>
 			<div class = "scheduleOptions">
+				<label style="font-size:40px; margin-right:25px">Assignment options:</label>
+				 <div class = "scheduleOptions">
+				    <label style="font-size:33px">Use daily shift max(3)</label>
+				    <input type="checkbox" style="height:35px;width:35px" ng-model="useDailyMax" checked>
+			    </div>
+			    <br>
+			    <div class = "scheduleOptions">
+				    <label style="font-size:33px">Use weekly work day max(5)</label>
+				    <input type="checkbox" style="height:35px;width:35px" ng-model="useWeeklyMax" checked>
+			    </div>
+			    <br>
 				<div style="horizontal-align:right;" class = "scheduleOptions">
-				    <label style="font-size:38px">Allow unlimited overtime</label>
-				    <input type="checkbox" style="height:40px;width:40px" ng-model="allowOvertime">
-			    </div>
-			    <br>
-			    <div class = "scheduleOptions">
-				    <label style="font-size:38px">Use daily shift maximum</label>
-				    <input type="checkbox" style="height:40px;width:40px" ng-model="useDailyMax">
-			    </div>
-			    <br>
-			    <div class = "scheduleOptions">
-				    <label style="font-size:38px">Use weekly work day maximum</label>
-				    <input type="checkbox" style="height:40px;width:40px" ng-model="useWeeklyMax">
+				    <label style="font-size:33px">Allow unlimited overtime</label>
+				    <input type="checkbox" style="height:35px;width:35px" ng-model="allowOvertime">
 			    </div>
 			    <br hidden>
 			    <div hidden class = "scheduleOptions">
-				    <label style="font-size:38px">Prioritize second Shift</label>
-				    <input type="checkbox" style="height:40px;width:40px" ng-model="prioritizeSecondShift">
+				    <label style="font-size:33px">Prioritize second Shift</label>
+				    <input type="checkbox" style="height:35px;width:35px;" ng-model="prioritizeSecondShift">
 			    </div>
 			    <br>
 			    <div class = "scheduleOptions">
-				    <label style="font-size:38px">Allow unavailable</label>
-				    <input type="checkbox" style="height:40px;width:40px" ng-model="allowUnavailable">
+				    <label style="font-size:33px">Schedule unavailable staff</label>
+				    <input type="checkbox" style="height:35px;width:35px" ng-model="allowUnavailable">
 			    </div>
 			    <br>
 				<div class = "scheduleOptions">
-				    <label style="font-size:38px">Allow inactive</label>
-				    <input type="checkbox" style="height:40px;width:40px" ng-model="allowInactive">
+				    <label style="font-size:33px">Schedule inactive staff</label>
+				    <input type="checkbox" style="height:35px;width:35px" ng-model="allowInactive">
 			    </div>
 		    </div>
 	    	<br>
