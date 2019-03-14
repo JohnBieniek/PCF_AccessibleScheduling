@@ -95,7 +95,7 @@
 					<button style="display:inline-block;"  align="right" ng-class="{ disabled:  !isAssigning(tab) || isStopped(tab)}" class="deleteButton scheduleButton" type="button" ng-click="stopAssignment(tab)">Stop</button>
 				</div>
 				<div style="display:inline-block;" ng-if="!isAssigning(tab)">
-					<button style="display:inline-block;"  align="right" ng-class="{ disabled:  !isGenerated(tab) || isAssigning(tab) ||  isAssigned(tab) || isStopped(tab)}" class="scheduleButton" type="button" ng-click="assignShifts(tab,allowOvertime,allowInactive,allowUnavailable,prioritizeSecondShift,dailyMax,weeklyMax)">Assign</button>
+					<button style="display:inline-block;"  align="right" ng-class="{ disabled:  !isGenerated(tab) || isAssigning(tab) ||  isAssigned(tab) || isStopped(tab)}" class="scheduleButton" type="button" ng-click="assignShifts(tab,allowOvertime,allowInactive,allowUnavailable,prioritizeSecondShift,useDailyMax,useWeeklyMax)">Assign</button>
 				</div>
 			</div>
 			<br>
@@ -103,32 +103,32 @@
 				<label style="font-size:40px; margin-right:25px">Assignment options:</label>
 				 <div class = "scheduleOptions">
 				    <label style="font-size:33px">Use daily shift max(3)</label>
-				    <input type="checkbox" style="height:35px;width:35px" ng-model="useDailyMax" checked>
+				    <input type="checkbox" style="height:35px;width:35px" ng-model="useDailyMax" checked ng-click="toggleDailyMax()">
 			    </div>
 			    <br>
 			    <div class = "scheduleOptions">
 				    <label style="font-size:33px">Use weekly work day max(5)</label>
-				    <input type="checkbox" style="height:35px;width:35px" ng-model="useWeeklyMax" checked>
+				    <input type="checkbox" style="height:35px;width:35px" ng-model="useWeeklyMax" checked ng-click="toggleWeeklyMax()">
 			    </div>
 			    <br>
 				<div style="horizontal-align:right;" class = "scheduleOptions">
 				    <label style="font-size:33px">Allow unlimited overtime</label>
-				    <input type="checkbox" style="height:35px;width:35px" ng-model="allowOvertime">
+				    <input type="checkbox" style="height:35px;width:35px" ng-model="allowOvertime" ng-click="toggleOvertime()">
 			    </div>
 			    <br hidden>
 			    <div hidden class = "scheduleOptions">
 				    <label style="font-size:33px">Prioritize second Shift</label>
-				    <input type="checkbox" style="height:35px;width:35px;" ng-model="prioritizeSecondShift">
+				    <input type="checkbox" style="height:35px;width:35px;" ng-model="prioritizeSecondShift" ng-click="togglePrioritization()">
 			    </div>
 			    <br>
 			    <div class = "scheduleOptions">
 				    <label style="font-size:33px">Schedule unavailable staff</label>
-				    <input type="checkbox" style="height:35px;width:35px" ng-model="allowUnavailable">
+				    <input type="checkbox" style="height:35px;width:35px" ng-model="allowUnavailable" ng-click="toggleUnavailable()">
 			    </div>
 			    <br>
 				<div class = "scheduleOptions">
 				    <label style="font-size:33px">Schedule inactive staff</label>
-				    <input type="checkbox" style="height:35px;width:35px" ng-model="allowInactive">
+				    <input type="checkbox" style="height:35px;width:35px" ng-click="toggleInactive()">
 			    </div>
 		    </div>
 	    	<br>

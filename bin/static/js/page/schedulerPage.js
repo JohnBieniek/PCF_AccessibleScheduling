@@ -47,9 +47,6 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
 	$scope.setTab = function(newTab){
 	  $scope.generatedBool = $scope.statusList[$scope.tab-1].generated;
       $scope.tab = newTab;
-      console.log("month:"+$scope.tab);
-      console.log("generated:"+$scope.statusList[$scope.tab-1].generated);
-      console.log("scope.statusList"+$scope.statusList[$scope.tab-1].toString());
       
       if($scope.statusList[$scope.tab-1].generated){
     	  $scope.generated="Generated";
@@ -71,6 +68,14 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
     		  $scope.assigned="Stopping";
     	  }
       }
+      
+      $scope.allowOvertime=false;
+ 	  $scope.allowUnavailable=false;
+ 	  $scope.prioritizeSecondShift=false;
+ 	  $scope.useDailyMax=true;
+ 	  $scope.useWeeklyMax=true;
+ 	  $scope.allowInactive=false;
+ 	  $scope.generatedBool = false;
       
       switch(newTab){
     	  case 1:
@@ -111,6 +116,26 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
     		  break;
       }
     };
+    
+    $scope.toggleInactive = function(){
+    	$scope.allowInactive = !$scope.allowInactive;
+    }
+    
+    $scope.toggleUnavailable = function(){
+    	$scope.allowUnavailable = !$scope.allowUnavailable;
+    }
+    $scope.toggleOvertime = function(){
+    	$scope.allowOvertime = !$scope.allowOvertime;
+    }
+    $scope.toggleDailyMax = function(){
+    	$scope.useDailyMax = !$scope.useDailyMax;
+    }
+    $scope.toggleWeeklyMax = function(){
+    	$scope.useWeeklyMax = !$scope.useWeeklyMax;
+    }
+    $scope.togglePrioritizationHistory = function(){
+    	$scope.prioritizeSecondShift = !$scope.prioritizeSecondShift;
+    }
     
     $scope.isTabGenerated = function(month){
         return $scope.statusList[month-1].generated && $scope.tab != month && !$scope.statusList[month-1].assigned&& !$scope.statusList[month-1].assigning;
@@ -196,6 +221,14 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
 	        })
 	        .then(function(response) {
 	        	$scope.listStatusItems();
+	        	
+	        	$scope.allowOvertime=false;
+		       	 $scope.allowUnavailable=false;
+		       	 $scope.prioritizeSecondShift=false;
+		       	 $scope.useDailyMax=true;
+		       	 $scope.useWeeklyMax=true;
+		       	 $scope.allowInactive=false;
+		       	 $scope.generatedBool = false;
 	        });
     	}
     }

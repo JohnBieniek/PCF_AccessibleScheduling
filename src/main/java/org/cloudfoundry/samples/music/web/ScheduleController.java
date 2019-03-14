@@ -107,6 +107,7 @@ public class ScheduleController {
     													,@RequestParam("prioritizeSecondShift") boolean prioritizeSecondShift
     													,@RequestParam("dailyMax") boolean dailyMax
     													,@RequestParam("weeklyMax") boolean weeklyMax) {
+    	System.out.println("Starting assignment");
     	ScheduleStatus status = scheduleStatusCrud.findOne(month);
     	scheduleStatusRepository.deleteByMonth(month);
     	
@@ -122,7 +123,7 @@ public class ScheduleController {
     	
     	ScheduleOptions options = new ScheduleOptions(month, year, allowOvertime, allowInactive,allowUnavailable, 
     													prioritizeSecondShift, dailyMax,weeklyMax);
-    	
+    	System.out.println(options.toString());
     	try {
 			assignmentManager.scheduleShifts(options);
 		} catch (ProccessingException | CorruptDataException e) {
