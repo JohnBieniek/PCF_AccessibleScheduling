@@ -100,7 +100,7 @@ public class ShiftAssignmentManager {
     	ArrayList<Shift> shifts = shiftManager.getUnassignedNonEventShiftsForMonth(month);
 		ArrayList<Shift> unassignedShiftsForWeek = ShiftWorker.getShiftsStartingWeekOfMonth(shifts, week, month,year);
 		ArrayList<Shift> unassignedShiftsForWeekdays= ShiftWorker.getWeekdayShifts(unassignedShiftsForWeek);
-		
+		System.out.println("scheduling weekday shifts");
 		scheduleShifts(unassignedShiftsForWeekdays,week,month,year,options);
     }
     
@@ -152,7 +152,6 @@ public class ShiftAssignmentManager {
 	    				!prestaffedShift.getRequestedStaffId().equalsIgnoreCase(employeeId)){
 	    				throw new ProccessingException(Shift.class,prestaffedShift);//This method only for prestaffed, if here, these aren't prestaffed. 
 	    			}
-	    			
 	    			//TODO add logic to ensure they have proper qualification to work with this client on this shift, perhaps in a helper method
 	    			if((employeeShiftCompatibilityManager.isValidFor(employee, prestaffedShift,options) &&
 	    				( options.isAllowOvertime() || 
@@ -212,7 +211,7 @@ public class ShiftAssignmentManager {
     public String saveAssignedUnconflictedPrestaffedRecuringShiftsToTableForMonth(ScheduleOptions options) throws CorruptDataException, ProccessingException{
     	ArrayList<Shift> prestaffedRecuringShifts = shiftManager.getPrestaffedRecurringShiftsForMonth(options.getMonthInt());
     	ArrayList<Shift> onPrestaffedRecuringShifts =getOnPrestaffedShifts(prestaffedRecuringShifts);
-    	System.out.println("Staffing " + prestaffedRecuringShifts.size() +" prestaffed shifts that have no conflicts.");
+    	//System.out.println("Staffing " + prestaffedRecuringShifts.size() +" prestaffed shifts that have no conflicts.");
     	HashMap<String,ArrayList<Shift>> onPrestaffedRecuringShiftsPerEmployee =ShiftWorker.getPrestaffedEmployeeShiftMap(onPrestaffedRecuringShifts);
 
     	HashMap<String,ArrayList<Shift>> unconflictedPrestaffedRecuringShiftsPerEmployee = ShiftWorker.getNonoverlapingShiftsPerEmployee(onPrestaffedRecuringShiftsPerEmployee);
@@ -262,7 +261,7 @@ public class ShiftAssignmentManager {
     public Shift getWeekendShiftStartingWeekOfMonth(int week,int month, int year, ScheduleOptions options) throws CorruptDataException, ProccessingException{
     	ArrayList<Shift> shifts = shiftManager.getUnassignedNonEventShiftsForMonth(month);
 		ArrayList<Shift> unassignedShiftsForWeek = ShiftWorker.getShiftsStartingWeekOfMonth(shifts, week, month,year);
-		System.out.println(unassignedShiftsForWeek.size() + " shifts remain unassigned for week "+week+".");
+		//System.out.println(unassignedShiftsForWeek.size() + " shifts remain unassigned for week "+week+".");
 		ArrayList<Shift> unassignedShiftsForWeekends= ShiftWorker.getWeekendShifts(unassignedShiftsForWeek);
 		int possible = 9001;
 		Shift selected = null;
@@ -339,13 +338,15 @@ public class ShiftAssignmentManager {
     	
     	//Get all those valid to work this shift
     	shiftCompatibilities = employeeShiftCompatibilityManager.getValidCompatibilities(employeeShiftCompatibilityManager.getEmployeeShiftCompatibilitiesForShift(shift),options);
-
+	
     	//If we have at least one valid employee for this shift
     	if(null!=shiftCompatibilities && null != shiftCompatibilities.compatibilities && 
     	   shiftCompatibilities.compatibilities.size() >0) {
+    		System.out.println("options.isAllowOvertime() when at least one available:"+options.isAllowOvertime() );
     		//If we have only 1 valid employee give them the shift regardless
     		if(shiftCompatibilities.compatibilities.size()==1 && 
-    		   !employeeShiftCompatibilityManager.getAssignmentWouldIncurOvertime(shiftCompatibilities.compatibilities.get(0))) {
+    				( options.isAllowOvertime() || 
+					!employeeShiftCompatibilityManager.getAssignmentWouldIncurOvertime(shiftCompatibilities.compatibilities.get(0)))) {
     			employee=shiftCompatibilities.compatibilities.get(0).getEmployee();
     			if(employee!=null) {
 	    			shift.setAssignmentReason("Only " + employee.getFirst() +" was compatible and available. ");
@@ -366,6 +367,7 @@ public class ShiftAssignmentManager {
     		
     		//Assign to the person with the most time
     		if(!assigned) {
+    			System.out.println("trying to assign to most time");
     			employee=employeeShiftCompatibilityManager.getEmployeeWithMostTimeSafely(shiftCompatibilities);
     			if(null!=employee) {
     				shift.setAssignmentReason(employee.getFirst() +" had the most time before overtime");
@@ -373,6 +375,17 @@ public class ShiftAssignmentManager {
 	    			assigned=true;
     			}
 			}
+    		
+    		//If scheduling when already in overtime is allowed, give to the person with the fewest hours
+    		if(!assigned && options.isAllowOvertime()){
+				employee=employeeShiftCompatibilityManager.getEmployeeWithFewestHours(shiftCompatibilities);
+				
+				if(null!=employee) {
+					shift.setAssignmentReason(employee.getFirst() +" had the fewest hours when overtime was allowed");
+    				scheduleShift(shift,employee);
+	    			assigned=true;
+				}
+    		}
     	}
     	
     	return assigned;

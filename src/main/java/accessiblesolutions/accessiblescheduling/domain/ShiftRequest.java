@@ -49,11 +49,11 @@ public class ShiftRequest {
     public boolean isValid(){
     	boolean valid = true;
     	float duration = 0;
-    	System.out.println("requstEmployee:"+requestEmployee + " staffId:"+staffId);
+    	//System.out.println("requstEmployee:"+requestEmployee + " staffId:"+staffId);
     	if(requestEmployee && (null==staffId ||staffId.length()==0)){
     		valid=false;
     	}
-    	System.out.println("valid:"+valid);
+    	//System.out.println("valid:"+valid);
     	
     	try{
     		duration = getDuration();
@@ -61,7 +61,7 @@ public class ShiftRequest {
     	catch(CorruptDataException e){
     		valid=false;
     	}
-    	System.out.println("valid:"+valid + " duration:"+duration);
+    	//System.out.println("valid:"+valid + " duration:"+duration);
     	return valid;
     }
     
@@ -77,10 +77,10 @@ public class ShiftRequest {
 		int endHour = (int) Integer.parseInt(endTime.split(":")[0]);
 		int endMin = (int) Integer.parseInt(endTime.split(":")[1]);
 		
-		System.out.println("startHour"+startHour);
-		System.out.println("startMin"+startMin);
-				System.out.println("endHour"+endHour);
-						System.out.println("endMin"+endMin);
+		//System.out.println("startHour"+startHour);
+		//System.out.println("startMin"+startMin);
+				//System.out.println("endHour"+endHour);
+						//System.out.println("endMin"+endMin);
     	if(getOvernight()){
     		duration+=24;
     	}
@@ -89,9 +89,9 @@ public class ShiftRequest {
     		System.out.println("ERROR: shift ends before starting " +toString() + " duration:"+duration);
     		throw new CorruptDataException(Shift.class,this);
     	}
-    	System.out.println("Getting duration");
+    	//System.out.println("Getting duration");
     	duration+=(endHour-startHour) + ((endMin-startMin)/60.0);
-    	System.out.println("Got duration:"+duration);
+    	//System.out.println("Got duration:"+duration);
     	if(duration>24||duration<=0){
     		System.out.println("ERROR: shift is inappropriate duration " +toString() + " duration:"+duration);
     		throw new CorruptDataException(Shift.class,this);

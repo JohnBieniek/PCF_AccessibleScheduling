@@ -396,6 +396,30 @@ public class EmployeeShiftCompatibilityManager {
 		
 		return new EmployeeShiftCompatibilities(compatibility);
 	}
+    
+     /** 
+     * @param compatibilities Employees coupled with shifts they are being considered for
+     * @return employee has the most time before their min hours is met
+     * @throws CorruptDataException invalid shift
+     * @throws ProccessingException null compatibility, employee, or shift
+     */
+	public Employee getEmployeeWithFewestHours(EmployeeShiftCompatibilities compatibilities) throws CorruptDataException, ProccessingException {
+    	Employee employee = null;
+		float time = 9001;
+		
+		if(null==compatibilities || compatibilities.compatibilities==null) {
+			throw new ProccessingException("Null EmployeeShiftCompatibilities provided for assesment to getEmployeeWithFewestHours");
+		}
+		
+		for(EmployeeShiftCompatibility compatibility :compatibilities.compatibilities){
+			if(getHoursNeeded(compatibility)<=time){
+				time=getHoursNeeded(compatibility);
+				employee=compatibility.getEmployee();
+			}
+		}
+		
+		return employee;
+	}
 	
     /**Returns the employee of the group that has the most time until min hours is met
      * for the week of their shift
@@ -573,9 +597,9 @@ public class EmployeeShiftCompatibilityManager {
 				int week = Util.getWeekOfDate(shift.getStartDate());
 				
 				try {
-					System.out.println("getting hours");
+					//System.out.println("getting hours");
 					hours = employeeShiftManager.getHoursScheduledWeekOfMonth(employee,week,shift.getStartMonth());
-					System.out.println("got "+hours+" hours");
+					//System.out.println("got "+hours+" hours");
 				} catch (CorruptDataException e) {
 					throw new ProccessingException(e);
 				}
@@ -619,17 +643,18 @@ public class EmployeeShiftCompatibilityManager {
 		else if(!shift.isValid()) {
 			throw new CorruptDataException("Invalid shift provided to getResting");
 		}
-		
+		System.out.println("options.isWeeklyMax():"+options.isWeeklyMax());
 		if(options.isDailyMax() && getAssignmentWouldViolateMaxShiftsPerDay(compatibility)){
 			resting= true;
 		}
 		else if(options.isWeeklyMax() &&getAssignmentWouldViolateMaxWeeklyWorkDays(compatibility)){
+			System.out.println("violates max weekly");
 			resting=true;
 		}
 		else if(getAssignmentWouldViolateAlternateWeekendsOff(compatibility)){
 			resting=true;
 		}
-		
+		System.out.println("resting:"+true);
 		return resting;
 	}
 	    
@@ -745,9 +770,9 @@ public class EmployeeShiftCompatibilityManager {
 		}
 		
 		if(!employee.requestedOff(shift)){
-			System.out.println("not requested off");
+			//System.out.println("not requested off");
     		if(isUnassignedFor(employee,shift)){
-    			System.out.println("unassinged");
+    			//System.out.println("unassinged");
     			if(options.isAllowUnavailable() || isAvailableFor(employee,shift)){
     				assignable=true;
     			}
@@ -783,12 +808,12 @@ public class EmployeeShiftCompatibilityManager {
 		if(dayInt==7){
 			dayInt=0;
 		}
-		System.out.println("day:"+dayInt);
+		//System.out.println("day:"+dayInt);
 		
 		if(!shift.getOvernight()){
-			System.out.println("not overnight");
+			//System.out.println("not overnight");
 			if(employee.getDaysAvailable()[dayInt]){
-				System.out.println("available day");
+				//System.out.println("available day");
 				boolean[] availability = employee.getAvailabilityFor(dayInt);
 				
 				String start = shift.getStartTime();
@@ -900,10 +925,10 @@ public class EmployeeShiftCompatibilityManager {
     	}
     	else{
     		clientID = shift.getClientId();
-    		System.out.println("getting client "+clientID);
+    		//System.out.println("getting client "+clientID);
     		client=clientRepository.findOne(clientID);
 
-    		System.out.println("got client "+client.toString());
+    		//System.out.println("got client "+client.toString());
 	    	valid = employeeClientCompatibilityManager.isCompatibleWith(employee,client);
     	}
     	
@@ -975,7 +1000,7 @@ public class EmployeeShiftCompatibilityManager {
 				}
 			}
 		}
-		
+		System.out.println("valid?"+validity);
 		return validity;
 	}
 }

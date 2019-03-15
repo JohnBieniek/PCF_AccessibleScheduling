@@ -38,7 +38,7 @@ public class AlternateWeekendsOffNotification {
 
 	public void setWeekendsWorked(ArrayList<ArrayList<Shift>> weekendsWorked) throws CorruptDataException {
 		this.weekendsWorked = weekendsWorked;
-		System.out.println("started setWeekendsWorked");
+		//System.out.println("started setWeekendsWorked");
 		ArrayList<WeekendsNotificationInfo> weekendNotificationArray = new ArrayList<WeekendsNotificationInfo>();
 		
 		for(ArrayList<Shift> weekend:weekendsWorked){
@@ -120,7 +120,7 @@ public class AlternateWeekendsOffNotification {
 			weekendsNotificationInfo[i]=weekendNotificationArray.get(i);
 		}
 		setWeekendNotificationInfo(weekendsNotificationInfo);
-		System.out.println("ended setWeekendsWorked");
+		//System.out.println("ended setWeekendsWorked");
 	}
 
 	public WeekendsNotificationInfo[] getWeekendNotificationInfo() {

@@ -123,7 +123,7 @@ public class ScheduleController {
     	
     	ScheduleOptions options = new ScheduleOptions(month, year, allowOvertime, allowInactive,allowUnavailable, 
     													prioritizeSecondShift, dailyMax,weeklyMax);
-    	System.out.println(options.toString());
+    	System.out.println("Schedule options:"+options.toString());
     	try {
 			assignmentManager.scheduleShifts(options);
 		} catch (ProccessingException | CorruptDataException e) {

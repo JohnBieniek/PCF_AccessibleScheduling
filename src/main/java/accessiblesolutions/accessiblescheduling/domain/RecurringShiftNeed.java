@@ -58,7 +58,7 @@ public class RecurringShiftNeed {
 	    	if(start.getValue()==7 && end.getValue()==1) {
 	    		start=start.minus(2);
 	    		end = start.plus(1);
-	    		System.out.println("start tweaked: "+start + " end tweaked: " +end);
+	    		//System.out.println("start tweaked: "+start + " end tweaked: " +end);
 	    	}
 	    	
 	    	if(end.compareTo(start)<0||end.compareTo(start)>1){
@@ -71,7 +71,7 @@ public class RecurringShiftNeed {
 			int endHour = (int) Integer.parseInt(endTime.split(":")[0]);
 			int endMin = (int) Integer.parseInt(endTime.split(":")[1]);
 	    	if(valid){
-	    		System.out.println(start.compareTo(end));
+	    		///System.out.println(start.compareTo(end));
 	    		if(start.compareTo(end)==-1){
 	    			if(endMin>startMin){
 	    				if(endHour>=startHour){
@@ -112,7 +112,7 @@ public class RecurringShiftNeed {
     		reason="No Staff when one was requested";
     	}
     	
-    	System.out.println(reason);
+    	//System.out.println(reason);
     	
     	return valid;
     }
