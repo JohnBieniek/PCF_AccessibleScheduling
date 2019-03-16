@@ -213,14 +213,6 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
 	        })
 	        .then(function(response) {
 	        	$scope.listStatusItems();
-	        	
-	        	$scope.allowOvertime=false;
-		       	 $scope.allowUnavailable=false;
-		       	 $scope.prioritizeSecondShift=false;
-		       	 $scope.useDailyMax=true;
-		       	 $scope.useWeeklyMax=true;
-		       	 $scope.allowInactive=false;
-		       	 $scope.generatedBool = false;
 	        });
     	}
     }
@@ -245,23 +237,25 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
     }
     
     $scope.stopAssignment = function(month){
-    	$scope.assigned="Stopping";
-    	$http({
-            url: '/schedule/stopAssignment',
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            params: {
-                month: month
-            }
-        })
-        .then(function(response) {
-        	$scope.statusList = response.data.sort(function(a, b){return a.month-b.month});
-    		console.log(response.data);
-    		console.log($scope.statusList[0].generated);
-    		$scope.setTab($scope.tab);
-        });
+    	if(confirm("Are you sure you want to stop assigning shifts for "+$scope.monthName+"?")){
+	    	$scope.assigned="Stopping";
+	    	$http({
+	            url: '/schedule/stopAssignment',
+	            method: 'GET',
+	            headers: {
+	                'Content-Type': 'application/x-www-form-urlencoded'
+	            },
+	            params: {
+	                month: month
+	            }
+	        })
+	        .then(function(response) {
+	        	$scope.statusList = response.data.sort(function(a, b){return a.month-b.month});
+	    		console.log(response.data);
+	    		console.log($scope.statusList[0].generated);
+	    		$scope.setTab($scope.tab);
+	        });
+    	}
     }
     
     $scope.generateShifts = function(month){

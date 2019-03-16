@@ -645,6 +645,7 @@ public class EmployeeShiftCompatibilityManager {
 		}
 		System.out.println("options.isWeeklyMax():"+options.isWeeklyMax());
 		if(options.isDailyMax() && getAssignmentWouldViolateMaxShiftsPerDay(compatibility)){
+			System.out.println("violates max daily");
 			resting= true;
 		}
 		else if(options.isWeeklyMax() &&getAssignmentWouldViolateMaxWeeklyWorkDays(compatibility)){
@@ -652,9 +653,10 @@ public class EmployeeShiftCompatibilityManager {
 			resting=true;
 		}
 		else if(getAssignmentWouldViolateAlternateWeekendsOff(compatibility)){
+			System.out.println("violates alternate weekends");
 			resting=true;
 		}
-		System.out.println("resting:"+true);
+		System.out.println("resting:"+resting);
 		return resting;
 	}
 	    
@@ -689,7 +691,7 @@ public class EmployeeShiftCompatibilityManager {
 			if(null == employee || null == shift) {
 				throw new ProccessingException("Null shift or employee provided to getValidCompatibilities");
 			}
-			
+			System.out.println("shift is checking validity of options:"+shift.toString()+"  employee:"+employee.toString());
 			if(isValidFor(employee,shift,options)){
 				validCompatibilities.add(compatibility);
 			}
@@ -981,7 +983,7 @@ public class EmployeeShiftCompatibilityManager {
 	 */
 	public boolean isValidFor(Employee employee, Shift shift,ScheduleOptions options) throws CorruptDataException, ProccessingException{
 		boolean validity=false;
-		
+		System.out.println("checking validity of:"+shift.toString());
 		if(null==employee||null==shift ||null==options) {
 			throw new ProccessingException("Null options, employee or shift provided to isCompatibleWith");
 		}
