@@ -66,8 +66,8 @@
 		    	</div>
 	    	</ul>
 	   	</div>
-	   	<div style="display:inline-block; vertical-align: top; width:70%">
-			<div class="scheduler" >
+	   	<div style="display:inline-block; vertical-align: top; width:70%" ng-init="getScheduled(tab)">
+			<div class="scheduler" ng-init="getUnscheduled(tab)" >
 				<div>
 					<label style="font-size:43px">{{monthName}}</label>
 				</div>
@@ -77,6 +77,14 @@
 				<div style="display:inline-block">
 					<div style="display:inline-block" class = "incomplete" ng-class="{ complete: isGenerated(tab) }">
 						<p style="display:inline-block"> <b> {{generated}} </b> </p>
+					</div>
+					<div style="display:inline-block;width:120px" class = "completion">
+						<div>
+							<p style="display:inline-block" class="scheduled"> <b> {{scheduled}} </b> </p>
+						</div>
+						<div>
+							<p style="display:inline-block" class="unscheduled"> <b> {{unscheduled}} </b> </p>
+						</div>
 					</div>
 					<div class = "incomplete" style="display:inline-block" ng-class="{ complete: isAssigned(tab), working: isAssigning(tab) || isStopped(tab), errored: isErrored(tab) }">
 						<p align="right"   style="display:inline-block"> <b> {{assigned}} </b> </p>

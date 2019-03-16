@@ -152,6 +152,16 @@ public class ScheduleController {
         return scheduleStatusCrud.findAll();
     }
     
+    @RequestMapping(value = "/unscheduled", method = RequestMethod.GET)
+    public int unscheduled(@RequestParam("month") String month) throws NumberFormatException, ProccessingException {
+        return shiftManager.getUnassignedShiftsForMonth(Integer.parseInt(month)).size();
+    }
+    
+    @RequestMapping(value = "/scheduled", method = RequestMethod.GET)
+    public int scheduled(@RequestParam("month") String month) throws NumberFormatException, ProccessingException {
+        return shiftManager.getAssignedShiftsForMonth(Integer.parseInt(month)).size();
+    }
+    
     @RequestMapping(value = "/generateStatusList", method = RequestMethod.GET)
     public Iterable<ScheduleStatus> generateStatusList() {
     	scheduleManager.generateStatusList();

@@ -42,11 +42,15 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
 	 $scope.tab=1;
 	 $scope.monthName="January";
 	 $scope.statusList=[];
-	 
+	 $scope.unscheduled=0;
+	 $scope.scheduled=0;
 	 
 	$scope.setTab = function(newTab){
 	  $scope.generatedBool = $scope.statusList[$scope.tab-1].generated;
       $scope.tab = newTab;
+      
+      $scope.getUnscheduled(newTab);
+      $scope.getScheduled(newTab);
       
       if($scope.statusList[$scope.tab-1].generated){
     	  $scope.generated="Generated";
@@ -233,6 +237,38 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
     		console.log($scope.statusList[0].generated);
     		$scope.setTab($scope.tab);
     		setTimeout(listStatusItems,10000);
+        });
+    }
+    
+    $scope.getScheduled = function getScheduled(month){
+    	$http({
+            url: '/schedule/scheduled',
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            params: {
+            	month: month
+            }
+        })
+        .then(function(response) {
+        	$scope.scheduled=response.data;
+        });
+    }
+    
+    $scope.getUnscheduled = function getUnscheduled(month){
+    	$http({
+            url: '/schedule/unscheduled',
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            params: {
+            	month: month
+            }
+        })
+        .then(function(response) {
+        	$scope.unscheduled=response.data;
         });
     }
     

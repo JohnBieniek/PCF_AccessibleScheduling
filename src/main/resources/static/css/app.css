@@ -68,6 +68,7 @@
 .complete{
 	border-color: #2db93d!important;
 	background-color: #2db93d!important;
+	verticle-allign:baseline;
 }
 
 .incomplete{
@@ -78,9 +79,28 @@
 	margin-left:20px;
     margin-right:20px;
 	padding: 15px;
-	 width: 230px;
+ 	width: 230px;
 }
 
+.completion{
+	vertical-align: text-bottom;
+	 width: 120px;
+	 height: 50px;
+}
+.scheduled{
+	background-color: #2db93d;
+	border-color: #2db93d;
+	border-radius: 25px; 
+	font-size: 25px;
+	 width: 120px;
+}
+.unscheduled{
+	background-color: #d3d7cf;
+	border-color: #d3d7cf;
+	border-radius: 25px; 
+	font-size: 25px;
+	 width: 120px;
+}
 .loginPage{
 	background-color: #6a0000;
 	font-size: 50px;
