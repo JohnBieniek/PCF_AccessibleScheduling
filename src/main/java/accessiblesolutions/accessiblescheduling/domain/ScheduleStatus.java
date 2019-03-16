@@ -12,6 +12,8 @@ public class ScheduleStatus {
 	private boolean assigning;
 	private boolean errored;
 	private boolean stopped;
+	private int scheduled;
+	private int unscheduled;
 	
 	public String getMonth() {
 		return month;
