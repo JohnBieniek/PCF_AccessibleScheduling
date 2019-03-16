@@ -83,7 +83,7 @@
 }
 
 .completion{
-	verticle-allign: bottom;
+	vertical-align: text-bottom;
 	 width: 120px;
 	 height: 50px;
 }
