@@ -128,10 +128,10 @@ public class Shift {
 		int endHour = (int) Integer.parseInt(endTime.split(":")[0]);
 		int endMin = (int) Integer.parseInt(endTime.split(":")[1]);
 		
-		System.out.println("startHour"+startHour);
-		System.out.println("startMin"+startMin);
-				System.out.println("endHour"+endHour);
-						System.out.println("endMin"+endMin);
+		//System.out.println("startHour"+startHour);
+		//System.out.println("startMin"+startMin);
+				//System.out.println("endHour"+endHour);
+						//System.out.println("endMin"+endMin);
     	if(getOvernight()){
     		duration+=24;
     	}
@@ -151,9 +151,9 @@ public class Shift {
     		System.out.println("ERROR: shift ends before starting " +toString() + " duration:"+duration);
     		throw new CorruptDataException(Shift.class,this);
     	}
-    	System.out.println("Getting duration");
+    	//System.out.println("Getting duration");
     	duration+=(endHour-startHour) + ((endMin-startMin)/60.0);
-    	System.out.println("Got duration:"+duration);
+    	//System.out.println("Got duration:"+duration);
     	if(duration>24||duration<=0){
     		System.out.println("ERROR: shift is inappropriate duration " +toString() + " duration:"+duration);
     		throw new CorruptDataException(Shift.class,this);

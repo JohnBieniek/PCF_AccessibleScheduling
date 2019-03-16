@@ -18,6 +18,7 @@ import accessiblesolutions.accessiblescheduling.domain.ScheduleStatus;
 import accessiblesolutions.accessiblescheduling.domain.Shift;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
+import accessiblesolutions.accessiblescheduling.to.ScheduleOptions;
 
 @RestController
 @RequestMapping(value = "/schedule")
@@ -64,38 +65,49 @@ public class ScheduleController {
         return shiftManager.getDurationOfShiftsStartingWeekOfMonth(Integer.parseInt(week),Integer.parseInt(month),Integer.parseInt(year));
     }
     
-    @RequestMapping(value = "/staffWeekdayShift", method = RequestMethod.GET)
-    public String staffWeekdayShift(@RequestParam("week") String week,@RequestParam("month") String month,@RequestParam("year") String year) throws CorruptDataException, ProccessingException {
-        return assignmentManager.scheduleWeekdayShiftStartingWeekOfMonth(Integer.parseInt(week),Integer.parseInt(month),Integer.parseInt(year));
-    }
-    
-    @RequestMapping(value = "/staffWeekdayShifts", method = RequestMethod.GET)
-    public String staffWeekdayShifts(@RequestParam("week") String week,@RequestParam("month") String month,@RequestParam("year") String year) throws CorruptDataException, ProccessingException {
-        return assignmentManager.scheduleWeekdayShiftsStartingWeekOfMonth(Integer.parseInt(week),Integer.parseInt(month),Integer.parseInt(year));
-    }
-    
-    @RequestMapping(value = "/staffWeekendShift", method = RequestMethod.GET)
-    public String staffWeekendShift(@RequestParam("week") String week,@RequestParam("month") String month,@RequestParam("year") String year) throws CorruptDataException, ProccessingException {
-        return assignmentManager.scheduleWeekendShiftStartingWeekOfMonth(Integer.parseInt(week),Integer.parseInt(month),Integer.parseInt(year));
-    }
-    
-    @RequestMapping(value = "/staffWeekendShifts", method = RequestMethod.GET)
-    public String staffWeekendShifts(@RequestParam("week") String week,@RequestParam("month") String month,@RequestParam("year") String year) throws CorruptDataException, ProccessingException {
-        return assignmentManager.scheduleWeekendShiftsStartingWeekOfMonth(Integer.parseInt(week),Integer.parseInt(month),Integer.parseInt(year));
-    }
-    
-    @RequestMapping(value = "/staffWeeksShifts", method = RequestMethod.GET)
-    public String staffWeeksShifts(@RequestParam("week") String week,@RequestParam("month") String month,@RequestParam("year") String year) throws CorruptDataException, ProccessingException {
-        return assignmentManager.scheduleShiftsStartingWeekOfMonth(Integer.parseInt(week),Integer.parseInt(month),Integer.parseInt(year));
-    }
+//    @RequestMapping(value = "/staffWeekdayShift", method = RequestMethod.GET)
+//    public String staffWeekdayShift(@RequestParam("week") String week,@RequestParam("month") String month,@RequestParam("year") String year) throws CorruptDataException, ProccessingException {
+//        return assignmentManager.scheduleWeekdayShiftStartingWeekOfMonth(Integer.parseInt(week),Integer.parseInt(month),Integer.parseInt(year));
+//    }
+//    
+//    @RequestMapping(value = "/staffWeekdayShifts", method = RequestMethod.GET)
+//    public String staffWeekdayShifts(@RequestParam("week") String week,@RequestParam("month") String month,@RequestParam("year") String year) throws CorruptDataException, ProccessingException {
+//        return assignmentManager.scheduleWeekdayShiftsStartingWeekOfMonth(Integer.parseInt(week),Integer.parseInt(month),Integer.parseInt(year));
+//    }
+//    
+//    @RequestMapping(value = "/staffWeekendShift", method = RequestMethod.GET)
+//    public String staffWeekendShift(@RequestParam("week") String week,@RequestParam("month") String month,@RequestParam("year") String year) throws CorruptDataException, ProccessingException {
+//        return assignmentManager.scheduleWeekendShiftStartingWeekOfMonth(Integer.parseInt(week),Integer.parseInt(month),Integer.parseInt(year));
+//    }
+//    
+//    @RequestMapping(value = "/staffWeekendShifts", method = RequestMethod.GET)
+//    public String staffWeekendShifts(@RequestParam("week") String week,@RequestParam("month") String month,@RequestParam("year") String year) throws CorruptDataException, ProccessingException {
+//        return assignmentManager.scheduleWeekendShiftsStartingWeekOfMonth(Integer.parseInt(week),Integer.parseInt(month),Integer.parseInt(year));
+//    }
+//    
+//    @RequestMapping(value = "/staffWeeksShifts", method = RequestMethod.GET)
+//    public String staffWeeksShifts(@RequestParam("week") String week,@RequestParam("month") String month,@RequestParam("year") String year) throws CorruptDataException, ProccessingException {
+//        return assignmentManager.scheduleShiftsStartingWeekOfMonth(Integer.parseInt(week),Integer.parseInt(month),Integer.parseInt(year));
+//    }
     
     @RequestMapping(value = "/staffPreassignedShifts", method = RequestMethod.GET)
     public String staffPreassignedShifts(@RequestParam("month") String month,@RequestParam("year") String year) throws CorruptDataException, ProccessingException {
-        return assignmentManager.staffPreassignedShifts(month,year,false);
+    	ScheduleOptions options = new ScheduleOptions();
+    	options.setMonth(month);
+    	options.setYear(year);
+    	return assignmentManager.staffPreassignedShifts(options);
     }
     
     @RequestMapping(value = "/staffShiftsSafely", method = RequestMethod.GET)
-    public Iterable<ScheduleStatus> staffShiftsSafely(@RequestParam("month") String month,@RequestParam("year") String year) {
+    public Iterable<ScheduleStatus> staffShiftsSafely(@RequestParam("month") String month
+    													,@RequestParam("year") String year
+    													,@RequestParam("allowOvertime") boolean allowOvertime
+    													,@RequestParam("allowInactive") boolean allowInactive
+    													,@RequestParam("allowUnavailable") boolean allowUnavailable
+    													,@RequestParam("prioritizeSecondShift") boolean prioritizeSecondShift
+    													,@RequestParam("dailyMax") boolean dailyMax
+    													,@RequestParam("weeklyMax") boolean weeklyMax) {
+    	System.out.println("Starting assignment");
     	ScheduleStatus status = scheduleStatusCrud.findOne(month);
     	scheduleStatusRepository.deleteByMonth(month);
     	
@@ -109,8 +121,11 @@ public class ScheduleController {
         	scheduleStatusCrud.save(status);
     	}
     	
+    	ScheduleOptions options = new ScheduleOptions(month, year, allowOvertime, allowInactive,allowUnavailable, 
+    													prioritizeSecondShift, dailyMax,weeklyMax);
+    	System.out.println("Schedule options:"+options.toString());
     	try {
-			assignmentManager.scheduleShifts(month,year);
+			assignmentManager.scheduleShifts(options);
 		} catch (ProccessingException | CorruptDataException e) {
 			status = scheduleStatusCrud.findOne(month);
 	    	scheduleStatusRepository.deleteByMonth(month);
@@ -127,6 +142,11 @@ public class ScheduleController {
     	return scheduleStatusCrud.findAll();
     }
     
+    @RequestMapping(value = "/assigning", method = RequestMethod.GET)
+    public boolean assigning(@RequestParam("month") String month) {
+    	return assignmentManager.scheduleStatus(month).isAssigning();
+    }
+    
     @RequestMapping(value = "/statusList", method = RequestMethod.GET)
     public Iterable<ScheduleStatus> scheduleStatusList() {
         return scheduleStatusCrud.findAll();
@@ -135,6 +155,24 @@ public class ScheduleController {
     @RequestMapping(value = "/generateStatusList", method = RequestMethod.GET)
     public Iterable<ScheduleStatus> generateStatusList() {
     	scheduleManager.generateStatusList();
+        return scheduleStatusCrud.findAll();
+    }
+    
+    @RequestMapping(value = "/stopAssignment", method = RequestMethod.GET)
+    public Iterable<ScheduleStatus> stopAssignment(@RequestParam("month") String month) throws CorruptDataException {
+    	ScheduleStatus status = scheduleStatusCrud.findOne(month);
+    	scheduleStatusRepository.deleteByMonth(month);
+    	
+    	if(null==status) {
+    		status= new ScheduleStatus();
+    		status.setMonth(month);
+    	}
+    	
+    	status.setGenerated(true);
+		status.setAssigning(true);
+		status.setStopped(true);
+    	scheduleStatusCrud.save(status);
+    	
         return scheduleStatusCrud.findAll();
     }
     
@@ -149,10 +187,13 @@ public class ScheduleController {
         return manager.generateSingleShifts(month);
     }
     
-    @RequestMapping(value = "/staffShifts", method = RequestMethod.GET)
-    public String staffShifts(@RequestParam("month") String month,@RequestParam("year") String year) throws CorruptDataException, ProccessingException {
-        return manager.staffShifts(month,year);
-    }
+//    @RequestMapping(value = "/staffShifts", method = RequestMethod.GET)
+//    public String staffShifts(@RequestParam("month") String month,@RequestParam("year") String year) throws CorruptDataException, ProccessingException {
+//        ScheduleOptions options = new ScheduleOptions();
+//        options.setMonth(month);
+//        options.setYear(year);
+//    	return manager.staffShifts(options);
+//    }
     
     @RequestMapping(value = "/getShiftsForMonth", method = RequestMethod.GET)
     public String getShiftsForOfMonth(@RequestParam("month") String month) {

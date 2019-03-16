@@ -11,6 +11,7 @@ public class ScheduleStatus {
 	private boolean assigned;
 	private boolean assigning;
 	private boolean errored;
+	private boolean stopped;
 	
 	public String getMonth() {
 		return month;
@@ -43,9 +44,15 @@ public class ScheduleStatus {
 	public void setErrored(boolean errored) {
 		this.errored = errored;
 	}
+	public boolean isStopped() {
+		return stopped;
+	}
+	public void setStopped(boolean stopped) {
+		this.stopped = stopped;
+	}
 	@Override
 	public String toString() {
 		return "ScheduleStatus [month=" + month + ", generated=" + generated + ", assigned=" + assigned + ", assigning="
-				+ assigning + ", errored=" + errored + "]";
+				+ assigning + ", errored=" + errored + ", stopped=" + stopped + "]";
 	}
 }

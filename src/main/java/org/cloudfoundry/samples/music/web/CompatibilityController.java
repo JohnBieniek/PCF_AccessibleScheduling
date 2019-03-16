@@ -4,9 +4,6 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 
-import accessiblesolutions.accessiblescheduling.domain.EmployeeShiftCompatibility;
-import accessiblesolutions.accessiblescheduling.domain.Shift;
-
 import org.cloudfoundry.samples.music.managers.CustomDataManager;
 import org.cloudfoundry.samples.music.managers.EmployeeShiftCompatibilityManager;
 import org.cloudfoundry.samples.music.managers.EmployeeShiftManager;
@@ -24,10 +21,13 @@ import org.springframework.web.bind.annotation.RestController;
 import accessiblesolutions.accessiblescheduling.domain.Client;
 import accessiblesolutions.accessiblescheduling.domain.CustomField;
 import accessiblesolutions.accessiblescheduling.domain.Employee;
+import accessiblesolutions.accessiblescheduling.domain.EmployeeShiftCompatibility;
+import accessiblesolutions.accessiblescheduling.domain.Shift;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
 import accessiblesolutions.accessiblescheduling.to.CompatibilityDTO;
 import accessiblesolutions.accessiblescheduling.to.EmployeeUpdateTO;
+import accessiblesolutions.accessiblescheduling.to.ScheduleOptions;
 import accessiblesolutions.accessiblescheduling.to.UpdateTO;
 
 @RestController
@@ -440,7 +440,10 @@ public class CompatibilityController {
     		to.setEmployeeId(employee.getId());
     	}
     	
-    	to.setBooleanResponse(employeeShiftCompatibilityManager.isAssignableFor(employee,shift));
+    	ScheduleOptions options = new ScheduleOptions();
+    	
+    	
+    	to.setBooleanResponse(employeeShiftCompatibilityManager.isAssignableFor(employee,shift,options));
 
     	return to;
     }
@@ -470,7 +473,9 @@ public class CompatibilityController {
     		to.setEmployeeId(employee.getId());
     	}
     	
-    	to.setBooleanResponse(employeeShiftCompatibilityManager.isValidFor(employee,shift));
+    	ScheduleOptions options = new ScheduleOptions();
+    	
+    	to.setBooleanResponse(employeeShiftCompatibilityManager.isValidFor(employee,shift,options));
 
     	return to;
     }

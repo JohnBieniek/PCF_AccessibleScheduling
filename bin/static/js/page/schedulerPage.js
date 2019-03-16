@@ -30,6 +30,12 @@ angular.module('vacation', ['ngResource', 'ui.bootstrap']).
 function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
 	 $scope.multiTableEditing=false;
 	 $scope.month=1;
+	 $scope.allowOvertime=false;
+	 $scope.allowUnavailable=false;
+	 $scope.prioritizeSecondShift=false;
+	 $scope.useDailyMax=true;
+	 $scope.useWeeklyMax=true;
+	 $scope.allowInactive=false;
 	 $scope.generatedBool = false;
 	 $scope.generated="Generated";
 	 $scope.assigned="Unassigned";
@@ -38,12 +44,9 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
 	 $scope.statusList=[];
 	 
 	 
-	 $scope.setTab = function(newTab){
+	$scope.setTab = function(newTab){
 	  $scope.generatedBool = $scope.statusList[$scope.tab-1].generated;
       $scope.tab = newTab;
-      console.log("month:"+$scope.tab);
-      console.log("generated:"+$scope.statusList[$scope.tab-1].generated);
-      console.log("scope.statusList"+$scope.statusList[$scope.tab-1].toString());
       
       if($scope.statusList[$scope.tab-1].generated){
     	  $scope.generated="Generated";
@@ -55,12 +58,15 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
       if($scope.statusList[$scope.tab-1].assigned){
     	  $scope.assigned="Assigned";
       }
-      else{
+      else {
     	  $scope.assigned="Unassigned";
       }
       
       if($scope.statusList[$scope.tab-1].assigning){
     	  $scope.assigned="Assigning";
+    	  if($scope.statusList[$scope.tab-1].stopped){
+    		  $scope.assigned="Stopping";
+    	  }
       }
       
       switch(newTab){
@@ -103,6 +109,26 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
       }
     };
     
+    $scope.toggleInactive = function(){
+    	$scope.allowInactive = !$scope.allowInactive;
+    }
+    
+    $scope.toggleUnavailable = function(){
+    	$scope.allowUnavailable = !$scope.allowUnavailable;
+    }
+    $scope.toggleOvertime = function(){
+    	$scope.allowOvertime = !$scope.allowOvertime;
+    }
+    $scope.toggleDailyMax = function(){
+    	$scope.useDailyMax = !$scope.useDailyMax;
+    }
+    $scope.toggleWeeklyMax = function(){
+    	$scope.useWeeklyMax = !$scope.useWeeklyMax;
+    }
+    $scope.togglePrioritizationHistory = function(){
+    	$scope.prioritizeSecondShift = !$scope.prioritizeSecondShift;
+    }
+    
     $scope.isTabGenerated = function(month){
         return $scope.statusList[month-1].generated && $scope.tab != month && !$scope.statusList[month-1].assigned&& !$scope.statusList[month-1].assigning;
       };
@@ -124,8 +150,12 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
         return $scope.statusList[month-1].errored;
       };
     $scope.isAssigning = function(month){
-    	return $scope.statusList[month-1].assigning 
+    	return $scope.statusList[month-1].assigning
       };
+      
+      $scope.isStopped = function(month){
+      	return $scope.statusList[month-1].stopped
+        };
           
       $scope.isNotAssignable = function(month){
     	  assignable = true;
@@ -206,6 +236,28 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
         });
     }
     
+    $scope.stopAssignment = function(month){
+    	if(confirm("Are you sure you want to stop assigning shifts for "+$scope.monthName+"?")){
+	    	$scope.assigned="Stopping";
+	    	$http({
+	            url: '/schedule/stopAssignment',
+	            method: 'GET',
+	            headers: {
+	                'Content-Type': 'application/x-www-form-urlencoded'
+	            },
+	            params: {
+	                month: month
+	            }
+	        })
+	        .then(function(response) {
+	        	$scope.statusList = response.data.sort(function(a, b){return a.month-b.month});
+	    		console.log(response.data);
+	    		console.log($scope.statusList[0].generated);
+	    		$scope.setTab($scope.tab);
+	        });
+    	}
+    }
+    
     $scope.generateShifts = function(month){
     	$http({
             url: '/schedule/generateShifts',
@@ -226,7 +278,7 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
         });
     }
     
-    $scope.assignShifts = function(month){
+    $scope.assignShifts = function(month, allowOvertime,allowInactive,allowUnavailable,prioritizeSecondShift,dailyMax,weeklyMax){
     	$scope.statusList[month-1].assigning=true;
     	$scope.assigned="Assigning";
     	console.log("$scope.statusList" +$scope.statusList.toString());
@@ -238,7 +290,13 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
             },
             params: {
                 month: month,
-                year: '2019'
+                year: '2019',
+                allowOvertime: allowOvertime,
+                allowInactive: allowInactive,
+                allowUnavailable: allowUnavailable,
+                prioritizeSecondShift: prioritizeSecondShift,
+                dailyMax: dailyMax,
+                weeklyMax: weeklyMax
             }
         })
         .then(function(response) {
