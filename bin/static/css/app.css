@@ -1,3 +1,12 @@
+html,body
+{
+    width: 100%;
+    height: 100%;
+    margin: 0px;
+    padding: 0px;
+    overflow-x: hidden; 
+}
+
 #body {
     padding-top: 10px;
 }
@@ -196,6 +205,11 @@
     padding-right:20px;
 }
 
+.rightAllign{
+	vertical-align: bottom;
+	text-align: right;
+  	margin-right: 0px;
+}
 .centered{
 	 text-align: center;
 	margin-left: auto;
