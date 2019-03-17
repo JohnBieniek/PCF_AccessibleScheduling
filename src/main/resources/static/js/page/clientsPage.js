@@ -176,14 +176,16 @@ function ClientsController($scope, $modal, $http, Clients, Client, CustomFields,
      }
     
     $scope.deleteClient = function (client) {
-        Client.delete({id: client.id},
-            function () {
-                Status.success("Client deleted");
-                $scope.listClients();
-            },
-            function (result) {
-                Status.error("Error deleting client: " + result.status);
-            }
-        );
+    	if(confirm("Are you sure to delete info for "+client.first+"?")){
+	        Client.delete({id: client.id},
+	            function () {
+	                Status.success("Client deleted");
+	                $scope.listClients();
+	            },
+	            function (result) {
+	                Status.error("Error deleting client: " + result.status);
+	            }
+	        );
+    	}
     };
 }

@@ -1,30 +1,23 @@
 <div id="adminView" ng-init="init()">
-   <!-- <div class="page-header">
-         <h1>Admin view</h1>
-        <div>
-            <span> [ view : </span>
-            <a href="" ng-click="setPage('dashboard')">Dashboard</a>
-            <a href="" ng-click="setPage('clientList')">Clients</a>
-            <a href="" ng-click="setPage('scheduling')">Scheduling</a>
-            <a href="" ng-click="setPage('employeeList')">Employees</a>
-            <a href="" ng-click="setPage('vacation')">Vacation/Sickness</a>
-            <a href="" ng-click="setPage('eventList')">Events</a>
-            <a href="" ng-click="setPage('shiftList')">Shifts</a>
-            <a href="" ng-click="setPage('settings')">Settings</a>
-            <span> ] </span>
-        </div>
-    </div>-->
-     <div class="head">
-         	 	<i style="display:inline-block" class="glyphicon glyphicon-home micon" ng-click="setPage('scheduler')"></i>
-              <p style="display:inline-block"  class="titleText" ng-click="setPage('scheduler')">Accessible Scheduling</p>
-              	<i style="display:inline-block" class="glyphicon glyphicon-user micon rightAllign" ng-click="setPage('clients')">
-              		<br>
-              		 <p style="text-align:center" ng-click="setPage('clients')">Clients</p>
-              	</i>
-               <!--<ul class="navbar-nav">
-                 <li></li>
-              </ul>-->
+ 	<div class="head">
+ 	<div style="display:inline-block;text-align:right">
+          <p style="display:inline-block"  class="titleText" ng-click="setPage('scheduler')">Accessible Scheduling</p>
           </div>
+	        <div style="display:inline-block;float:right;margin-top:15px!important;">
+	          	<i style="margin-right: 10px!important;" class="glyphicon glyphicon-user micon navAllign" ng-click="setPage('clients')">Clients
+	          		<!--  <p style="text-align:center" ng-click="setPage('clients')">Clients</p> -->
+	          	</i>|
+	          	<i style="margin-right: 10px!important;" class="glyphicon glyphicon-plus-sign micon navAllign" ng-click="setPage('employeeList')">Staff
+	          		 <!--  <p style="text-align:center" ng-click="setPage('employeeList')">Staff</p>-->
+	          	</i>|
+	          	<i style="margin-right: 10px!important;" class="glyphicon glyphicon-dashboard micon navAllign" ng-click="setPage('scheduler')">Scheduler
+	          		 <!--  <p style="text-align:center" ng-click="setPage('scheduler')">Scheduler</p>-->
+	          	</i>|
+				<i style="margin-right: 10px!important;" class="glyphicon glyphicon-cog micon navAllign" ng-click="setPage('settings')">Settings
+	          		 <!--  <p style="text-align:center" ng-click="setPage('settings')">Settings</p>-->
+	          	</i>
+          	</div>
+      </div>
     <div class="row">
         <div ng-include src="'templates/util/status.html'"></div>
     </div>
