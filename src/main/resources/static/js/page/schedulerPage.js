@@ -216,7 +216,9 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
 	            }
 	        })
 	        .then(function(response) {
-	        	$scope.listStatusItems();
+	        	$scope.statusList = response.data.sort(function(a, b){return a.month-b.month});
+	        	$scope.getUnscheduled(newTab);
+	            $scope.getScheduled(newTab);
 	        });
     	}
     }
@@ -236,7 +238,7 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
     		console.log(response.data);
     		console.log($scope.statusList[0].generated);
     		$scope.setTab($scope.tab);
-    		setTimeout(listStatusItems,10000);
+    		setTimeout(listStatusItems,12500);
         });
     }
     
@@ -272,9 +274,25 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
         });
     }
     
+    $scope.finishAssignment = function finishAssignment(){
+    	$http({
+            url: '/schedule/finishAssignment',
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            params: {
+                month: $scope.tab
+            }
+        })
+        .then(function(response) {
+        	$scope.statusList = response.data.sort(function(a, b){return a.month-b.month});
+        });
+    }
+
     $scope.stopAssignment = function(month){
     	if(confirm("Are you sure you want to stop assigning shifts for "+$scope.monthName+"?")){
-	    	$scope.assigned="Stopping";
+	    	//$scope.assigned="Stopping";
 	    	$http({
 	            url: '/schedule/stopAssignment',
 	            method: 'GET',
@@ -290,6 +308,7 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
 	    		console.log(response.data);
 	    		console.log($scope.statusList[0].generated);
 	    		$scope.setTab($scope.tab);
+	    		//setTimeout($scope.finishAssignment,10000);
 	        });
     	}
     }
@@ -343,4 +362,5 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
     		$scope.setTab($scope.tab);
         });
     }
+    $scope.listStatusItems();
 }

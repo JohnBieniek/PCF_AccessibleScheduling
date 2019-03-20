@@ -65,7 +65,7 @@ public class ShiftAssignmentManager {
 				//Most time
   
     //The real new one
-    public void scheduleShifts(ScheduleOptions options) throws ProccessingException, CorruptDataException {
+    public void scheduleShifts(ScheduleOptions options){
     	int month = Integer.parseInt(options.getMonth());
     	int year = Integer.parseInt(options.getYear());
     	
@@ -82,12 +82,21 @@ public class ShiftAssignmentManager {
     	status.setAssigning(true);
     	scheduleStatusCrud.save(status);
     	
-    	staffPreassignedShifts(options);
-    	
-    	for(int week = 0; week<6;week++){
-    		scheduleWeekendShifts(week,month,year,options);
-    		scheduleWeekdayShifts(week,month,year,options);
-    	}
+    	try {
+			staffPreassignedShifts(options);
+			
+			for(int week = 0; week<6;week++){
+	    		scheduleWeekendShifts(week,month,year,options);
+	    		scheduleWeekdayShifts(week,month,year,options);
+	    	}
+		} catch (Exception e) {
+			scheduleStatusRepository.deleteByMonth(options.getMonth());
+	    	
+	    	status.setAssigning(false);
+	    	status.setAssigned(true);
+	    	scheduleStatusCrud.save(status);
+	    	System.out.println("Failed to assign everything. "+e.getMessage());
+		}
     	
     	scheduleStatusRepository.deleteByMonth(options.getMonth());
     	
@@ -100,7 +109,7 @@ public class ShiftAssignmentManager {
     	ArrayList<Shift> shifts = shiftManager.getUnassignedNonEventShiftsForMonth(month);
 		ArrayList<Shift> unassignedShiftsForWeek = ShiftWorker.getShiftsStartingWeekOfMonth(shifts, week, month,year);
 		ArrayList<Shift> unassignedShiftsForWeekdays= ShiftWorker.getWeekdayShifts(unassignedShiftsForWeek);
-		System.out.println("scheduling weekday shifts:"+unassignedShiftsForWeekdays.size());
+		//System.out.println("scheduling weekday shifts:"+unassignedShiftsForWeekdays.size());
 		scheduleShifts(unassignedShiftsForWeekdays,week,month,year,options);
     }
     
@@ -108,7 +117,7 @@ public class ShiftAssignmentManager {
     	ArrayList<Shift> shifts = shiftManager.getUnassignedNonEventShiftsForMonth(month);
 		ArrayList<Shift> unassignedShiftsForWeek = ShiftWorker.getShiftsStartingWeekOfMonth(shifts, week, month,year);
 		ArrayList<Shift> unassignedShiftsForWeekends= ShiftWorker.getWeekendShifts(unassignedShiftsForWeek);
-		System.out.println("scheduling weekend shifts:"+unassignedShiftsForWeekends.size());
+		//System.out.println("scheduling weekend shifts:"+unassignedShiftsForWeekends.size());
 		scheduleShifts(unassignedShiftsForWeekends,week,month,year,options);
     }
     
@@ -120,6 +129,7 @@ public class ShiftAssignmentManager {
     		if(!stopped) {
 	        	if(scheduleStatus(month+"").isStopped()) {
 	        		stopped=true;
+	        		i=maxItterations;
 	        	}
 	        	else {
 					if(unassignedShifts!=null && unassignedShifts.size()>0) {
@@ -315,7 +325,7 @@ public class ShiftAssignmentManager {
     	//If we have at least one valid employee for this shift
     	if(null!=shiftCompatibilities && null != shiftCompatibilities.compatibilities && 
     	   shiftCompatibilities.compatibilities.size() >0) {
-    		System.out.println("options.isAllowOvertime() when at least one available:"+options.isAllowOvertime() );
+    		//System.out.println("options.isAllowOvertime() when at least one available:"+options.isAllowOvertime() );
     		//If we have only 1 valid employee give them the shift regardless
     		if(shiftCompatibilities.compatibilities.size()==1 && 
     				( options.isAllowOvertime() || 
@@ -340,7 +350,7 @@ public class ShiftAssignmentManager {
     		
     		//Assign to the person with the most time
     		if(!assigned) {
-    			System.out.println("trying to assign to most time");
+    			//System.out.println("trying to assign to most time");
     			employee=employeeShiftCompatibilityManager.getEmployeeWithMostTimeSafely(shiftCompatibilities);
     			if(null!=employee) {
     				shift.setAssignmentReason(employee.getFirst() +" had the most time before overtime");
@@ -375,7 +385,7 @@ public class ShiftAssignmentManager {
 		shift.setStaffName(employee.getFirst());
 		shift.setAssigned(true);
 		shiftCrud.save(shift);
-		System.out.println("assigned:"+shift.toString());
+		//System.out.println("assigned:"+shift.toString());
     }
     
     public ScheduleStatus scheduleStatus(String month) {

@@ -643,20 +643,20 @@ public class EmployeeShiftCompatibilityManager {
 		else if(!shift.isValid()) {
 			throw new CorruptDataException("Invalid shift provided to getResting");
 		}
-		System.out.println("options.isWeeklyMax():"+options.isWeeklyMax());
+		//System.out.println("options.isWeeklyMax():"+options.isWeeklyMax());
 		if(options.isDailyMax() && getAssignmentWouldViolateMaxShiftsPerDay(compatibility)){
-			System.out.println("violates max daily");
+			//System.out.println("violates max daily");
 			resting= true;
 		}
 		else if(options.isWeeklyMax() &&getAssignmentWouldViolateMaxWeeklyWorkDays(compatibility)){
-			System.out.println("violates max weekly");
+			//System.out.println("violates max weekly");
 			resting=true;
 		}
 		else if(getAssignmentWouldViolateAlternateWeekendsOff(compatibility)){
-			System.out.println("violates alternate weekends");
+			//System.out.println("violates alternate weekends");
 			resting=true;
 		}
-		System.out.println("resting:"+resting);
+		//System.out.println("resting:"+resting);
 		return resting;
 	}
 	    
@@ -691,7 +691,7 @@ public class EmployeeShiftCompatibilityManager {
 			if(null == employee || null == shift) {
 				throw new ProccessingException("Null shift or employee provided to getValidCompatibilities");
 			}
-			System.out.println("shift is checking validity of options:"+shift.toString()+"  employee:"+employee.toString());
+			//System.out.println("shift is checking validity of options:"+shift.toString()+"  employee:"+employee.toString());
 			if(isValidFor(employee,shift,options)){
 				validCompatibilities.add(compatibility);
 			}
@@ -983,7 +983,7 @@ public class EmployeeShiftCompatibilityManager {
 	 */
 	public boolean isValidFor(Employee employee, Shift shift,ScheduleOptions options) throws CorruptDataException, ProccessingException{
 		boolean validity=false;
-		System.out.println("checking validity of:"+shift.toString());
+		//System.out.println("checking validity of:"+shift.toString());
 		if(null==employee||null==shift ||null==options) {
 			throw new ProccessingException("Null options, employee or shift provided to isCompatibleWith");
 		}
@@ -1002,7 +1002,7 @@ public class EmployeeShiftCompatibilityManager {
 				}
 			}
 		}
-		System.out.println("valid?"+validity);
+		//System.out.println("valid?"+validity);
 		return validity;
 	}
 }
