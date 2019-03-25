@@ -4503,8 +4503,9 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	public void getRestingReturnsTrueViolatingMaxDailyShifts() {
 		Employee employee = new Employee();
 		employee.setId("assignedOneDay");
-		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
-		
+		Shift shift = new Shift();
+		ScheduleOptions options = new ScheduleOptions();
+		options.setDailyMax(true);
 		shift.setStartDate("2018-04-02");
 		shift.setEndDate("2018-04-02");
 		shift.setStartTime("10:00");
@@ -4532,7 +4533,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		Employee employee = new Employee();
 		employee.setId("assignedFiveDay");
 		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
-		
+		options.setWeeklyMax(true);
 		shift.setStartDate("2018-02-04");
 		shift.setEndDate("2018-02-04");
 		shift.setStartTime("10:00");
@@ -5056,7 +5057,9 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	    employee.setDaysAvailable(availability);
 		employee.setOffAlternateWeekends(true);
 		employee.setId("assignedFiveDay");
-		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
+		Shift shift = new Shift();
+		ScheduleOptions options = new ScheduleOptions();
+		options.setWeeklyMax(true);
 		
 		shift.setStartDate("2018-02-04");
 		shift.setEndDate("2018-02-04");
