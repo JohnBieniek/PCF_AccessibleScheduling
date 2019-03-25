@@ -50,13 +50,15 @@ public class ScheduleController {
 
     @RequestMapping(value = "/byMonth", method = RequestMethod.DELETE)
     public Iterable<ScheduleStatus> deleteByMonth(@RequestParam("month") String  month) {
-        ScheduleStatus status = new ScheduleStatus();
-        
-    	status.setMonth(month);
-    	    	
-    	scheduleStatusRepository.deleteByMonth(month);
-    	scheduleStatusCrud.save(status);
-    	
+    	 ScheduleStatus status = new ScheduleStatus();
+         
+     	status.setMonth(month);
+     	    	
+     	scheduleStatusRepository.deleteByMonth(month);
+     	scheduleStatusCrud.save(status);
+     	
+     
+        shiftManager.deleteShiftsForMonth(Integer.parseInt(month));
     	return scheduleStatusCrud.findAll();
     }
     

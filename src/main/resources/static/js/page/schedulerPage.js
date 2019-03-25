@@ -217,8 +217,8 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
 	        })
 	        .then(function(response) {
 	        	$scope.statusList = response.data.sort(function(a, b){return a.month-b.month});
-	        	$scope.getUnscheduled(newTab);
-	            $scope.getScheduled(newTab);
+	        	$scope.getUnscheduled(month);
+	            $scope.getScheduled(month);
 	        });
     	}
     }
