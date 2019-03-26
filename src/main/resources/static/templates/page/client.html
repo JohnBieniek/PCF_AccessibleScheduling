@@ -1,0 +1,52 @@
+<div ng-controller="MobileClientController" ng-init="listClients()">
+	<divstyle="display:inline-block;">
+	 	<div style="display:inline-block;">
+			<ul>
+				<div class="monthSelector">
+					<div ng-repeat="client in clients">
+						<div class = "clientTab" ng-class="{ active: isClientSet(client) }">
+					    	<div >
+					       		<p ng-click="setClient(client)">{{client.first}}</p>
+					    	</div>
+				    	</div>
+			    	</div>
+		    	</div>
+	    	</ul>
+	   	</div>
+	   	<div style="display:inline-block; vertical-align: top; width:60%"">
+			<div>
+				<div style="display:inline-block;" class = "recTab" ng-class="{ active: isSet('Schedule') }">
+			    	<div >
+			       		<p ng-click="setTab('Schedule')">Schedule</p>
+			    	</div>
+		    	</div>
+		    	<div style="display:inline-block;" class = "recTab" ng-class="{ active: isSet('Requests') }">
+			    	<div >
+			       		<p ng-click="setTab('Requests')">Requests</p>
+			    	</div>
+		    	</div>
+		    	<div style="display:inline-block;" class = "recTab" ng-class="{ active: isSet('Details') }">
+			    	<div >
+			       		<p ng-click="setTab('Details')">Details</p>
+			    	</div>
+		    	</div>
+	    	</div>
+	    	<div ng-if="isSet('Requests')">
+	    		<p style="font-size:40px"";>{{client.first}} {{client.initial}}<p>
+	    		<button ng-click="addRequest(client,employees)"><span class="glyphicon glyphicon-plus"></span>Create new Request</button>
+	    		<h2>Existing Requests</h2>
+				<div ng-repeat="request in requests">
+					<div class = "myTab">
+				    	<div >
+				       		<p ng-click="editRequest(request)">{{request}}!</p>
+				    	</div>
+			    	</div>
+		    	</div>
+	    	</div>
+		 <div>
+    </div>
+    
+	<script type="text/javascript" src="js/modal/RequestModalController.js"></script>
+    <script type="text/javascript" src="js/component/shiftRequestTable.js"></script>
+    <script type="text/javascript" src="js/page/mobileClientPage.js"></script>
+</div>
