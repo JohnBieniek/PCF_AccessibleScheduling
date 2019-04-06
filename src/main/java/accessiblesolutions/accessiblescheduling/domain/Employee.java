@@ -93,7 +93,7 @@ public class Employee {
 
 	public int cleanDuplicateVacationDays() {
 		int daysRemoved = 0;
-		System.out.println("clean in:"+requestedOff.toString());
+		//System.out.println("clean in:"+requestedOff.toString());
 		
 		if(null!=requestedOff) {	
 			ArrayList<String> vacation = new ArrayList<String>();
@@ -104,9 +104,9 @@ public class Employee {
 	
 				if(!vacation.isEmpty()) {
 					for (String vacationDay : vacation) {
-						System.out.println("vac" +vacationDay + " req:"+requestedDay);
+						//System.out.println("vac" +vacationDay + " req:"+requestedDay);
 						if(null!=vacationDay && vacationDay.equalsIgnoreCase(requestedDay)) {
-							System.out.println("duplicate");
+							//System.out.println("duplicate");
 							duplicate=true;
 						}
 					}
@@ -124,8 +124,8 @@ public class Employee {
 			requestedOff =  vacation.toArray(requestedOff);
 		}
 		
-		System.out.println("days removed:"+daysRemoved);
-		System.out.println("clean out:"+requestedOff.toString());
+		//System.out.println("days removed:"+daysRemoved);
+		//System.out.println("clean out:"+requestedOff.toString());
 		return daysRemoved;
 	}
 	

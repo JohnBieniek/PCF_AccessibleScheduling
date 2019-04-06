@@ -66,67 +66,82 @@
 		    	</div>
 	    	</ul>
 	   	</div>
-	   	<div style="display:inline-block; vertical-align: top; width:70%">
-			<div class="scheduler" >
-				<h2 style="font-size:45px">{{monthName}}</h2>
-				<br>
+	   	<div style="display:inline-block; vertical-align: top; width:70%" ng-init="getScheduled(tab)">
+			<div class="scheduler" ng-init="getUnscheduled(tab)" >
+				<div>
+					<label style="font-size:43px">Scheduler</label>
+				</div>
+				<div>
+					<label style="font-size:38px">{{monthName}}</label>
+				</div>
+				<div>
+					<label style="font-size:24px">Generate shifts from requests. Assign them to employees.</label>
+				</div>
 				<div style="display:inline-block">
 					<div style="display:inline-block" class = "incomplete" ng-class="{ complete: isGenerated(tab) }">
 						<p style="display:inline-block"> <b> {{generated}} </b> </p>
 					</div>
-					<div class = "incomplete" style="display:inline-block" ng-class="{ complete: isAssigned(tab), working: isAssigning(tab), errored: isErrored(tab) }">
+					<div style="display:inline-block;width:120px" class = "completion">
+						<div>
+							<p style="display:inline-block" class="scheduled"> <b> {{scheduled}} </b> </p>
+						</div>
+						<div>
+							<p style="display:inline-block" class="unscheduled"> <b> {{unscheduled}} </b> </p>
+						</div>
+					</div>
+					<div class = "incomplete" style="display:inline-block" ng-class="{ complete: isAssigned(tab), working: isAssigning(tab) || isStopped(tab), errored: isErrored(tab) }">
 						<p align="right"   style="display:inline-block"> <b> {{assigned}} </b> </p>
 					</div>
 				</div>
 					<br>
 					<br>
 					<br>
-				<button class="scheduleButton" ng-class="{ disabled: isGenerated(tab) }" type="button" ng-click="generateShifts(tab)">Generate</button>
-				
-				<button align="right" ng-class="{ disabled:  !isGenerated(tab) || isAssigning(tab) ||  isAssigned(tab)}" class="scheduleButton"type="button" ng-click="assignShifts(tab)">Assign</button>
+				<div style="display:inline-block;" ng-if="isGenerated(tab)">
+					<button class="deleteButton scheduleButton" ng-class="{ disabled: !isGenerated(tab) || isAssigning(tab) }" type="button" ng-click="deleteShifts(tab)">Delete</button>
+				</div>
+				<div style="display:inline-block;" ng-if="!isGenerated(tab)">
+					<button class="scheduleButton" ng-class="{ disabled: isGenerated(tab) }" type="button" ng-click="generateShifts(tab)">Generate</button>
+				</div>
+				<div style="display:inline-block;" ng-if="isAssigning(tab)">
+					<button style="display:inline-block;"  align="right" ng-class="{ disabled:  !isAssigning(tab) || isStopped(tab)}" class="deleteButton scheduleButton" type="button" ng-click="stopAssignment(tab)">Stop</button>
+				</div>
+				<div style="display:inline-block;" ng-if="!isAssigning(tab)">
+					<button style="display:inline-block;"  align="right" ng-class="{ disabled:  !isGenerated(tab) || isAssigning(tab) ||  isAssigned(tab) || isStopped(tab)}" class="scheduleButton" type="button" ng-click="assignShifts(tab,allowOvertime,allowInactive,allowUnavailable,prioritizeSecondShift,useDailyMax,useWeeklyMax)">Assign</button>
+				</div>
 			</div>
 			<br>
-			<br>
-			<br>
-			<div hidden class = "scheduleOptions">
+			<div class = "scheduleOptions" ng-if="isGenerated(tab)">
+				<label style="font-size:40px; margin-right:25px">Assignment options:</label>
+				 <div class = "scheduleOptions">
+				    <label style="font-size:33px">Use daily shift max(3)</label>
+				    <input type="checkbox" style="height:35px;width:35px" ng-model="useDailyMax" checked ng-click="toggleDailyMax()">
+			    </div>
+			    <br>
+			    <div class = "scheduleOptions">
+				    <label style="font-size:33px">Use weekly work day max(5)</label>
+				    <input type="checkbox" style="height:35px;width:35px" ng-model="useWeeklyMax" checked ng-click="toggleWeeklyMax()">
+			    </div>
+			    <br>
 				<div style="horizontal-align:right;" class = "scheduleOptions">
-				    <label style="font-size:38px">Allow overtime</label>
-				    <input type="checkbox" style="height:40px;width:40px" ng-model="allowOvertime">
+				    <label style="font-size:33px">Allow unlimited overtime</label>
+				    <input type="checkbox" style="height:35px;width:35px" ng-model="allowOvertime" ng-click="toggleOvertime()">
+			    </div>
+			    <br hidden>
+			    <div hidden class = "scheduleOptions">
+				    <label style="font-size:33px">Prioritize second Shift</label>
+				    <input type="checkbox" style="height:35px;width:35px;" ng-model="prioritizeSecondShift" ng-click="togglePrioritization()">
 			    </div>
 			    <br>
 			    <div class = "scheduleOptions">
-				    <label style="font-size:38px">Use daily shift maximum</label>
-				    <input type="checkbox" style="height:40px;width:40px" ng-model="useDailyMax">
-			    </div>
-			    <br>
-			    <div class = "scheduleOptions">
-				    <label style="font-size:38px">Use weekly work day maximum</label>
-				    <input type="checkbox" style="height:40px;width:40px" ng-model="useWeeklyMax">
-			    </div>
-			    <br>
-			    <div class = "scheduleOptions">
-				    <label style="font-size:38px">Prioritize second Shift</label>
-				    <input type="checkbox" style="height:40px;width:40px" ng-model="prioritizeSecondShift">
-			    </div>
-			    <br>
-			    <div class = "scheduleOptions">
-				    <label style="font-size:38px">Allow unavailable</label>
-				    <input type="checkbox" style="height:40px;width:40px" ng-model="allowUnavailable">
+				    <label style="font-size:33px">Schedule unavailable staff</label>
+				    <input type="checkbox" style="height:35px;width:35px" ng-model="allowUnavailable" ng-click="toggleUnavailable()">
 			    </div>
 			    <br>
 				<div class = "scheduleOptions">
-				    <label style="font-size:38px">Allow inactive</label>
-				    <input type="checkbox" style="height:40px;width:40px" ng-model="allowInactive">
+				    <label style="font-size:33px">Schedule inactive staff</label>
+				    <input type="checkbox" style="height:35px;width:35px"ng-model="allowInactive" ng-click="toggleInactive()">
 			    </div>
 		    </div>
-	    	<br>
-			<br>
-			<br>
-			<br>
-			<br>
-			<div class="centered">
-				<button class="deleteButton scheduleButton" ng-class="{ disabled: !isGenerated(tab) || isAssigning(tab) }" type="button" ng-click="deleteShifts(tab)">Delete</button>
-			</div>
 		 <div>
     </div>
     <script type="text/javascript" src="js/page/schedulerPage.js"></script>

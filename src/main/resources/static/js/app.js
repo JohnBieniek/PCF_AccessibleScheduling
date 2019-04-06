@@ -6,6 +6,10 @@ angular.module('AccessibleScheduling', ['mainNavigation', 'errors', 'status', 'i
         	controller: 'ErrorsController',
             templateUrl: 'templates/util/errors.html'
         })
+        .when('/clients', {
+        	controller: 'ErrorsController',
+            templateUrl: 'templates/util/errors.html'
+        })
         .otherwise({
         	 controller: 'MainNavigationController',
              templateUrl: 'templates/adminView.html'

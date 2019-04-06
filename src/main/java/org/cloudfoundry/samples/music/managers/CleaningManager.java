@@ -27,6 +27,7 @@ import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
 import accessiblesolutions.accessiblescheduling.to.AlternateWeekendsOffNotification;
 import accessiblesolutions.accessiblescheduling.to.OverWeeklyDaysNotification;
 import accessiblesolutions.accessiblescheduling.to.ScheduleNotification;
+import accessiblesolutions.accessiblescheduling.to.ScheduleOptions;
 import accessiblesolutions.accessiblescheduling.to.ShiftIssueTO;
 import accessiblesolutions.accessiblescheduling.to.ShiftNotification;
 import accessiblesolutions.accessiblescheduling.to.Weekend;
@@ -677,14 +678,14 @@ public class CleaningManager {
 
 	public String fixShiftNotification(ShiftNotification shiftNotification) throws CorruptDataException, ProccessingException {
 		String output = "";
-		
+		ScheduleOptions options = new ScheduleOptions();
 		Shift shift = shiftNotification.getIssues().get(0).getShift();
 		
 		if(null!=shift){
 			Employee previousEmployee = employeeCrud.findOne(shift.getStaffId());
     		output+="Attempting to assign " +shift.toString();
     		System.out.println("Attempitng to assign " + shift.toString());
-			EmployeeShiftCompatibilities shiftCompatibilities = employeeShiftCompatibilityManager.getValidCompatibilities(employeeShiftCompatibilityManager.getEmployeeShiftCompatibilitiesForShift(shift));
+			EmployeeShiftCompatibilities shiftCompatibilities = employeeShiftCompatibilityManager.getValidCompatibilities(employeeShiftCompatibilityManager.getEmployeeShiftCompatibilitiesForShift(shift),options);
 			output+=shiftCompatibilities.compatibilities.toString();
 			Employee employee=null;
 			//attemptAssigningOnlyCompatibility

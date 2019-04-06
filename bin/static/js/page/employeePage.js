@@ -183,14 +183,16 @@ function EmployeesController($scope, $modal, $http, Employees, Employee, CustomF
     }
 
     $scope.deleteEmployee = function (employee) {
-        Employee.delete({id: employee.id},
-            function () {
-                Status.success("Employee deleted");
-                $scope.listEmployees();
-            },
-            function (result) {
-                Status.error("Error deleting employee: " + result.status);
-            }
-        );
+    	if(confirm("Are you sure to delete info for "+employee.first+"?")){
+	        Employee.delete({id: employee.id},
+	            function () {
+	                Status.success("Employee deleted");
+	                $scope.listEmployees();
+	            },
+	            function (result) {
+	                Status.error("Error deleting employee: " + result.status);
+	            }
+	        );
+    	}
     };
 }

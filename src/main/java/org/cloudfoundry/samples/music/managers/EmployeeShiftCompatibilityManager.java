@@ -3,18 +3,18 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
-import accessiblesolutions.accessiblescheduling.domain.EmployeeShiftCompatibilities;
-import accessiblesolutions.accessiblescheduling.domain.EmployeeShiftCompatibility;
-import accessiblesolutions.accessiblescheduling.domain.Shift;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
 
 import accessiblesolutions.accessiblescheduling.domain.Client;
 import accessiblesolutions.accessiblescheduling.domain.Employee;
+import accessiblesolutions.accessiblescheduling.domain.EmployeeShiftCompatibilities;
+import accessiblesolutions.accessiblescheduling.domain.EmployeeShiftCompatibility;
+import accessiblesolutions.accessiblescheduling.domain.Shift;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
+import accessiblesolutions.accessiblescheduling.to.ScheduleOptions;
 import accessiblesolutions.accessiblescheduling.util.Util;
 import accessiblesolutions.accessiblescheduling.worker.ShiftWorker;
 
@@ -396,6 +396,30 @@ public class EmployeeShiftCompatibilityManager {
 		
 		return new EmployeeShiftCompatibilities(compatibility);
 	}
+    
+     /** 
+     * @param compatibilities Employees coupled with shifts they are being considered for
+     * @return employee has the most time before their min hours is met
+     * @throws CorruptDataException invalid shift
+     * @throws ProccessingException null compatibility, employee, or shift
+     */
+	public Employee getEmployeeWithFewestHours(EmployeeShiftCompatibilities compatibilities) throws CorruptDataException, ProccessingException {
+    	Employee employee = null;
+		float time = 9001;
+		
+		if(null==compatibilities || compatibilities.compatibilities==null) {
+			throw new ProccessingException("Null EmployeeShiftCompatibilities provided for assesment to getEmployeeWithFewestHours");
+		}
+		
+		for(EmployeeShiftCompatibility compatibility :compatibilities.compatibilities){
+			if(getHoursNeeded(compatibility)<=time){
+				time=getHoursNeeded(compatibility);
+				employee=compatibility.getEmployee();
+			}
+		}
+		
+		return employee;
+	}
 	
     /**Returns the employee of the group that has the most time until min hours is met
      * for the week of their shift
@@ -573,9 +597,9 @@ public class EmployeeShiftCompatibilityManager {
 				int week = Util.getWeekOfDate(shift.getStartDate());
 				
 				try {
-					System.out.println("getting hours");
+					//System.out.println("getting hours");
 					hours = employeeShiftManager.getHoursScheduledWeekOfMonth(employee,week,shift.getStartMonth());
-					System.out.println("got "+hours+" hours");
+					//System.out.println("got "+hours+" hours");
 				} catch (CorruptDataException e) {
 					throw new ProccessingException(e);
 				}
@@ -595,18 +619,19 @@ public class EmployeeShiftCompatibilityManager {
 	/**Returns true if assignment would violate max shifts per day, week, or alternate weekends off
 	 * 
 	 * @param compatibility
+	 * @param options 
 	 * @return
 	 * @throws CorruptDataException invalid shift
 	 * @throws ProccessingException null compatibility, employee, or shift
 	 * @Tested
 	 */
-	public boolean getResting(EmployeeShiftCompatibility compatibility) throws CorruptDataException, ProccessingException{
+	public boolean getResting(EmployeeShiftCompatibility compatibility, ScheduleOptions options) throws CorruptDataException, ProccessingException{
 		boolean resting = false;
 		Employee employee = null;
 		Shift shift = null; 
 		
-		if(null==compatibility ){
-			throw new ProccessingException("Null compatibility provided to getResting");
+		if(null==compatibility || null == options){
+			throw new ProccessingException("Null options or compatibility provided to getResting");
 		}
 		
 		employee = compatibility.getEmployee();
@@ -618,17 +643,20 @@ public class EmployeeShiftCompatibilityManager {
 		else if(!shift.isValid()) {
 			throw new CorruptDataException("Invalid shift provided to getResting");
 		}
-		
-		if(getAssignmentWouldViolateMaxShiftsPerDay(compatibility)){
+		//System.out.println("options.isWeeklyMax():"+options.isWeeklyMax());
+		if(options.isDailyMax() && getAssignmentWouldViolateMaxShiftsPerDay(compatibility)){
+			//System.out.println("violates max daily");
 			resting= true;
 		}
-		else if(getAssignmentWouldViolateMaxWeeklyWorkDays(compatibility)){
+		else if(options.isWeeklyMax() &&getAssignmentWouldViolateMaxWeeklyWorkDays(compatibility)){
+			//System.out.println("violates max weekly");
 			resting=true;
 		}
 		else if(getAssignmentWouldViolateAlternateWeekendsOff(compatibility)){
+			//System.out.println("violates alternate weekends");
 			resting=true;
 		}
-		
+		//System.out.println("resting:"+resting);
 		return resting;
 	}
 	    
@@ -640,7 +668,7 @@ public class EmployeeShiftCompatibilityManager {
 	 * @throws ProccessingException null compatibilities, compatibility, employee, client, or shift
 	 * @Tested
 	 */
-	public EmployeeShiftCompatibilities getValidCompatibilities(EmployeeShiftCompatibilities compatibilities) throws CorruptDataException, ProccessingException{
+	public EmployeeShiftCompatibilities getValidCompatibilities(EmployeeShiftCompatibilities compatibilities,ScheduleOptions options) throws CorruptDataException, ProccessingException{
 		Employee employee = null;
 		Shift shift = null;
 		ArrayList<EmployeeShiftCompatibility> validCompatibilities = new ArrayList<EmployeeShiftCompatibility>();
@@ -663,8 +691,8 @@ public class EmployeeShiftCompatibilityManager {
 			if(null == employee || null == shift) {
 				throw new ProccessingException("Null shift or employee provided to getValidCompatibilities");
 			}
-			
-			if(isValidFor(employee,shift)){
+			//System.out.println("shift is checking validity of options:"+shift.toString()+"  employee:"+employee.toString());
+			if(isValidFor(employee,shift,options)){
 				validCompatibilities.add(compatibility);
 			}
 		}
@@ -728,25 +756,26 @@ public class EmployeeShiftCompatibilityManager {
 	 * 
 	 * @param employee
 	 * @param shift a valid shift
+	 * @param options 
 	 * @return boolean Available, Unassigned, not requested off
 	 * @throws CorruptDataException invalid shift
 	 * @throws ProccessingException null employee or shift
 	 * @Tested
 	 */
-	public boolean isAssignableFor(Employee employee,Shift shift) throws CorruptDataException, ProccessingException{
+	public boolean isAssignableFor(Employee employee,Shift shift, ScheduleOptions options) throws CorruptDataException, ProccessingException{
 		boolean assignable=false;
-		if(null==employee||null==shift) {
-			throw new ProccessingException("Null employee or shift provided to isUnassignedFor");
+		if(null==employee||null==shift || null ==options) {
+			throw new ProccessingException("Null options,employee or shift provided to isUnassignedFor");
 		}
 		else if(!shift.isValid()) {
 			throw new CorruptDataException("Invalid shift provided to isUnassignedFor");
 		}
 		
 		if(!employee.requestedOff(shift)){
-			System.out.println("not requested off");
+			//System.out.println("not requested off");
     		if(isUnassignedFor(employee,shift)){
-    			System.out.println("unassinged");
-    			if(isAvailableFor(employee,shift)){
+    			//System.out.println("unassinged");
+    			if(options.isAllowUnavailable() || isAvailableFor(employee,shift)){
     				assignable=true;
     			}
     		}
@@ -781,12 +810,12 @@ public class EmployeeShiftCompatibilityManager {
 		if(dayInt==7){
 			dayInt=0;
 		}
-		System.out.println("day:"+dayInt);
+		//System.out.println("day:"+dayInt);
 		
 		if(!shift.getOvernight()){
-			System.out.println("not overnight");
+			//System.out.println("not overnight");
 			if(employee.getDaysAvailable()[dayInt]){
-				System.out.println("available day");
+				//System.out.println("available day");
 				boolean[] availability = employee.getAvailabilityFor(dayInt);
 				
 				String start = shift.getStartTime();
@@ -898,10 +927,10 @@ public class EmployeeShiftCompatibilityManager {
     	}
     	else{
     		clientID = shift.getClientId();
-    		System.out.println("getting client "+clientID);
+    		//System.out.println("getting client "+clientID);
     		client=clientRepository.findOne(clientID);
 
-    		System.out.println("got client "+client.toString());
+    		//System.out.println("got client "+client.toString());
 	    	valid = employeeClientCompatibilityManager.isCompatibleWith(employee,client);
     	}
     	
@@ -952,28 +981,28 @@ public class EmployeeShiftCompatibilityManager {
 	 * @throws CorruptDataException The Shift provided is invalid
 	 * @Tested
 	 */
-	public boolean isValidFor(Employee employee, Shift shift) throws CorruptDataException, ProccessingException{
+	public boolean isValidFor(Employee employee, Shift shift,ScheduleOptions options) throws CorruptDataException, ProccessingException{
 		boolean validity=false;
-		
-		if(null==employee||null==shift) {
-			throw new ProccessingException("Null employee or shift provided to isCompatibleWith");
+		//System.out.println("checking validity of:"+shift.toString());
+		if(null==employee||null==shift ||null==options) {
+			throw new ProccessingException("Null options, employee or shift provided to isCompatibleWith");
 		}
 		else if(!shift.isValid()) {
 			throw new CorruptDataException("Invalid shift provided to isCompatibleWith");
 		}
 		
 		if(isCompatibleWith(employee,shift)){
-			if(isAssignableFor(employee,shift)){
-				if(!employee.getInactive()){
+			if(isAssignableFor(employee,shift,options)){
+				if(options.isAllowInactive() || !employee.getInactive()){
 					if(!employee.getFixedSchedule()){
-						if(!getResting(new EmployeeShiftCompatibility(employee,shift))){
+						if(!getResting(new EmployeeShiftCompatibility(employee,shift),options)){
 							validity=true;
 						}
 					}
 				}
 			}
 		}
-		
+		//System.out.println("valid?"+validity);
 		return validity;
 	}
 }
