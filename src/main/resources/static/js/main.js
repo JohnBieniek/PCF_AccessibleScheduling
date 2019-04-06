@@ -93,6 +93,7 @@ function MainNavigationController($scope, $modal, $http, Status) {
 		 $scope.sortDescending = !$scope.sortDescending;
 	 }
     $scope.setPage = function (viewName) {
+    	console.log("Setting page to:"+viewName);
         $scope.page = "templates/page/" + viewName + ".html";
     };
     $scope.setSortField = function(sortField){

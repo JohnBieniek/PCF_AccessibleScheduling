@@ -49,15 +49,17 @@ public class ScheduleController {
     }
 
     @RequestMapping(value = "/byMonth", method = RequestMethod.DELETE)
-    public ArrayList<Shift> deleteByMonth(@RequestParam("month") String  month) {
-        ScheduleStatus status = new ScheduleStatus();
-        
-    	status.setMonth(month);
-    	    	
-    	scheduleStatusRepository.deleteByMonth(month);
-    	scheduleStatusCrud.save(status);
-    	
-        return shiftManager.deleteShiftsForMonth(Integer.parseInt(month));
+    public Iterable<ScheduleStatus> deleteByMonth(@RequestParam("month") String  month) {
+    	 ScheduleStatus status = new ScheduleStatus();
+         
+     	status.setMonth(month);
+     	    	
+     	scheduleStatusRepository.deleteByMonth(month);
+     	scheduleStatusCrud.save(status);
+     	
+     
+        shiftManager.deleteShiftsForMonth(Integer.parseInt(month));
+    	return scheduleStatusCrud.findAll();
     }
     
     @RequestMapping(value = "/durationOfWeeksShifts", method = RequestMethod.GET)
@@ -124,21 +126,9 @@ public class ScheduleController {
     	ScheduleOptions options = new ScheduleOptions(month, year, allowOvertime, allowInactive,allowUnavailable, 
     													prioritizeSecondShift, dailyMax,weeklyMax);
     	System.out.println("Schedule options:"+options.toString());
-    	try {
-			assignmentManager.scheduleShifts(options);
-		} catch (ProccessingException | CorruptDataException e) {
-			status = scheduleStatusCrud.findOne(month);
-	    	scheduleStatusRepository.deleteByMonth(month);
-	    	
-	    	if(null==status) {
-	    		status= new ScheduleStatus();
-	    		status.setMonth(month);
-	    	}
-	    	
-    		status.setAssigning(false);
-    		status.setErrored(true);
-        	scheduleStatusCrud.save(status);
-		}
+    	
+		assignmentManager.scheduleShifts(options);
+
     	return scheduleStatusCrud.findAll();
     }
     
@@ -168,8 +158,30 @@ public class ScheduleController {
         return scheduleStatusCrud.findAll();
     }
     
+    @RequestMapping(value = "/finishAssignment", method = RequestMethod.GET)
+    public Iterable<ScheduleStatus> finishAssignment(@RequestParam("month") String month) throws CorruptDataException {
+    	ScheduleStatus status = assignmentManager.scheduleStatus(month);
+    	System.out.println("finishing assignment for "+month);
+    	if(null==status) {
+    		status= new ScheduleStatus();
+    		status.setMonth(month);
+    	}
+    	
+    	if(status.isAssigning()) {
+    		status.setAssigning(false);
+    		System.out.println("errored when trying to shut down");
+    	}
+    	if(status.isGenerated()) {
+    		status.setAssigned(true);
+    		scheduleStatusRepository.deleteByMonth(month);
+        	scheduleStatusCrud.save(status);
+    	}
+    	
+        return scheduleStatusCrud.findAll();
+    }
+    
     @RequestMapping(value = "/stopAssignment", method = RequestMethod.GET)
-    public Iterable<ScheduleStatus> stopAssignment(@RequestParam("month") String month) throws CorruptDataException {
+    public Iterable<ScheduleStatus> stopAssignment(@RequestParam("month") String month) throws CorruptDataException, InterruptedException {
     	ScheduleStatus status = scheduleStatusCrud.findOne(month);
     	scheduleStatusRepository.deleteByMonth(month);
     	
@@ -182,7 +194,8 @@ public class ScheduleController {
 		status.setAssigning(true);
 		status.setStopped(true);
     	scheduleStatusCrud.save(status);
-    	
+    	Thread.sleep(5000);
+    	finishAssignment(month);
         return scheduleStatusCrud.findAll();
     }
     
