@@ -25,6 +25,18 @@ function RequestModalController($scope, $modalInstance, $http, selectedClient, s
 	}
     $scope.valid=false;
     
+    $scope.addException = function(newDate){
+    	if(!$scope.shiftRequest.exceptions){
+    		$scope.shiftRequest.exceptions=[];
+    	}
+    	 $scope.shiftRequest.exceptions.push(newDate);
+    };
+    
+	$scope.removeException=function(item){ 
+	    var index= $scope.shiftRequest.exceptions.indexOf(item)
+	     $scope.shiftRequest.exceptions.splice(index,1);     
+	}
+
     $scope.isValid = function(shiftRequest){
     	$http({
             url: '/requests/validity',

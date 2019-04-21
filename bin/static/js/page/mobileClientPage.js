@@ -298,6 +298,7 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
        var addModal = $modal.open({
            templateUrl: 'templates/modal/requestForm.html',
            controller: RequestModalController,
+           windowClass: 'app-modal-window',
            resolve: {
            	selectedClient: function(){
            		return clone(selectedClient);

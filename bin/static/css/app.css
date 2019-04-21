@@ -184,6 +184,10 @@ html,body
     background-color: white;
 }
 
+.app-modal-window .modal-dialog {
+  width: 95%;
+}
+
 .micon {
      font-size:30px;
      margin-left:30px;

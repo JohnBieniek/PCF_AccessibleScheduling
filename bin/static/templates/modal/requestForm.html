@@ -3,23 +3,24 @@
     <h3 ng-show="shiftRequestAction === 'update'">Edit a Request</h3>
 </div>
 
-<div class="modal-body">
+<div class="modal-body" style="width=80%">
     <form name="requestForm" role="form">
         <div ng-if="selectedClient">
-    	    <label for="clientName" style="font-size:18px">Client Name:</label>
-    	    <label for="clientName" style="font-size:16px">{{selectedClient.first}}</label>
+    	    <label for="clientName" style="font-size:25px">Client Name:</label>
+    	    <label for="clientName" style="font-size:23px">{{selectedClient.first}}</label>
         </div>
         
         <div>
-            <label for="fixedStaff" style="font-size:18px">Request Staff Member</label>
+            <label for="fixedStaff" style="font-size:25px">Request Staff Member</label>
             <input ng-change="isValid(shiftRequest)" ng-click="selectedEmployee = null" type="checkbox" id="fixedStaff" name="fixedStaff" style="height:20px;width:20px"  ng-model="shiftRequest.requestEmployee">
         </div>
         
         <div ng-if="shiftRequest.requestEmployee" class="form-group has-feedback" ng-class="{'has-warning': recurringShiftNeedForm.staffName.$invalid, 'has-success': recurringShiftNeedForm.staffName.$valid}">
-            <label for="staffName" style="font-size:16px">Staff Name</label>
+            <label for="staffName" style="font-size:25px">Staff Name</label>
             
             <select name="mySelect" 
             		id="mySelect"
+            		style="font-size:23px"
             		ng-change="isValid(shiftRequest)"
             		ng-init = "selectedEmployee"
       				ng-options="employee.first for employee in employees | orderBy:'first' track by employee.id"
@@ -34,26 +35,26 @@
         
         <div ng-if="shiftRequest.staffId || shiftRequestAction==='update' || !shiftRequest.requestEmployee">
 	        <div>
-	            <label for="startDate" style="font-size:18px">Start Date/Time</label>
-	            <input ng-change="isValid(shiftRequest)" type="date" ng-model="shiftRequest.startDate" placeholder="Date" ng-required/>
-	            <input ng-change="isValid(shiftRequest)" type="time" ng-model="shiftRequest.startTime">
+	            <label for="startDate" style="font-size:25px">Start Date/Time</label>
+	            <input style="font-size:23px" ng-change="isValid(shiftRequest)" type="date" ng-model="shiftRequest.startDate" placeholder="Date" ng-required/>
+	            <input style="font-size:23px" ng-change="isValid(shiftRequest)" type="time" ng-model="shiftRequest.startTime">
 	        </div>
 	        
 	        <div>
-	            <label for="endDate" style="font-size:18px">End Date/Time</label>
-	            <input ng-change="isValid(shiftRequest)" type="date" ng-model="shiftRequest.endDate" placeholder="Date" ng-required/>
-	            <input ng-change="isValid(shiftRequest)" type="time" ng-model="shiftRequest.endTime">
+	            <label for="endDate" style="font-size:25px">End Date/Time</label>
+	            <input style="font-size:23px" ng-change="isValid(shiftRequest)" type="date" ng-model="shiftRequest.endDate" placeholder="Date" ng-required/>
+	            <input style="font-size:23px" ng-change="isValid(shiftRequest)" type="time" ng-model="shiftRequest.endTime">
 	        </div>
 	        <br>
 	        <div>
-   	            <label style="font-size:18px">Repetition</label>
+   	            <label style="font-size:25px">Repetition</label>
    	            <br>
-  	           	<label style="font-size:16px">Repeats every</label>
+  	           	<label style="font-size:23px">Repeats every</label>
    	            <input type="checkbox" style="height:20px;width:20px"  ng-model="shiftRequest.repeats">
-   	            <input type="number" name="every" min="1">
+   	            <input style="width:50px;font-size:21px'" type="number" name="every" min="1">
    	            
 			    <form name="myForm" style="display:inline-block" >
-		    		<select style="display:inline-block"
+		    		<select style="display:inline-block; font-size:23px"
 		    				ng-change="setInterval(selectedInterval)"
 				      		ng-model="selectedInverval"
 				      		ng-value="{{selectedInterval}}">
@@ -64,7 +65,41 @@
 	          		</select>
 			  	</form>
 			  	<br>
-   	            <label style="font-size:18px">Exceptions</label>
+   	            
+   	            <div ng-if="shiftRequest.repeats">
+   	            <br>
+   	            	<label style="font-size:25px">Exceptions</label>
+				  </br>
+				   <form ng-submit="addException(newDate)">
+				           <label style="font-size:25px">Date:</label>
+				           <input style="font-size:23px" type="date" ng-model="newDate" placeholder="Date" ng-required/>
+				           <a style="font-size:23px" href="" ng-click="addException(newDate)"><span class="glyphicon glyphicon-plus"></span>add date</a>
+			      </form>
+			      <br>
+				  <div style="height:200px; overflow-y:auto">
+				     <ul ng-repeat="exception in shiftRequest.exceptions track by $index">
+				         <li>
+				           <form>
+			      	        <div style="display:inline-block">
+				           		<span style="font-size:23px">{{exception}}</span>
+				           	</div>
+			   		        <div style="display:inline-block">
+					           	<a href="" ng-click="removeException(exception)">
+					           		<div style="display:inline-block">
+					           			<span class="glyphicon glyphicon-minus"></span>
+					           		</div>
+					           		<div style="display:inline-block">
+					           			<span style="font-size:21px">remove exception</span>
+					           		</div>
+					           	</a>
+				           </form>
+				         </li>
+				     </ul>
+				  </div>
+				  </br>
+				     
+				 
+			   </div>
 	        </div>
         </div>
     </form>

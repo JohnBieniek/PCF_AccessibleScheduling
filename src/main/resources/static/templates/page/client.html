@@ -2,7 +2,7 @@
 	<divstyle="display:inline-block;">
 	 	<div style="display:inline-block;">
 			<ul>
-				<div class="monthSelector">
+				<div style="overflow-y:auto" class="monthSelector">
 					<div ng-repeat="client in clients">
 						<div class = "clientTab" ng-class="{ active: isClientSet(client) }">
 					    	<div >
@@ -32,8 +32,8 @@
 		    	</div>
 	    	</div>
 	    	<div ng-if="isSet('Requests')">
-	    		<p style="font-size:40px"";>{{client.first}} {{client.initial}}<p>
-	    		<button ng-click="addRequest(client,employees)"><span class="glyphicon glyphicon-plus"></span>Create new Request</button>
+	    		<p style="font-size:40px">{{client.first}} {{client.initial}}<p>
+	    		<button style="font-size:30px" ng-click="addRequest(client,employees)"><span class="glyphicon glyphicon-plus"></span>Create new Request</button>
 	    		<h2>Existing Requests</h2>
 				<div ng-repeat="request in requests">
 					<div class = "myTab">
