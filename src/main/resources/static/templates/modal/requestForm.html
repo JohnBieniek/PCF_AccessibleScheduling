@@ -1,6 +1,6 @@
 <div class="modal-header">
-    <h3 ng-show="shiftRequestAction === 'add'">Add a Single Shift Request</h3>
-    <h3 ng-show="shiftRequestAction === 'update'">Edit a Single Shift Request</h3>
+    <h3 ng-show="shiftRequestAction === 'add'">Add a Request</h3>
+    <h3 ng-show="shiftRequestAction === 'update'">Edit a Request</h3>
 </div>
 
 <div class="modal-body">
@@ -43,6 +43,28 @@
 	            <label for="endDate" style="font-size:18px">End Date/Time</label>
 	            <input ng-change="isValid(shiftRequest)" type="date" ng-model="shiftRequest.endDate" placeholder="Date" ng-required/>
 	            <input ng-change="isValid(shiftRequest)" type="time" ng-model="shiftRequest.endTime">
+	        </div>
+	        <br>
+	        <div>
+   	            <label style="font-size:18px">Repetition</label>
+   	            <br>
+  	           	<label style="font-size:16px">Repeats every</label>
+   	            <input type="checkbox" style="height:20px;width:20px"  ng-model="shiftRequest.repeats">
+   	            <input type="number" name="every" min="1">
+   	            
+			    <form name="myForm" style="display:inline-block" >
+		    		<select style="display:inline-block"
+		    				ng-change="setInterval(selectedInterval)"
+				      		ng-model="selectedInverval"
+				      		ng-value="{{selectedInterval}}">
+					    <option value=days>Day(s)</option>
+					    <option value=weeks>Week(s)</option>
+				        <option value=months>Month(s)</option>
+			            <option value=years>Year(s)</option>
+	          		</select>
+			  	</form>
+			  	<br>
+   	            <label style="font-size:18px">Exceptions</label>
 	        </div>
         </div>
     </form>

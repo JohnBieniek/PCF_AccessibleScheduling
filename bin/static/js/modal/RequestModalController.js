@@ -4,7 +4,7 @@ function RequestModalController($scope, $modalInstance, $http, selectedClient, s
     $scope.selectedEmployee=selectedEmployee;
     $scope.employees=employees;
     $scope.shiftRequest = shiftRequest;
-
+    $scope.selectedInterval='days';
     // Will execute myCallback every 5 seconds 
 	var intervalID = setInterval(function(){ myCallback(shiftRequest)}, 500);
 

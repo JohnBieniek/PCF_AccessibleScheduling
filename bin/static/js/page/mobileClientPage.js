@@ -1,8 +1,14 @@
-angular.module('vacation', ['ngResource', 'ui.bootstrap']).
+angular.module('client', ['ngResource', 'ui.bootstrap']).
 	factory('Clients', function ($resource) {
-	    return $resource('employees');
+	    return $resource('clients');
 	}).
 	factory('Client', function ($resource) {
+	    return $resource('client/:id', {id: '@id'});
+	}).
+	factory('Employees', function ($resource) {
+	    return $resource('employees');
+	}).
+	factory('Employee', function ($resource) {
 	    return $resource('employees/:id', {id: '@id'});
 	}).
 	factory("EditorStatus", function () {
@@ -27,7 +33,7 @@ angular.module('vacation', ['ngResource', 'ui.bootstrap']).
         }
     });
 
-function MobileClientController($scope, $modal, $http, Clients, Client,Status) {
+function MobileClientController($scope, $modal, $http, Clients, Client,Employee, Employees, Status) {
 	 $scope.multiTableEditing=false;
 	 $scope.month=1;
 	 $scope.allowOvertime=false;
@@ -44,12 +50,16 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Status) {
 	 $scope.statusList=[];
 	 $scope.unscheduled=0;
 	 $scope.scheduled=0;
-	 
+	 $scope.selectedInterval="days";
 	$scope.setTab = function(newTab){
       $scope.tab = newTab;
 	}
 	$scope.setClient = function(newClient){
 	      $scope.client = newClient;
+		}
+	
+	$scope.setInterval = function(newInterval){
+	      $scope.interval = newInterval;
 		}
     
     $scope.toggleInactive = function(){
@@ -144,6 +154,11 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Status) {
 	    }
     $scope.listClients = function listClients() {
         $scope.clients = Clients.query();
+        $scope.employees = Employees.query();
+    }
+    
+    $scope.listEmployees = function listEmployees() {
+        $scope.employees = Employees.query();
     }
     
     $scope.deleteShifts = function(month){
@@ -235,7 +250,7 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Status) {
 
     $scope.stopAssignment = function(month){
     	if(confirm("Are you sure you want to stop assigning shifts for "+$scope.monthName+"?")){
-	    	//$scope.assigned="Stopping";
+	    	// $scope.assigned="Stopping";
 	    	$http({
 	            url: '/schedule/stopAssignment',
 	            method: 'GET',
@@ -251,7 +266,7 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Status) {
 	    		console.log(response.data);
 	    		console.log($scope.statusList[0].generated);
 	    		$scope.setTab($scope.tab);
-	    		//setTimeout($scope.finishAssignment,10000);
+	    		// setTimeout($scope.finishAssignment,10000);
 	        });
     	}
     }
