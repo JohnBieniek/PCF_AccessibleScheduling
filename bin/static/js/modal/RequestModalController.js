@@ -36,8 +36,27 @@ function RequestModalController($scope, $modalInstance, $http, selectedClient, s
 	    var index= $scope.shiftRequest.exceptions.indexOf(item)
 	     $scope.shiftRequest.exceptions.splice(index,1);     
 	}
+	
+	$scope.setSelectedInterval=function(selectedInterval){
+		console.log("selectedInterval:"+selectedInterval)
+		$scope.selectedInterval=selectedInterval
+	}
+	
+	$scope.setMonthInterval=function(monthInterval){
+		$scope.monthInterval=monthInterval
+	}
+	
+	$scope.everyWeek=function(weekInterval){
+		return weekInterval=='weeks'
+	}
+	
+	$scope.everyMonth=function(selectedInterval){
+		return selectedInterval=='months'
+	}
 
     $scope.isValid = function(shiftRequest){
+    	//get day of month
+    	//get week of month
     	$http({
             url: '/requests/validity',
             method: 'POST',
