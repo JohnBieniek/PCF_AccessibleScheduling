@@ -142,7 +142,7 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
     };
     
     $scope.isClientSet = function(client){
-        return $scope.client === client;
+        return $scope.client === client && client !==null;
       };
     
 	 function clone (obj) {

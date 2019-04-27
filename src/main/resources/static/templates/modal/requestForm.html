@@ -3,7 +3,7 @@
     <h3 ng-show="shiftRequestAction === 'update'">Edit a Request</h3>
 </div>
 
-<div class="modal-body" style="width=80%">
+<div class="modal-body">
     <form name="requestForm" role="form">
         <div ng-if="selectedClient">
     	    <label for="clientName" style="font-size:25px">Client Name:</label>
@@ -46,12 +46,12 @@
 	            <input style="font-size:23px" ng-change="isValid(shiftRequest)" type="time" ng-model="shiftRequest.endTime">
 	        </div>
 	        <br>
-	        <div>
+	        <div ng-if="shiftRequest.startDate">
    	            <label style="font-size:25px">Repetition</label>
    	            <br>
   	           	<label style="font-size:23px">Repeats every</label>
    	            <input type="checkbox" style="height:20px;width:20px"  ng-model="shiftRequest.repeats">
-   	            <input style="width:50px;font-size:21px'" type="number" name="every" min="1">
+   	            <input style="width:50px;font-size:21px'" type="number" name="every" min="1" ng-model="shiftRequest.repeatsEvery">
    	            
 			    <form name="myForm" style="display:inline-block" >
 		    		<select style="display:inline-block; font-size:23px"
@@ -69,53 +69,68 @@
    	            <div ng-if="shiftRequest.repeats">
    	            <br>
    	            <div ng-if="everyWeek(selectedInterval)">
-   	            	<div style="display:inline-block" >
+   	            	<div class="daySelector">
 						<label for="sunday" style="font-size:15px">Sun</label>
 						<br>
-						<input type="checkbox" ng-model="everySunday">
+						<input class="dayCheckbox" type="checkbox" ng-model="everySunday">
 					</div>
-					<div style="display:inline-block">
+					<div class="daySelector">
 						<label for="monday" style="font-size:15px;text-align:center">Mon</label>
 						<br>
-						<input type="checkbox" ng-model="everyMonday">
+						<input class="dayCheckbox" type="checkbox" ng-model="everyMonday">
 					</div>
-					<div style="display:inline-block">
+					<div class="daySelector">
 						<label for="monday" style="font-size:15px;text-align:center">Tues</label>
 						<br>
-						<input type="checkbox" ng-model="everyTuesday">
+						<input class="dayCheckbox"  type="checkbox" ng-model="everyTuesday">
 					</div>
-					<div style="display:inline-block">
+					<div class="daySelector">
 						<label for="monday" style="font-size:15px;text-align:center">Wed</label>
 						<br>
-						<input type="checkbox" ng-model="everyWednesday">
+						<input class="dayCheckbox"  type="checkbox" ng-model="everyWednesday">
 					</div>
-					<div style="display:inline-block">
+					<div class="daySelector">
 						<label for="monday" style="font-size:15px;text-align:center">Thurs</label>
 						<br>
-						<input type="checkbox" ng-model="everyThursday">
+						<input class="dayCheckbox" type="checkbox" ng-model="everyThursday">
 					</div>
-					<div style="display:inline-block">
+					<div class="daySelector">
 						<label for="monday" style="font-size:15px;text-align:center">Fri</label>
 						<br>
-						<input type="checkbox" ng-model="everyFriday">
+						<input class="dayCheckbox"  type="checkbox" ng-model="everyFriday">
 					</div>
-					<div style="display:inline-block">
+					<div class="daySelector">
 						<label for="monday" style="font-size:15px;text-align:center">Sat</label>
 						<br>
-						<input type="checkbox" ng-model="everySaturday">
+						<input class="dayCheckbox"  type="checkbox" ng-model="everySaturday">
 					</div>
+					<br>
    	            </div>
    	            <div ng-if="everyMonth(selectedInterval)">
-   	            	<form name="myForm" style="display:inline-block" >
+				  	<form name="myForm" style="display:inline-block" >
 			    		<select style="display:inline-block; font-size:23px"
-			    				ng-change="setMonthInterval(selectedMonthInterval)"
-					      		ng-model="selectedMonthInverval"
-					      		ng-value="{{selectedMonthInterval}}">
-						    <option value=days>Every month on day {{dayOfMonth}}</option>
-						    <option value=weeks>Every month on the {{dayOfMonth}} of the {{weekOfMonth}} week</option>
+					      		ng-model="selectedInterval2"
+					      		ng-init="selectedInterval2"
+					      		ng-value="{{selectedInterval2}}">
+						    <option value=days>Every {{shiftRequest.repeatsEvery}} month(s) on day {{dayOfMonth}} </option>
+						    <option value=weeks>Every {{shiftRequest.repeatsEvery}} month(s) on {{dayOfWeek}} of week {{weekOfMonth}}</option>
 		          		</select>
 				  	</form>
+				  	<br>
    	            </div>
+   	             <div ng-if="everyYear(selectedInterval)">
+		    		<form name="myForm" style="display:inline-block" >
+			    		<select style="display:inline-block; font-size:23px"
+					      		ng-model="selectedInterval3"
+					      		ng-init="selectedInterval3"
+					      		ng-value="{{selectedInterval3}}">
+						    <option value=days>Every {{shiftRequest.repeatsEvery}} year(s) in {{monthName}} on day {{dayOfMonth}}</option>
+						    <option value=weeks>Every {{shiftRequest.repeatsEvery}} year(s) in  {{monthName}} on {{dayOfWeek}} of week {{weekOfMonth}}</option>
+		          		</select>
+				  	</form>
+				  	<br>
+   	            </div>
+   	            <br>
    	            	<label style="font-size:25px">Exceptions</label>
 				  </br>
 				   <form ng-submit="addException(newDate)">

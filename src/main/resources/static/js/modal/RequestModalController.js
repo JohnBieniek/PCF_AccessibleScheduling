@@ -1,16 +1,117 @@
 function RequestModalController($scope, $modalInstance, $http, selectedClient, selectedEmployee, employees,shiftRequest, action) {
-    $scope.shiftRequestAction = action;
+
+	$scope.shiftRequestAction = action;
     $scope.selectedClient=selectedClient;
     $scope.selectedEmployee=selectedEmployee;
     $scope.employees=employees;
     $scope.shiftRequest = shiftRequest;
+	$scope.shiftRequest.repeatsEvery=1;
     $scope.selectedInterval='days';
+    $scope.selectedInterval2='days';
+    $scope.selectedInterval3='days';
+    $scope.selectedYearInterval=1;
+    $scope.selectedMonthInterval = 1;
+    $scope.dayOfMonth=-1;
+    $scope.dayOfWeek="Fakeday";
+    $scope.weekOfMonth=-1;
+
+    
     // Will execute myCallback every 5 seconds 
 	var intervalID = setInterval(function(){ myCallback(shiftRequest)}, 500);
 
 	function myCallback(shiftRequest) {
+		var date = new Date($scope.shiftRequest.startDate);
+		$scope.dayOfMonth = date.getDate()+1;//It comes out zero indexed
+		var dayOfWeek = date.getDay();
+		
+	  switch(date.getMonth()+1){
+    	  case 1:
+    		  $scope.monthName="January";
+    		  break;
+    	  case 2:
+    		  $scope.monthName="Febuary";
+    		  break;
+    	  case 3:
+    		  $scope.monthName="March";
+    		  break;
+    	  case 4:
+    		  $scope.monthName="April";
+    		  break;
+    	  case 5:
+    		  $scope.monthName="May";
+    		  break;
+    	  case 6:
+    		  $scope.monthName="June";
+    		  break;
+    	  case 7:
+    		  $scope.monthName="July";
+    		  break;
+    	  case 8:
+    		  $scope.monthName="August";
+    		  break;
+    	  case 9:
+    		  $scope.monthName="September";
+    		  break;
+    	  case 10:
+    		  $scope.monthName="October";
+    		  break;
+    	  case 11:
+    		  $scope.monthName="November";
+    		  break;
+    	  case 12:
+    		  $scope.monthName="December";
+    		  break;
+      }
+		switch(dayOfWeek){
+    	  case 6:
+    		  $scope.dayOfWeek="Sunday";
+    		  break;
+		  case 0:
+			  $scope.dayOfWeek="Monday";
+    		  break;
+    	  case 1:
+    		  $scope.dayOfWeek="Tuesday";
+    		  break;
+    	  case 2:
+    		  $scope.dayOfWeek="Wednesday";
+    		  break;
+    	  case 3:
+    		  $scope.dayOfWeek="Thursday";
+    		  break;
+    	  case 4:
+    		  $scope.dayOfWeek="Friday";
+    		  break;
+    	  case 5:
+    		  $scope.dayOfWeek="Saturday";
+    		  break;
+        }
+		
+		var week=1;
+		var day = date.getDate()+1;
+
+		for(var i = 0; i<32;i++){
+			day=day-1;
+			
+			if(day<=0){
+				break;
+			}
+			else{
+				if(dayOfWeek==0){
+					dayOfWeek = 6;
+				}
+				else{
+					if(dayOfWeek==6){
+						week=week+1;
+					}
+					dayOfWeek=dayOfWeek-1;
+				}
+			}
+		}
+		
+		$scope.weekOfMonth= week;
+		
 		$http({
-            url: '/requests/validity',
+            url: '/recurringShiftNeeds/validity',
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -38,9 +139,22 @@ function RequestModalController($scope, $modalInstance, $http, selectedClient, s
 	}
 	
 	$scope.setSelectedInterval=function(selectedInterval){
-		console.log("selectedInterval:"+selectedInterval)
 		$scope.selectedInterval=selectedInterval
 	}
+	
+	$scope.setSelectedInterval2=function(selectedInterval2){
+		$scope.selectedInterval2=selectedInterval2
+	}
+	
+	$scope.setSelectedInterval3=function(selectedInterval3){
+		$scope.selectedInterval3=selectedInterval3
+	}
+
+	
+	$scope.setSelectedMonthInterval=function(selectedMonthInterval){
+		$scope.selectedMonthInterval=selectedMonthInterval
+	}
+	
 	
 	$scope.setMonthInterval=function(monthInterval){
 		$scope.monthInterval=monthInterval
@@ -53,24 +167,28 @@ function RequestModalController($scope, $modalInstance, $http, selectedClient, s
 	$scope.everyMonth=function(selectedInterval){
 		return selectedInterval=='months'
 	}
+	
+	$scope.everyYear=function(selectedInterval){
+		return selectedInterval=='years'
+	}
 
-    $scope.isValid = function(shiftRequest){
-    	//get day of month
-    	//get week of month
-    	$http({
-            url: '/requests/validity',
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            params: {
-            	shiftRequest: shiftRequest
-            }
-        })
-        .then(function(response) {
-    		$scope.valid = response.data;
-        });
-    }
+//    $scope.isValid = function(shiftRequest){
+//    	//get day of month
+//    	//get week of month
+//    	$http({
+//            url: '/requests/validity',
+//            method: 'POST',
+//            headers: {
+//                'Content-Type': 'application/x-www-form-urlencoded'
+//            },
+//            params: {
+//            	shiftRequest: shiftRequest
+//            }
+//        })
+//        .then(function(response) {
+//    		$scope.valid = response.data;
+//        });
+//    }
     
     if(!$scope.shiftRequest.clientId){
     	$scope.shiftRequest.clientId=selectedClient.id;
