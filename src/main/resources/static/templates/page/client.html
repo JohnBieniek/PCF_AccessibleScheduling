@@ -31,6 +31,12 @@
 			    	</div>
 		    	</div>
 	    	</div>
+	    	<div ng-if="isSet('Schedule')">
+	    		<h4 class='rightAlign'>Sunday</h4>
+	    		<h4 class='rightAlign'>Monday</h4>
+	    		<h4 class='rightAlign'>Tuesday</h4>
+	    		<h4 class='rightAlign'>Wednesday</h4>
+	    	</div>
 	    	<div ng-if="isSet('Requests')">
 	    		<p style="font-size:40px">{{client.first}} {{client.initial}}<p>
 	    		<button style="font-size:30px" ng-click="addRequest(client,employees)"><span class="glyphicon glyphicon-plus"></span>Create new Request</button>
@@ -43,9 +49,70 @@
 			    	</div>
 		    	</div>
 	    	</div>
+	    	<div ng-if="isSet('Details')" class = 'rightAlign'>
+	    		<form name="clientForm" role="form">
+			        <div class="form-group has-feedback" ng-class="{'has-warning': clientForm.first.$invalid, 'has-success': clientForm.first.$valid}">
+			            <label for="first" style="font-size:18px">First</label>
+			            <input type="text" class="form-control input-large rightAlign nameInput" id="first" name="first" required ng-model="client.first">
+			            <span class="glyphicon form-control-feedback" ng-class="{'glyphicon-warning-sign': clientForm.first.$invalid, 'glyphicon-ok': clientForm.first.$valid}"></span>
+			        </div>
+			        
+			        <div class="form-group has-feedback" ng-class="{'has-warning': clientForm.initial.$invalid, 'has-success': clientForm.initial.$valid}">
+			            <label for="initial" style="font-size:18px">Initial / Identifier</label>
+			            <input type="text" class="form-control input-large rightAlign nameInput" id="initial" name="initial" required ng-model="client.initial">
+			            <span class="glyphicon form-control-feedback" ng-class="{'glyphicon-warning-sign': clientForm.initial.$invalid, 'glyphicon-ok': clientForm.initial.$valid}"></span>
+			        </div>
+			        
+			        <div>
+			            <label for="preferSigning" style="font-size:18px">Prefers Signing Staff</label>
+			            <input type="checkbox" id="preferSigning" name="preferSigning" style="height:20px;width:20px" ng-model="client.preferSigning">
+			        </div>
+			        
+			        <div>
+			            <label for="signingOnly" style="font-size:18px">Only Signing Staff</label>
+			            <input type="checkbox"  id="signingOnly" name="signingOnly" style="height:20px;width:20px" ng-model="client.signingOnly">
+			        </div>
+			        
+			        <div>
+			            <label for="smoker" style="font-size:18px">No Smokers</label>
+			            <input type="checkbox" id="smoker" name="smoker" style="height:20px;width:20px" ng-model="client.noSmokers">
+			        </div>
+			        
+			        <div>
+			            <label for="ownsCats" style="font-size:18px">Owns Cats</label>
+			            <input type="checkbox" id="ownsCats" name="ownsCats" style="height:20px;width:20px" ng-model="client.ownsCats">
+			        </div>
+			        
+			        <div>
+			            <label for="noMaleStaff" style="font-size:18px">No Male Staff</label>
+			            <input type="checkbox" id="noMaleStaff" name="noMaleStaff" style="height:20px;width:20px" ng-model="client.noMaleStaff">
+			        </div>
+			        <div>
+			            <label for="noFemaleStaff" style="font-size:18px">No Female Staff</label>
+			            <input type="checkbox" id="noFemaleStaff" name="noFemaleStaff" style="height:20px;width:20px" ng-model="client.noFemaleStaff">
+			        </div>
+			        
+			        <div>
+			            <label for="medPass" style="font-size:18px">Med Pass</label>
+			            <input type="checkbox" id="medPass" name="medPass" style="height:20px;width:20px" ng-model="client.medPass">
+			        </div>
+			        
+				    <div ng-if="customFieldDataEditing">
+				        <div ng-repeat="customField in customFields">
+			            	<div ng-init="getClientCustomFieldData(client,customField,$index)">
+			            		<label for="customField" style="font-size:18px">{{customField.clientVariable}}</label>
+			            		<input type="checkbox" id="customField" name="customField" style="height:20px;width:20px" ng-model="client.customValue[$index]">
+			            	</div>
+				        </div>
+			        </div>
+			    </form>
+			    <br>
+			    <button class="btn btn-primary btn-md active" ng-disabled="clientForm.$invalid" ng-click="ok()" ng-class="{ 'disabled': clientform.$invalid }" >OK</button>
+	    	</div>
 		 <div>
     </div>
     
+    <script type="text/javascript" src="js/modal/ClientModalController.js"></script>
 	<script type="text/javascript" src="js/modal/RequestModalController.js"></script>
     <script type="text/javascript" src="js/component/shiftRequestTable.js"></script>
     <script type="text/javascript" src="js/page/mobileClientPage.js"></script>

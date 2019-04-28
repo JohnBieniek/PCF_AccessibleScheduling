@@ -29,6 +29,15 @@ html,body
     
 }
 
+.nameInput{
+	width:150px;
+}
+.rightAlign{
+	margin-left:auto;
+	margin-right:0;
+	text-align:right;
+}
+
 .scheduleButton{
 	font-size: 35px;
 	margin-left:20px;
