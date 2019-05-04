@@ -15,6 +15,7 @@ function RequestModalController($scope, $modalInstance, $http, selectedClient, s
     $scope.dayOfWeek="Fakeday";
     $scope.weekOfMonth=-1;
 
+    $scope.numbers = new Array(52).fill().map((x,i)=>i); 
     
     // Will execute myCallback every 5 seconds 
 	var intervalID = setInterval(function(){ myCallback(shiftRequest)}, 500);
@@ -109,20 +110,6 @@ function RequestModalController($scope, $modalInstance, $http, selectedClient, s
 		}
 		
 		$scope.weekOfMonth= week;
-		
-		$http({
-            url: '/recurringShiftNeeds/validity',
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            params: {
-            	shiftRequest: shiftRequest
-            }
-        })
-        .then(function(response) {
-    		$scope.valid = response.data;
-        });
 	}
     $scope.valid=false;
     
@@ -130,16 +117,63 @@ function RequestModalController($scope, $modalInstance, $http, selectedClient, s
     	if(!$scope.shiftRequest.exceptions){
     		$scope.shiftRequest.exceptions=[];
     	}
-    	 $scope.shiftRequest.exceptions.push(newDate);
+    	
+    	if(!$scope.shiftRequest.exceptions.includes(newDate)){
+    		$scope.shiftRequest.exceptions.push(newDate);
+    	}
     };
     
 	$scope.removeException=function(item){ 
 	    var index= $scope.shiftRequest.exceptions.indexOf(item)
 	     $scope.shiftRequest.exceptions.splice(index,1);     
 	}
-	
-	$scope.setSelectedInterval=function(selectedInterval){
-		$scope.selectedInterval=selectedInterval
+
+	$scope.requestIsValid = function(shiftRequest){
+		var valid = true;
+		
+		if(null==shiftRequest){
+			valid=false;
+		}
+		else{
+			if(shiftRequest.requestEmployee && null==$scope.selectedEmployee){
+				valid=false;//No employee when one was requested
+			}
+			else if(null==shiftRequest.startDate || null==shiftRequest.endDate){
+				valid=false;//No start or end date
+			}
+			else if(null==shiftRequest.startTime || null==shiftRequest.endTime){
+				valid=false;//No start or end time
+			}
+			else{
+				var splitStartDate = shiftRequest.startDate.split('-');
+				var splitEndDate = shiftRequest.endDate.split('-');
+				
+				var splitStartTime = shiftRequest.startTime.split(':');
+				var splitEndTime = shiftRequest.endTime.split(':');
+				
+				if(shiftRequest.startDate ==shiftRequest.endDate){
+					if(parseInt(splitStartTime[0])>parseInt(splitEndTime[0])){
+						valid=false;//Starts in hours after it ends
+					}
+					else if(splitStartTime[0]==splitEndTime[0]){
+						if(parseInt(splitStartTime[1])>=parseInt(splitEndTime[1])){
+							valid=false;//Starts when it ends or minutes after
+						}
+					}
+				}
+				else if(parseInt(splitEndTime[1])>parseInt(splitStartTime[1])){
+    				if(parseInt(splitEndTime[0])>=parseInt(splitStartTime[0])){
+						valid=false;
+						//reason = "greater than 24 hours";
+    				}
+				}
+				else if(parseInt(splitEndTime[0])>parseInt(splitStartTime[0])){
+					valid=false;//reason="greater than 24 hours";
+				}
+			}
+		}
+
+		return valid;
 	}
 	
 	$scope.setSelectedInterval2=function(selectedInterval2){

@@ -51,9 +51,47 @@
    	            <br>
   	           	<label style="font-size:23px">Repeats every</label>
    	            <input type="checkbox" style="height:20px;width:20px"  ng-model="shiftRequest.repeats">
-   	            <input style="width:50px;font-size:21px'" type="number" name="every" min="1" ng-model="shiftRequest.repeatsEvery">
-   	            
 			    <form name="myForm" style="display:inline-block" >
+		    		<select style="display:inline-block; font-size:23px"
+				      		ng-model="shiftRequest.repeatsEvery"
+				      		ng-init="shiftRequest.repeatsEvery"
+				      		ng-value="{{shiftRequest.repeatsEvery}}">
+					    <option value=1>1</option>
+					    <option value=2>2</option>
+  					    <option value=3>3</option>
+   					    <option value=4>4</option>
+   					    <option value=5>5</option>
+   					    <option value=6>6</option>
+   					    <option value=7>7</option>
+   					    <option value=8>8</option>
+   					    <option value=9>9</option>
+   					    <option value=10>10</option>
+   					    <option value=11>11</option>
+   					    <option value=12>12</option>
+   					    <option value=13>13</option>
+   					    <option value=14>14</option>
+   					    <option value=15>15</option>
+   					    <option value=16>16</option>
+   					    <option value=17>17</option>
+   					    <option value=18>18</option>
+   					    <option value=19>19</option>
+   					    <option value=20>20</option>
+   					    <option value=21>21</option>
+   					    <option value=22>22</option>
+   					    <option value=23>23</option>
+   					    <option value=24>24</option>
+   					    <option value=25>25</option>
+   					    <option value=26>26</option>
+   					    <option value=27>27</option>
+   					    <option value=28>28</option>
+   					    <option value=29>29</option>
+   					    <option value=30>30</option>
+   					    <option value=31>31</option>
+	          		</select>
+			  	</form>
+
+   	            
+   	            <form name="myForm" style="display:inline-block" >
 		    		<select style="display:inline-block; font-size:23px"
 				      		ng-model="selectedInterval"
 				      		ng-init="selectedInterval"
@@ -169,6 +207,6 @@
 </div>
 
 <div class="modal-footer">
-    <button class="btn btn-primary btn-md active" ng-show="valid" ng-click="ok()" >OK</button>
-    <button class="btn btn-warning btn-md active" ng-click="cancel()">Cancel</button>
+    <div style="display:inline-block" ng-if="requestIsValid(shiftRequest)"><button class="btn btn-primary btn-md active" ng-click="ok()" >OK</button></div>
+    <button style="display:inline-block" class="btn btn-warning btn-md active" ng-click="cancel()">Cancel</button>
 </div>
