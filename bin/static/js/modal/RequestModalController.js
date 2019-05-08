@@ -118,7 +118,7 @@ function RequestModalController($scope, $modalInstance, $http, selectedClient, s
     		$scope.shiftRequest.exceptions=[];
     	}
     	
-    	if(!$scope.shiftRequest.exceptions.includes(newDate)){
+    	if(!$scope.shiftRequest.exceptions.includes(newDate) && newDate!=null && newDate!=""){
     		$scope.shiftRequest.exceptions.push(newDate);
     	}
     };

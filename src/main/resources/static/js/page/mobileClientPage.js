@@ -319,7 +319,19 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
        });
 
        addModal.result.then(function (shiftRequest) {
-           saveShiftRequest(shiftRequest);
+    		$http({
+                url: '/clientRequests',
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                params: {
+                    clientRequest: shiftRequest
+                }
+            })
+            .then(function(response) {
+        		console.log(response.data);
+            });
        });
    };
    
