@@ -43,8 +43,9 @@
 	    		<h2>Existing Requests</h2>
 				<div ng-repeat="request in requests">
 					<div class = "myTab">
+						{{request.clientName}}
 				    	<div >
-				       		<p ng-click="editRequest(request)">{{request}}!</p>
+				       		<p ng-click="editRequest(request)"></p>
 				    	</div>
 			    	</div>
 		    	</div>

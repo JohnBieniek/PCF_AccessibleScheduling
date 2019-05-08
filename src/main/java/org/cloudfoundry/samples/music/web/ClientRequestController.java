@@ -69,7 +69,20 @@ public class ClientRequestController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public ClientRequest update(@RequestParam ClientRequest clientRequest) {
+    public ClientRequest update(@RequestParam String param) {
+    	ClientRequest clientRequest =null;
+
+    	ObjectMapper mapper = new ObjectMapper();
+    	
+    	try {
+			clientRequest = mapper.readValue(param, ClientRequest.class);
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
         return repository.save(clientRequest);
     }
 

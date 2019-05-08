@@ -161,27 +161,8 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
         $scope.employees = Employees.query();
     }
     
-    $scope.deleteShifts = function(month){
-    	if(confirm("Are you sure to delete the shifts for "+$scope.monthName+"?")) {
-	    	$http({
-	            url: '/schedule/byMonth',
-	            method: 'DELETE',
-	            headers: {
-	                'Content-Type': 'application/x-www-form-urlencoded'
-	            },
-	            params: {
-	            	month: month
-	            }
-	        })
-	        .then(function(response) {
-	        	$scope.statusList = response.data.sort(function(a, b){return a.month-b.month});
-	        	$scope.getUnscheduled(month);
-	            $scope.getScheduled(month);
-	        });
-    	}
-    }
-    
-    $scope.listStatusItems = function listStatusItems(){
+   
+    $scope.listRequests = function listRequests(){
     	$http({
             url: '/schedule/statusList',
             method: 'GET',
@@ -192,11 +173,7 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
             }
         })
         .then(function(response) {
-    		$scope.statusList = response.data.sort(function(a, b){return a.month-b.month});
-    		console.log(response.data);
-    		console.log($scope.statusList[0].generated);
-    		$scope.setTab($scope.tab);
-    		setTimeout(listStatusItems,12500);
+    		$scope.requests = response.data;
         });
     }
     
@@ -326,7 +303,7 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
                     'Content-Type': 'application/x-www-form-urlencoded'
                 },
                 params: {
-                    clientRequest: shiftRequest
+                    param: shiftRequest
                 }
             })
             .then(function(response) {
