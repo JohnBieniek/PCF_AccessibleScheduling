@@ -42,11 +42,38 @@
 	    		<button style="font-size:30px" ng-click="addRequest(client,employees)"><span class="glyphicon glyphicon-plus"></span>Create new Request</button>
 	    		<h2>Existing Requests</h2>
 				<div ng-repeat="request in requests">
-					<div class = "myTab">
-						{{request.clientName}}
-				    	<div >
-				       		<p ng-click="editRequest(request)"></p>
-				    	</div>
+					<div ng-click="editRequest(request)" class = "request">
+						<p class="inline">{{request.startTime}} - {{request.endTime}}</p> 
+						<div class="inline" ng-if="request.requestEmployee">
+							<p> with {{request.employeeName}}</p>
+						</div>
+						<div class="inline" ng-if="request.repeats">
+							<p class="inline" > every {{request.repeatsEvery}} {{request.interval}} <p>
+							<div class="inline" ng-if="request.days[0]">
+								<p>Su</p>
+							</div>
+							<div class="inline" ng-if="!request.days[1]">
+								<p>M</p>
+							</div>
+							<div class="inline" ng-if="!request.days[2]">
+								<p>Tu</p>
+							</div>
+							<div class="inline" ng-if="!request.days[3]">
+								<p>W</p>
+							</div>
+							<div class="inline" ng-if="!request.days[4]">
+								<p>Th</p>
+							</div>
+							<div class="inline" ng-if="!request.days[5]">
+								F
+							</div>
+							<div class="inline" ng-if="!request.days[6]">
+								Sa
+							</div>
+						</div>
+						<div class="inline">
+							<p> starting {{request.startDate}}<p>
+						</div>
 			    	</div>
 		    	</div>
 	    	</div>

@@ -6,6 +6,7 @@ import org.cloudfoundry.samples.music.managers.EmployeeShiftMapManager;
 import org.cloudfoundry.samples.music.managers.ScheduleManager;
 import org.cloudfoundry.samples.music.managers.ShiftAssignmentManager;
 import org.cloudfoundry.samples.music.managers.ShiftManager;
+import org.cloudfoundry.samples.music.repositories.mongodb.MongoClientRequestRepository;
 import org.cloudfoundry.samples.music.repositories.mongodb.ScheduleStatusRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import accessiblesolutions.accessiblescheduling.domain.ClientRequest;
 import accessiblesolutions.accessiblescheduling.domain.ScheduleStatus;
 import accessiblesolutions.accessiblescheduling.domain.Shift;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
@@ -42,10 +44,18 @@ public class ScheduleController {
     
     @Autowired
     private ScheduleStatusRepository scheduleStatusRepository;   
+
+    @Autowired
+    private MongoClientRequestRepository mongoRepository;
     
     @Autowired
     public ScheduleController(ScheduleManager manager) {
         this.manager=manager;
+    }
+
+    @RequestMapping(value = "/clientsRequests", method = RequestMethod.GET)
+    public Iterable<ClientRequest> clientsRequests(@RequestParam String clientId) {
+        return mongoRepository.findByClientId(clientId);
     }
 
     @RequestMapping(value = "/byMonth", method = RequestMethod.DELETE)

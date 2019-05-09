@@ -56,6 +56,7 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
 	}
 	$scope.setClient = function(newClient){
 	      $scope.client = newClient;
+	      $scope.listRequests(newClient);
 		}
 	
 	$scope.setInterval = function(newInterval){
@@ -162,18 +163,28 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
     }
     
    
-    $scope.listRequests = function listRequests(){
+    $scope.listRequests = function listRequests(client){
+    	let id = "-1";
+    	
+    	if(null!=client){
+    		id=client.id;
+    	}
+    	
     	$http({
-            url: '/schedule/statusList',
+            url: '/schedule/clientsRequests',
             method: 'GET',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
+            	clientId:id
             }
         })
         .then(function(response) {
+        	console.log("got requests"+response.data);
     		$scope.requests = response.data;
+    		let notation = "AM";
+    		
         });
     }
     
@@ -407,5 +418,4 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
     		$scope.setTab($scope.tab);
         });
     }
-    $scope.listStatusItems();
 }
