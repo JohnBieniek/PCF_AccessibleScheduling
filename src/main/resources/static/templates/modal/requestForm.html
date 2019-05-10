@@ -22,7 +22,7 @@
             		id="mySelect"
             		style="font-size:23px"
             		ng-change="isValid(shiftRequest)"
-            		ng-init = "selectedEmployee"
+            		ng-init = "selectedEmployee || employee.first"
       				ng-options="employee.first for employee in employees | orderBy:'first' track by employee.id"
       				ng-model="selectedEmployee"
       				ng-value="{{employee.first}}">
@@ -93,9 +93,9 @@
    	            
    	            <form name="myForm" style="display:inline-block" >
 		    		<select style="display:inline-block; font-size:23px"
-				      		ng-model="selectedInterval"
-				      		ng-init="selectedInterval"
-				      		ng-value="{{selectedInterval}}">
+				      		ng-model="shiftRequest.selectedInterval"
+				      		ng-init="shiftRequest.selectedInterval || 'days'"
+				      		ng-value="{{shiftRequest.selectedInterval}}">
 					    <option value=days>Day(s)</option>
 					    <option value=weeks>Week(s)</option>
 				        <option value=months>Month(s)</option>
@@ -106,7 +106,7 @@
    	            
    	            <div ng-if="shiftRequest.repeats">
    	            <br>
-   	            <div ng-if="everyWeek(selectedInterval)">
+   	            <div ng-if="everyWeek(shiftRequest.selectedInterval)">
    	            	<div class="daySelector">
 						<label for="sunday" style="font-size:15px">Sun</label>
 						<br>

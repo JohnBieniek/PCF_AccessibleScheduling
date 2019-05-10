@@ -183,6 +183,11 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
         .then(function(response) {
         	console.log("got requests"+response.data);
     		$scope.requests = response.data;
+    		
+    		for(request in $scope.requests){
+    			request.dsiplayTime= request.startsLocalDateTime.hour +":" request.startsLocalDateTime.minute;
+    							
+    		}
     		let notation = "AM";
     		
         });
@@ -280,7 +285,48 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
     }
     
     
-    
+    $scope.editRequest = function (selectedRequest,selectedClient,employees) {
+		 console.log("attempting to open requestForm and RequestModalController");
+      var editModal = $modal.open({
+          templateUrl: 'templates/modal/requestForm.html',
+          controller: RequestModalController,
+          windowClass: 'app-modal-window',
+          resolve: {
+          	selectedClient: function(){
+          		return clone(selectedClient);
+          	},
+          	employees: function(){
+          		return clone(employees);
+          	},
+          	selectedEmployee: function(){
+          		return "";
+          	},
+              shiftRequest: function () {
+                  return selectedRequest;
+              },
+              action: function() {
+                  return 'edit';
+              }
+          }
+      });
+
+      editModal.result.then(function (shiftRequest) {
+   		$http({
+               url: '/clientRequests',
+               method: 'POST',
+               headers: {
+                   'Content-Type': 'application/x-www-form-urlencoded'
+               },
+               params: {
+                   param: shiftRequest
+               }
+           })
+           .then(function(response) {
+       		console.log(response.data);
+           });
+      });
+  };
+  
     $scope.addRequest = function (selectedClient,employees) {
 		 console.log("attempting to open requestForm and RequestModalController");
        var addModal = $modal.open({

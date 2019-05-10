@@ -1,5 +1,5 @@
 <div ng-controller="MobileClientController" ng-init="listClients()">
-	<divstyle="display:inline-block;">
+	<div style="display:inline-block;">
 	 	<div style="display:inline-block;">
 			<ul>
 				<div style="overflow-y:auto" class="monthSelector">
@@ -13,7 +13,7 @@
 		    	</div>
 	    	</ul>
 	   	</div>
-	   	<div ng-if="isClientSet(client)" style="display:inline-block; vertical-align: top; width:60%"">
+	   	<div ng-if="isClientSet(client)" style="display:inline-block; vertical-align: top; width:65%"">
 			<div>
 				<div style="display:inline-block;" class = "recTab" ng-class="{ active: isSet('Schedule') }">
 			    	<div >
@@ -42,37 +42,33 @@
 	    		<button style="font-size:30px" ng-click="addRequest(client,employees)"><span class="glyphicon glyphicon-plus"></span>Create new Request</button>
 	    		<h2>Existing Requests</h2>
 				<div ng-repeat="request in requests">
-					<div ng-click="editRequest(request)" class = "request">
-						<p class="inline">{{request.startTime}} - {{request.endTime}}</p> 
+					<div ng-click="editRequest(request,client,employees)" class = "request">
+						<p class="inline">{{getStartDisplay(request)}} - {{request.endTime}}</p> 
 						<div class="inline" ng-if="request.requestEmployee">
-							<p> with {{request.employeeName}}</p>
+							<p> with {{request.staffName}}</p>
 						</div>
 						<div class="inline" ng-if="request.repeats">
-							<p class="inline" > every {{request.repeatsEvery}} {{request.interval}} <p>
+							<p class="inline" > every {{request.repeatsEvery}} {{request.interval}} </p>
 							<div class="inline" ng-if="request.days[0]">
 								<p>Su</p>
 							</div>
 							<div class="inline" ng-if="!request.days[1]">
 								<p>M</p>
 							</div>
-							<div class="inline" ng-if="!request.days[2]">
-								<p>Tu</p>
-							</div>
-							<div class="inline" ng-if="!request.days[3]">
-								<p>W</p>
-							</div>
-							<div class="inline" ng-if="!request.days[4]">
-								<p>Th</p>
-							</div>
-							<div class="inline" ng-if="!request.days[5]">
-								F
-							</div>
+								<p class="inline" ng-if="request.days[2]">Tu</p>
+								<p class="inline" ng-if="request.days[3]">W</p>
+								<p class="inline" ng-if="request.days[4]">Th</p>
+								<p class="inline" ng-if="request.days[5]">F</p>
 							<div class="inline" ng-if="!request.days[6]">
-								Sa
+								<p>Sa</p>
 							</div>
+							<p class="inline"> starting </p>
+						</div>
+						<div ng-if= "!request.repeats" class="inline">
+							<p> on <p>
 						</div>
 						<div class="inline">
-							<p> starting {{request.startDate}}<p>
+							<p>{{request.startDate}}<p>
 						</div>
 			    	</div>
 		    	</div>
