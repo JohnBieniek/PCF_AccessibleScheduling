@@ -45,7 +45,7 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
 	 $scope.generatedBool = false;
 	 $scope.generated="Generated";
 	 $scope.assigned="Unassigned";
-	 $scope.tab=1;
+	 $scope.tab="Schedule";
 	 $scope.monthName="January";
 	 $scope.statusList=[];
 	 $scope.unscheduled=0;
@@ -153,6 +153,38 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
 	 $scope.setMonth = function setMonth(month) {
 	        $scope.month = month;
 	    }
+	 
+	 $scope.getDisplayTime = function getStartDisplay(request) {
+		 	console.log("hour="+parseInt(request.startsLocalDateTime.hour));
+		 	let startHour = parseInt(request.startsLocalDateTime.hour);
+		 	let endHour= parseInt(request.endsLocalDateTime.hour);
+		 	
+		 	let startMinute = parseInt(request.startsLocalDateTime.minute);
+		 	let endMinute= parseInt(request.endsLocalDateTime.minute);
+		 	
+		 	let startModifier = "AM";
+		 	let endModifier = "AM";
+		 	
+		 	if(startHour>11){
+		 		startHour-=12;
+		 		startModifier="PM"
+		 	}
+		 	
+		 	if(endHour>11){
+		 		endHour-=12;
+		 		endModifier="PM"
+		 	}
+		 	
+		 	if(startMinute<10){
+		 		startMinute="0"+startMinute
+		 	}
+		 	
+		 	if(endMinute<10){
+		 		endMinute="0"+endMinute
+		 	}
+	        request.displayTime = startHour+":"+startMinute+startModifier+"-";
+	        request.displayTime += endHour+":"+endMinute+endModifier;
+	    }
     $scope.listClients = function listClients() {
         $scope.clients = Clients.query();
         $scope.employees = Employees.query();
@@ -181,16 +213,10 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
             }
         })
         .then(function(response) {
-        	console.log("got requests"+response.data);
+        	console.log("got requests");
+        	console.log(response.data);
     		$scope.requests = response.data;
-    		
-    		for(request in $scope.requests){
-    			request.dsiplayTime= request.startsLocalDateTime.hour +":" request.startsLocalDateTime.minute;
-    							
-    		}
-    		let notation = "AM";
-    		
-        });
+    	});
     }
     
     $scope.getScheduled = function getScheduled(month){
@@ -287,6 +313,7 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
     
     $scope.editRequest = function (selectedRequest,selectedClient,employees) {
 		 console.log("attempting to open requestForm and RequestModalController");
+		 
       var editModal = $modal.open({
           templateUrl: 'templates/modal/requestForm.html',
           controller: RequestModalController,
@@ -299,7 +326,7 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
           		return clone(employees);
           	},
           	selectedEmployee: function(){
-          		return "";
+          		return selectedRequest.staffId;
           	},
               shiftRequest: function () {
                   return selectedRequest;

@@ -195,15 +195,15 @@ function RequestModalController($scope, $modalInstance, $http, selectedClient, s
 	}
 	
 	$scope.everyWeek=function(weekInterval){
-		return weekInterval=='weeks'
+		return weekInterval=='week(s)'
 	}
 	
 	$scope.everyMonth=function(selectedInterval){
-		return selectedInterval=='months'
+		return selectedInterval=='month(s)'
 	}
 	
 	$scope.everyYear=function(selectedInterval){
-		return selectedInterval=='years'
+		return selectedInterval=='year(s)'
 	}
 
 //    $scope.isValid = function(shiftRequest){

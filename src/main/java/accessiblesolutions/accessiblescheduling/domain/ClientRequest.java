@@ -7,6 +7,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import accessiblesolutions.accessiblescheduling.util.Util;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -34,10 +35,13 @@ public class ClientRequest {
     private String repeatsEvery;
     private boolean[] days;
     private String interval;
+    private String monthInterval;
+    private String yearInterval;
 
     public ClientRequest() {
     }
 
+    
     public boolean isValid(){
     	boolean valid = true;
     	float duration = 0;
@@ -342,5 +346,21 @@ public class ClientRequest {
 
 	public void setInterval(String interval) {
 		this.interval = interval;
+	}
+
+	public String getYearInterval() {
+		return yearInterval;
+	}
+
+	public void setYearInterval(String yearInterval) {
+		this.yearInterval = yearInterval;
+	}
+
+	public String getMonthInterval() {
+		return monthInterval;
+	}
+
+	public void setMonthInterval(String monthInterval) {
+		this.monthInterval = monthInterval;
 	}
 }

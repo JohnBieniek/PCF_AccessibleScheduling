@@ -93,20 +93,20 @@
    	            
    	            <form name="myForm" style="display:inline-block" >
 		    		<select style="display:inline-block; font-size:23px"
-				      		ng-model="shiftRequest.selectedInterval"
-				      		ng-init="shiftRequest.selectedInterval || 'days'"
-				      		ng-value="{{shiftRequest.selectedInterval}}">
-					    <option value=days>Day(s)</option>
-					    <option value=weeks>Week(s)</option>
-				        <option value=months>Month(s)</option>
-			            <option value=years>Year(s)</option>
+				      		ng-model="shiftRequest.interval"
+				      		ng-init="shiftRequest.interval || 'day(s)'"
+				      		ng-value="{{shiftRequest.interval}}">
+					    <option value=day(s)>Day(s)</option>
+					    <option value=week(s)>Week(s)</option>
+				        <option value=month(s)>Month(s)</option>
+			            <option value=year(s)>Year(s)</option>
 	          		</select>
 			  	</form>
 			  	<br>
    	            
    	            <div ng-if="shiftRequest.repeats">
    	            <br>
-   	            <div ng-if="everyWeek(shiftRequest.selectedInterval)">
+   	            <div ng-if="everyWeek(shiftRequest.interval)">
    	            	<div class="daySelector">
 						<label for="sunday" style="font-size:15px">Sun</label>
 						<br>
@@ -144,24 +144,24 @@
 					</div>
 					<br>
    	            </div>
-   	            <div ng-if="everyMonth(selectedInterval)">
+   	            <div ng-if="everyMonth(shiftRequest.interval)">
 				  	<form name="myForm" style="display:inline-block" >
 			    		<select style="display:inline-block; font-size:23px"
-					      		ng-model="selectedInterval2"
-					      		ng-init="selectedInterval2"
-					      		ng-value="{{selectedInterval2}}">
+					      		ng-model="shiftRequest.monthInterval"
+					      		ng-init="shiftRequest.monthInterval || days"
+					      		ng-value="{{shiftRequest.monthInterval}}">
 						    <option value=days>Every {{shiftRequest.repeatsEvery}} month(s) on day {{dayOfMonth}} </option>
 						    <option value=weeks>Every {{shiftRequest.repeatsEvery}} month(s) on {{dayOfWeek}} of week {{weekOfMonth}}</option>
 		          		</select>
 				  	</form>
 				  	<br>
    	            </div>
-   	             <div ng-if="everyYear(selectedInterval)">
+   	             <div ng-if="everyYear(shiftRequest.interval)">
 		    		<form name="myForm" style="display:inline-block" >
 			    		<select style="display:inline-block; font-size:23px"
-					      		ng-model="selectedInterval3"
-					      		ng-init="selectedInterval3"
-					      		ng-value="{{selectedInterval3}}">
+					      		ng-model="shiftRequest.yearInterval"
+					      		ng-init="shiftRequest.yearInterval || days"
+					      		ng-value="{{shiftRequest.yearInterval}}">
 						    <option value=days>Every {{shiftRequest.repeatsEvery}} year(s) in {{monthName}} on day {{dayOfMonth}}</option>
 						    <option value=weeks>Every {{shiftRequest.repeatsEvery}} year(s) in  {{monthName}} on {{dayOfWeek}} of week {{weekOfMonth}}</option>
 		          		</select>

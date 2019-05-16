@@ -13,7 +13,7 @@
 		    	</div>
 	    	</ul>
 	   	</div>
-	   	<div ng-if="isClientSet(client)" style="display:inline-block; vertical-align: top; width:65%"">
+	   	<div ng-if="isClientSet(client)" style="display:inline-block; vertical-align: top; width:70%"">
 			<div>
 				<div style="display:inline-block;" class = "recTab" ng-class="{ active: isSet('Schedule') }">
 			    	<div >
@@ -31,6 +31,7 @@
 			    	</div>
 		    	</div>
 	    	</div>
+	    	<br>
 	    	<div ng-if="isSet('Schedule')">
 	    		<h4 class='rightAlign'>Sunday</h4>
 	    		<h4 class='rightAlign'>Monday</h4>
@@ -38,17 +39,17 @@
 	    		<h4 class='rightAlign'>Wednesday</h4>
 	    	</div>
 	    	<div ng-if="isSet('Requests')">
-	    		<p style="font-size:40px">{{client.first}} {{client.initial}}<p>
-	    		<button style="font-size:30px" ng-click="addRequest(client,employees)"><span class="glyphicon glyphicon-plus"></span>Create new Request</button>
-	    		<h2>Existing Requests</h2>
+	    		<p  class="inline" style="font-size:40px"> {{client.first}} {{client.initial}}</p>
+	    		<button  class="inline" style="font-size:30px" ng-click="addRequest(client,employees)"><span class="glyphicon glyphicon-plus"></span>Create new Request</button>
+	    		<h2> Existing Requests</h2>
 				<div ng-repeat="request in requests">
 					<div ng-click="editRequest(request,client,employees)" class = "request">
-						<p class="inline">{{getStartDisplay(request)}} - {{request.endTime}}</p> 
+						<p ng-init="getDisplayTime(request)" class="inline">{{request.displayTime}}</p> 
 						<div class="inline" ng-if="request.requestEmployee">
-							<p> with {{request.staffName}}</p>
+							<span> with {{request.staffName}}</span>
 						</div>
 						<div class="inline" ng-if="request.repeats">
-							<p class="inline" > every {{request.repeatsEvery}} {{request.interval}} </p>
+							<span class="inline" > every {{request.repeatsEvery}} {{request.interval}} </span>
 							<div class="inline" ng-if="request.days[0]">
 								<p>Su</p>
 							</div>

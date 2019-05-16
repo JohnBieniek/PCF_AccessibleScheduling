@@ -76,6 +76,7 @@ public class ClientRequestController {
     	
     	try {
 			clientRequest = mapper.readValue(param, ClientRequest.class);
+			//clientRequest.generateDisplayValue();
 		} catch (JsonParseException e) {
 			e.printStackTrace();
 		} catch (JsonMappingException e) {
