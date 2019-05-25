@@ -57,6 +57,9 @@ html,body
   text-decoration: none;
 }
 
+.red{
+	color: #cc0000;
+}
 .errored{
 	border-color: #cc0000!important;
 	background-color: #cc0000!important;

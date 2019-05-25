@@ -22,7 +22,7 @@
             		id="mySelect"
             		style="font-size:23px"
             		ng-change="isValid(shiftRequest)"
-            		ng-init = "shiftRequest.staffId || employee.id"
+            		ng-init = "shiftRequest.staffName || employee.id"
       				ng-options="employee.first for employee in employees | orderBy:'first' track by employee.id"
       				ng-model="selectedEmployee"
       				ng-value="{{employee.first}}">
@@ -115,34 +115,35 @@
 					<div class="daySelector">
 						<label for="monday" style="font-size:15px;text-align:center">Mon</label>
 						<br>
-						<input class="dayCheckbox" type="checkbox" ng-model="shiftRequest.everyMonday">
+						<input class="dayCheckbox" type="checkbox" ng-init="shiftRequest.days[1]" ng-model="shiftRequest.days[1]">
 					</div>
 					<div class="daySelector">
 						<label for="monday" style="font-size:15px;text-align:center">Tues</label>
 						<br>
-						<input class="dayCheckbox"  type="checkbox" ng-model="shiftRequest.everyTuesday">
+						<input class="dayCheckbox"  type="checkbox" ng-init="shiftRequest.days[2]" ng-model="shiftRequest.days[2]">
 					</div>
 					<div class="daySelector">
 						<label for="monday" style="font-size:15px;text-align:center">Wed</label>
 						<br>
-						<input class="dayCheckbox"  type="checkbox" ng-model="shiftRequest.everyWednesday">
+						<input class="dayCheckbox"  ng-init="shiftRequest.days[3]" type="checkbox" ng-model="shiftRequest.days[3]">
 					</div>
 					<div class="daySelector">
 						<label for="monday" style="font-size:15px;text-align:center">Thurs</label>
 						<br>
-						<input class="dayCheckbox" type="checkbox" ng-model="shiftRequest.everyThursday">
+						<input class="dayCheckbox" type="checkbox" ng-init="shiftRequest.days[4]" ng-model="shiftRequest.days[4]">
 					</div>
 					<div class="daySelector">
 						<label for="monday" style="font-size:15px;text-align:center">Fri</label>
 						<br>
-						<input class="dayCheckbox"  type="checkbox" ng-model="shiftRequest.everyFriday">
+						<input class="dayCheckbox"  type="checkbox" ng-init="shiftRequest.days[5]" ng-model="shiftRequest.days[5]">
 					</div>
 					<div class="daySelector">
 						<label for="monday" style="font-size:15px;text-align:center">Sat</label>
 						<br>
-						<input class="dayCheckbox"  type="checkbox" ng-model="shiftRequest.everySaturday">
+						<input class="dayCheckbox"  type="checkbox" ng-init="shiftRequest.days[6]" ng-model="shiftRequest.days[6]">
 					</div>
 					<br>
+   	            <br>
    	            </div>
    	            <div ng-if="everyMonth(shiftRequest.interval)">
 				  	<form name="myForm" style="display:inline-block" >
@@ -155,6 +156,7 @@
 		          		</select>
 				  	</form>
 				  	<br>
+   	            <br>
    	            </div>
    	             <div ng-if="everyYear(shiftRequest.interval)">
 		    		<form name="myForm" style="display:inline-block" >
@@ -167,8 +169,9 @@
 		          		</select>
 				  	</form>
 				  	<br>
-   	            </div>
+				  	
    	            <br>
+   	            </div>
    	            	<label style="font-size:25px">Exceptions</label>
 				  </br>
 				   <form ng-submit="addException(newDate)">

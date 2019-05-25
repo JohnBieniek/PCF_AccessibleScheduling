@@ -44,8 +44,9 @@
 	    		<button  class="inline rightAlign" style="font-size:30px;float:right; margin-right:20px" ng-click="addRequest(client,employees)"><span class="glyphicon glyphicon-plus"></span>Create new Request</button>
 	    		<h2 style="margin-left:10px"> Existing Requests</h2>
 				<div ng-repeat="request in requests">
-					<div ng-click="editRequest(request,client,employees)" class = "request">
-						<p ng-init="getDisplayValue(request)">{{request.displayValue}}</p>
+					<div ng-init="setInitialDays(request)" ng-click="editRequest(request,client,employees)" class = "request">
+						<span style="display:inline-block;" ng-init="getDisplayValue(request)">{{request.displayValue}}</span>
+						<span ng-click="deleteShiftRequest(request)" style="display:inline-block;" class="glyphicon inline red glyphicon-trash"></span>
 			    	</div>
 		    	</div>
 	    	</div>

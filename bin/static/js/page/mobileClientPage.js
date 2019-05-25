@@ -60,84 +60,9 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
 		}
 	
 	$scope.setInterval = function(newInterval){
-	      $scope.interval = newInterval;
-		}
-    
-    $scope.toggleInactive = function(){
-    	$scope.allowInactive = !$scope.allowInactive;
-    }
-    
-    $scope.toggleUnavailable = function(){
-    	$scope.allowUnavailable = !$scope.allowUnavailable;
-    }
-    $scope.toggleOvertime = function(){
-    	$scope.allowOvertime = !$scope.allowOvertime;
-    }
-    $scope.toggleDailyMax = function(){
-    	$scope.useDailyMax = !$scope.useDailyMax;
-    }
-    $scope.toggleWeeklyMax = function(){
-    	$scope.useWeeklyMax = !$scope.useWeeklyMax;
-    }
-    $scope.togglePrioritizationHistory = function(){
-    	$scope.prioritizeSecondShift = !$scope.prioritizeSecondShift;
-    }
-    
-    $scope.isTabGenerated = function(month){
-        return $scope.statusList[month-1].generated && $scope.tab != month && !$scope.statusList[month-1].assigned&& !$scope.statusList[month-1].assigning;
-      };
-      $scope.isTabAssigned = function(month){
-          return $scope.statusList[month-1].assigned && $scope.tab != month&& !$scope.statusList[month-1].assigning ;
-        };
-    $scope.isGenerated = function(month){
-        return $scope.statusList[month-1].generated;
-      };
-      
-      $scope.isWorking = function(month){
-          return $scope.statusList[month-1].assigning  && $scope.tab != month;
-        };
-      
-      $scope.isAssigned = function(month){
-          return $scope.statusList[month-1].assigned;
-        };
-    $scope.isErrored = function(month){
-        return $scope.statusList[month-1].errored;
-      };
-    $scope.isAssigning = function(month){
-    	return $scope.statusList[month-1].assigning
-      };
-      
-      $scope.isStopped = function(month){
-      	return $scope.statusList[month-1].stopped
-        };
-          
-      $scope.isNotAssignable = function(month){
-    	  assignable = true;
-    	  
-    	  console.log("assignable:"+assignable);
-    	  if($scope.statusList[month-1].generated=="false"){
-    		  assignable=false;
-    	  }
-    	  
-	   	  console.log("assignable:"+assignable);
-	   	  
-		  if($scope.statusList[month-1].assigning=="true"){
-	  		assignable=false;
-		  }
-  	  
-	   	  console.log("assignable:"+assignable);
-	   	  
-	   	if($scope.statusList[month-1].assigned=="true"){
-  		  assignable=false;
-  	  }
-  	  unassignable = !assignable;
-	   	  console.log("unassignable:"+unassignable);
-    	  console.log("$scope.statusList[month-1].generated" + $scope.statusList[month-1].generated);
-    	  console.log("$scope.statusList[month-1].assigning "+$scope.statusList[month-1].assigning );
-    	  console.log("$scope.statusList[month-1].assigned"+$scope.statusList[month-1].assigned);
-      	return unassignable;
-       };
-      
+      $scope.interval = newInterval;
+	}
+     
 	 $scope.isSet = function(tabNum){
       return $scope.tab === tabNum;
     };
@@ -161,6 +86,7 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
 		 }
 		 console.log(request.days);
 	 }
+	 
 	 $scope.getDisplayValue = function getDisplayValue(request) {
 		let startHour = parseInt(request.startsLocalDateTime.hour);
 	 	let endHour= parseInt(request.endsLocalDateTime.hour);
@@ -197,10 +123,32 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
 		 if(request.repeats){
 			 request.displayValue+= " every "+request.repeatsEvery + " " +request.interval; 
 		 }
-		 if(request.days && request.days[0]){
-			 request.displayValue+="S";
+		 if(request.days && request.interval=="week(s)"){
+			 request.displayValue+=" [";
+			 if(request.days[0]){
+				 request.displayValue+="Su";
+			 }
+			 if(request.days[1]){
+				 request.displayValue+="M";
+			 }
+			 if(request.days[2]){
+				 request.displayValue+="Tu";
+			 }
+			 if(request.days[3]){
+				 request.displayValue+="W";
+			 }
+			 if(request.days[4]){
+				 request.displayValue+="Th";
+			 }
+			 if(request.days[5]){
+				 request.displayValue+="F";
+			 }
+			 if(request.days[6]){
+				 request.displayValue+="Sa";
+			 }
+			 request.displayValue+="]";
 		 }
-		 var weekOfMonth = 1;
+		 var weekOfMonth = 0;
 		 var dateCursor = request.startsLocalDate.dayOfMonth;
 		 
 		 for(var i =0; i<8;i++){
@@ -210,9 +158,6 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
 			 }
 		 }
 		 
-		 console.log("interval"+request.interval);
-		 console.log("monthInterval"+request.monthInterval);
-		 console.log("dateTime"+request.startsLocalDateTime);
 		 if(request.interval=="month(s)"){
 			 if(request.monthInterval=="days"){
 				 request.displayValue+=" on day "+request.startsLocalDate.dayOfMonth;
@@ -246,19 +191,17 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
 				 request.displayValue+=request.exceptions[index];
 			 }
 		 }
+		 
+		 request.displayValue+=".";
 	 }
-	 $scope.getDisplayTime = function getDisplayTime(request) {
-		 	console.log("hour="+parseInt(request.startsLocalDateTime.hour));
-		 	
-	    }
-    $scope.listClients = function listClients() {
+
+	 $scope.listClients = function listClients() {
         $scope.clients = Clients.query();
-        console.log("client and clients[0]")
-        console.log($scope.client);
-        console.log($scope.clients[0]);
+
         if($scope.client==null){
         	$scope.client = $scope.clients[0];
         }
+        
         $scope.employees = Employees.query();
     }
     
@@ -285,8 +228,6 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
             }
         })
         .then(function(response) {
-        	console.log("got requests");
-        	console.log(response.data);
     		$scope.requests = response.data;
     	});
     }
@@ -315,44 +256,8 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
     	});
     }
     
-    $scope.getScheduled = function getScheduled(month){
-    	$http({
-            url: '/schedule/scheduled',
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            params: {
-            	month: month
-            }
-        })
-        .then(function(response) {
-        	$scope.scheduled=response.data;
-        });
-    }
-    
-    $scope.getUnscheduled = function getUnscheduled(month){
-    	$http({
-            url: '/schedule/unscheduled',
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            params: {
-            	month: month
-            }
-        })
-        .then(function(response) {
-        	$scope.unscheduled=response.data;
-        });
-    }
-    
-
-
  
     $scope.editRequest = function (selectedRequest,selectedClient,employees) {
-		 console.log("attempting to open requestForm and RequestModalController");
-		 
       var editModal = $modal.open({
           templateUrl: 'templates/modal/requestForm.html',
           controller: RequestModalController,
@@ -388,7 +293,7 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
                }
            })
            .then(function(response) {
-       		console.log(response.data);
+        		$scope.requests = response.data;
            });
       });
   };
@@ -419,6 +324,7 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
        });
 
        addModal.result.then(function (shiftRequest) {
+    	   $scope.getDisplayValue(shiftRequest);
     		$http({
                 url: '/clientRequests',
                 method: 'POST',
@@ -430,7 +336,7 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
                 }
             })
             .then(function(response) {
-        		console.log(response.data);
+            	$scope.requests = response.data;
             });
        });
    };
@@ -486,6 +392,7 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
    };
    
    $scope.deleteShiftRequest = function (shiftRequest) {
+	   if(confirm("Are you sure to delete info for the following request?"+shiftRequest.displayValue)){
         Request.delete({id: shiftRequest.id},
             function () {
                 Status.success("Shift Request deleted");
@@ -495,39 +402,6 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
                 Status.error("Error deleting shift Request: " + result.status);
             }
         );
+	   }
     };
-    
-    
-    
-    
-    
-    $scope.assignShifts = function(month, allowOvertime,allowInactive,allowUnavailable,prioritizeSecondShift,dailyMax,weeklyMax){
-    	$scope.statusList[month-1].assigning=true;
-    	$scope.assigned="Assigning";
-    	console.log("$scope.statusList" +$scope.statusList.toString());
-    	$http({
-            url: '/schedule/staffShiftsSafely',
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            params: {
-                month: month,
-                year: '2019',
-                allowOvertime: allowOvertime,
-                allowInactive: allowInactive,
-                allowUnavailable: allowUnavailable,
-                prioritizeSecondShift: prioritizeSecondShift,
-                dailyMax: dailyMax,
-                weeklyMax: weeklyMax
-            }
-        })
-        .then(function(response) {
-        	
-        	$scope.statusList = response.data.sort(function(a, b){return a.month-b.month});
-    		console.log(response.data);
-    		console.log($scope.statusList[0].generated);
-    		$scope.setTab($scope.tab);
-        });
-    }
 }
