@@ -238,7 +238,9 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
     		console.log(response.data);
     		console.log($scope.statusList[0].generated);
     		$scope.setTab($scope.tab);
-    		setTimeout(listStatusItems,12500);
+    		if($scope.page.includes("scheduler")){
+    			setTimeout(listStatusItems,12500);
+    		}
         });
     }
     

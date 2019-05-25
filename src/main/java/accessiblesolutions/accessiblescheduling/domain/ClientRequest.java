@@ -37,6 +37,7 @@ public class ClientRequest {
     private String interval;
     private String monthInterval;
     private String yearInterval;
+    private String[] exceptions;
 
     public ClientRequest() {
     }
@@ -362,5 +363,15 @@ public class ClientRequest {
 
 	public void setMonthInterval(String monthInterval) {
 		this.monthInterval = monthInterval;
+	}
+
+
+	public String[] getExceptions() {
+		return exceptions;
+	}
+
+
+	public void setExceptions(String[] exceptions) {
+		this.exceptions = exceptions;
 	}
 }

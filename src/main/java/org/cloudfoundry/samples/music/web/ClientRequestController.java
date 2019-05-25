@@ -6,6 +6,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.cloudfoundry.samples.music.repositories.mongodb.MongoClientRequestRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,8 @@ import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 public class ClientRequestController {
     private static final Logger logger = LoggerFactory.getLogger(ClientRequestController.class);
     private CrudRepository<ClientRequest, String> repository;
+    @Autowired
+    private MongoClientRequestRepository mongoRepository;
 
     @Autowired
     public ClientRequestController(CrudRepository<ClientRequest, String> repository) {
@@ -69,7 +72,7 @@ public class ClientRequestController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public ClientRequest update(@RequestParam String param) {
+    public List<ClientRequest> update(@RequestParam String param) {
     	ClientRequest clientRequest =null;
 
     	ObjectMapper mapper = new ObjectMapper();
@@ -84,7 +87,9 @@ public class ClientRequestController {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-        return repository.save(clientRequest);
+        repository.save(clientRequest);
+        
+        return mongoRepository.findByClientId(clientRequest.getClientId());
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)

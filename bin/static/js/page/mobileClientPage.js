@@ -200,13 +200,49 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
 		 if(request.days && request.days[0]){
 			 request.displayValue+="S";
 		 }
+		 var weekOfMonth = 1;
+		 var dateCursor = request.startsLocalDate.dayOfMonth;
+		 
+		 for(var i =0; i<8;i++){
+			 if(dateCursor>0){
+				 dateCursor-=7;
+				 weekOfMonth+=1;
+			 }
+		 }
+		 
+		 console.log("interval"+request.interval);
+		 console.log("monthInterval"+request.monthInterval);
+		 console.log("dateTime"+request.startsLocalDateTime);
+		 if(request.interval=="month(s)"){
+			 if(request.monthInterval=="days"){
+				 request.displayValue+=" on day "+request.startsLocalDate.dayOfMonth;
+			 }
+			 else{
+				 request.displayValue+=" on "+request.startsLocalDate.dayOfWeek + " of week "+weekOfMonth;
+			 }
+		 }
+		 
+		 if(request.interval=="year(s)"){
+			 if(request.yearInterval=="days"){
+				 request.displayValue+=" on day "+request.startsLocalDate.dayOfMonth;
+			 }
+			 else{
+				 request.displayValue+=" on "+request.startsLocalDate.dayOfWeek + " of week "+weekOfMonth;
+			 }
+		 }
 		 console.log("exceptions");
 		 console.log(request.exceptions);
-		 if(request.exceptions && request.exceptions.length>0){
+		 if(request.exceptions !=undefined && request.exceptions!=null && request.exceptions.length>0){
 			 request.displayValue+=" except ";
-			 var exception;
-			 for(exception in request.exceptions){
-				 request.displayValue+=exception;
+
+			 for(var index = 0; index <request.exceptions.length;index++){
+				 if(index==request.exceptions.length-1){
+					 request.displayValue+=" and " 
+				 }
+				 else if(index>0){
+					 request.displayValue+=" ,"
+				 }
+				 request.displayValue+=request.exceptions[0];
 			 }
 		 }
 	 }
