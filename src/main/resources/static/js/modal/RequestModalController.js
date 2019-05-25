@@ -135,7 +135,7 @@ function RequestModalController($scope, $modalInstance, $http, selectedClient, s
 			valid=false;
 		}
 		else{
-			if(shiftRequest.requestEmployee && null==$scope.selectedEmployee){
+			if(shiftRequest.requestEmployee && null==shiftRequest.staffName){
 				valid=false;//No employee when one was requested
 			}
 			else if(null==shiftRequest.startDate || null==shiftRequest.endDate){

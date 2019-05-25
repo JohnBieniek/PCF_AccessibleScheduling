@@ -154,7 +154,19 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
 	        $scope.month = month;
 	    }
 	 
-	 $scope.getDisplayTime = function getStartDisplay(request) {
+	 $scope.getDisplayValue = function getDisplayValue(request) {
+		 request.displayValue=$scope.getDisplayTime(request);
+		 if(request.requestEmployee){
+			 request.displayValue+=" with "+request.staffName;
+		 }
+		 if(request.repeats){
+			 request.displayValue+= " every "+request.repeatsEvery + " " +request.interval; 
+		 }
+		 if(request.days && request.days[0]){
+			 request.displayValue+="S";
+		 }
+	 }
+	 $scope.getDisplayTime = function getDisplayTime(request) {
 		 	console.log("hour="+parseInt(request.startsLocalDateTime.hour));
 		 	let startHour = parseInt(request.startsLocalDateTime.hour);
 		 	let endHour= parseInt(request.endsLocalDateTime.hour);
@@ -187,6 +199,12 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
 	    }
     $scope.listClients = function listClients() {
         $scope.clients = Clients.query();
+        console.log("client and clients[0]")
+        console.log($scope.client);
+        console.log($scope.clients[0]);
+        if($scope.client==null){
+        	$scope.client = $scope.clients[0];
+        }
         $scope.employees = Employees.query();
     }
     
@@ -216,6 +234,30 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
         	console.log("got requests");
         	console.log(response.data);
     		$scope.requests = response.data;
+    	});
+    }
+    
+    $scope.listCurrentShifts = function listCurrentShifts(client){
+    	let id = "-1";
+    	
+    	if(null!=client){
+    		id=client.id;
+    	}
+    	
+    	$http({
+            url: '/schedule/currentShifts',
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            params: {
+            	clientId:id
+            }
+        })
+        .then(function(response) {
+        	console.log("shifts");
+        	console.log(response.data);
+    		$scope.currentShifts = response.data;
     	});
     }
     
@@ -251,66 +293,9 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
         });
     }
     
-    $scope.finishAssignment = function finishAssignment(){
-    	$http({
-            url: '/schedule/finishAssignment',
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            params: {
-                month: $scope.tab
-            }
-        })
-        .then(function(response) {
-        	$scope.statusList = response.data.sort(function(a, b){return a.month-b.month});
-        });
-    }
 
-    $scope.stopAssignment = function(month){
-    	if(confirm("Are you sure you want to stop assigning shifts for "+$scope.monthName+"?")){
-	    	// $scope.assigned="Stopping";
-	    	$http({
-	            url: '/schedule/stopAssignment',
-	            method: 'GET',
-	            headers: {
-	                'Content-Type': 'application/x-www-form-urlencoded'
-	            },
-	            params: {
-	                month: month
-	            }
-	        })
-	        .then(function(response) {
-	        	$scope.statusList = response.data.sort(function(a, b){return a.month-b.month});
-	    		console.log(response.data);
-	    		console.log($scope.statusList[0].generated);
-	    		$scope.setTab($scope.tab);
-	    		// setTimeout($scope.finishAssignment,10000);
-	        });
-    	}
-    }
-    
-    $scope.generateShifts = function(month){
-    	$http({
-            url: '/schedule/generateShifts',
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            params: {
-                month: month
-            }
-        })
-        .then(function(response) {
-        	$scope.statusList = response.data.sort(function(a, b){return a.month-b.month});
-    		console.log(response.data);
-    		console.log($scope.statusList[0].generated);
-    		$scope.setTab($scope.tab);
-    		
-        });
-    }
-    
-    
+
+ 
     $scope.editRequest = function (selectedRequest,selectedClient,employees) {
 		 console.log("attempting to open requestForm and RequestModalController");
 		 

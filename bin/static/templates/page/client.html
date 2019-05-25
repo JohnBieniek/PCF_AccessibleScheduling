@@ -3,7 +3,7 @@
 	 	<div style="display:inline-block;">
 			<ul>
 				<div style="overflow-y:auto" class="monthSelector">
-					<div ng-repeat="client in clients">
+					<div ng-repeat="client in clients" ng-init="setClient(clients[0])">
 						<div class = "clientTab" ng-class="{ active: isClientSet(client) }">
 					    	<div >
 					       		<p ng-click="setClient(client)">{{client.first}}</p>
@@ -13,8 +13,8 @@
 		    	</div>
 	    	</ul>
 	   	</div>
-	   	<div ng-if="isClientSet(client)" style="display:inline-block; vertical-align: top; width:70%"">
-			<div>
+	   	<div ng-if="isClientSet(client)" style="display:inline-block; vertical-align: top; width:70%">
+			<div style="width:100%">
 				<div style="display:inline-block;" class = "recTab" ng-class="{ active: isSet('Schedule') }">
 			    	<div >
 			       		<p ng-click="setTab('Schedule')">Schedule</p>
@@ -32,7 +32,8 @@
 		    	</div>
 	    	</div>
 	    	<br>
-	    	<div ng-if="isSet('Schedule')">
+	    	<div ng-if="isSet('Schedule')" style="width:100%">
+	    		<h2 class = 'centered' style="width:600px">~ Mon.AB - Mon.XY ~</h2>
 	    		<h4 class='rightAlign'>Sunday</h4>
 	    		<h4 class='rightAlign'>Monday</h4>
 	    		<h4 class='rightAlign'>Tuesday</h4>
@@ -44,33 +45,7 @@
 	    		<h2> Existing Requests</h2>
 				<div ng-repeat="request in requests">
 					<div ng-click="editRequest(request,client,employees)" class = "request">
-						<p ng-init="getDisplayTime(request)" class="inline">{{request.displayTime}}</p> 
-						<div class="inline" ng-if="request.requestEmployee">
-							<span> with {{request.staffName}}</span>
-						</div>
-						<div class="inline" ng-if="request.repeats">
-							<span class="inline" > every {{request.repeatsEvery}} {{request.interval}} </span>
-							<div class="inline" ng-if="request.days[0]">
-								<p>Su</p>
-							</div>
-							<div class="inline" ng-if="!request.days[1]">
-								<p>M</p>
-							</div>
-								<p class="inline" ng-if="request.days[2]">Tu</p>
-								<p class="inline" ng-if="request.days[3]">W</p>
-								<p class="inline" ng-if="request.days[4]">Th</p>
-								<p class="inline" ng-if="request.days[5]">F</p>
-							<div class="inline" ng-if="!request.days[6]">
-								<p>Sa</p>
-							</div>
-							<p class="inline"> starting </p>
-						</div>
-						<div ng-if= "!request.repeats" class="inline">
-							<p> on <p>
-						</div>
-						<div class="inline">
-							<p>{{request.startDate}}<p>
-						</div>
+						<p ng-init="getDisplayValue(request)">{{request.displayValue}}</p>
 			    	</div>
 		    	</div>
 	    	</div>
