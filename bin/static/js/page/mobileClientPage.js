@@ -221,8 +221,9 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
 				 request.displayValue+=" on "+request.startsLocalDate.dayOfWeek + " of week "+weekOfMonth;
 			 }
 		 }
-		 
+		 console.log("yearInterval"+request.yearInterval);
 		 if(request.interval=="year(s)"){
+			 request.displayValue+= " in " +request.startsLocalDate.month;
 			 if(request.yearInterval=="days"){
 				 request.displayValue+=" on day "+request.startsLocalDate.dayOfMonth;
 			 }
@@ -230,8 +231,8 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
 				 request.displayValue+=" on "+request.startsLocalDate.dayOfWeek + " of week "+weekOfMonth;
 			 }
 		 }
-		 console.log("exceptions");
-		 console.log(request.exceptions);
+
+		 //Add exceptions
 		 if(request.exceptions !=undefined && request.exceptions!=null && request.exceptions.length>0){
 			 request.displayValue+=" except ";
 
@@ -242,7 +243,7 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
 				 else if(index>0){
 					 request.displayValue+=" ,"
 				 }
-				 request.displayValue+=request.exceptions[0];
+				 request.displayValue+=request.exceptions[index];
 			 }
 		 }
 	 }
