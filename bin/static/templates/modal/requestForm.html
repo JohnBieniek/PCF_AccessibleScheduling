@@ -22,7 +22,7 @@
             		id="mySelect"
             		style="font-size:23px"
             		ng-change="isValid(shiftRequest)"
-            		ng-init = "selectedEmployee || employee.first"
+            		ng-init = "shiftRequest.staffId || employee.id"
       				ng-options="employee.first for employee in employees | orderBy:'first' track by employee.id"
       				ng-model="selectedEmployee"
       				ng-value="{{employee.first}}">
@@ -106,7 +106,7 @@
    	            
    	            <div ng-if="shiftRequest.repeats">
    	            <br>
-   	            <div ng-if="everyWeek(shiftRequest.interval)">
+   	            <div ng-if="everyWeek(shiftRequest.interval)" ng-init="setInitialDays(shiftRequest)">
    	            	<div class="daySelector">
 						<label for="sunday" style="font-size:15px">Sun</label>
 						<br>

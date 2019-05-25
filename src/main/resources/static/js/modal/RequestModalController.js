@@ -17,6 +17,9 @@ function RequestModalController($scope, $modalInstance, $http, selectedClient, s
 
     $scope.numbers = new Array(52).fill().map((x,i)=>i); 
     
+    if(shiftRequest){
+    	console.log("staffId="+shiftRequest.staffId);
+    }
     // Will execute myCallback every 5 seconds 
 	var intervalID = setInterval(function(){ myCallback(shiftRequest)}, 500);
 

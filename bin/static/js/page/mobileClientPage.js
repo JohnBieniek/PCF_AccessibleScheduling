@@ -153,9 +153,44 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
 	 $scope.setMonth = function setMonth(month) {
 	        $scope.month = month;
 	    }
-	 
+	 $scope.setInitialDays = function setInitialDays(request){
+		 console.log("days initial");
+		 console.log(request.days);
+		 if(request.days==null || request.days==undefined){
+			 request.days=[false,false,false,false,false,false,false];
+		 }
+		 console.log(request.days);
+	 }
 	 $scope.getDisplayValue = function getDisplayValue(request) {
-		 request.displayValue=$scope.getDisplayTime(request);
+		let startHour = parseInt(request.startsLocalDateTime.hour);
+	 	let endHour= parseInt(request.endsLocalDateTime.hour);
+	 	
+	 	let startMinute = parseInt(request.startsLocalDateTime.minute);
+	 	let endMinute= parseInt(request.endsLocalDateTime.minute);
+	 	
+	 	let startModifier = "AM";
+	 	let endModifier = "AM";
+	 	
+	 	if(startHour>11){
+	 		startHour-=12;
+	 		startModifier="PM"
+	 	}
+	 	
+	 	if(endHour>11){
+	 		endHour-=12;
+	 		endModifier="PM"
+	 	}
+	 	
+	 	if(startMinute<10){
+	 		startMinute="0"+startMinute
+	 	}
+	 	
+	 	if(endMinute<10){
+	 		endMinute="0"+endMinute
+	 	}
+        request.displayValue = startHour+":"+startMinute+startModifier+"-";
+        request.displayValue += endHour+":"+endMinute+endModifier;
+		 
 		 if(request.requestEmployee){
 			 request.displayValue+=" with "+request.staffName;
 		 }
@@ -165,37 +200,19 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
 		 if(request.days && request.days[0]){
 			 request.displayValue+="S";
 		 }
+		 console.log("exceptions");
+		 console.log(request.exceptions);
+		 if(request.exceptions && request.exceptions.length>0){
+			 request.displayValue+=" except ";
+			 var exception;
+			 for(exception in request.exceptions){
+				 request.displayValue+=exception;
+			 }
+		 }
 	 }
 	 $scope.getDisplayTime = function getDisplayTime(request) {
 		 	console.log("hour="+parseInt(request.startsLocalDateTime.hour));
-		 	let startHour = parseInt(request.startsLocalDateTime.hour);
-		 	let endHour= parseInt(request.endsLocalDateTime.hour);
 		 	
-		 	let startMinute = parseInt(request.startsLocalDateTime.minute);
-		 	let endMinute= parseInt(request.endsLocalDateTime.minute);
-		 	
-		 	let startModifier = "AM";
-		 	let endModifier = "AM";
-		 	
-		 	if(startHour>11){
-		 		startHour-=12;
-		 		startModifier="PM"
-		 	}
-		 	
-		 	if(endHour>11){
-		 		endHour-=12;
-		 		endModifier="PM"
-		 	}
-		 	
-		 	if(startMinute<10){
-		 		startMinute="0"+startMinute
-		 	}
-		 	
-		 	if(endMinute<10){
-		 		endMinute="0"+endMinute
-		 	}
-	        request.displayTime = startHour+":"+startMinute+startModifier+"-";
-	        request.displayTime += endHour+":"+endMinute+endModifier;
 	    }
     $scope.listClients = function listClients() {
         $scope.clients = Clients.query();
