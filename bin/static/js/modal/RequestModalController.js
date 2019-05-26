@@ -2,7 +2,7 @@ function RequestModalController($scope, $modalInstance, $http, selectedClient, s
 
 	$scope.shiftRequestAction = action;
     $scope.selectedClient=selectedClient;
-    $scope.selectedEmployee=selectedEmployee;
+    $scope.selectedEmployee=null;
     $scope.employees=employees;
     $scope.shiftRequest = shiftRequest;
 	$scope.shiftRequest.repeatsEvery=1;
@@ -16,13 +16,24 @@ function RequestModalController($scope, $modalInstance, $http, selectedClient, s
     $scope.weekOfMonth=-1;
 
     $scope.numbers = new Array(52).fill().map((x,i)=>i); 
-    
-    if(shiftRequest){
-    	console.log("staffId="+shiftRequest.staffId);
-    }
+    $scope.selectedEmployee=$scope.employees[0];
+    	if(shiftRequest && shiftRequest.staffId != undefined){
+    		console.log("staffId="+shiftRequest.staffId);
+    		for(var index = 0; index<$scope.employees.length;index++){
+    			if($scope.employees[index].id==shiftRequest.staffId){
+    				$scope.selectedEmployee=$scope.employees[index];
+    			}
+    		}
+    	}
+    		//if()
+        console.log("employees");
+        console.log($scope.employees);
+        console.log("selectedEmployee");
+        console.log($scope.selectedEmployee);
+        myCallback(shiftRequest);
     // Will execute myCallback every 5 seconds 
 	var intervalID = setInterval(function(){ myCallback(shiftRequest)}, 500);
-
+	
 	function myCallback(shiftRequest) {
 		var date = new Date($scope.shiftRequest.startDate);
 		$scope.dayOfMonth = date.getDate()+1;//It comes out zero indexed

@@ -88,6 +88,10 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
 	 }
 	 
 	 $scope.getDisplayValue = function getDisplayValue(request) {
+		 if(request.startsLocalDateTime==null || request.startsLocalDateTime==undefined){
+			 return null;
+		 }
+		 
 		let startHour = parseInt(request.startsLocalDateTime.hour);
 	 	let endHour= parseInt(request.endsLocalDateTime.hour);
 	 	
@@ -176,19 +180,31 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
 				 request.displayValue+=" on "+request.startsLocalDate.dayOfWeek + " of week "+weekOfMonth;
 			 }
 		 }
+		 
+		 if(request.repeats){
+			 request.displayValue+= " starting "+request.startDate; 
+		 }
+		 else{
+			 request.displayValue+=" on "+ request.startDate;
+		 }
 
 		 //Add exceptions
 		 if(request.exceptions !=undefined && request.exceptions!=null && request.exceptions.length>0){
 			 request.displayValue+=" except ";
-
-			 for(var index = 0; index <request.exceptions.length;index++){
-				 if(index==request.exceptions.length-1){
-					 request.displayValue+=" and " 
+			 
+			 if(request.exceptions.length<4){
+				 for(var index = 0; index <request.exceptions.length;index++){
+					 if(index==request.exceptions.length-1 && request.exceptions.length>1){
+						 request.displayValue+=" and " 
+					 }
+					 else if(index>0){
+						 request.displayValue+=" ,"
+					 }
+					 request.displayValue+=request.exceptions[index];
 				 }
-				 else if(index>0){
-					 request.displayValue+=" ,"
-				 }
-				 request.displayValue+=request.exceptions[index];
+			 }
+			 else{
+				 request.displayValue+" as noted";
 			 }
 		 }
 		 
@@ -393,15 +409,19 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
    
    $scope.deleteShiftRequest = function (shiftRequest) {
 	   if(confirm("Are you sure to delete info for the following request?"+shiftRequest.displayValue)){
-        Request.delete({id: shiftRequest.id},
-            function () {
-                Status.success("Shift Request deleted");
-                $scope.listShiftRequests();
-            },
-            function (result) {
-                Status.error("Error deleting shift Request: " + result.status);
-            }
-        );
+		   $http({
+               url: '/schedule/deleteRequest',
+               method: 'GET',
+               headers: {
+                   'Content-Type': 'application/x-www-form-urlencoded'
+               },
+               params: {
+                   id: shiftRequest.id
+               }
+           })
+           .then(function(response) {
+           		$scope.requests = response.data;
+           });
 	   }
     };
 }

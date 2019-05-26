@@ -1,6 +1,7 @@
 package org.cloudfoundry.samples.music.web;//Ignore complaints
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.cloudfoundry.samples.music.managers.EmployeeShiftMapManager;
 import org.cloudfoundry.samples.music.managers.ScheduleManager;
@@ -53,6 +54,15 @@ public class ScheduleController {
         this.manager=manager;
     }
 
+    @RequestMapping(value = "/deleteRequest", method = RequestMethod.GET)
+    public List<ClientRequest> deleteById(@RequestParam String id) {
+    	ClientRequest request = mongoRepository.findOne(id);
+    	String clientId=request.getClientId();
+    	mongoRepository.delete(id);
+        
+        return mongoRepository.findByClientId(clientId);
+    }
+    
     @RequestMapping(value = "/clientsRequests", method = RequestMethod.GET)
     public Iterable<ClientRequest> clientsRequests(@RequestParam String clientId) {
         return mongoRepository.findByClientId(clientId);

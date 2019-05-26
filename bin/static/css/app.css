@@ -57,6 +57,9 @@ html,body
   text-decoration: none;
 }
 
+.trash{
+	margin-top:9px;
+}
 .red{
 	color: #cc0000;
 }

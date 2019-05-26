@@ -22,7 +22,7 @@
             		id="mySelect"
             		style="font-size:23px"
             		ng-change="isValid(shiftRequest)"
-            		ng-init = "shiftRequest.staffName || employee.id"
+            		ng-init = "selectedEmployee"
       				ng-options="employee.first for employee in employees | orderBy:'first' track by employee.id"
       				ng-model="selectedEmployee"
       				ng-value="{{employee.first}}">
@@ -33,7 +33,7 @@
             <input type="text" ng-hide="true" id="staffName" name="staffName" ng-model="shiftRequest.staffName" ng-value="shiftRequest.staffName=selectedEmployee.first">
         </div>
         
-        <div ng-if="shiftRequest.staffId || shiftRequestAction==='update' || !shiftRequest.requestEmployee">
+        <div>
 	        <div>
 	            <label for="startDate" style="font-size:25px">Start Date/Time</label>
 	            <input style="font-size:23px" ng-change="isValid(shiftRequest)" type="date" ng-model="shiftRequest.startDate" placeholder="Date" ng-required/>

@@ -98,12 +98,6 @@ public class ClientRequestController {
         return repository.findOne(id);
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    public void deleteById(@PathVariable String id) {
-        logger.info("Deleting clientRequest " + id);
-        repository.delete(id);
-    }
-    
     @RequestMapping(value = "/set", method = RequestMethod.POST)
     public List<ClientRequest> set(@RequestBody List<ClientRequest> requests) {
     	repository.save(requests);
