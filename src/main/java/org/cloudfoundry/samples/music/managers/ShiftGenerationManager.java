@@ -1,6 +1,7 @@
 package org.cloudfoundry.samples.music.managers;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjuster;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
 
+import accessiblesolutions.accessiblescheduling.domain.ClientRequest;
 import accessiblesolutions.accessiblescheduling.domain.Event;
 import accessiblesolutions.accessiblescheduling.domain.RecurringShiftNeed;
 import accessiblesolutions.accessiblescheduling.domain.ScheduleStatus;
@@ -25,6 +27,9 @@ public class ShiftGenerationManager {
 	private static final Logger logger = LoggerFactory.getLogger(ShiftGenerationManager.class);
     private CrudRepository<Event, String> eventRepository;//TODO switch to autowired
     private CrudRepository<Shift, String> shiftCrud;
+    
+    @Autowired
+    private CrudRepository<ClientRequest, String> requestRepository;
     
     @Autowired
     private CrudRepository<ScheduleStatus, String> scheduleStatusCrud;
@@ -46,6 +51,135 @@ public class ShiftGenerationManager {
         this.recurringShiftNeedRepository = recurringShiftNeedRepository;
     }
     
+    public String generateShifts(String selectedMonth,String selectedYear) throws NumberFormatException{
+    	String response = "Generated ";
+    	int shiftsGenerated = 0;
+    	Iterable<ClientRequest> requests = requestRepository.findAll();
+    	
+    	for(ClientRequest request: requests) {
+    		try {
+				shiftsGenerated+=generateShifts(request,selectedMonth,Integer.parseInt(selectedYear));
+			} catch (CorruptDataException e) {
+				e.printStackTrace();
+			}
+    	}
+    	
+    	return response+shiftsGenerated;
+    }
+    
+    public int generateShifts(ClientRequest request,String selectedMonth, int selectedYear) throws CorruptDataException {
+    	ArrayList<Shift> shifts = new ArrayList<Shift>();
+    	String startDate = null;
+		String month = null;
+		String[] splitDate = null;
+		
+		startDate = request.getStartDate();
+		
+		if(startDate!=null) {
+			splitDate = startDate.split("-");
+			
+			if(splitDate.length>1){
+				month = splitDate[1];
+			}
+			
+			if(!request.isRepeats()) {
+    			try {
+					Shift shift = new Shift();
+					
+					shift.setEvent(false);
+					shift.setClientName(request.getClientName());
+					shift.setClientId(request.getClientId());
+					shift.setRequestedStaffId(request.getStaffId());
+					shift.setRequestedStaffName(request.getStaffName());
+					shift.setStartDate(request.getStartDate());
+					shift.setStartTime(request.getStartTime());
+					shift.setEndDate(request.getEndDate());
+					shift.setEndTime(request.getEndTime());
+					
+					shift.setStartWeek(shift.getStartWeek());
+				
+					shift.setStartMonth(Integer.parseInt(month));
+					shift.setStartYear(Integer.parseInt(splitDate[0]));
+					shifts.add(shift);
+	    		} catch (CorruptDataException e) {
+					System.out.println("ERROR: Corrupt time for shift provided"+e.getMessage());
+				}
+    		}
+			else {
+				ArrayList<LocalDateTime> times = new ArrayList<LocalDateTime>();
+				
+				try {
+					times= getDatesForRequestDuringMonth(request,Integer.parseInt(selectedMonth),selectedYear);
+				} catch (NumberFormatException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				for(LocalDateTime time:times) {
+					shifts.add(getShiftForRequestAtTime(request,time));
+				}
+			}
+    	}
+		else {
+			System.out.println("ERROR: Corrupt time for shift provided");
+		}
+    	
+    	if(shifts.size()>0) {
+    		shiftCrud.save(shifts);
+    	}
+    	
+    	return shifts.size();
+    }
+    
+    public Shift getShiftForRequestAtTime(ClientRequest request,LocalDateTime time) {
+    	Shift shift = new Shift();
+    	
+    	return shift;
+    }
+    
+    public ArrayList<LocalDateTime> getDatesForRequestDuringMonth(ClientRequest request, int selectedMonth, int selectedYear) throws CorruptDataException{
+    	ArrayList<LocalDateTime> times = new ArrayList<LocalDateTime>();
+    	LocalDateTime initialTime = request.getStartsLocalDateTime();
+    	LocalDateTime timeCursor = initialTime;
+    	int increment = Integer.parseInt(request.getRepeatsEvery());
+    	
+    	if(initialTime.getYear()<=selectedYear) {
+	    	if(initialTime.getMonthValue()<selectedMonth) {
+	    		while(timeCursor.getMonthValue()<selectedMonth) {
+	    			if(request.getInterval().contains("day")) {
+		    			timeCursor=timeCursor.plusDays(increment);
+	    			}
+	    			else if(request.getInterval().contains("week")) {
+	    				
+	    			}
+	    			else if(request.getInterval().contains("month")) {
+	    				if(request.getMonthInterval().contains("day")) {
+	    					
+	    				}
+	    				else {//weeks
+	    					
+	    				}
+	    			}
+	    			else {
+	    				if(request.getYearInterval().contains("day")) {
+	    					
+	    				}
+	    				else {//weeks
+	    					
+	    				}
+	    			}
+	    			
+
+	    		}
+	    	}
+	    	
+	    	for(int index =1;index<32;index++) {
+	    		
+	    	}
+    	}
+    	
+    	return times;
+    }
     public String generateEventShifts(String selectedMonth) throws CorruptDataException {
     	String shiftResponse = "~Events~" + System.lineSeparator();
     	Iterable<Event> events = eventRepository.findAll();
