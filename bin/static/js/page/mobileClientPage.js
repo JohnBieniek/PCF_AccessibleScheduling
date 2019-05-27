@@ -51,6 +51,7 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
 	 $scope.unscheduled=0;
 	 $scope.scheduled=0;
 	 $scope.selectedInterval="day(s)";
+	 $scope.detailsChanged=false;
 	$scope.setTab = function(newTab){
       $scope.tab = newTab;
 	}
@@ -62,6 +63,10 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
 	$scope.setInterval = function(newInterval){
       $scope.interval = newInterval;
 	}
+	
+	$scope.setDetailsToChanged = function(){
+      $scope.detailsChanged=true;;
+	}
      
 	 $scope.isSet = function(tabNum){
       return $scope.tab === tabNum;
@@ -70,6 +75,19 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
     $scope.isClientSet = function(client){
         return $scope.client === client && client !==null;
       };
+      
+      $scope.isClientChangeValid = function(client){
+          let valid = true;
+          
+          if(client.first ==undefined || client.first.length<1){
+        	  valid=false;
+          }
+          if(!$scope.detailsChanged){
+        	  valid=false;
+          }
+
+          return valid;
+        };
     
 	 function clone (obj) {
 	        return JSON.parse(JSON.stringify(obj));
@@ -213,7 +231,9 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
 
 	 $scope.listClients = function listClients() {
         $scope.clients = Clients.query();
-
+        $scope.clients = $scope.clients.sort(function(a, b){return a.first > b.first});
+        console.log("clients");
+        console.log($scope.clients);
         if($scope.client==null){
         	$scope.client = $scope.clients[0];
         }
@@ -423,5 +443,68 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
            		$scope.requests = response.data;
            });
 	   }
+    };
+    
+    $scope.newClient = function () {
+    	$http({
+            url: '/schedule/createClient',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            params: {
+            }
+        })
+        .then(function(response) {
+        	if(response.data){
+                Status.success("Client created");
+        		$scope.clients = response.data;
+        	}
+        	else{
+        		Status.error("Failed to save client info.")
+        	}
+        });
+    };
+    
+    $scope.ok = function () {
+    	$scope.detailsChanged=false;
+    	$http({
+            url: '/schedule/updateClient',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            params: {
+                param: $scope.client
+            }
+        })
+        .then(function(response) {
+        	if(response.data){
+                Status.success("Client saved");
+        		$scope.client = response.data;
+            	$scope.detailsChanged=false;
+        	}
+        	else{
+        		Status.error("Failed to save client info.")
+        	}
+        });
+    };
+    
+    $scope.cancel = function () {
+    	$http({
+            url: '/clients/'+$scope.client.id,
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            params: {
+            }
+        })
+        .then(function(response) {
+        	$scope.detailsChanged=false;
+        	if(response.data){
+        		$scope.client = response.data;
+        	}
+        });
     };
 }

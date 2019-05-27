@@ -1,5 +1,6 @@
 package org.cloudfoundry.samples.music.web;//Ignore complaints
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,15 +8,20 @@ import org.cloudfoundry.samples.music.managers.EmployeeShiftMapManager;
 import org.cloudfoundry.samples.music.managers.ScheduleManager;
 import org.cloudfoundry.samples.music.managers.ShiftAssignmentManager;
 import org.cloudfoundry.samples.music.managers.ShiftManager;
+import org.cloudfoundry.samples.music.repositories.mongodb.MongoClientRepository;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoClientRequestRepository;
 import org.cloudfoundry.samples.music.repositories.mongodb.ScheduleStatusRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.core.JsonParseException;
+import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.databind.JsonMappingException;
+import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import accessiblesolutions.accessiblescheduling.domain.Client;
 import accessiblesolutions.accessiblescheduling.domain.ClientRequest;
 import accessiblesolutions.accessiblescheduling.domain.ScheduleStatus;
 import accessiblesolutions.accessiblescheduling.domain.Shift;
@@ -48,10 +54,44 @@ public class ScheduleController {
 
     @Autowired
     private MongoClientRequestRepository mongoRepository;
+ 
+    @Autowired
+    private MongoClientRepository clientRepository;
     
     @Autowired
     public ScheduleController(ScheduleManager manager) {
         this.manager=manager;
+    }
+    
+    @RequestMapping(value = "/createClient",method = RequestMethod.POST)
+    public Iterable<Client> createClient() {
+    	Client client =new Client();
+    	
+    	client.setFirst("A client");
+    	
+        clientRepository.save(client);
+        
+        return clientRepository.findAll();
+    }
+    
+    @RequestMapping(value = "/updateClient",method = RequestMethod.POST)
+    public Client updateClient(@RequestParam String param) {
+    	Client client =null;
+
+    	ObjectMapper mapper = new ObjectMapper();
+    	
+    	try {
+			client = mapper.readValue(param, Client.class);
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+        clientRepository.save(client);
+        
+        return clientRepository.findOne(client.getId());
     }
 
     @RequestMapping(value = "/deleteRequest", method = RequestMethod.GET)

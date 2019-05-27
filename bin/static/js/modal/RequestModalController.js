@@ -4,14 +4,19 @@ function RequestModalController($scope, $modalInstance, $http, selectedClient, s
     $scope.selectedClient=selectedClient;
     $scope.selectedEmployee=null;
     $scope.employees=employees;
-    if(shiftRequest.interval==null || shiftRequest.inverval==undefined){
+    
+    if(action=="add"){
+    	if(undefined==shiftRequest || null==shiftRequest){
+    		shiftRequest={};
+    	}
+    	
     	shiftRequest.interval="day(s)";
+    	shiftRequest.monthInterval="days";
+    	shiftRequest.yearInterval="days";
     }
     $scope.shiftRequest = shiftRequest;
-	$scope.shiftRequest.repeatsEvery=1;
-    $scope.selectedInterval='day(s)';
-    $scope.selectedInterval2='days';
-    $scope.selectedInterval3='days';
+	$scope.shiftRequest.repeatsEvery=1;   
+
     $scope.selectedYearInterval=1;
     $scope.selectedMonthInterval = 1;
     $scope.dayOfMonth=-1;
@@ -224,24 +229,15 @@ function RequestModalController($scope, $modalInstance, $http, selectedClient, s
 		return selectedInterval=='year(s)'
 	}
 
-//    $scope.isValid = function(shiftRequest){
-//    	//get day of month
-//    	//get week of month
-//    	$http({
-//            url: '/requests/validity',
-//            method: 'POST',
-//            headers: {
-//                'Content-Type': 'application/x-www-form-urlencoded'
-//            },
-//            params: {
-//            	shiftRequest: shiftRequest
-//            }
-//        })
-//        .then(function(response) {
-//    		$scope.valid = response.data;
-//        });
-//    }
-    
+	 $scope.setInitialDays = function setInitialDays(request){
+		 console.log("days initial");
+		 console.log(request.days);
+		 if(request.days==null || request.days==undefined){
+			 request.days=[false,false,false,false,false,false,false];
+		 }
+		 console.log(request.days);
+	 }
+	 
     if(!$scope.shiftRequest.clientId){
     	$scope.shiftRequest.clientId=selectedClient.id;
     }

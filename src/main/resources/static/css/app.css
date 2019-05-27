@@ -233,6 +233,20 @@ html,body
     padding-left:49px;
     padding-right:49px;
 }
+
+.newClientTab{
+	 background-color: #b1f0a1;
+  border-color: #b1f0a1 ;
+  color: black;
+    margin-bottom: 17px;
+    margin-top: 15px;
+    
+  border-radius: 25px; 
+    font-size:28px;
+    padding-left:20px;
+    padding-right:20px;
+}
+
 .clientTab{
 	 background-color: #d3d7cf;
   border-color: #6C6C6C ;

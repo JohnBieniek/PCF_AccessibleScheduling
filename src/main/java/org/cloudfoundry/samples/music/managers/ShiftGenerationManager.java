@@ -153,8 +153,11 @@ public class ShiftGenerationManager {
 	    				
 	    			}
 	    			else if(request.getInterval().contains("month")) {
+    					timeCursor=timeCursor.plusMonths(1);
+    					timeCursor=timeCursor.minusDays(timeCursor.getDayOfMonth()-1);
+    					
 	    				if(request.getMonthInterval().contains("day")) {
-	    					
+	    					timeCursor=timeCursor.plusDays(initialTime.getDayOfMonth()-1);
 	    				}
 	    				else {//weeks
 	    					
