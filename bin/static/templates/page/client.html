@@ -14,7 +14,7 @@
 	    	</ul>
 	   	</div>
 	   	<div ng-if="isClientSet(client)" style="display:inline-block; vertical-align: top; width:72%">
-			<div style="width:100%">
+			<div style="width:100%;text-align: center;">
 				<div style="display:inline-block;margin-left:20px" class = "recTab" ng-class="{ active: isSet('Schedule') }">
 			    	<div >
 			       		<p ng-click="setTab('Schedule')">Schedule</p>
@@ -110,7 +110,7 @@
 			    <br>
 			    <button class="btn btn-primary btn-md active" ng-disabled="clientForm.$invalid" ng-click="ok()" ng-class="{ 'disabled': clientform.$invalid }" >OK</button>
 	    	</div>
-		 <div>
+		 </div>
     </div>
     
     <script type="text/javascript" src="js/modal/ClientModalController.js"></script>

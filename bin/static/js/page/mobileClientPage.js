@@ -50,7 +50,7 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
 	 $scope.statusList=[];
 	 $scope.unscheduled=0;
 	 $scope.scheduled=0;
-	 $scope.selectedInterval="days";
+	 $scope.selectedInterval="day(s)";
 	$scope.setTab = function(newTab){
       $scope.tab = newTab;
 	}
@@ -204,7 +204,7 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
 				 }
 			 }
 			 else{
-				 request.displayValue+" as noted";
+				 request.displayValue+=" as noted";
 			 }
 		 }
 		 
