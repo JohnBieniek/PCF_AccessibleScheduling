@@ -4,9 +4,12 @@ function RequestModalController($scope, $modalInstance, $http, selectedClient, s
     $scope.selectedClient=selectedClient;
     $scope.selectedEmployee=null;
     $scope.employees=employees;
+    if(shiftRequest.interval==null || shiftRequest.inverval==undefined){
+    	shiftRequest.interval="day(s)";
+    }
     $scope.shiftRequest = shiftRequest;
 	$scope.shiftRequest.repeatsEvery=1;
-    $scope.selectedInterval='days';
+    $scope.selectedInterval='day(s)';
     $scope.selectedInterval2='days';
     $scope.selectedInterval3='days';
     $scope.selectedYearInterval=1;
@@ -14,6 +17,7 @@ function RequestModalController($scope, $modalInstance, $http, selectedClient, s
     $scope.dayOfMonth=-1;
     $scope.dayOfWeek="Fakeday";
     $scope.weekOfMonth=-1;
+    
 
     $scope.numbers = new Array(52).fill().map((x,i)=>i); 
     $scope.selectedEmployee=$scope.employees[0];

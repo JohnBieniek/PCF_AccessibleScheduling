@@ -1,8 +1,8 @@
 <div ng-controller="MobileClientController" ng-init="listClients()">
 	<div style="display:inline-block;width:100%">
-	 	<div style="display:inline-block;">
+	 	<div style="display:inline-block;width:25%">
 			<ul>
-				<div style="overflow-y:auto" class="monthSelector">
+				<div style="overflow-y:auto;height:85vh" class="monthSelector">
 					<div ng-repeat="client in clients" ng-init="setClient(clients[0])">
 						<div class = "clientTab" ng-class="{ active: isClientSet(client) }">
 					    	<div >
@@ -13,9 +13,9 @@
 		    	</div>
 	    	</ul>
 	   	</div>
-	   	<div ng-if="isClientSet(client)" style="display:inline-block; vertical-align: top; width:72%">
+	   	<div ng-if="isClientSet(client)" style="overflow-y:auto;display:inline-block; vertical-align: top; width:72%;height:85vh">
 			<div style="width:100%;text-align: center;">
-				<div style="display:inline-block;margin-left:20px" class = "recTab" ng-class="{ active: isSet('Schedule') }">
+				<div style="display:inline-block" class = "recTab" ng-class="{ active: isSet('Schedule') }">
 			    	<div >
 			       		<p ng-click="setTab('Schedule')">Schedule</p>
 			    	</div>
