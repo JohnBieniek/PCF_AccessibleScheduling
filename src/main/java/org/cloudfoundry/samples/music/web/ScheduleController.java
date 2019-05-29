@@ -2,6 +2,7 @@ package org.cloudfoundry.samples.music.web;//Ignore complaints
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.cloudfoundry.samples.music.managers.EmployeeShiftMapManager;
@@ -70,8 +71,10 @@ public class ScheduleController {
     	client.setFirst("A client");
     	
         clientRepository.save(client);
-        
-        return clientRepository.findAll();
+
+        List<Client> clients = clientRepository.findAll();
+        Collections.sort(clients);
+		return clients;
     }
     
     @RequestMapping(value = "/updateClient",method = RequestMethod.POST)

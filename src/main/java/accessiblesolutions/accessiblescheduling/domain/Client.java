@@ -10,7 +10,7 @@ import org.hibernate.annotations.GenericGenerator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true) 
-public class Client {
+public class Client implements Comparable{
     @Id
     @Column(length=40)
     @GeneratedValue(generator="randomId")
@@ -44,6 +44,13 @@ public class Client {
         this.first = first;
         this.initial = initial;
     }
+	
+	@Override
+	public int compareTo(Object arg0) {
+		Client client = (Client)arg0;
+		
+		return getFirst().toLowerCase().compareTo(client.getFirst().toLowerCase());
+	}
 
     public String getId() {
         return id;
@@ -139,5 +146,5 @@ public class Client {
 
     public boolean getFixedSchedule() {
         return fixedSchedule;
-    }
+    }	
 }

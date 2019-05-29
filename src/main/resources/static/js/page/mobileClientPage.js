@@ -459,6 +459,7 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
         	if(response.data){
                 Status.success("Client created");
         		$scope.clients = response.data;
+        		$scope.tab="Schedule";
         	}
         	else{
         		Status.error("Failed to save client info.")
@@ -488,6 +489,32 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
         		Status.error("Failed to save client info.")
         	}
         });
+    };
+    
+    $scope.delete = function () {
+ 	   if(confirm("Are you sure to delete info for "+$scope.client.first + " "+$scope.client.initial+"?")){
+    	$http({
+            url: '/clients/'+$scope.client.id,
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            params: {
+            }
+        })
+        .then(function(response) {
+        	console.log(response);
+        	if(response){
+                Status.success("Client deleted.");
+        		$scope.clients =response.data;
+        		$scope.client =response.data[0];
+        		$scope.tab="Schedule";
+        	}
+        	else{
+        		Status.error("Failed to delete client info.")
+        	}
+        });
+ 	   }
     };
     
     $scope.cancel = function () {

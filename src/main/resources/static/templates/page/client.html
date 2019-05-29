@@ -2,7 +2,7 @@
 	<div style="display:inline-block;width:100%">
 	 	<div style="display:inline-block;width:25%">
 			<ul>
-				<div style="overflow-y:auto;height:80vh" class="monthSelector">
+				<div style="overflow-y:auto;height:82vh" class="monthSelector">
 					<div class = "newClientTab">
 				    	<div >
 				       		<p ng-click="newClient()"><span class="glyphicon glyphicon-plus"></span>&nbsp;New Client</p>
@@ -11,14 +11,14 @@
 					<div ng-repeat="client in clients" ng-init="setClient(clients[0])">
 						<div class = "clientTab" ng-class="{ active: isClientSet(client) }">
 					    	<div >
-					       		<p ng-click="setClient(client)">&nbsp;{{client.first}}</p>
+					       		<p ng-click="setClient(client)">{{client.first}} {{client.initial}}</p>
 					    	</div>
 				    	</div>
 			    	</div>
 		    	</div>
 	    	</ul>
 	   	</div>
-	   	<div ng-if="isClientSet(client)" style="overflow-y:auto;display:inline-block; vertical-align: top; width:72%;height:80vh">
+	   	<div ng-if="isClientSet(client)" style="display:inline-block; vertical-align: top; width:72%;height:82vh">
 			<div style="width:100%;text-align: center;">
 				<div style="display:inline-block" class = "recTab" ng-class="{ active: isSet('Schedule') }">
 			    	<div >
@@ -44,7 +44,7 @@
 	    		<h4 class='rightAlign'>Tuesday</h4>
 	    		<h4 class='rightAlign'>Wednesday</h4>
 	    	</div>
-	    	<div ng-if="isSet('Requests')">
+	    	<div overflow-y:auto; ng-if="isSet('Requests')">
 	    		<p  class="inline" style="font-size:40px;margin-left:10px"> {{client.first}} {{client.initial}}</p>
 	    		<button  class="inline rightAlign" style="font-size:30px;float:right; margin-right:20px" ng-click="addRequest(client,employees)"><span class="glyphicon glyphicon-plus"></span>Create new Request</button>
 	    		<h2 style="margin-left:10px"> Existing Requests</h2>
@@ -55,15 +55,15 @@
 			    	</div>
 		    	</div>
 	    	</div>
-	    	<div ng-if="isSet('Details')" class = 'rightAlign' style="width:600px">
+	    	<div ng-if="isSet('Details')" class = 'rightAlign'>
 	    		<form name="clientForm" role="form" style="margin-right:24%">
-			        <div class="form-group">
+			        <div>
 			            <label for="first" class="inline" style="font-size:38px">First</label>
 			            <input ng-change="setDetailsToChanged()" type="text" class="form-control inline input-large rightAlign nameInput" id="first" name="first" required ng-model="client.first">
 			        </div>
 			        
-			        <div class="form-group ">
-			            <label for="initial" class="inline" style="font-size:38px">Initial / Identifier</label>
+			        <div>
+			            <label for="initial" class="inline" style="font-size:38px">Initial</label>
 			            <input ng-change="setDetailsToChanged()" type="text" class="inline form-control input-large rightAlign nameInput" id="initial" name="initial" required ng-model="client.initial">
 			        </div>
 			        
@@ -110,9 +110,15 @@
 				        </div>
 			        </div>
 			    </form>
+   			    <div class="rightAlign">
+				    <button ng-if="isClientChangeValid(client)"  class="rightAlign btn inline btn-primary btn-md active" ng-disabled="clientForm.$invalid" ng-click="ok()" >OK</button>
+				    <button ng-if="isClientChangeValid(client)" class="rightAlign btn inline btn-warning btn-md active" style="margin-right:24%;margin-left:10px" ng-click="cancel()">Cancel</button>
+			    </div>
 			    <br>
-			    <button ng-if="isClientChangeValid(client)"  class="btn inline btn-primary btn-md active" ng-disabled="clientForm.$invalid" ng-click="ok()" >OK</button>
-			    <button ng-if="isClientChangeValid(client)" class="btn inline btn-warning btn-md active" style="margin-right:24%;margin-left:10px" ng-click="cancel()">Cancel</button>
+			    <br>
+			    <br>
+			    <br>
+  			    <button class="deleteClientButton inline" ng-click="delete()" >Delete</button>
 	    	</div>
 		 </div>
     </div>
