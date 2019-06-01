@@ -50,9 +50,9 @@ public class ScheduleManager {
 	public Iterable<Shift> getClientShiftsForWeek(String clientId, String month, String day, String year) {
 		// TODO Auto-generate
 		LocalDate date = LocalDate.of(Integer.parseInt(year), Integer.parseInt(month), Integer.parseInt(day));
+		System.out.println("Found date for request of :"+date.toString());
 		
-		
-		shiftCrud.findByStartMonthAndClientId(Integer.parseInt(month),clientId);
-		return null;
+		Iterable<Shift> shifts = shiftCrud.findByStartMonthAndClientId(Integer.parseInt(month),clientId);
+		return shifts;
 	} 
 }

@@ -60,6 +60,7 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
 	$scope.setClient = function(newClient){
 	      $scope.client = newClient;
 	      $scope.listRequests(newClient);
+	      $scope.listShifts();
 		}
 	
 	$scope.setInterval = function(newInterval){
@@ -253,7 +254,7 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
     	if(null!=$scope.client){
     		id=$scope.client.id;
     	}
-    	
+    	console.log($scope.week);
     	$http({
             url: '/schedule/clientShiftsForWeek',
             method: 'GET',
@@ -262,8 +263,8 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
             },
             params: {
             	clientId:id,
-            	month:$scope.week.getMonth(),
-            	day: $scope.week.getDay(),
+            	month:$scope.week.getMonth()+1,
+            	day: $scope.week.getDate(),
             	year:$scope.week.getFullYear()
             }
         })
