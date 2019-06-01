@@ -111,7 +111,6 @@ public class ShiftGenerationManager {
 				try {
 					times= getDatesForRequestDuringMonth(request,Integer.parseInt(selectedMonth),selectedYear);
 				} catch (NumberFormatException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				
@@ -131,8 +130,15 @@ public class ShiftGenerationManager {
     	return shifts.size();
     }
     
-    public Shift getShiftForRequestAtTime(ClientRequest request,LocalDateTime time) {
+    public Shift getShiftForRequestAtTime(ClientRequest request,LocalDateTime time) throws CorruptDataException {
     	Shift shift = new Shift();
+    	shift.setClientId(request.getClientId());
+    	shift.setClientName(request.getClientName());
+    	shift.setRequestedStaffId(request.getStaffId());
+    	shift.setStaffName(request.getStaffName());
+    	shift.setTime(time.toLocalTime().toString());
+    	shift.setDate(time.toLocalDate().toString());
+    	shift.setDisplayDate();
     	
     	return shift;
     }

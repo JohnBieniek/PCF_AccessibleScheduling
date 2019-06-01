@@ -38,11 +38,14 @@
 	    	</div>
 	    	<br>
 	    	<div ng-if="isSet('Schedule')" style="width:100%">
-	    		<h2 class = 'centered' style="width:600px">~ Mon.AB - Mon.XY ~</h2>
-	    		<h4 class='rightAlign'>Sunday</h4>
-	    		<h4 class='rightAlign'>Monday</h4>
-	    		<h4 class='rightAlign'>Tuesday</h4>
-	    		<h4 class='rightAlign'>Wednesday</h4>
+	    		<div ng-init="listShifts()">
+		    		
+		    		<h2 class = 'centered' style="width:600px">~ Mon.AB - Mon.XY ~</h2>
+		    		<h4 class='rightAlign'>Sunday</h4>
+		    		<h4 class='rightAlign'>Monday</h4>
+		    		<h4 class='rightAlign'>Tuesday</h4>
+		    		<h4 class='rightAlign'>Wednesday</h4>
+	    		</div>
 	    	</div>
 	    	<div overflow-y:auto; ng-if="isSet('Requests')">
 	    		<p  class="inline" style="font-size:40px;margin-left:10px"> {{client.first}} {{client.initial}}</p>
@@ -109,16 +112,18 @@
 			            	</div>
 				        </div>
 			        </div>
+       			    <div style="float:right" class="rightAlign">
+					    <button ng-if="isClientChangeValid(client)"  class="rightAlign inline okClientButton" ng-click="ok()" >OK</button>
+					    <button ng-if="isClientChangeValid(client)" class="rightAlign  inline cancelClientButton" style="margin-left:10px" ng-click="cancel()">Cancel</button>
+				    </div>
 			    </form>
-   			    <div class="rightAlign">
-				    <button ng-if="isClientChangeValid(client)"  class="rightAlign btn inline btn-primary btn-md active" ng-disabled="clientForm.$invalid" ng-click="ok()" >OK</button>
-				    <button ng-if="isClientChangeValid(client)" class="rightAlign btn inline btn-warning btn-md active" style="margin-right:24%;margin-left:10px" ng-click="cancel()">Cancel</button>
-			    </div>
 			    <br>
 			    <br>
 			    <br>
 			    <br>
-  			    <button class="deleteClientButton inline" ng-click="delete()" >Delete</button>
+			    <br>
+			    <br>
+  			    <button class="deleteClientButton" ng-click="delete()" >Delete</button>
 	    	</div>
 		 </div>
     </div>

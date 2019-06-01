@@ -64,6 +64,17 @@ public class ScheduleController {
         this.manager=manager;
     }
     
+    
+    @RequestMapping(value = "/clientShiftsForWeek",method = RequestMethod.GET)
+    public Iterable<Shift> clientShiftsForWeek(@RequestParam String clientId, @RequestParam String week) {
+    	return manager.getClientShiftsForWeek(clientId,week, week, week);
+    }
+    
+//    @RequestMapping(value = "/currentWeek",method = RequestMethod.GET)
+//    public String currentWeek() {
+//    	return manager.getCurrentWeek();
+//    }
+    
     @RequestMapping(value = "/createClient",method = RequestMethod.POST)
     public Iterable<Client> createClient() {
     	Client client =new Client();

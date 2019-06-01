@@ -14,6 +14,7 @@ import accessiblesolutions.accessiblescheduling.domain.Shift;
 @Profile("mongodb")
 public interface MongoShiftRepository extends MongoRepository<Shift, String> {
 	List<Shift> findByStartMonth(int month);
+	List<Shift> findByStartMonthAndClientId(int month, String clientId);
 	List<Shift> findByStartMonth(int month, PageRequest pageRequest);
 	long deleteByStartMonth(int month);
 }

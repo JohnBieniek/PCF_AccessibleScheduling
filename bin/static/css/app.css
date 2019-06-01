@@ -100,6 +100,29 @@ html,body
     text-align: center;
     background-color: #cc0000;  		
 }
+.okClientButton{
+	width: 90px;
+    margin-right: 0px;
+	margin-left:auto;
+    font-size: 30px;
+    float: left;
+    color: black;
+    font-weight: bold;
+    text-align: center;
+    background-color: #3d9e03;  		
+}
+.cancelClientButton{
+	width: 180px;
+    margin-right: 0px;
+	margin-left:auto;
+    font-size: 30px;
+    float: left;
+    color: black;
+    font-weight: bold;
+    text-align: center;
+    background-color: #729fcf;  		
+}
+
 
 .scheduleOptions{
 	text-align: right;

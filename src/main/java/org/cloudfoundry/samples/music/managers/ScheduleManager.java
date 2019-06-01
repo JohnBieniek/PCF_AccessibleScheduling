@@ -1,12 +1,15 @@
 package org.cloudfoundry.samples.music.managers;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+import org.cloudfoundry.samples.music.repositories.mongodb.MongoShiftRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
 
 import accessiblesolutions.accessiblescheduling.domain.ScheduleStatus;
+import accessiblesolutions.accessiblescheduling.domain.Shift;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
-import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
-import accessiblesolutions.accessiblescheduling.to.ScheduleOptions;
 @Component
 public class ScheduleManager {
     @Autowired
@@ -14,6 +17,9 @@ public class ScheduleManager {
     
     @Autowired
     ShiftAssignmentManager shiftAssignmentManager;
+    
+    @Autowired
+    private MongoShiftRepository shiftCrud;
     
     @Autowired
     private CrudRepository<ScheduleStatus, String> scheduleStatusCrud;
@@ -40,4 +46,13 @@ public class ScheduleManager {
 
     	return requestResponse;
     }
+
+	public Iterable<Shift> getClientShiftsForWeek(String clientId, String month, String day, String year) {
+		// TODO Auto-generate
+		LocalDate date = LocalDate.of(Integer.parseInt(year), Integer.parseInt(month), Integer.parseInt(day));
+		
+		
+		shiftCrud.findByStartMonthAndClientId(Integer.parseInt(month),clientId);
+		return null;
+	} 
 }

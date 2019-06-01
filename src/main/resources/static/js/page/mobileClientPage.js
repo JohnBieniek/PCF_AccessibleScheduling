@@ -52,6 +52,8 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
 	 $scope.scheduled=0;
 	 $scope.selectedInterval="day(s)";
 	 $scope.detailsChanged=false;
+	 $scope.week = new Date();//.getTime();
+	 console.log($scope.week);
 	$scope.setTab = function(newTab){
       $scope.tab = newTab;
 	}
@@ -245,6 +247,32 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
         $scope.employees = Employees.query();
     }
     
+    $scope.listShifts = function listShifts(){
+    	let id = "-1";
+    	
+    	if(null!=$scope.client){
+    		id=$scope.client.id;
+    	}
+    	
+    	$http({
+            url: '/schedule/clientShiftsForWeek',
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            params: {
+            	clientId:id,
+            	month:$scope.week.getMonth(),
+            	day: $scope.week.getDay(),
+            	year:$scope.week.getFullYear()
+            }
+        })
+        .then(function(response) {
+        	console.log("got shifts:");
+        	console.log(response.data);
+    		$scope.shifts = response.data;
+    	});
+    }
    
     $scope.listRequests = function listRequests(client){
     	let id = "-1";
@@ -268,11 +296,11 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
     	});
     }
     
-    $scope.listCurrentShifts = function listCurrentShifts(client){
+    $scope.listCurrentShifts = function listCurrentShifts(){
     	let id = "-1";
     	
-    	if(null!=client){
-    		id=client.id;
+    	if(null!=$scope.client){
+    		id=$scope.client.id;
     	}
     	
     	$http({
