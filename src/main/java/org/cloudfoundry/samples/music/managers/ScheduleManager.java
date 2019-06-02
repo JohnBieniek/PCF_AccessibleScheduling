@@ -53,6 +53,11 @@ public class ScheduleManager {
 		System.out.println("Found date for request of :"+date.toString());
 		
 		Iterable<Shift> shifts = shiftCrud.findByStartMonthAndClientId(Integer.parseInt(month),clientId);
+		
+		for(Shift shift:shifts) {
+			//if(datesShareWeeks)
+		}
+		
 		return shifts;
 	} 
 }
