@@ -9,13 +9,13 @@
     		<label  style="font-size:16px">{{shift.eventName}}</label>
     	</div>
     	
-        <div ng-if="shiftAction === 'update' && !shift.eventName" class="form-group has-feedback" ng-class="{'has-warning': shiftForm.clientName.$invalid, 'has-success': shiftForm.clientName.$valid}">
+        <div ng-if="!shift.eventName" class="form-group has-feedback" ng-class="{'has-warning': shiftForm.clientName.$invalid, 'has-success': shiftForm.clientName.$valid}">
             <label for="clientName" style="font-size:18px">Client Name:</label>
             <label  style="font-size:16px">{{shift.clientName}}</label>
             <span class="glyphicon form-control-feedback" ng-class="{'glyphicon-warning-sign': shiftForm.clientName.$invalid, 'glyphicon-ok': shiftForm.clientName.$valid}"></span>
         </div>
         
-        <div ng-if="shiftAction === 'add'" class="form-group has-feedback" >
+        <!-- <div ng-if="shiftAction === 'add'" class="form-group has-feedback" >
             <label for="staffName" style="font-size:16px">Client Name</label>
             
             <select name="mySelect" 
@@ -31,7 +31,7 @@
       				
             <input required type="text" ng-change="isValid(shift)" ng-hide="true" id="clientId" name="clientId" ng-model="shift.clientId" ng-value="shift.clientId=selectedClient.id">
             <input required type="text" ng-change="isValid(shift)" ng-hide="true" id="clientName" name="clientName" ng-model="shift.clientName" ng-value="shift.clientName=selectedClient.first">
-        </div>
+        </div> -->
         <div ng-if="shiftAction === 'update'" class="form-group has-feedback" ng-class="{'has-warning': shiftForm.staffName.$invalid, 'has-success': shiftForm.staffName.$valid}">
             <label for="staffName" style="font-size:18px">Staff Name:</label>
 			<label style="font-size:16px">{{shift.staffName}}</label>

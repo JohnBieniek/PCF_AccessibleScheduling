@@ -1,6 +1,8 @@
 package org.cloudfoundry.samples.music.managers;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Month;
+import java.util.ArrayList;
 
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoShiftRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,16 +50,29 @@ public class ScheduleManager {
     }
 
 	public Iterable<Shift> getClientShiftsForWeek(String clientId, String month, String day, String year) {
-		// TODO Auto-generate
-		LocalDate date = LocalDate.of(Integer.parseInt(year), Integer.parseInt(month), Integer.parseInt(day));
-		System.out.println("Found date for request of :"+date.toString());
+		ArrayList<Shift> out=new ArrayList<Shift>();
 		
 		Iterable<Shift> shifts = shiftCrud.findByStartMonthAndClientId(Integer.parseInt(month),clientId);
 		
+		LocalDate weekStart = LocalDate.of(Integer.parseInt(year), Month.of(Integer.parseInt(month)), Integer.parseInt(day));
+		LocalDate weekEnd=null;
+		
+		while(weekStart.getDayOfWeek().getValue()!=7) {
+			weekStart=weekStart.minusDays(1);
+		}
+		weekEnd=weekStart.plusDays(6);
+
 		for(Shift shift:shifts) {
-			//if(datesShareWeeks)
+			try {
+				if(shift.getStartsLocalDate().isAfter(weekStart.minusDays(1)) &&
+						shift.getStartsLocalDate().isBefore(weekEnd.plusDays(1))){
+					out.add(shift);
+				}
+			} catch (CorruptDataException e) {
+				e.printStackTrace();
+			}
 		}
 		
-		return shifts;
+		return out;
 	} 
 }

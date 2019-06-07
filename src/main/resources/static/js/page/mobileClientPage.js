@@ -5,6 +5,12 @@ angular.module('client', ['ngResource', 'ui.bootstrap']).
 	factory('Client', function ($resource) {
 	    return $resource('client/:id', {id: '@id'});
 	}).
+	factory('Shifts', function ($resource) {
+	    return $resource('shifts');
+	}).
+	factory('Shift', function ($resource) {
+	    return $resource('shift/:id', {id: '@id'});
+	}).
 	factory('Employees', function ($resource) {
 	    return $resource('employees');
 	}).
@@ -33,7 +39,7 @@ angular.module('client', ['ngResource', 'ui.bootstrap']).
         }
     });
 
-function MobileClientController($scope, $modal, $http, Clients, Client,Employee, Employees, Status) {
+function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Shift,Employee, Employees, Status) {
 	 $scope.multiTableEditing=false;
 	 $scope.month=1;
 	 $scope.allowOvertime=false;
@@ -54,6 +60,7 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
 	 $scope.detailsChanged=false;
 	 $scope.week = new Date();//.getTime();
 	 console.log($scope.week);
+	 $scope.days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 	$scope.setTab = function(newTab){
       $scope.tab = newTab;
 	}
@@ -70,6 +77,96 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
 	$scope.setDetailsToChanged = function(){
       $scope.detailsChanged=true;;
 	}
+     $scope.isDay = function(shift, day){
+    	 return day.toUpperCase() === shift.startsLocalDate.dayOfWeek.toUpperCase();
+     }
+     
+     $scope.getDisplayWeek = function(){
+    	 console.log("week"+$scope.week);
+    	 console.log("getDate"+$scope.week.getDate());
+    	 console.log("scope.week.getDay"+$scope.week.getDay());
+    	 $scope.displayWeek = parseInt($scope.week.getDate())-parseInt($scope.week.getDay()) + " - " +parseInt($scope.week.getDate())-parseInt($scope.week.getDay()) ;
+    	 console.log("displayWeek"+$scope.displayWeek);
+    	 switch(parseInt($scope.week.getMonth())+1){
+		   	  case 1:
+		   		  $scope.monthName="January";
+		   		  break;
+		   	  case 2:
+		   		  $scope.monthName="Febuary";
+		   		  break;
+		   	  case 3:
+		   		  $scope.monthName="March";
+		   		  break;
+		   	  case 4:
+		   		  $scope.monthName="April";
+		   		  break;
+		   	  case 5:
+		   		  $scope.monthName="May";
+		   		  break;
+		   	  case 6:
+		   		  $scope.monthName="June";
+		   		  break;
+		   	  case 7:
+		   		  $scope.monthName="July";
+		   		  break;
+		   	  case 8:
+		   		  $scope.monthName="August";
+		   		  break;
+		   	  case 9:
+		   		  $scope.monthName="September";
+		   		  break;
+		   	  case 10:
+		   		  $scope.monthName="October";
+		   		  break;
+		   	  case 11:
+		   		  $scope.monthName="November";
+		   		  break;
+		   	  case 12:
+		   		  $scope.monthName="December";
+		   		  break;
+	     }
+    	 
+     }
+     
+     $scope.setShiftDisplay = function(shift){
+    	 if(shift.startsLocalDateTime==null || shift.startsLocalDateTime==undefined){
+			 return null;
+		 }
+		 
+		let startHour = parseInt(shift.startsLocalDateTime.hour);
+	 	let endHour= parseInt(shift.endsLocalDateTime.hour);
+	 	
+	 	let startMinute = parseInt(shift.startsLocalDateTime.minute);
+	 	let endMinute= parseInt(shift.endsLocalDateTime.minute);
+	 	
+	 	let startModifier = "AM";
+	 	let endModifier = "AM";
+	 	
+	 	if(startHour>11){
+	 		startHour-=12;
+	 		startModifier="PM"
+	 	}
+	 	
+	 	if(endHour>11){
+	 		endHour-=12;
+	 		endModifier="PM"
+	 	}
+	 	
+	 	if(startMinute<10){
+	 		startMinute="0"+startMinute
+	 	}
+	 	
+	 	if(endMinute<10){
+	 		endMinute="0"+endMinute
+	 	}
+        shift.displayValue = startHour+":"+startMinute+startModifier+"-";
+        shift.displayValue += endHour+":"+endMinute+endModifier;
+		 
+		 if(shift.staffName!=null){
+			 shift.displayValue+=" with "+shift.staffName;
+		 }
+		 shift.displayValue+= ".";
+     }
      
 	 $scope.isSet = function(tabNum){
       return $scope.tab === tabNum;
@@ -248,6 +345,70 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
         $scope.employees = Employees.query();
     }
     
+    $scope.getDisplayWeek = function () {
+    	
+    }
+    
+    function saveShift(shift) {
+        Shifts.save(shift,
+            function () {
+                Status.success("Shift saved");
+                $scope.listShifts();
+            },
+            function (result) {
+                Status.error("Error saving shift: " + result.status);
+            }
+        );
+    }
+    
+    $scope.addShift = function () {
+        var addModal = $modal.open({
+            templateUrl: 'templates/modal/shiftForm.html',
+            controller: ShiftModalController,
+            resolve: {
+            	shift: function(){
+            		return {};
+            	},
+            	client: function(){
+            		return clone($scope.client);
+            	},
+            	clients: function(){
+            		return clone($scope.clients);
+            	},
+                action: function() {
+                    return 'add';
+                }
+            }
+        });
+
+        addModal.result.then(function (shift) {
+        	console.log(shift.startDate);
+        	console.log(shift.startDate.split("-"));
+        	if(shift.startYear==0 || shift.startYear == undefined || shift.startYear==null){
+        		shift.startYear=shift.startDate.split("-")[0];
+        	}
+        	if(shift.startMonth==0 || shift.startMonth == undefined || shift.startMonth==null){
+        		shift.startMonth=shift.startDate.split("-")[1];
+        	}
+        	console.log(shift.startMonth);
+        	console.log(shift.startYear);
+            saveShift(shift);
+        });
+    };
+    
+    
+    $scope.deleteShift = function (shift) {
+        Shift.delete({id: shift.id},
+            function () {
+                Status.success("Shift deleted");
+                $scope.listShifts();
+            },
+            function (result) {
+                Status.error("Error deleting shift: " + result.status);
+            }
+        );
+    };
+    
     $scope.listShifts = function listShifts(){
     	let id = "-1";
     	
@@ -422,6 +583,28 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
        );
    }
    
+   $scope.editShift = function (shift) {
+       var updateModal = $modal.open({
+           templateUrl: 'templates/modal/shiftForm.html',
+           controller: ShiftModalController,
+           resolve: {
+               shift: function() {
+                   return clone(shift);
+               },
+               clients: function(){
+           		return {};
+           	},
+               action: function() {
+                   return 'update';
+               }
+           }
+       });
+
+       updateModal.result.then(function (shift) {
+           saveShift(shift);
+       });
+   };
+   
    $scope.updateShiftRequest = function (selectedClient, shiftRequest,employees) {
    	var selectedEmployee = employees.filter(function( employee ) {
  		  return employee.id == shiftRequest.staffId;
@@ -520,8 +703,32 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Employee,
         });
     };
     
+    $scope.deleteShift = function (shift) {
+  	   if(confirm("Are you sure you want to delete the following shift? "+shift.display)){
+     	$http({
+             url: '/shifts/'+shift.id,
+             method: 'DELETE',
+             headers: {
+                 'Content-Type': 'application/x-www-form-urlencoded'
+             },
+             params: {
+             }
+         })
+         .then(function(response) {
+         	console.log(response);
+         	if(response){
+                 Status.success("Shift deleted.");
+                 $scope.listShifts();
+         	}
+         	else{
+         		Status.error("Failed to delete client info.")
+         	}
+         });
+  	   }
+     };
+     
     $scope.delete = function () {
- 	   if(confirm("Are you sure to delete info for "+$scope.client.first + " "+$scope.client.initial+"?")){
+ 	   if(confirm("Are you sure you want to delete info for "+$scope.client.first + " "+$scope.client.initial+"?")){
     	$http({
             url: '/clients/'+$scope.client.id,
             method: 'DELETE',

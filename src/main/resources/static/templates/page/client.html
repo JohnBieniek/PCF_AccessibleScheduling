@@ -10,7 +10,7 @@
 			    	</div>
 					<div ng-repeat="client in clients" ng-init="setClient(clients[0])">
 						<div class = "clientTab" ng-class="{ active: isClientSet(client) }">
-					    	<div >
+					    	<div>
 					       		<p ng-click="setClient(client)">{{client.first}} {{client.initial}}</p>
 					    	</div>
 				    	</div>
@@ -39,12 +39,24 @@
 	    	<br>
 	    	<div ng-if="isSet('Schedule')" style="width:100%">
 	    		<div ng-init="listShifts()">
-		    		
-		    		<h2 class = 'centered' style="width:600px">~ Mon.AB - Mon.XY ~</h2>
-		    		<h4 class='rightAlign'>Sunday</h4>
-		    		<h4 class='rightAlign'>Monday</h4>
-		    		<h4 class='rightAlign'>Tuesday</h4>
-		    		<h4 class='rightAlign'>Wednesday</h4>
+	    			<div >
+	    				<div class = 'centered' style="width:300px">
+				    		<h1 class = 'centered'>{{monthName}}</h1>
+				    		<h2 class = 'inline centered' ng-init="getDisplayWeek()">{{displayWeek}}</h2>
+    			            <!-- <input type="date" ng-model="week" placeholder="Date"/> -->
+			    		</div>
+			    		<button class="inline rightAlign" ng-click="addShift(client)">Add Shift</button>
+		    		</div>
+   					<div ng-repeat="day in days">
+			    		<h4 class='weekDay rightAlign'>{{day}}</h4>
+			    		<div ng-repeat="shift in shifts">
+			    			<div ng-if="isDay(shift,day,displayWeek)" class = "shift">
+			    				<span ng-init="setShiftDisplay(shift)">{{shift.display}}</span>
+								<span ng-click="editShift(shift,client,employees)" style="display:inline-block;width:94%" ng-init="getShiftDisplayValue(shift)">{{shift.displayValue}}</span>
+								<span ng-click="deleteShift(shift)" style="display:inline-block;float:right" class="glyphicon inline red trash glyphicon-trash"></span>
+							</div>
+						</div>
+   					</div>
 	    		</div>
 	    	</div>
 	    	<div overflow-y:auto; ng-if="isSet('Requests')">
@@ -128,6 +140,7 @@
 		 </div>
     </div>
     
+    <script type="text/javascript" src="js/modal/ShiftModalController.js"></script>
     <script type="text/javascript" src="js/modal/ClientModalController.js"></script>
 	<script type="text/javascript" src="js/modal/RequestModalController.js"></script>
     <script type="text/javascript" src="js/component/shiftRequestTable.js"></script>
