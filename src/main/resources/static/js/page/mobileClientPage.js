@@ -78,7 +78,7 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
       $scope.detailsChanged=true;;
 	}
      $scope.isDay = function(shift, day){
-    	 return day.toUpperCase() === shift.startsLocalDate.dayOfWeek.toUpperCase();
+    	 return day.toUpperCase().includes(shift.startsLocalDate.dayOfWeek.toUpperCase());
      }
      
      Date.prototype.addDays = function(days) {
@@ -99,6 +99,50 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
     	 $scope.listShifts();
      }
      
+     $scope.getDisplayMonth = function(date){
+    	 var monthName = "January";
+    	 
+		 switch(parseInt(date.getMonth())+1){
+		  	  case 1:
+		  		  monthName="January";
+		  		  break;
+		  	  case 2:
+		  		  monthName="Febuary";
+		  		  break;
+		  	  case 3:
+		  		  monthName="March";
+		  		  break;
+		  	  case 4:
+		  		  monthName="April";
+		  		  break;
+		  	  case 5:
+		  		  monthName="May";
+		  		  break;
+		  	  case 6:
+		  		  monthName="June";
+		  		  break;
+		  	  case 7:
+		  		  monthName="July";
+		  		  break;
+		  	  case 8:
+		  		  monthName="August";
+		  		  break;
+		  	  case 9:
+		  		  monthName="September";
+		  		  break;
+		  	  case 10:
+		  		  monthName="October";
+		  		  break;
+		  	  case 11:
+		  		  monthName="November";
+		  		  break;
+		  	  case 12:
+		  		  monthName="December";
+		  		  break;
+	 		}
+		 return monthName;
+     }
+     
      $scope.getDisplayWeek = function(){
     	 var date = parseInt($scope.week.getDate());
     	 var day = parseInt($scope.week.getDay());
@@ -108,44 +152,18 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
     	 
     	 $scope.displayWeek = weekStart.getDate()+ " - " +weekEnd.getDate();
 
-    	 switch(parseInt(weekStart.getMonth())+1){
-		   	  case 1:
-		   		  $scope.monthName="January";
-		   		  break;
-		   	  case 2:
-		   		  $scope.monthName="Febuary";
-		   		  break;
-		   	  case 3:
-		   		  $scope.monthName="March";
-		   		  break;
-		   	  case 4:
-		   		  $scope.monthName="April";
-		   		  break;
-		   	  case 5:
-		   		  $scope.monthName="May";
-		   		  break;
-		   	  case 6:
-		   		  $scope.monthName="June";
-		   		  break;
-		   	  case 7:
-		   		  $scope.monthName="July";
-		   		  break;
-		   	  case 8:
-		   		  $scope.monthName="August";
-		   		  break;
-		   	  case 9:
-		   		  $scope.monthName="September";
-		   		  break;
-		   	  case 10:
-		   		  $scope.monthName="October";
-		   		  break;
-		   	  case 11:
-		   		  $scope.monthName="November";
-		   		  break;
-		   	  case 12:
-		   		  $scope.monthName="December";
-		   		  break;
-	     }
+    	 $scope.year = parseInt(weekStart.getYear())+1900;
+    	 $scope.monthName=$scope.getDisplayMonth(weekStart);
+    	 $scope.displayDays=[
+			'Sunday '+$scope.monthName + " "+weekStart.getDate(),
+			'Monday '+$scope.getDisplayMonth(weekStart.addDays(1)) + " "+weekStart.addDays(1).getDate(),
+			'Tuesday '+$scope.getDisplayMonth(weekStart.addDays(2)) + " "+weekStart.addDays(2).getDate(),
+			'Wednesday '+$scope.getDisplayMonth(weekStart.addDays(3)) + " "+weekStart.addDays(3).getDate(),
+			'Thursday '+$scope.getDisplayMonth(weekStart.addDays(4)) + " "+weekStart.addDays(4).getDate(),
+			'Friday '+$scope.getDisplayMonth(weekStart.addDays(5)) + " "+weekStart.addDays(5).getDate(),
+			'Saturday '+$scope.getDisplayMonth(weekStart.addDays(6)) + " "+weekStart.addDays(6).getDate()
+		];
+
     	 console.log("Month:"+$scope.monthName);
      }
      
@@ -550,6 +568,9 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
            controller: RequestModalController,
            windowClass: 'app-modal-window',
            resolve: {
+        	client : function(){
+        		return clone(selectedClient);
+        	},
            	selectedClient: function(){
            		return clone(selectedClient);
            	},
@@ -609,6 +630,9 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
            resolve: {
                shift: function() {
                    return clone(shift);
+               },
+               client: function(){
+            	   return clone($scope.selectedClient);
                },
                clients: function(){
            		return {};
