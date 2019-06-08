@@ -81,13 +81,34 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
     	 return day.toUpperCase() === shift.startsLocalDate.dayOfWeek.toUpperCase();
      }
      
+     Date.prototype.addDays = function(days) {
+	    var date = new Date(this.valueOf());
+	    date.setDate(date.getDate() + days);
+	    return date;
+	}
+     
+     $scope.decrementWeek = function(){
+    	 $scope.week = $scope.week.addDays(-7);
+    	 $scope.getDisplayWeek();
+    	 $scope.listShifts();
+     }
+     
+     $scope.incrementWeek = function(){
+    	 $scope.week = $scope.week.addDays(7);
+    	 $scope.getDisplayWeek();
+    	 $scope.listShifts();
+     }
+     
      $scope.getDisplayWeek = function(){
-    	 console.log("week"+$scope.week);
-    	 console.log("getDate"+$scope.week.getDate());
-    	 console.log("scope.week.getDay"+$scope.week.getDay());
-    	 $scope.displayWeek = parseInt($scope.week.getDate())-parseInt($scope.week.getDay()) + " - " +parseInt($scope.week.getDate())-parseInt($scope.week.getDay()) ;
-    	 console.log("displayWeek"+$scope.displayWeek);
-    	 switch(parseInt($scope.week.getMonth())+1){
+    	 var date = parseInt($scope.week.getDate());
+    	 var day = parseInt($scope.week.getDay());
+    	 
+    	 var weekStart = $scope.week.addDays(-day);
+    	 var weekEnd = weekStart.addDays(6);
+    	 
+    	 $scope.displayWeek = weekStart.getDate()+ " - " +weekEnd.getDate();
+
+    	 switch(parseInt(weekStart.getMonth())+1){
 		   	  case 1:
 		   		  $scope.monthName="January";
 		   		  break;
@@ -125,7 +146,7 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
 		   		  $scope.monthName="December";
 		   		  break;
 	     }
-    	 
+    	 console.log("Month:"+$scope.monthName);
      }
      
      $scope.setShiftDisplay = function(shift){
@@ -339,14 +360,11 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
         }
         
         $scope.employees = Employees.query();
+        $scope.getDisplayWeek();
     }
     
     $scope.listEmployees = function listEmployees() {
         $scope.employees = Employees.query();
-    }
-    
-    $scope.getDisplayWeek = function () {
-    	
     }
     
     function saveShift(shift) {
@@ -415,6 +433,7 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
     	if(null!=$scope.client){
     		id=$scope.client.id;
     	}
+    	$scope.getDisplayWeek();
     	console.log($scope.week);
     	$http({
             url: '/schedule/clientShiftsForWeek',

@@ -2,12 +2,12 @@
 	<div style="display:inline-block;width:100%">
 	 	<div style="display:inline-block;width:25%">
 			<ul>
-				<div style="overflow-y:auto;height:82vh" class="monthSelector">
-					<div class = "newClientTab">
-				    	<div >
-				       		<p ng-click="newClient()"><span class="glyphicon glyphicon-plus"></span>&nbsp;New Client</p>
-				    	</div>
+				<div class = "newClientTab">
+			    	<div >
+			       		<p ng-click="newClient()"><span class="glyphicon glyphicon-plus"></span>&nbsp;New Client</p>
 			    	</div>
+		    	</div>
+				<div style="overflow-y:auto;height:82vh" class="monthSelector">
 					<div ng-repeat="client in clients" ng-init="setClient(clients[0])">
 						<div class = "clientTab" ng-class="{ active: isClientSet(client) }">
 					    	<div>
@@ -39,14 +39,20 @@
 	    	<br>
 	    	<div ng-if="isSet('Schedule')" style="width:100%">
 	    		<div ng-init="listShifts()">
-	    			<div >
-	    				<div class = 'centered' style="width:300px">
-				    		<h1 class = 'centered'>{{monthName}}</h1>
-				    		<h2 class = 'inline centered' ng-init="getDisplayWeek()">{{displayWeek}}</h2>
-    			            <!-- <input type="date" ng-model="week" placeholder="Date"/> -->
+	    			<div ng-init="getDisplayWeek()">
+	    				<div class="centered">
+				    		<button class="inline" ng-click="decrementWeek()"><span class="changeWeek glyphicon glyphicon-chevron-left"></span></button>
+		    				<div class = 'inline centered'>
+					    		<h1 class = 'centered'>{{monthName}}</h1>
+					    		<h2 class = 'inline centered'>{{displayWeek}}</h2>
+				    		</div>
+				    		<button class="inline" ng-click="incrementWeek()"><span class="changeWeek glyphicon glyphicon-chevron-right"></span></button>
 			    		</div>
-			    		<button class="inline rightAlign" ng-click="addShift(client)">Add Shift</button>
+   			    		<button  class="rightAlign" style="font-size:30px;float:right; margin-right:0px" ng-click="addShift(client)"><span class="glyphicon glyphicon-plus"></span>New Shift</button>
 		    		</div>
+		    		<br>
+		    		<br>
+		    		<br>
    					<div ng-repeat="day in days">
 			    		<h4 class='weekDay rightAlign'>{{day}}</h4>
 			    		<div ng-repeat="shift in shifts">

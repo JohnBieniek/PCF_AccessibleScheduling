@@ -276,6 +276,16 @@ html,body
     padding-right:49px;
 }
 
+.weekPicker{
+	margin-left:30%;
+ 	font-size:35px;
+ 	width:40%;
+}
+
+.changeWeek{
+	font-size:30px;	
+}
+
 .newClientTab{
 	 background-color: #b1f0a1;
   border-color: #b1f0a1 ;
@@ -322,15 +332,15 @@ html,body
 }
 
 .addShift{
-	width: 90px;
     margin-right: 0px;
 	margin-left:auto;
     font-size: 30px;
-    float: left;
+    float: right;
     color: black;
-    font-weight: bold;
     text-align: center;
-    background-color: #3d9e03;  				
+    background-color: #b1f0a1; 		
+    padding:5px;
+    width:150px;		
 }
 
 .shift{

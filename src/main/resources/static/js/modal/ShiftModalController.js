@@ -1,6 +1,13 @@
-function ShiftModalController($scope, $modalInstance, $http, shift, clients, action) {
+function ShiftModalController($scope, $modalInstance, $http, shift, client,clients, action) {
     $scope.shiftAction = action;
     $scope.shift = shift;
+    $scope.client=client;
+    if(shift.clientId==null||shift.clientName==undefined){
+    	shift.clientId=client.id;
+    }
+    if(shift.clientName==null||shift.clientName==undefined){
+    	shift.clientName=client.first;
+    }
     $scope.clients = clients;
     $scope.valid=false;
     if(action=="add"){
