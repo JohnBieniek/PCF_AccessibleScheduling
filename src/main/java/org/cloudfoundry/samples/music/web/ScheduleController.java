@@ -8,6 +8,7 @@ import java.util.List;
 import org.cloudfoundry.samples.music.managers.EmployeeShiftMapManager;
 import org.cloudfoundry.samples.music.managers.ScheduleManager;
 import org.cloudfoundry.samples.music.managers.ShiftAssignmentManager;
+import org.cloudfoundry.samples.music.managers.ShiftGenerationManager;
 import org.cloudfoundry.samples.music.managers.ShiftManager;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoClientRepository;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoClientRequestRepository;
@@ -37,6 +38,9 @@ public class ScheduleController {
     
     @Autowired
     ShiftManager shiftManager;
+    
+    @Autowired
+    ShiftGenerationManager generationManager;
     
     @Autowired
     ShiftAssignmentManager assignmentManager;
@@ -134,6 +138,11 @@ public class ScheduleController {
      
         shiftManager.deleteShiftsForMonth(Integer.parseInt(month));
     	return scheduleStatusCrud.findAll();
+    }
+    
+    @RequestMapping(value = "/staffSuggestion", method = RequestMethod.GET)
+    public void staffSuggestion(@RequestParam("shiftId") String shiftId) throws CorruptDataException, ProccessingException {
+        //return assignmentManager.getStaffSuggestion();
     }
     
     @RequestMapping(value = "/durationOfWeeksShifts", method = RequestMethod.GET)
@@ -274,8 +283,8 @@ public class ScheduleController {
     }
     
     @RequestMapping(value = "/generateShifts", method = RequestMethod.GET)
-    public Iterable<ScheduleStatus> generateShifts(@RequestParam("month") String month) throws CorruptDataException {
-        manager.generateShifts(month);
+    public Iterable<ScheduleStatus> generateShifts(@RequestParam("month") String month,@RequestParam("year") String year) throws CorruptDataException {
+    	generationManager.generateShifts(month,year);//manager.generateShifts(month);
         return scheduleStatusCrud.findAll();
     }
     

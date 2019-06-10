@@ -30,6 +30,11 @@ angular.module('vacation', ['ngResource', 'ui.bootstrap']).
 function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
 	 $scope.multiTableEditing=false;
 	 $scope.month=1;
+	 $scope.week = new Date();
+	 console.log("week"+$scope.week);
+	 if($scope.year==null ||$scope.year==undefined){
+		 $scope.year=parseInt($scope.week.getYear())+1900;
+	 }
 	 $scope.allowOvertime=false;
 	 $scope.allowUnavailable=false;
 	 $scope.prioritizeSecondShift=false;
@@ -316,6 +321,7 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
     }
     
     $scope.generateShifts = function(month){
+    	console.log("generating shifts with year:"+$scope.year);
     	$http({
             url: '/schedule/generateShifts',
             method: 'GET',
@@ -323,7 +329,8 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
-                month: month
+                month: month,
+                year: $scope.year
             }
         })
         .then(function(response) {
