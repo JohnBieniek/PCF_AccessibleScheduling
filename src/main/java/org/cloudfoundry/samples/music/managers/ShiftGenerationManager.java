@@ -57,7 +57,7 @@ public class ShiftGenerationManager {
     	String response = "Generated ";
     	int shiftsGenerated = 0;
     	Iterable<ClientRequest> requests = requestRepository.findAll();
-    	
+    	System.out.println("generating shifts");
     	for(ClientRequest request: requests) {
     		try {
 				shiftsGenerated+=generateShiftsForRequest(request,selectedMonth,Integer.parseInt(selectedYear));
@@ -67,6 +67,18 @@ public class ShiftGenerationManager {
 				e.printStackTrace();
 			}
     	}
+    	System.out.println(response+shiftsGenerated);
+    	
+    	ScheduleStatus status = scheduleStatusCrud.findOne(selectedMonth);
+    	
+    	if(null==status) {
+    		status= new ScheduleStatus();
+    		status.setMonth(selectedMonth);
+    	}
+    	
+    	scheduleStatusRepository.deleteByMonth(selectedMonth);
+    	status.setGenerated(true);
+    	scheduleStatusCrud.save(status);
     	
     	return response+shiftsGenerated;
     }
@@ -88,22 +100,7 @@ public class ShiftGenerationManager {
 			
 			if(!request.isRepeats()) {
     			try {
-					Shift shift = new Shift();
-					
-					shift.setEvent(false);
-					shift.setClientName(request.getClientName());
-					shift.setClientId(request.getClientId());
-					shift.setRequestedStaffId(request.getStaffId());
-					shift.setRequestedStaffName(request.getStaffName());
-					shift.setStartDate(request.getStartDate());
-					shift.setStartTime(request.getStartTime());
-					shift.setEndDate(request.getEndDate());
-					shift.setEndTime(request.getEndTime());
-					
-					shift.setStartWeek(shift.getStartWeek());
-				
-					shift.setStartMonth(Integer.parseInt(month));
-					shift.setStartYear(Integer.parseInt(splitDate[0]));
+					Shift shift = getShiftForRequestAtTime(request,request.getStartsLocalDateTime());
 					shifts.add(shift);
 	    		} catch (CorruptDataException e) {
 					System.out.println("ERROR: Corrupt time for shift provided"+e.getMessage());
@@ -123,14 +120,18 @@ public class ShiftGenerationManager {
 				for(LocalDateTime time:times) {
 					boolean included = true;
 					
-					for(String exception: request.getExceptions()) {
-						if(exception.equalsIgnoreCase(Util.getDateFromLocalDateTime(time))) {
-							included=false;
+					if(request!=null) {
+						if(request.getExceptions()!=null && request.getExceptions().length>0) {
+							for(String exception: request.getExceptions()) {
+								if(exception.equalsIgnoreCase(Util.getDateFromLocalDateTime(time))) {
+									included=false;
+								}
+							}
 						}
-					}
-					System.out.println("getting shift for :"+ time);
-					if(included) {
-						shifts.add(getShiftForRequestAtTime(request,time));
+						System.out.println("getting shift for :"+ time+included);
+						if(included) {
+							shifts.add(getShiftForRequestAtTime(request,time));
+						}
 					}
 				}
 			}
@@ -140,6 +141,7 @@ public class ShiftGenerationManager {
 		}
     	
     	if(shifts.size()>0) {
+    		System.out.println("Saving:"+shifts.size()+" shifts for"+request.toString());
     		shiftCrud.save(shifts);
     	}
     	
@@ -151,11 +153,16 @@ public class ShiftGenerationManager {
     	shift.setClientId(request.getClientId());
     	shift.setClientName(request.getClientName());
     	shift.setRequestedStaffId(request.getStaffId());
-    	shift.setStaffName(request.getStaffName());
+    	shift.setRequestedStaffName(request.getStaffName());
     	shift.setTime(time.toLocalTime().toString());
     	shift.setDate(Util.getDateFromLocalDateTime(time));
     	shift.setStartDate(Util.getDateFromLocalDateTime(time));
+    	shift.setStartTime(time.toLocalTime().toString());
     	shift.setEndDate(Util.getDateFromLocalDateTime(request.getEndsLocalDateTime()));
+    	shift.setEndTime(request.getEndTime());
+    	shift.setStartMonth(time.getMonthValue());
+    	shift.setStartYear(time.getYear());
+    	shift.setStartWeek(Util.getWeekOfDate(time.toLocalDate().toString()));
     	shift.setDisplayDate();
     	
     	return shift;
@@ -171,7 +178,7 @@ public class ShiftGenerationManager {
 	    	if(initialTime.getMonthValue()<selectedMonth) {
 	    		while(timeCursor.getMonthValue()<selectedMonth || timeCursor.getYear()<selectedYear) {
 	    			if(request.getInterval().contains("day")) {//Gets to first shift of this Month
-		    			timeCursor=timeCursor.plusDays(increment);
+		    			timeCursor=timeCursor.plusDays(increment);/**working*/
 	    			}
 	    			else if(request.getInterval().contains("week")) {//Gets to first Saturday of this Month
 	    				if(timeCursor.getDayOfWeek().getValue()==6) {//Look at Saturday since coming from before
@@ -201,8 +208,8 @@ public class ShiftGenerationManager {
     					}
 	    			}
 	    		}
-	    		times.add(timeCursor);
 	    	}
+	    	times.add(timeCursor);
 	    	
 	    	if(request.getInterval().contains("day")) {
 	    		for(int index =1;index<32;index++) {
@@ -221,7 +228,7 @@ public class ShiftGenerationManager {
 	    			for(int index = 0; index<7;index++) {
 	    				boolean working = request.getDays()[index];
 	    				LocalDateTime selectedDay = timeCursor.minusDays(6-index);
-	    				
+	    				System.out.println("making shifts for day "+index + " "+working +" monthValue:"+selectedDay.getMonthValue()+" selectedMonth"+selectedMonth);
 	    				if(working && selectedDay.getMonthValue()==selectedMonth) {
 	    					times.add(selectedDay);
 	    				}
