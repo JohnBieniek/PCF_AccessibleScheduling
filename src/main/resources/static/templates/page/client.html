@@ -7,7 +7,7 @@
 			       		<p ng-click="newClient()"><span class="glyphicon glyphicon-plus"></span>&nbsp;New Client</p>
 			    	</div>
 		    	</div>
-				<div style="overflow-y:auto;height:82vh" class="monthSelector">
+				<div style="overflow-y:auto;height:80vh" class="monthSelector">
 					<div ng-repeat="client in clients" ng-init="setClient(clients[0])">
 						<div class = "clientTab" ng-class="{ active: isClientSet(client) }">
 					    	<div>
@@ -39,21 +39,22 @@
 	    	<br>
 	    	<div ng-if="isSet('Schedule')" style="width:100%">
 	    		<div ng-init="listShifts()">
-	    			<div ng-init="getDisplayWeek()">
-	    				<div class="centered">
-				    		<button class="inline" ng-click="decrementWeek()"><span class="changeWeek glyphicon glyphicon-chevron-left"></span></button>
+	    			<div ng-init="getDisplayWeek()" style="width:100%">
+	    				<div class="inline" style="margin-left:32%;width:40%;text-align: center;">
 		    				<div class = 'inline centered'>
-					    		<h1 class = 'centered'>{{monthName}}  {{year}}</h1>
-					    		<h2 class = 'inline centered'>{{displayWeek}}</h2>
+					    		<div>
+						    		<h1 class = 'centered'>{{monthName}}  {{year}}</h1>
+					    		</div>
+					    		<div>
+						    		<button class="inline" ng-click="decrementWeek()"><span class="changeWeek glyphicon glyphicon-chevron-left"></span></button>
+						    		<h2 class = 'inline centered' style="width:140px">{{displayWeek}}</h2>
+						    		<button class="inline" ng-click="incrementWeek()"><span class="changeWeek glyphicon glyphicon-chevron-right"></span></button>
+					    		</div>
 				    		</div>
-				    		<button class="inline" ng-click="incrementWeek()"><span class="changeWeek glyphicon glyphicon-chevron-right"></span></button>
 			    		</div>
-   			    		<button  class="rightAlign" style="font-size:30px;float:right; margin-right:0px" ng-click="addShift(client)"><span class="glyphicon glyphicon-plus"></span>New Shift</button>
+   			    		<button  class="inline rightAlign newShiftButton" ng-click="addShift(client)"><span class="glyphicon glyphicon-plus"></span>&nbsp;New Shift</button>
 		    		</div>
-		    		<br>
-		    		<br>
-		    		<br>
-   					<div style="overflow-y:auto;height:65vh;">
+		 			<div style="overflow-y:auto;height:70vh;">
    						<div ng-repeat="day in displayDays">
 				    		<h4 class='weekDay rightAlign'>{{day}}</h4>
 				    		<div ng-repeat="shift in shifts">
@@ -68,9 +69,9 @@
 	    		</div>
 	    	</div>
 	    	<div overflow-y:auto; ng-if="isSet('Requests')">
-	    		<p  class="inline" style="font-size:40px;margin-left:10px"> {{client.first}} {{client.initial}}</p>
-	    		<button  class="inline rightAlign" style="font-size:30px;float:right; margin-right:20px" ng-click="addRequest(client,employees)"><span class="glyphicon glyphicon-plus"></span>New Request</button>
-	    		<h2 style="margin-left:10px"> Existing Requests</h2>
+	    		<!-- <p  class="inline" style="font-size:40px;margin-left:10px"> {{client.first}} {{client.initial}}</p>-->
+ 	    		<h2 class ="inline" style="font-size:40px;margin-left:10px;color:#729fcf!important;"> Existing Requests</h2>
+	    		<button  class="inline rightAlign" style="font-size:30px;float:right; margin-right:20px;margin-top:20px;background-color:#b1f0a1;" ng-click="addRequest(client,employees)"><span class="glyphicon glyphicon-plus"></span>&nbsp;New Request</button>
 				<div ng-repeat="request in requests">
 					<div ng-init="setInitialDays(request)" class = "request">
 						<span ng-click="editRequest(request,client,employees)" style="display:inline-block;width:94%" ng-init="getDisplayValue(request)">{{request.displayValue}}</span>
@@ -79,7 +80,7 @@
 		    	</div>
 	    	</div>
 	    	<div ng-if="isSet('Details')" class = 'rightAlign'>
-	    		<form name="clientForm" role="form" style="margin-right:24%">
+	    		<form name="clientForm" role="form" style="margin-right:3%">
 			        <div>
 			            <label for="first" class="inline" style="font-size:38px">First</label>
 			            <input ng-change="setDetailsToChanged()" type="text" class="form-control inline input-large rightAlign nameInput" id="first" name="first" required ng-model="client.first">

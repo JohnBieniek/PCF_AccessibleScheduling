@@ -1,7 +1,8 @@
-function ShiftModalController($scope, $modalInstance, $http, shift, client,clients,date, action) {
+function ShiftModalController($scope, $modalInstance, $http, shift, client,clients,employees,date, action) {
     $scope.shiftAction = action;
     $scope.shift = shift;
     $scope.client=client;
+    $scope.employees=employees;
     if(shift.clientId==null||shift.clientName==undefined){
     	shift.clientId=client.id;
     }
@@ -18,6 +19,18 @@ function ShiftModalController($scope, $modalInstance, $http, shift, client,clien
     	$scope.shift.endTime="20:00";
     	$scope.valid=true;
     }
+    
+	if(shift && shift.staffId != undefined){
+		for(var index = 0; index<$scope.employees.length;index++){
+			if($scope.employees[index].id==shift.staffId){
+				$scope.selectedEmployee=$scope.employees[index];
+			}
+		}
+	}
+    
+//    if($scope.shift.staffId==null || $scope.shift.staffId==undefined){
+//    	$scope.selectedEmployee=$scope.employees[0];
+//    }
    
     $scope.isValid = function(shift){
     	$http({

@@ -64,7 +64,7 @@ html,body
 }
 
 .trash{
-	margin-top:9px;
+	margin-top:6px;
 }
 .red{
 	color: #cc0000;
@@ -269,7 +269,6 @@ html,body
 	 background-color: #d3d7cf;
   border-color: #6C6C6C ;
   color: black;
-    margin-bottom: 17px;
     margin-top: 15px;
     font-size:35px;
     padding-left:49px;
@@ -327,7 +326,7 @@ html,body
 }
 
 .weekDay{
-	font-size:35px;	
+	font-size:32px;	
 }
 
 .addShift{
@@ -343,8 +342,8 @@ html,body
 }
 
 .shift{
-	 background-color: #b1f0a1;
-  border-color: #b1f0a1 ;
+	 background-color: #d3d7cf;
+  border-color: #d3d7cf;
   border-radius: 25px; 
   color: black;
   margin-left:20px;
@@ -356,9 +355,18 @@ html,body
     width: 95%;
 }
 
+.newShiftButton{
+	background-color:#b1f0a1;
+	font-size:30px;
+	width: 200px;
+	text-align:center;
+	float:right; 
+	margin-right:0px
+}
+
 .request{
-	 background-color: #b1f0a1;
-  border-color: #b1f0a1 ;
+	 background-color: #d3d7cf;
+  border-color: #d3d7cf;
   border-radius: 25px; 
   color: black;
   margin-left:20px;

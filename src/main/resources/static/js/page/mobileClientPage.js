@@ -201,8 +201,8 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
 	 	if(endMinute<10){
 	 		endMinute="0"+endMinute
 	 	}
-        shift.displayValue = startHour+":"+startMinute+startModifier+"-";
-        shift.displayValue += endHour+":"+endMinute+endModifier;
+        shift.displayValue = (startHour!=0?startHour:"12")+":"+startMinute+startModifier+"-";
+        shift.displayValue += (endHour!=0?endHour:"12")+":"+endMinute+endModifier;
 		 
 		 if(shift.staffName!=null){
 			 shift.displayValue+=" with "+shift.staffName;
@@ -278,8 +278,8 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
 	 	if(endMinute<10){
 	 		endMinute="0"+endMinute
 	 	}
-        request.displayValue = startHour+":"+startMinute+startModifier+"-";
-        request.displayValue += endHour+":"+endMinute+endModifier;
+        request.displayValue = (startHour!=0?startHour:"12")+":"+startMinute+startModifier+"-";
+        request.displayValue += (endHour!=0?endHour:"12")+":"+endMinute+endModifier;
 		 
 		 if(request.requestEmployee){
 			 request.displayValue+=" with "+request.staffName;
@@ -414,6 +414,9 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
             	clients: function(){
             		return clone($scope.clients);
             	},
+            	employees:function(){
+            		return clone($scope.employees);
+            	},
             	date: function(){
              	   return $scope.week;
                 },
@@ -544,6 +547,9 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
               shiftRequest: function () {
                   return selectedRequest;
               },
+              date:function(){
+            	  return "";
+              },
               action: function() {
                   return 'edit';
               }
@@ -645,10 +651,13 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
                },
                clients: function(){
            		return {};
-           	},
-           	date: function(){
-         	   return $scope.week;
-            },
+	           	},
+	           	employees:function(){
+	        		return clone($scope.employees);
+	        	},
+	           	date: function(){
+	         	   return $scope.week;
+	            },
                action: function() {
                    return 'update';
                }
