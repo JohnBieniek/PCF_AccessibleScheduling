@@ -69,7 +69,7 @@
 	    	</div>
 	    	<div overflow-y:auto; ng-if="isSet('Requests')">
 	    		<p  class="inline" style="font-size:40px;margin-left:10px"> {{client.first}} {{client.initial}}</p>
-	    		<button  class="inline rightAlign" style="font-size:30px;float:right; margin-right:20px" ng-click="addRequest(client,employees)"><span class="glyphicon glyphicon-plus"></span>Create new Request</button>
+	    		<button  class="inline rightAlign" style="font-size:30px;float:right; margin-right:20px" ng-click="addRequest(client,employees)"><span class="glyphicon glyphicon-plus"></span>New Request</button>
 	    		<h2 style="margin-left:10px"> Existing Requests</h2>
 				<div ng-repeat="request in requests">
 					<div ng-init="setInitialDays(request)" class = "request">

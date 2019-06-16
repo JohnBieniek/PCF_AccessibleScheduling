@@ -1,4 +1,4 @@
-function ShiftModalController($scope, $modalInstance, $http, shift, client,clients, action) {
+function ShiftModalController($scope, $modalInstance, $http, shift, client,clients,date, action) {
     $scope.shiftAction = action;
     $scope.shift = shift;
     $scope.client=client;
@@ -12,6 +12,11 @@ function ShiftModalController($scope, $modalInstance, $http, shift, client,clien
     $scope.valid=false;
     if(action=="add"){
     	$scope.shift.creationReason="Manual";
+    	$scope.shift.startDate=date.getFullYear()+"-"+((date.getMonth()+1)<10?"0"+(date.getMonth()+1):(date.getMonth()+1))+"-"+date.getDate();
+    	$scope.shift.endDate=date.getFullYear()+"-"+((date.getMonth()+1)<10?"0"+(date.getMonth()+1):(date.getMonth()+1))+"-"+date.getDate();
+    	$scope.shift.startTime="12:00";
+    	$scope.shift.endTime="20:00";
+    	$scope.valid=true;
     }
    
     $scope.isValid = function(shift){

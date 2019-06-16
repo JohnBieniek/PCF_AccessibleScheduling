@@ -1,10 +1,10 @@
-function RequestModalController($scope, $modalInstance, $http, selectedClient, selectedEmployee, employees,shiftRequest, action) {
+function RequestModalController($scope, $modalInstance, $http, selectedClient, selectedEmployee, employees,shiftRequest, date, action) {
 
 	$scope.shiftRequestAction = action;
     $scope.selectedClient=selectedClient;
     $scope.selectedEmployee=null;
     $scope.employees=employees;
-    
+  
     if(action=="add"){
     	if(undefined==shiftRequest || null==shiftRequest){
     		shiftRequest={};
@@ -13,7 +13,12 @@ function RequestModalController($scope, $modalInstance, $http, selectedClient, s
     	shiftRequest.interval="day(s)";
     	shiftRequest.monthInterval="days";
     	shiftRequest.yearInterval="days";
-    	$scope.shiftRequest.repeatsEvery=1;   
+    	shiftRequest.repeatsEvery=1;  
+    	shiftRequest.startDate=date.getFullYear()+"-"+((date.getMonth()+1)<10?"0"+(date.getMonth()+1):(date.getMonth()+1))+"-"+date.getDate();
+    	shiftRequest.endDate=date.getFullYear()+"-"+((date.getMonth()+1)<10?"0"+(date.getMonth()+1):(date.getMonth()+1))+"-"+date.getDate();
+    	console.log("shiftRequest.startDate"+shiftRequest.startDate);
+    	shiftRequest.startTime="12:00";
+    	shiftRequest.endTime="20:00";
     }
     $scope.shiftRequest = shiftRequest;
 

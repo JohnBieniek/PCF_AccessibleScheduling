@@ -58,7 +58,10 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
 	 $scope.scheduled=0;
 	 $scope.selectedInterval="day(s)";
 	 $scope.detailsChanged=false;
-	 $scope.week = new Date();//.getTime();
+	 if($scope.week==undefined || $scope.week ==null){
+		 $scope.week = new Date();//.getTime();
+	 }
+
 	 console.log($scope.week);
 	 $scope.days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 	$scope.setTab = function(newTab){
@@ -411,6 +414,9 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
             	clients: function(){
             		return clone($scope.clients);
             	},
+            	date: function(){
+             	   return $scope.week;
+                },
                 action: function() {
                     return 'add';
                 }
@@ -583,6 +589,9 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
                shiftRequest: function () {
                    return {};
                },
+               date: function(){
+            	   return $scope.week;
+               },
                action: function() {
                    return 'add';
                }
@@ -637,6 +646,9 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
                clients: function(){
            		return {};
            	},
+           	date: function(){
+         	   return $scope.week;
+            },
                action: function() {
                    return 'update';
                }
@@ -669,6 +681,9 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
            		if(selectedEmployee!=null && selectedEmployee.length>0){
            			return clone(selectedEmployee[0]);
            		}
+           		return "";
+           	},
+           	date: function(){
            		return "";
            	},
                action: function() {

@@ -36,7 +36,7 @@
         <div>
 	        <div>
 	            <label for="startDate" style="font-size:25px">Start Date/Time</label>
-	            <input style="font-size:23px" ng-change="isValid(shiftRequest)" type="date" ng-model="shiftRequest.startDate" placeholder="Date" ng-required/>
+	            <input style="font-size:23px" ng-change="isValid(shiftRequest)" type="date" ng-init="shiftRequest.startDate" ng-value="{{shiftRequest.startDate}}" ng-model="shiftRequest.startDate" placeholder="Date" ng-required/>
 	            <input style="font-size:23px" ng-change="isValid(shiftRequest)" type="time" ng-model="shiftRequest.startTime">
 	        </div>
 	        
