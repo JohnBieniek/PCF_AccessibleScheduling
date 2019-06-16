@@ -55,7 +55,13 @@ public abstract class Util {
 		else{
 			date+=month+"-";
 		}
-		date+=time.getDayOfMonth();
+		int day = time.getDayOfMonth();
+		if(day<10){
+			date+="0"+day;
+		}
+		else{
+			date+=day;
+		}
 		
 		return date;
 	}

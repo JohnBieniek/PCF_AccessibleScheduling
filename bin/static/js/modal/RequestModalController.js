@@ -13,9 +13,9 @@ function RequestModalController($scope, $modalInstance, $http, selectedClient, s
     	shiftRequest.interval="day(s)";
     	shiftRequest.monthInterval="days";
     	shiftRequest.yearInterval="days";
+    	$scope.shiftRequest.repeatsEvery=1;   
     }
     $scope.shiftRequest = shiftRequest;
-	$scope.shiftRequest.repeatsEvery=1;   
 
     $scope.selectedYearInterval=1;
     $scope.selectedMonthInterval = 1;

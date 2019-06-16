@@ -158,7 +158,12 @@ public class ShiftGenerationManager {
     	shift.setDate(Util.getDateFromLocalDateTime(time));
     	shift.setStartDate(Util.getDateFromLocalDateTime(time));
     	shift.setStartTime(time.toLocalTime().toString());
-    	shift.setEndDate(Util.getDateFromLocalDateTime(request.getEndsLocalDateTime()));
+    	if(request.getOvernight()) {
+    		shift.setEndDate(Util.getDateFromLocalDateTime(shift.getStartsLocalDateTime().plusDays(1)));
+    	}
+    	else {
+    		shift.setEndDate(Util.getDateFromLocalDateTime(shift.getStartsLocalDateTime()));
+    	}
     	shift.setEndTime(request.getEndTime());
     	shift.setStartMonth(time.getMonthValue());
     	shift.setStartYear(time.getYear());
@@ -205,7 +210,7 @@ public class ShiftGenerationManager {
 		    					int shift = initialTime.getDayOfWeek().getValue()-timeCursor.getDayOfWeek().getValue();
 		    					timeCursor=timeCursor.plusDays(shift);//gives only shift
 		    				}
-    					}
+    					}    			    
 	    			}
 	    		}
 	    	}
@@ -223,17 +228,24 @@ public class ShiftGenerationManager {
 	    			}
 		    	}
 	    	}
-	    	else if(request.getInterval().contains("weeks")) {
-	    		while(timeCursor.getMonthValue()==selectedMonth) {
+	    	else if(request.getInterval().contains("week")) {
+	    		times.clear();
+	    		while(timeCursor.getDayOfWeek().getValue()!=6) {
+	    			timeCursor=timeCursor.plusDays(1);
+	    		}
+	    		System.out.println("Starting week time generation at:"+timeCursor.toString()+ timeCursor.getDayOfWeek().toString());
+	    		while(timeCursor.minusDays(6).getMonthValue()<=selectedMonth) {
+	    			System.out.println("Finding times for week of :"+timeCursor.toString());
 	    			for(int index = 0; index<7;index++) {
 	    				boolean working = request.getDays()[index];
 	    				LocalDateTime selectedDay = timeCursor.minusDays(6-index);
-	    				System.out.println("making shifts for day "+index + " "+working +" monthValue:"+selectedDay.getMonthValue()+" selectedMonth"+selectedMonth);
+	    				System.out.println("making shifts for day "+selectedDay.getDayOfWeek().toString() + " "+working +" monthValue:"+selectedDay.getMonthValue()+" selectedMonth"+selectedMonth);
 	    				if(working && selectedDay.getMonthValue()==selectedMonth) {
 	    					times.add(selectedDay);
+	    					System.out.println("Added time:"+selectedDay.toString());
 	    				}
 	    			}
-	    			
+	    			System.out.println("incrementing "+ increment + " weeks");
 	    			timeCursor=timeCursor.plusWeeks(increment);
 	    		}
 	    	}

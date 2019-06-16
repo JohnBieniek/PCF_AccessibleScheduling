@@ -52,8 +52,6 @@ public class ScheduleManager {
 	public Iterable<Shift> getClientShiftsForWeek(String clientId, String month, String day, String year) {
 		ArrayList<Shift> out=new ArrayList<Shift>();
 		
-		Iterable<Shift> shifts = shiftCrud.findByStartMonthAndClientId(Integer.parseInt(month),clientId);
-		
 		LocalDate weekStart = LocalDate.of(Integer.parseInt(year), Month.of(Integer.parseInt(month)), Integer.parseInt(day));
 		LocalDate weekEnd=null;
 		
@@ -61,15 +59,54 @@ public class ScheduleManager {
 			weekStart=weekStart.minusDays(1);
 		}
 		weekEnd=weekStart.plusDays(6);
-
-		for(Shift shift:shifts) {
+		
+		Iterable<Shift> firstMonthsShifts = shiftCrud.findByStartMonthAndClientId(weekStart.getMonthValue(),clientId);
+		Iterable<Shift> secondMonthsShifts = null;
+		if(weekStart.getMonthValue()!=weekEnd.getMonthValue()) {
+			secondMonthsShifts = shiftCrud.findByStartMonthAndClientId(weekEnd.getMonthValue(),clientId);
+		}
+		
+		System.out.println("getting shifts starting:"+weekStart.toString()+" and ending:"+weekEnd.toString());
+		for(Shift shift:firstMonthsShifts) {
 			try {
+				System.out.println("shifts start:"+shift.getStartsLocalDate().toString());
 				if(shift.getStartsLocalDate().isAfter(weekStart.minusDays(1)) &&
 						shift.getStartsLocalDate().isBefore(weekEnd.plusDays(1))){
-					out.add(shift);
+					boolean alreadyAdded=false;
+					
+					for(Shift existingShift:out) {
+						if(existingShift.getId().equalsIgnoreCase(shift.getId())) {
+							alreadyAdded=true;
+						}
+					}
+					if(!alreadyAdded) {
+						out.add(shift);
+					}
 				}
 			} catch (CorruptDataException e) {
 				e.printStackTrace();
+			}
+		}
+		if(null!=secondMonthsShifts) {
+			for(Shift shift:secondMonthsShifts) {
+				try {
+					System.out.println("shifts start:"+shift.getStartsLocalDate().toString());
+					if(shift.getStartsLocalDate().isAfter(weekStart.minusDays(1)) &&
+							shift.getStartsLocalDate().isBefore(weekEnd.plusDays(1))){
+						boolean alreadyAdded=false;
+						
+						for(Shift existingShift:out) {
+							if(existingShift.getId().equalsIgnoreCase(shift.getId())) {
+								alreadyAdded=true;
+							}
+						}
+						if(!alreadyAdded) {
+							out.add(shift);
+						}
+					}
+				} catch (CorruptDataException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 		
