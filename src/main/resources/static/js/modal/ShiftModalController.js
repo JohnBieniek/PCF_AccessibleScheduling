@@ -3,6 +3,7 @@ function ShiftModalController($scope, $modalInstance, $http, shift, client,clien
     $scope.shift = shift;
     $scope.client=client;
     $scope.employees=employees;
+    $scope.showEmployee=true;
     if(shift.clientId==null||shift.clientName==undefined){
     	shift.clientId=client.id;
     }
@@ -32,6 +33,17 @@ function ShiftModalController($scope, $modalInstance, $http, shift, client,clien
 //    	$scope.selectedEmployee=$scope.employees[0];
 //    }
    
+	$scope.clearSelectedEmployee = function(){
+		console.log("clearign selected");
+		$scope.showEmployee=false;
+		$scope.showEmployee=true;
+		$scope.selectedEmployee="";
+		$scope.employee="";
+		$scope.shift.staffId="";
+		$scope.shift.staffName="";
+		document.getElementById("mySelect").value=null;
+		$scope.isValid($scope.shift);
+	}
     $scope.isValid = function(shift){
     	$http({
             url: '/shifts/validity',

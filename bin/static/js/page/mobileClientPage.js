@@ -379,8 +379,11 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
         if($scope.client==null){
         	$scope.client = $scope.clients[0];
         }
-        
         $scope.employees = Employees.query();
+        var none = {"id":"0","first":"None","initial":""};
+        $scope.employees.push(none);
+        console.log("employees:");
+        console.log($scope.employees);
         $scope.getDisplayWeek();
     }
     
