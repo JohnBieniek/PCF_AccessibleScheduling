@@ -240,7 +240,7 @@ public class ShiftGenerationManager {
 	    				boolean working = request.getDays()[index];
 	    				LocalDateTime selectedDay = timeCursor.minusDays(6-index);
 	    				System.out.println("making shifts for day "+selectedDay.getDayOfWeek().toString() + " "+working +" monthValue:"+selectedDay.getMonthValue()+" selectedMonth"+selectedMonth);
-	    				if(working && selectedDay.getMonthValue()==selectedMonth) {
+	    				if(working && selectedDay.getMonthValue()==selectedMonth && selectedDay.isAfter(request.getStartsLocalDateTime())) {
 	    					times.add(selectedDay);
 	    					System.out.println("Added time:"+selectedDay.toString());
 	    				}
