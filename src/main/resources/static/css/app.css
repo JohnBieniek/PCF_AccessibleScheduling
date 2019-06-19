@@ -246,8 +246,11 @@ html,body
     background-color: white;
 }
 
+.modal-dialog{
+	width:85% !important;
+}
 .app-modal-window .modal-dialog {
-  width: 65%;
+  width: 85% !important;
 }
 
 .requestBody{
@@ -326,7 +329,7 @@ html,body
 }
 
 .weekDay{
-	font-size:32px;	
+	font-size:25px;	
 }
 
 .addShift{
@@ -378,13 +381,15 @@ html,body
     width: 95%;
 }
 
+.navIcon{
+	margin-left:30px !imporant;
+}
 .navAllign{
 	display:inline-block;
 	vertical-align: middle;
-	text-align: right;
+	text-align: center;
   	margin-left: 5px!important;
   	margin-right: 5px!important;
-  	font-size:25px!important;
 }
 .centered{
 	 text-align: center;
