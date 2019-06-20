@@ -62,16 +62,17 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
 		 $scope.week = new Date();//.getTime();
 	 }
 
-	 console.log($scope.week);
 	 $scope.days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 	$scope.setTab = function(newTab){
       $scope.tab = newTab;
 	}
 	$scope.setClient = function(newClient){
+		if($scope.client == null || $scope.client== undefined || $scope.client.id !==newClient.id){
 	      $scope.client = newClient;
 	      $scope.listRequests(newClient);
 	      $scope.listShifts();
 		}
+	}
 	
 	$scope.setInterval = function(newInterval){
       $scope.interval = newInterval;
@@ -330,7 +331,6 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
 				 request.displayValue+=" on "+request.startsLocalDate.dayOfWeek + " of week "+weekOfMonth;
 			 }
 		 }
-		 console.log("yearInterval"+request.yearInterval);
 		 if(request.interval=="year(s)"){
 			 request.displayValue+= " in " +request.startsLocalDate.month;
 			 if(request.yearInterval=="days"){
@@ -374,17 +374,10 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
 	 $scope.listClients = function listClients() {
         $scope.clients = Clients.query();
         $scope.clients = $scope.clients.sort(function(a, b){return a.first > b.first});
-        console.log("clients");
-        console.log($scope.clients);
         if($scope.client==null){
         	$scope.client = $scope.clients[0];
         }
         $scope.employees = Employees.query();
-        var none = {"id":"0","first":"None","initial":""};
-        $scope.employees.push(none);
-        console.log("employees:");
-        console.log($scope.employees);
-        $scope.getDisplayWeek();
     }
     
     $scope.listEmployees = function listEmployees() {

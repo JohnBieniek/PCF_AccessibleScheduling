@@ -28,12 +28,13 @@ angular.module('vacation', ['ngResource', 'ui.bootstrap']).
     });
 
 function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
-	 $scope.multiTableEditing=false;
-	 $scope.month=1;
+
 	 $scope.week = new Date();
 	 console.log("week"+$scope.week);
 	 if($scope.year==null ||$scope.year==undefined){
 		 $scope.year=parseInt($scope.week.getYear())+1900;
+		 $scope.month=parseInt($scope.week.getMonth()+2);
+		 $scope.tab=$scope.month;
 	 }
 	 $scope.allowOvertime=false;
 	 $scope.allowUnavailable=false;
@@ -44,36 +45,36 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
 	 $scope.generatedBool = false;
 	 $scope.generated="Generated";
 	 $scope.assigned="Unassigned";
-	 $scope.tab=1;
+
 	 $scope.monthName="January";
 	 $scope.statusList=[];
 	 $scope.unscheduled=0;
 	 $scope.scheduled=0;
 	 
 	$scope.setTab = function(newTab){
-	  $scope.generatedBool = $scope.statusList[$scope.tab-1].generated;
+	  if($scope.statusList && $scope.statusList[$scope.tab-1])$scope.generatedBool = $scope.statusList[$scope.tab-1].generated;
       $scope.tab = newTab;
       
       $scope.getUnscheduled(newTab);
       $scope.getScheduled(newTab);
       
-      if($scope.statusList[$scope.tab-1].generated){
+      if($scope.statusList && $scope.statusList[$scope.tab-1] && $scope.statusList[$scope.tab-1].generated){
     	  $scope.generated="Generated";
       }
       else{
     	  $scope.generated="Ungenerated";
       }
       
-      if($scope.statusList[$scope.tab-1].assigned){
+      if($scope.statusList && $scope.statusList[$scope.tab-1] && $scope.statusList[$scope.tab-1].assigned){
     	  $scope.assigned="Assigned";
       }
       else {
     	  $scope.assigned="Unassigned";
       }
       
-      if($scope.statusList[$scope.tab-1].assigning){
+      if($scope.statusList && $scope.statusList[$scope.tab-1] && $scope.statusList[$scope.tab-1].assigning){
     	  $scope.assigned="Assigning";
-    	  if($scope.statusList[$scope.tab-1].stopped){
+    	  if($scope.statusList && $scope.statusList[$scope.tab-1] && $scope.statusList[$scope.tab-1].stopped){
     		  $scope.assigned="Stopping";
     	  }
       }
@@ -139,58 +140,67 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
     }
     
     $scope.isTabGenerated = function(month){
-        return $scope.statusList[month-1].generated && $scope.tab != month && !$scope.statusList[month-1].assigned&& !$scope.statusList[month-1].assigning;
+    	if($scope.statusList && $scope.statusList[month-1]) return $scope.statusList[month-1].generated && $scope.tab != month && !$scope.statusList[month-1].assigned&& !$scope.statusList[month-1].assigning;
+  	  return false;
       };
       $scope.isTabAssigned = function(month){
-          return $scope.statusList[month-1].assigned && $scope.tab != month&& !$scope.statusList[month-1].assigning ;
-        };
+    	  if($scope.statusList && $scope.statusList[month-1])return $scope.statusList[month-1].assigned && $scope.tab != month&& !$scope.statusList[month-1].assigning ;
+    	  return false;
+        }
     $scope.isGenerated = function(month){
-        return $scope.statusList[month-1].generated;
+    	if($scope.statusList && $scope.statusList[month-1])return $scope.statusList[month-1].generated;
+  	  return false;
       };
       
       $scope.isWorking = function(month){
-          return $scope.statusList[month-1].assigning  && $scope.tab != month;
+    	  if($scope.statusList && $scope.statusList[month-1])return $scope.statusList[month-1].assigning  && $scope.tab != month;
+    	  return false;
         };
       
       $scope.isAssigned = function(month){
-          return $scope.statusList[month-1].assigned;
+    	  if($scope.statusList && $scope.statusList[month-1])return $scope.statusList[month-1].assigned;
+    	  return false;
         };
     $scope.isErrored = function(month){
-        return $scope.statusList[month-1].errored;
+    	if($scope.statusList && $scope.statusList[month-1])return $scope.statusList[month-1].errored;
+  	  return false;
       };
     $scope.isAssigning = function(month){
-    	return $scope.statusList[month-1].assigning
+    	if($scope.statusList && $scope.statusList[month-1])return $scope.statusList[month-1].assigning
+  	  return false;
       };
       
       $scope.isStopped = function(month){
-      	return $scope.statusList[month-1].stopped
+    	  if($scope.statusList && $scope.statusList[month-1])return $scope.statusList[month-1].stopped
+    	  return false;
         };
           
       $scope.isNotAssignable = function(month){
     	  assignable = true;
     	  
     	  console.log("assignable:"+assignable);
-    	  if($scope.statusList[month-1].generated=="false"){
-    		  assignable=false;
+    	  if($scope.statusList && $scope.statusList[month-1]){
+    		  if($scope.statusList[month-1].generated=="false"){
+    	 
+	    		  assignable=false;
+	    	  }
     	  }
     	  
 	   	  console.log("assignable:"+assignable);
-	   	  
-	   	if($scope.statusList[month-1].assigning=="true"){
-  		  assignable=false;
-  	  }
+	   	if($scope.statusList && $scope.statusList[month-1]){ 
+		   	if($scope.statusList[month-1].assigning=="true"){
+	  		  assignable=false;
+	  	  }
+	   	}
   	  
 	   	  console.log("assignable:"+assignable);
-	   	  
-	   	if($scope.statusList[month-1].assigned=="true"){
-  		  assignable=false;
-  	  }
+	   	if($scope.statusList && $scope.statusList[month-1]){ 
+		   	if($scope.statusList[month-1].assigned=="true"){
+	  		  assignable=false;
+	  	  }
+	   	}
   	  unassignable = !assignable;
-	   	  console.log("unassignable:"+unassignable);
-    	  console.log("$scope.statusList[month-1].generated" + $scope.statusList[month-1].generated);
-    	  console.log("$scope.statusList[month-1].assigning "+$scope.statusList[month-1].assigning );
-    	  console.log("$scope.statusList[month-1].assigned"+$scope.statusList[month-1].assigned);
-      	return unassignable;
+	   	      	return unassignable;
        };
       
 	 $scope.isSet = function(tabNum){
@@ -240,8 +250,6 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
         })
         .then(function(response) {
     		$scope.statusList = response.data.sort(function(a, b){return a.month-b.month});
-    		console.log(response.data);
-    		console.log($scope.statusList[0].generated);
     		$scope.setTab($scope.tab);
     		if($scope.page.includes("scheduler")){
     			setTimeout(listStatusItems,12500);
@@ -312,10 +320,7 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
 	        })
 	        .then(function(response) {
 	        	$scope.statusList = response.data.sort(function(a, b){return a.month-b.month});
-	    		console.log(response.data);
-	    		console.log($scope.statusList[0].generated);
 	    		$scope.setTab($scope.tab);
-	    		//setTimeout($scope.finishAssignment,10000);
 	        });
     	}
     }
@@ -335,8 +340,6 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
         })
         .then(function(response) {
         	$scope.statusList = response.data.sort(function(a, b){return a.month-b.month});
-    		console.log(response.data);
-    		console.log($scope.statusList[0].generated);
     		$scope.setTab($scope.tab);
     		
         });
@@ -345,7 +348,6 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
     $scope.assignShifts = function(month, allowOvertime,allowInactive,allowUnavailable,prioritizeSecondShift,dailyMax,weeklyMax){
     	$scope.statusList[month-1].assigning=true;
     	$scope.assigned="Assigning";
-    	console.log("$scope.statusList" +$scope.statusList.toString());
     	$http({
             url: '/schedule/staffShiftsSafely',
             method: 'GET',
@@ -366,8 +368,6 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
         .then(function(response) {
         	
         	$scope.statusList = response.data.sort(function(a, b){return a.month-b.month});
-    		console.log(response.data);
-    		console.log($scope.statusList[0].generated);
     		$scope.setTab($scope.tab);
         });
     }
