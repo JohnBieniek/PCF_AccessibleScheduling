@@ -3,6 +3,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoShiftRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -109,7 +111,23 @@ public class ScheduleManager {
 				}
 			}
 		}
+		Shift[] outArray = new Shift[out.size()];
 		
+		for(int index = 0 ; index<out.size();index++){
+			outArray[index]=out.get(index);
+		}
+		
+		Arrays.sort(outArray, new Comparator<Shift>() {
+	        @Override
+	        public int compare(Shift o1, Shift o2) {
+	            return o1.compareTo(o2);
+	        }
+	    });
+		out=new ArrayList<Shift>();
+		for(Shift returnedShift: outArray){
+			out.add(returnedShift);
+		}
+		 
 		return out;
 	} 
 }
