@@ -587,6 +587,7 @@ public class CompatibilityController {
     	String param2= request.getParameter("customField");
     	String param3= request.getParameter("index");
     	ObjectMapper mapper = new ObjectMapper();
+    	mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     	
     	try {
 			client = mapper.readValue(param1, Client.class);

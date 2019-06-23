@@ -9,7 +9,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @Entity
-@JsonIgnoreProperties(ignoreUnknown = true) 
+@JsonIgnoreProperties
 public class Client implements Comparable{
     @Id
     @Column(length=40)

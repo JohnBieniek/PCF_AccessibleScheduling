@@ -17,6 +17,9 @@ angular.module('client', ['ngResource', 'ui.bootstrap']).
 	factory('Employee', function ($resource) {
 	    return $resource('employees/:id', {id: '@id'});
 	}).
+	factory('CustomFields', function ($resource) {
+        return $resource('customFields');
+    }).
 	factory("EditorStatus", function () {
         var editorEnabled = {};
 
@@ -39,7 +42,7 @@ angular.module('client', ['ngResource', 'ui.bootstrap']).
         }
     });
 
-function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Shift,Employee, Employees, Status) {
+function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Shift,Employee, Employees, CustomFields, Status) {
 	 $scope.multiTableEditing=false;
 	 $scope.month=1;
 	 $scope.allowOvertime=false;
@@ -54,10 +57,12 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
 	 $scope.tab="Schedule";
 	 $scope.monthName="January";
 	 $scope.statusList=[];
+	 $scope.customValue=[];
 	 $scope.unscheduled=0;
 	 $scope.scheduled=0;
 	 $scope.selectedInterval="day(s)";
 	 $scope.detailsChanged=false;
+	 $scope.customFieldDateEditing=true;
 	 if($scope.week==undefined || $scope.week ==null){
 		 $scope.week = new Date();//.getTime();
 	 }
@@ -65,15 +70,42 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
 	 $scope.days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 	$scope.setTab = function(newTab){
       $scope.tab = newTab;
-	}
+	} 
+	$scope.getClientCustomFieldData = function (client,customField,index){
+     	$http({
+            url: '/compatibility/clientCustomFieldData',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            params: {
+                client: client,
+                customField: customField,
+                index:index,
+            }
+        })
+        .then(function(response) {
+        	$scope.customValue[response.data.numericResponse] = response.data.booleanResponse;
+        });
+    }
 	$scope.setClient = function(newClient){
 		if($scope.client == null || $scope.client== undefined || $scope.client.id !==newClient.id){
+		  $scope.detailsChanged=false;
 	      $scope.client = newClient;
 	      $scope.listRequests(newClient);
 	      $scope.listShifts();
+	      console.log("$scope.customFields:"+$scope.customFields);
+	      if($scope.client!=null && $scope.customFields !=null){
+		      for(var index = 0; index<$scope.customFields.length;index++){
+		    	  console.log("$scope.customFields[index]:"+$scope.customFields[index]);
+			      $scope.getClientCustomFieldData($scope.client,$scope.customFields[index],index);
+		      }
+	      }
 		}
 	}
-	
+	 $scope.listCustomFields = function listCustomFields() {
+         $scope.customFields = CustomFields.query();
+     }
 	$scope.setInterval = function(newInterval){
       $scope.interval = newInterval;
 	}
@@ -744,6 +776,23 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
     
     $scope.ok = function () {
     	$scope.detailsChanged=false;
+
+        var size = $scope.customFields.length;
+        for(var i = 0; i < size ;i++){
+            $http({
+                url: '/compatibility/setClientCustomFieldData',
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                params: {
+                    client: $scope.client,
+                    customField: $scope.customFields[i],
+                    value:$scope.customValue[i],
+                }
+            });
+        }
+        
     	$http({
             url: '/schedule/updateClient',
             method: 'POST',
