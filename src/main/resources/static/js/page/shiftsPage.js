@@ -113,6 +113,16 @@ function ShiftsController($scope, $filter, $modal, $http,  Shifts, Shift, Client
         });
 
         addModal.result.then(function (shift) {
+        	console.log(shift.startDate);
+        	console.log(shift.startDate.split("-"));
+        	if(shift.startYear==0 || shift.startYear == undefined || shift.startYear==null){
+        		shift.startYear=shift.startDate.split("-")[0];
+        	}
+        	if(shift.startMonth==0 || shift.startMonth == undefined || shift.startMonth==null){
+        		shift.startMonth=shift.startDate.split("-")[1];
+        	}
+        	console.log(shift.startMonth);
+        	console.log(shift.startYear);
             saveShift(shift);
         });
     };

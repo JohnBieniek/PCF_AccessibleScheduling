@@ -3,19 +3,32 @@
  	<div style="display:inline-block;text-align:right">
           <p style="display:inline-block"  class="titleText" ng-click="setPage('scheduler')">Accessible Scheduling</p>
           </div>
-	        <div style="display:inline-block;float:right;margin-top:15px!important;">
-	          	<i style="margin-right: 10px!important;" class="glyphicon glyphicon-user micon navAllign" ng-click="setPage('clients')">Clients
-	          		<!--  <p style="text-align:center" ng-click="setPage('clients')">Clients</p> -->
-	          	</i>|
-	          	<i style="margin-right: 10px!important;" class="glyphicon glyphicon-plus-sign micon navAllign" ng-click="setPage('employeeList')">Staff
-	          		 <!--  <p style="text-align:center" ng-click="setPage('employeeList')">Staff</p>-->
-	          	</i>|
-	          	<i style="margin-right: 10px!important;" class="glyphicon glyphicon-dashboard micon navAllign" ng-click="setPage('scheduler')">Scheduler
-	          		 <!--  <p style="text-align:center" ng-click="setPage('scheduler')">Scheduler</p>-->
-	          	</i>|
-				<i style="margin-right: 10px!important;" class="glyphicon glyphicon-cog micon navAllign" ng-click="setPage('settings')">Settings
-	          		 <!--  <p style="text-align:center" ng-click="setPage('settings')">Settings</p>-->
-	          	</i>
+	        <div style="display:inline-block;float:right;margin-top:7px!important;">
+	        	<div class="navAllign" ng-click="setPage('client')">
+	       			<i style = "margin-left:5px !important" class="glyphicon glyphicon-user"/>
+        			<br>
+        			<span class="centered">Clients</span>
+	          	</div>
+	          	<div class="navAllign" ng-click="setPage('employeeList')">
+	       			<i style = "margin-left:5px !important" class="glyphicon glyphicon-plus-sign"/>
+        			<br>
+        			<span class="centered">Staff</span>
+	          	</div>
+	          	<div class="navAllign" ng-click="setPage('shiftList')">
+        			<i style = "margin-left:5px !important" class="glyphicon glyphicon-align-justify"/>
+        			<br>
+        			<span class="centered">Shifts</span>
+	          	</div>
+	          	<div class="navAllign" ng-click="setPage('scheduler')">
+        			<i style = "margin-left:5px !important" class="glyphicon glyphicon-dashboard " />
+        			<br>
+        			<span class="centered">Scheduler</span>
+	          	</div>
+				<div class="navAllign" ng-click="setPage('settings')">
+        			<i style = "margin-left:5px !important" class="glyphicon glyphicon-cog"/>
+        			<br>
+        			<span class="centered">Settings</span>
+	          	</div>
           	</div>
       </div>
     <div class="row">
