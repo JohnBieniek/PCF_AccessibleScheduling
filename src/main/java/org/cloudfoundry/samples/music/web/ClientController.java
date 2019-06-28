@@ -18,6 +18,7 @@ import accessiblesolutions.accessiblescheduling.domain.Client;
 import accessiblesolutions.accessiblescheduling.domain.CustomField;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -36,7 +37,9 @@ public class ClientController {
 
     @RequestMapping(method = RequestMethod.GET)
     public Iterable<Client> clients() {
-        return repository.findAll();
+    	List<Client> clients = (List<Client>) repository.findAll();
+        Collections.sort(clients);
+		return clients;
     }
 
     @RequestMapping(method = RequestMethod.PUT)
@@ -58,9 +61,13 @@ public class ClientController {
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    public void deleteById(@PathVariable String id) {
+    public List<Client> deleteById(@PathVariable String id) {
         logger.info("Deleting client " + id);
         repository.delete(id);
+    	List<Client> clients = (List<Client>) repository.findAll();
+        Collections.sort(clients);
+        
+		return clients;
     }
     
     @RequestMapping(value = "/set", method = RequestMethod.POST)

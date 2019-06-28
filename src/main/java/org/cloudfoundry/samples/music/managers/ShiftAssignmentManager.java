@@ -160,7 +160,8 @@ public class ShiftAssignmentManager {
     	
     	for(String employeeId:prestaffedShiftsPerEmployee.keySet()){
     		ArrayList<Shift> prestaffedShiftsForSelectedEmployee = prestaffedShiftsPerEmployee.get(employeeId);
-    		Employee employee = employeeCrud.findOne(employeeId);
+     		Employee employee = employeeCrud.findOne(employeeId);
+       		System.out.println("assigning "+ prestaffedShiftsForSelectedEmployee + " shifts to "+employee.getFirst()+" "+employee.getInitial());
     		
     		if(null != prestaffedShiftsForSelectedEmployee && !prestaffedShiftsForSelectedEmployee.isEmpty()){
 	    		for(Shift prestaffedShift:prestaffedShiftsForSelectedEmployee){
@@ -169,7 +170,6 @@ public class ShiftAssignmentManager {
 	    				!prestaffedShift.getRequestedStaffId().equalsIgnoreCase(employeeId)){
 	    				throw new ProccessingException(Shift.class,prestaffedShift);//This method only for prestaffed, if here, these aren't prestaffed. 
 	    			}
-	    			//TODO add logic to ensure they have proper qualification to work with this client on this shift, perhaps in a helper method
 	    			if((employeeShiftCompatibilityManager.isValidFor(employee, prestaffedShift,options) &&
 	    				( options.isAllowOvertime() || 
     					  !(employeeShiftCompatibilityManager.getHoursScheduledWeekOfShift(employee,prestaffedShift)+prestaffedShift.getDuration()>employee.getMaxHours())
@@ -194,10 +194,9 @@ public class ShiftAssignmentManager {
     public String staffPreassignedShifts(ScheduleOptions options) throws CorruptDataException, ProccessingException{
     	String result = "";
     	
-    	result +=saveAssignedUnconflictedPrestaffedRecuringShiftsToTableForMonth(options);
-    	
-    	result+=saveAssignedUnconflictedPrestaffedSingleShiftsToTableForMonth(options);
-    		    	
+    	result +=saveAssignedUnconflictedShiftsToTableForMonth(options);
+    	result +=saveAssignedShiftsToTableForMonth(options);
+    	System.out.println(result);
 		return result;
     }
 
@@ -224,41 +223,33 @@ public class ShiftAssignmentManager {
     	
     	return onShifts;
     }
-    
-    public String saveAssignedUnconflictedPrestaffedRecuringShiftsToTableForMonth(ScheduleOptions options) throws CorruptDataException, ProccessingException{
-    	ArrayList<Shift> prestaffedRecuringShifts = shiftManager.getPrestaffedRecurringShiftsForMonth(options.getMonthInt());
-    	ArrayList<Shift> onPrestaffedRecuringShifts =getOnPrestaffedShifts(prestaffedRecuringShifts);
-    	//System.out.println("Staffing " + prestaffedRecuringShifts.size() +" prestaffed shifts that have no conflicts.");
-    	HashMap<String,ArrayList<Shift>> onPrestaffedRecuringShiftsPerEmployee =ShiftWorker.getPrestaffedEmployeeShiftMap(onPrestaffedRecuringShifts);
-
-    	HashMap<String,ArrayList<Shift>> unconflictedPrestaffedRecuringShiftsPerEmployee = ShiftWorker.getNonoverlapingShiftsPerEmployee(onPrestaffedRecuringShiftsPerEmployee);
-    	
-    	ArrayList<Shift> assignedUnconflictedPrestaffedRecuringShifts = assignRequestedStaff(unconflictedPrestaffedRecuringShiftsPerEmployee,options);
-
-    	//    	logger.error(assignedUnconflictedPrestaffedRecuringShifts.size() + " assignedUnconflictedPrestaffedRecuringShifts");
-    	shiftCrud.save(assignedUnconflictedPrestaffedRecuringShifts);
-    	return "Assigned " + assignedUnconflictedPrestaffedRecuringShifts.size() +" prestaffed recurring shfits.";
-    }
-    
-
-    public String saveAssignedUnconflictedPrestaffedSingleShiftsToTableForMonth(ScheduleOptions options) throws CorruptDataException, ProccessingException {
-    	ArrayList<Shift> prestaffedSingleShifts = shiftManager.getPrestaffedSingleShiftsForMonth(options.getMonthInt());
-    	//logger.error("prestaffedSingleShifts " +prestaffedSingleShifts.size());
-    	ArrayList<Shift> onPrestaffedSingleShifts =getOnPrestaffedShifts(prestaffedSingleShifts);
-    	HashMap<String, ArrayList<Shift>> prestaffedSingleShiftsPerEmployee = ShiftWorker.getPrestaffedEmployeeShiftMap(onPrestaffedSingleShifts);
-    	
-    	HashMap<String, ArrayList<Shift>> unconflictedPrestaffedSingleShiftsPerEmployee=  ShiftWorker.getNonoverlapingShiftsPerEmployee(prestaffedSingleShiftsPerEmployee);
+  
+    public String saveAssignedUnconflictedShiftsToTableForMonth(ScheduleOptions options) throws CorruptDataException, ProccessingException {
+    	ArrayList<Shift> prestaffedShifts = shiftManager.getPrestaffedShiftsForMonth(options.getMonthInt());
+    	System.out.println("attempting to schedule "+prestaffedShifts.size() + " shifts for month:"+options.getMonth());
+    	ArrayList<Shift> onPrestaffedShifts =getOnPrestaffedShifts(prestaffedShifts);
+    	System.out.println("attempting to schedule "+prestaffedShifts.size() + " OnPrestaffed shifts for month:"+options.getMonth());
+    	HashMap<String, ArrayList<Shift>> prestaffedShiftsPerEmployee = ShiftWorker.getPrestaffedEmployeeShiftMap(onPrestaffedShifts);
+    	HashMap<String, ArrayList<Shift>> unconflictedPrestaffedShiftsPerEmployee=  ShiftWorker.getNonoverlapingShiftsPerEmployee(prestaffedShiftsPerEmployee);
 //    	logger.error("nonoverlappingPRestaffedSingleShifts" +unconflictedPrestaffedSingleShiftsPerEmployee.toString());
-    	unconflictedPrestaffedSingleShiftsPerEmployee=employeeShiftMapManager.getShiftsPerEmployeePerMonthUnconflictingWithAssignedShifts(unconflictedPrestaffedSingleShiftsPerEmployee,options.getMonthInt());
+    	unconflictedPrestaffedShiftsPerEmployee=employeeShiftMapManager.getShiftsPerEmployeePerMonthUnconflictingWithAssignedShifts(unconflictedPrestaffedShiftsPerEmployee,options.getMonthInt());
 	    //check to see if any conflicts exist in requested staff	    		
-	    //add conflict info somewhere
-    	//add conflicted shifts into array for later staff assignment->
-    	ArrayList<Shift> assignedUnconflictedPrestaffedSingleShifts = assignRequestedStaff(unconflictedPrestaffedSingleShiftsPerEmployee,options);
-    	//logger.error("prestaffedSingleShifts " +assignedUnconflictedPrestaffedSingleShifts.size());
-    	shiftCrud.save(assignedUnconflictedPrestaffedSingleShifts);
-    	return "Assigned " + assignedUnconflictedPrestaffedSingleShifts.size() +" prestaffed single shfits.";
+    	ArrayList<Shift> assignedUnconflictedPrestaffedShifts = assignRequestedStaff(unconflictedPrestaffedShiftsPerEmployee,options);
+    	shiftCrud.save(assignedUnconflictedPrestaffedShifts);
+    	return "Assigned " + assignedUnconflictedPrestaffedShifts.size() +" prestaffed single shfits.";
 	}
-
+    
+    public String saveAssignedShiftsToTableForMonth(ScheduleOptions options) throws CorruptDataException, ProccessingException {
+    	ArrayList<Shift> prestaffedShifts = shiftManager.getPrestaffedShiftsForMonth(options.getMonthInt());
+    	System.out.println("attempting to schedule "+prestaffedShifts.size() + " shifts for month:"+options.getMonth());
+    	ArrayList<Shift> onPrestaffedShifts =getOnPrestaffedShifts(prestaffedShifts);
+    	System.out.println("attempting to schedule "+prestaffedShifts.size() + " OnPrestaffed shifts for month:"+options.getMonth());
+    	HashMap<String, ArrayList<Shift>> prestaffedShiftsPerEmployee = ShiftWorker.getPrestaffedEmployeeShiftMap(onPrestaffedShifts);
+    	ArrayList<Shift> assignedUnconflictedPrestaffedShifts = assignRequestedStaff(prestaffedShiftsPerEmployee,options);
+    	shiftCrud.save(assignedUnconflictedPrestaffedShifts);
+    	return "Assigned " + assignedUnconflictedPrestaffedShifts.size() +" prestaffed single shfits.";
+	}
+    
     public Shift getWeekendShiftStartingWeekOfMonth(int week,int month, int year, ScheduleOptions options) throws CorruptDataException, ProccessingException{
     	ArrayList<Shift> shifts = shiftManager.getUnassignedNonEventShiftsForMonth(month);
 		ArrayList<Shift> unassignedShiftsForWeek = ShiftWorker.getShiftsStartingWeekOfMonth(shifts, week, month,year);

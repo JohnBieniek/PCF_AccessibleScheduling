@@ -994,7 +994,7 @@ public class EmployeeShiftCompatibilityManager {
 		if(isCompatibleWith(employee,shift)){
 			if(isAssignableFor(employee,shift,options)){
 				if(options.isAllowInactive() || !employee.getInactive()){
-					if(!employee.getFixedSchedule()){
+					if(employee.getId().equalsIgnoreCase(shift.getRequestedStaffId()) || !employee.getFixedSchedule()){
 						if(!getResting(new EmployeeShiftCompatibility(employee,shift),options)){
 							validity=true;
 						}

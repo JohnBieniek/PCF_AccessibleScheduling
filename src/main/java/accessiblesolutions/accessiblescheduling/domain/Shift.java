@@ -21,7 +21,7 @@ import javax.persistence.Id;
 
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Shift {
+public class Shift implements Comparable{
     @Id
     @Column(length=40)
     @GeneratedValue(generator="randomId")
@@ -72,6 +72,7 @@ public class Shift {
     	recurring=false;
     	event = false;
     }
+  
     public void setDisplayDate() throws CorruptDataException{
 		if(getOvernight()){
 			setDate(getStartDate()+" to " + getEndDate());
@@ -543,5 +544,23 @@ public class Shift {
 
 	public void setCreationReason(String creationReason) {
 		this.creationReason = creationReason;
+	}
+
+	@Override
+	public int compareTo(Object arg0) {
+		int result = 0;
+		Shift shift = (Shift) arg0;
+		try {
+			if(getStartsLocalDateTime().isAfter(shift.getStartsLocalDateTime())){
+				result=1;
+			}
+			else if(shift.getStartsLocalDateTime().isAfter(getStartsLocalDateTime())) {
+				result=-1;
+			}
+		} catch (CorruptDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return result;
 	}
 }
