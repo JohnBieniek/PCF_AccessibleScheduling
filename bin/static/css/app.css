@@ -123,6 +123,39 @@ html,body
     background-color: #729fcf;  		
 }
 
+.deleteEmployeeButton{
+  width: 180px;
+    margin-right: auto;
+  margin-left:15%;
+    font-size: 30px;
+    float: left;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    background-color: #cc0000;      
+}
+.okEmployeeButton{
+  width: 90px;
+    margin-right: 0px;
+  margin-left:auto;
+    font-size: 30px;
+    float: left;
+    color: black;
+    font-weight: bold;
+    text-align: center;
+    background-color: #3d9e03;      
+}
+.cancelEmployeeButton{
+  width: 180px;
+    margin-right: 0px;
+  margin-left:auto;
+    font-size: 30px;
+    float: left;
+    color: black;
+    font-weight: bold;
+    text-align: center;
+    background-color: #729fcf;      
+}
 
 .scheduleOptions{
 	text-align: right;
@@ -288,6 +321,19 @@ html,body
 	font-size:30px;	
 }
 
+.newEmployeeTab{
+   background-color: #b1f0a1;
+  border-color: #b1f0a1 ;
+  color: black;
+    margin-bottom: 17px;
+    margin-top: 15px;
+    
+  border-radius: 25px; 
+    font-size:28px;
+    padding-left:20px;
+    padding-right:20px;
+}
+
 .newClientTab{
 	 background-color: #b1f0a1;
   border-color: #b1f0a1 ;
@@ -300,7 +346,18 @@ html,body
     padding-left:20px;
     padding-right:20px;
 }
-
+.employeeTab{
+   background-color: #d3d7cf;
+  border-color: #6C6C6C ;
+  color: black;
+    margin-bottom: 17px;
+    margin-top: 15px;
+    
+  border-radius: 25px; 
+    font-size:35px;
+    padding-left:20px;
+    padding-right:20px;
+}
 .clientTab{
 	 background-color: #d3d7cf;
   border-color: #6C6C6C ;
@@ -367,6 +424,9 @@ html,body
 	margin-right:0px
 }
 
+.employeeDetails{
+  font-size:26px;
+}
 .request{
 	 background-color: #d3d7cf;
   border-color: #d3d7cf;

@@ -409,7 +409,8 @@ function MobileEmployeeController($scope, $modal, $http, Clients, Client,Shifts,
     }
     
     $scope.listEmployees = function listEmployees() {
-        $scope.employees = Employees.query();
+    	var newEmployees=Employees.query();
+        $scope.employees = newEmployees;
         
         if($scope.employee==null){
         	$scope.employee = $scope.employees[0];
@@ -517,13 +518,10 @@ function MobileEmployeeController($scope, $modal, $http, Clients, Client,Shifts,
             	   return {};
                },
                clients: function(){
-            	   return clone($scope.clients);
-               },
-               employees: function(){
-           		return clone($scope.employees);
+           		return {};
 	           	},
-	           	selectedEmployee:function(){
-	        		return clone($scope.employee);
+	           	employees:function(){
+	        		return clone($scope.employees);
 	        	},
 	           	date: function(){
 	         	   return $scope.week;
@@ -536,9 +534,9 @@ function MobileEmployeeController($scope, $modal, $http, Clients, Client,Shifts,
 
        updateModal.result.then(function (shift) {
            saveShift(shift);
+           $scope.listShifts();
        });
    };
-   
 
 
     $scope.newEmployee = function () {
@@ -554,7 +552,7 @@ function MobileEmployeeController($scope, $modal, $http, Clients, Client,Shifts,
         .then(function(response) {
         	if(response.data){
                 Status.success("Employee created");
-        		$scope.employees = response.data;
+        		$scope.listEmployees();
         		$scope.tab="Schedule";
         	}
         	else{
@@ -595,7 +593,7 @@ function MobileEmployeeController($scope, $modal, $http, Clients, Client,Shifts,
         .then(function(response) {
         	if(response.data){
                 Status.success("Employee saved");
-        		$scope.employees = response.data;
+				$scope.listEmployees();
             	$scope.detailsChanged=false;
         	}
         	else{
@@ -643,7 +641,7 @@ function MobileEmployeeController($scope, $modal, $http, Clients, Client,Shifts,
         	console.log(response);
         	if(response){
                 Status.success("Employee deleted.");
-        		$scope.employees =response.data;
+        		$scope.listEmployees();
      		$scope.employee =response.data[0];
         		$scope.tab="Schedule";
         	}
@@ -666,9 +664,7 @@ function MobileEmployeeController($scope, $modal, $http, Clients, Client,Shifts,
         })
         .then(function(response) {
         	$scope.detailsChanged=false;
-        	if(response.data){
-        		$scope.employees = response.data;
-        	}
+        	$scope.listEmployees();
         });
     };
 }

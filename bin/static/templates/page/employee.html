@@ -4,7 +4,7 @@
 			<ul>
 				<div class = "newEmployeeTab">
 			    	<div >
-			       		<p ng-click="newEmployee()"><span class="glyphicon glyphicon-plus" style="position:static !important"></span>&nbsp;New Employee</p>
+			       		<p ng-click="newEmployee()"><span class="glyphicon glyphicon-plus" style="position:static !important"></span>&nbsp;New Staff</p>
 			    	</div>
 		    	</div>
 				<div style="overflow-y:auto;height:80vh" class="monthSelector">
@@ -52,7 +52,6 @@
 					    		</div>
 				    		</div>
 			    		</div>
-   			    		<button  class="inline rightAlign newShiftButton" ng-click="addShift(employee)"><span class="glyphicon glyphicon-plus"></span>&nbsp;New Shift</button>
 		    		</div>
 		 			<div style="overflow-y:auto;height:70vh;">
    						<div ng-repeat="day in displayDays">
@@ -60,8 +59,9 @@
 				    		<div ng-repeat="shift in shifts">
 				    			<div ng-if="isDay(shift,day,displayWeek)" class = "shift">
 				    				<span ng-init="setShiftDisplay(shift)">{{shift.display}}</span>
-									<span ng-click="editShift(shift,employee,clients)" style="display:inline-block;width:94%" ng-init="getShiftDisplayValue(shift)">{{shift.displayValue}}</span>
-									<span ng-click="deleteShift(shift)" style="display:inline-block;float:right" class="glyphicon inline red trash glyphicon-trash"></span>
+									<span ng-click="editShift(shift,employee,clients)" style="display:inline-block;width:100%" ng-init="getShiftDisplayValue(shift)">
+										{{shift.displayValue}}
+									</span>
 								</div>
 							</div>
 						</div>
@@ -69,62 +69,129 @@
 	    		</div>
 	    	</div>
 	    	<div overflow-y:auto; ng-if="isSet('Requests')">
-	    		
+	    		<div style="width:90%;margin-left:5%" ng-controller="VacationController"  ng-init="listEmployees()">
+				  
+				  <div>
+					  <h2 class ="centered">Days requested off for {{employee.first}} {{employee.initial}}<h2/>
+					  </br>
+					  	<div class="inline">
+						     <ul ng-repeat="requestedDay in employee.requestedOff track by $index">
+						         <li>
+						           <form>
+					      	        <div style="display:inline-block">
+						           		<span style="font-size: 25px">{{requestedDay}}</span>
+						           	</div>
+					   		        <div style="display:inline-block">
+							           	<a href="" ng-click="removeAbsence(employee,requestedDay)">
+							           		<div style="display:inline-block">
+							           			<span style="font-size: 25px" class="glyphicon glyphicon-trash red"></span>
+							           		</div>
+							           	</a>
+						           </form>
+						         </li>
+						     </ul>
+					     </div>
+					     <div class="inline rightAlign" style="float: right;">
+							  <form ng-submit="addAbsence(newDate)">
+						           <input style="font-size: 25px" type="date" ng-model="newDate" placeholder="Date" ng-required/>
+						           <a href="" style="font-size: 25px" ng-click="addAbsence(employee,newDate)"><span class="glyphicon glyphicon-plus"></span>Add date</a>
+						      </form>
+						  </div>
+					   </div>
+					   
+				    <script type="text/javascript" src="js/page/vacationPage.js"></script>
+				</div>
 	    	</div>
 	    	<div ng-if="isSet('Details')" class = 'rightAlign'>
 	    		<form name="employeeForm" ng-init="listCustomFields()" role="form" style="overflow-y:auto;height:80vh;margin-right:3%">
 			        <div>
-			            <label for="first" class="inline" style="font-size:38px">First</label>
+			            <label for="first" class="inline employeeDetails" >First</label>
 			            <input ng-change="setDetailsToChanged()" type="text" class="form-control inline input-large rightAlign nameInput" id="first" name="first" required ng-model="employee.first">
 			        </div>
 			        
 			        <div>
-			            <label for="initial" class="inline" style="font-size:38px">Initial</label>
+			            <label for="initial" class="inline employeeDetails">Initial</label>
 			            <input ng-change="setDetailsToChanged()" type="text" class="inline form-control input-large rightAlign nameInput" id="initial" name="initial" required ng-model="employee.initial">
 			        </div>
-			      <!--   
+			    
+				     <div>
+			        	<div style="display:inline-block">
+				        	<label for="gender" class="employeeDetails">Gender:</label>
+			        	</div>
+				        <div style="display:inline-block">
+				        	<label for="female" style="font-size:20px">Female</label>
+				        	<input type="radio"  name="gender" value="female" style="height:21px;width:21px" ng-model="employee.gender"/>
+				        </div>
+				        <div style="display:inline-block">
+				        	<label for="male" style="font-size:20px">Male</label>
+				        	<input type="radio"  class="input-large" name="gender" style="height:21px;width:21px" value="male" ng-model="employee.gender" />
+				        </div>
+				    </div>
+				    
 			        <div>
-			            <label for="preferSigning" style="font-size:38px">Prefers Signing Staff</label>
-			            <input ng-change="setDetailsToChanged()" type="checkbox" id="preferSigning" name="preferSigning" style="height:20px;width:20px" ng-model="client.preferSigning">
+			            <label class="employeeDetails">No Cats</label>
+			            <input type="checkbox" id="noCats" name="noCats"  style="height:20px;width:20px" ng-model="employee.noCats">
 			        </div>
 			        
 			        <div>
-			            <label for="signingOnly" style="font-size:38px">Only Signing Staff</label>
-			            <input ng-change="setDetailsToChanged()" type="checkbox"  id="signingOnly" name="signingOnly" style="height:20px;width:20px" ng-model="client.signingOnly">
+			            <label for="smoker" class="employeeDetails">Smoker</label>
+			            <input type="checkbox" id="smoker" name="smoker"  style="height:20px;width:20px"  ng-model="employee.smoker">
 			        </div>
 			        
 			        <div>
-			            <label for="smoker" style="font-size:38px">No Smokers</label>
-			            <input ng-change="setDetailsToChanged()" type="checkbox" id="smoker" name="smoker" style="height:20px;width:20px" ng-model="client.noSmokers">
+			            <label for="signing" class="employeeDetails">Signing</label>
+			            <input type="checkbox" id="signing" name="signing" style="height:20px;width:20px" ng-model="employee.signing">
 			        </div>
 			        
 			        <div>
-			            <label for="ownsCats" style="font-size:38px">Owns Cats</label>
-			            <input ng-change="setDetailsToChanged()" type="checkbox" id="ownsCats" name="ownsCats" style="height:20px;width:20px" ng-model="client.ownsCats">
+			            <label for="medPassCertified" class="employeeDetails">Med Pass Certified</label>
+			            <input type="checkbox" id="medPassCertified" name="medPassCertified" style="height:20px;width:20px" ng-model="employee.medPassCertified">
 			        </div>
-			        
-			        <div>
-			            <label for="noMaleStaff" style="font-size:38px">No Male Staff</label>
-			            <input ng-change="setDetailsToChanged()"  type="checkbox" id="noMaleStaff" name="noMaleStaff" style="height:20px;width:20px" ng-model="client.noMaleStaff">
-			        </div>
-			        <div>
-			            <label for="noFemaleStaff" style="font-size:38px">No Female Staff</label>
-			            <input ng-change="setDetailsToChanged()"  type="checkbox" id="noFemaleStaff" name="noFemaleStaff" style="height:20px;width:20px" ng-model="client.noFemaleStaff">
-			        </div>
-			        
-			        <div>
-			            <label for="medPass" style="font-size:38px">Med Pass</label>
-			            <input ng-change="setDetailsToChanged()"  type="checkbox" id="medPass" name="medPass" style="height:20px;width:20px" ng-model="client.medPass">
-			        </div> -->
-			        
-				    <div ng-if="customFieldDataEditing">
+
+	        	    <div ng-if="customFieldDataEditing">
 				        <div ng-repeat="customField in customFields">
 			            	<div ng-init="getEmployeeCustomFieldData(employee,customField,$index)">
-			            		<label for="customField" style="font-size:38px">{{customField.employeeVariable}}</label>
+			            		<label for="customField" class="employeeDetails">{{customField.employeeVariable}}</label>
 			            		<input ng-change="setDetailsToChanged()" type="checkbox" id="customField" name="customField" style="height:20px;width:20px" ng-model="customValue[$index]">
 			            	</div>
 				        </div>
 			        </div>
+        
+			        <div>
+			            <label for="requestsExtraShifts" class="employeeDetails">Requests Extra Shifts</label>
+			            <input type="checkbox" id="requestsExtraShifts" name="requestsExtraShifts" style="height:20px;width:20px" ng-model="employee.requestsExtraShifts">
+			        </div>
+			        
+			        <div>
+			            <label for="offAlternateWeekends" class="employeeDetails">Off Alternate Weekends</label>
+			            <input type="checkbox" id="offAlternateWeekends" name="offAlternateWeekends" style="height:20px;width:20px" ng-model="employee.offAlternateWeekends">
+			        </div>
+			        
+			        <div>
+			            <label for="fixedSchedule" class="employeeDetails">Fixed Schedule</label>
+			            <input type="checkbox" id="fixedSchedule" name="fixedSchedule" style="height:20px;width:20px" ng-model="employee.fixedSchedule">
+			        </div>
+			        
+					<div>
+			            <label for="inactive" class="employeeDetails">Inactive</label>
+			            <input type="checkbox" id="inactive" name="inactive" style="height:20px;width:20px" ng-model="employee.inactive">
+			        </div>
+			    
+			    	<div>
+			           <label for="startDate" class="employeeDetails">Hire Date</label>
+			           <input type="date" ng-model="employee.hireDate" placeholder="Date"/>
+			        </div>
+			            
+					<div>
+			            <label for="minHours" class="employeeDetails">Minimum Requested Hours</label>
+			            <input type="text" id="minHours" name="minHours"  size="15" ng-model="employee.minHours">
+			        </div>
+			        
+			        <div>
+			            <label for="maxHours" class="employeeDetails">Maximum Requested Hours</label>
+			            <input type="text" id="maxHours" name="maxHours" size="15" ng-model="employee.maxHours">
+			        </div>
+        
        			    <div style="float:right" class="rightAlign">
 					    <button ng-if="isEmployeeChangeValid(employee)"  class="rightAlign inline okEmployeeButton" ng-click="ok()" >OK</button>
 					    <button ng-if="isEmployeeChangeValid(employee)" class="rightAlign  inline cancelEmployeeButton" style="margin-left:10px" ng-click="cancel()">Cancel</button>
