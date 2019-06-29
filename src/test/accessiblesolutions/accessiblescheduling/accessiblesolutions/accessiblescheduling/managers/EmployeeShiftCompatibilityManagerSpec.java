@@ -4662,8 +4662,9 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	    employee.setFridaysAvailability(daysAvailability);
 	    employee.setSaturdaysAvailability(daysAvailability);
 	    employee.setDaysAvailable(availability);
-		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
-		
+	    employee.setId("alwaysOnEmployee");
+		Shift shift = new Shift();
+		ScheduleOptions options = new ScheduleOptions();
 		shift.setStartDate("2018-01-04");
 		shift.setEndDate("2018-01-04");
 		shift.setStartTime("10:00");
@@ -5243,6 +5244,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	    employee.setFridaysAvailability(daysAvailability);
 	    employee.setSaturdaysAvailability(daysAvailability);
 	    employee.setDaysAvailable(availability);
+	    employee.setId("alwaysOnEmployee");
+	    
 		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
 		
 		shift.setStartDate("2018-01-04");

@@ -31,8 +31,8 @@
       			{{employee.first}}
       		</select>
 	        <span ng-click="clearSelectedEmployee()" style="font-size:23px" class="inline red glyphicon glyphicon-ban-circle"></span>      				
-            <input type="text" ng-hide="true" id="staffId" name="staffId" ng-model="shift.staffId" ng-value="shift.staffId=selectedEmployee.id">
-            <input type="text" ng-hide="true" id="staffName" name="staffName" ng-model="shift.staffName" ng-value="shift.staffName=selectedEmployee.first">
+            <input type="text" ng-hide="true" id="staffId" name="staffId" ng-model="shift.staffId" ng-value="shift.staffId=employee.id">
+            <input type="text" ng-hide="true" id="staffName" name="staffName" ng-model="shift.staffName" ng-value="shift.staffName=employee.first">
         </div>
         
 

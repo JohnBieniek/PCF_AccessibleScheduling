@@ -40,9 +40,11 @@ function VacationController($scope, $modal, $http, Employees, Employee,Status) {
     };
 	    
     $scope.removeAbsence=function(selectedEmployee,item){ 
-        var index=selectedEmployee.requestedOff.indexOf(item)
-        selectedEmployee.requestedOff.splice(index,1);     
-        saveEmployee(selectedEmployee);
+    	 if(confirm("Are you sure you want to delete this request?")){
+	        var index=selectedEmployee.requestedOff.indexOf(item)
+	        selectedEmployee.requestedOff.splice(index,1);     
+	        saveEmployee(selectedEmployee);
+	    }
       }
 	    
 	 function saveEmployee(employee) {
