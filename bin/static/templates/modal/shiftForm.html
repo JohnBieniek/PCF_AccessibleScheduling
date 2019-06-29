@@ -34,6 +34,23 @@
             <input type="text" ng-hide="true" id="staffId" name="staffId" ng-model="shift.staffId" ng-value="shift.staffId=selectedEmployee.id">
             <input type="text" ng-hide="true" id="staffName" name="staffName" ng-model="shift.staffName" ng-value="shift.staffName=selectedEmployee.first">
         </div>
+         <div class="form-group has-feedback" ng-class="{'has-warning': recurringShiftNeedForm.staffName.$invalid, 'has-success': recurringShiftNeedForm.staffName.$valid}">
+            <label for="staffName" style="font-size:25px">Staff Name</label>
+            
+            <select name="mySelect" 
+                    id="mySelect"
+                    style="font-size:23px"
+                    ng-change="isValid(shift)"
+                    ng-init = "selectedEmployee"
+                    ng-options="employee.first for employee in employees | orderBy:'first' track by employee.id"
+                    ng-model="selectedEmployee"
+                    ng-value="{{employee.first}}">
+                {{employee.first}}
+            </select>
+                    
+            <input type="text" ng-hide="true" id="staffId" name="staffId" ng-model="shift.staffId" ng-value="shift.staffId=selectedEmployee.id">
+            <input type="text" ng-hide="true" id="staffName" name="staffName" ng-model="shift.staffName" ng-value="shift.staffName=selectedEmployee.first">
+        </div>
         
 
         
