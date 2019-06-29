@@ -60,7 +60,11 @@ function ShiftModalController($scope, $modalInstance, $http, shift, client,clien
         });
     }
     
+
     $scope.ok = function () {
+        console.log("oking shift:"+$scope.shift);
+        console.log("oking employee:"+$scope.employee;
+        console.log("oking selectedEmployee:"+$scope.selectedEmployee);           
         $modalInstance.close($scope.shift);
     };
 
