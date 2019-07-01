@@ -15,30 +15,11 @@
             <span class="glyphicon form-control-feedback" ng-class="{'glyphicon-warning-sign': shiftForm.clientName.$invalid, 'glyphicon-ok': shiftForm.clientName.$valid}"></span>
         </div>
         
-       <div class="inline">
-            <label class = "inline" for="staffName" style="font-size:25px">Staff Name</label>
-            
-            <select  ng-if="showEmployee" 
-            		name="mySelect" 
-            		id="mySelect"
-            		class="inline"
-            		style="font-size:23px"
-            		ng-change="isValid(shift)"
-            		ng-init = "selectedEmployee"
-      				ng-options="employee.first for employee in employees | orderBy:'first' track by employee.id"
-      				ng-model="selectedEmployee"
-      				ng-value="{{employee.first}}">		
-      			{{employee.first}}
-      		</select>
-	        <span ng-click="clearSelectedEmployee()" style="font-size:23px" class="inline red glyphicon glyphicon-ban-circle"></span>      				
-            <input type="text" ng-hide="true" id="staffId" name="staffId" ng-model="shift.staffId" ng-value="shift.staffId=selectedEmployee.id">
-            <input type="text" ng-hide="true" id="staffName" name="staffName" ng-model="shift.staffName" ng-value="shift.staffName=selectedEmployee.first">
-        </div>
          <div class="form-group has-feedback" ng-class="{'has-warning': recurringShiftNeedForm.staffName.$invalid, 'has-success': recurringShiftNeedForm.staffName.$valid}">
-            <label for="staffName" style="font-size:25px">Staff Name</label>
-            
+            <label for="staffName" class="inline" style="font-size:25px">Staff Name</label>
             <select name="mySelect" 
                     id="mySelect"
+                    class="inline"  
                     style="font-size:23px"
                     ng-change="isValid(shift)"
                     ng-init = "selectedEmployee"
@@ -47,7 +28,7 @@
                     ng-value="{{employee.first}}">
                 {{employee.first}}
             </select>
-                    
+            <span ng-click="clearSelectedEmployee()" style="font-size:23px" class="inline red glyphicon glyphicon-ban-circle"></span>                   
             <input type="text" ng-hide="true" id="staffId" name="staffId" ng-model="shift.staffId" ng-value="shift.staffId=selectedEmployee.id">
             <input type="text" ng-hide="true" id="staffName" name="staffName" ng-model="shift.staffName" ng-value="shift.staffName=selectedEmployee.first">
         </div>
