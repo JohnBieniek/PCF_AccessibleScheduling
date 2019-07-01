@@ -3,6 +3,7 @@ angular.module('status', []).
         var status = null;
 
         var success = function (message) {
+            console.log("set status");
             this.status = { isError: false, message: message };
         };
 
@@ -12,6 +13,7 @@ angular.module('status', []).
 
         var clear = function () {
             this.status = null;
+            console.log("cleared status");
         };
 
         return {

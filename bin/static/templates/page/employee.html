@@ -20,17 +20,22 @@
 	   	</div>
 	   	<div ng-if="isEmployeeSet(employee)" style="display:inline-block; vertical-align: top; width:72%;height:82vh">
 			<div style="width:100%;text-align: center;">
-				<div style="display:inline-block" class = "recTab" ng-class="{ active: isSet('Schedule') }">
+				<div style="display:inline-block" class = "employeeRecTab" ng-class="{ active: isSet('Schedule') }">
 			    	<div >
 			       		<p ng-click="setTab('Schedule')">Schedule</p>
 			    	</div>
 		    	</div>
-		    	<div style="display:inline-block;" class = "recTab" ng-class="{ active: isSet('Requests') }">
+		    	<div style="display:inline-block;" class = "employeeRecTab" ng-class="{ active: isSet('Availability') }">
+			    	<div >
+			       		<p ng-click="setTab('Availability')">Availability</p>
+			    	</div>
+		    	</div>
+		    	<div style="display:inline-block;" class = "employeeRecTab" ng-class="{ active: isSet('Requests') }">
 			    	<div >
 			       		<p ng-click="setTab('Requests')">Requests</p>
 			    	</div>
 		    	</div>
-		    	<div style="display:inline-block;" class = "recTab" ng-class="{ active: isSet('Details') }">
+		    	<div style="display:inline-block;" class = "employeeRecTab" ng-class="{ active: isSet('Details') }">
 			    	<div >
 			       		<p ng-click="setTab('Details')">Details</p>
 			    	</div>
@@ -68,6 +73,380 @@
    					</div>
 	    		</div>
 	    	</div>
+	    	<div ng-if="isSet('Availability')" style="width:100%">
+	    		<div>
+	    			<div style="overflow-y:auto;height:80vh;margin-left:25px;">
+   						<!-- <div ng-repeat="day in days">
+				    		<h4 class='weekDay rightAlign'>{{day}}</h4>
+				    		<div ng-repeat="availability in employee.availability">
+				    			<div ng-if="isAvailabilityDay(availability,day)">
+				    				<p>Availability</p>
+								</div>
+							</div>
+						</div> -->
+						<div>
+				            <label for="daysAvailable" style="font-size:30px">Days Available</label>
+				            
+				            <div>
+				            	<label for="sunday" style="font-size:25px">Sunday</label>
+				            	<input type="checkbox" ng-change="setDetailsToChanged()" id="offSun" name="offSun" ng-model="employee.daysAvailable[0]">
+				            	<button ng-if="employee.daysAvailable[0]" ng-click="toggleAvailabilityFor(0,false)">Clear</button>
+								<button ng-if="employee.daysAvailable[0]" ng-click="toggleAvailabilityFor(0,true)">Fill</button>
+				            </div>
+				            <div ng-if="employee.daysAvailable[0]">        
+					            <div>
+					            	<span style="padding-left: 1.2em">12-1</span>
+					            	<span style="padding-left: .7em">1-2</span>
+									<span style="padding-left: .7em">2-3</span>
+									<span style="padding-left: .7em">3-4</span>
+									<span style="padding-left: .7em">4-5</span>
+									<span style="padding-left: .7em">5-6</span>
+									<span style="padding-left: .7em">6-7</span>
+									<span style="padding-left: .7em">7-8</span>
+									<span style="padding-left: .7em">8-9</span>
+									<span style="padding-left: .6em">9-10</span>
+									<span>10-11</span>
+									<span>11-12</span>		            	
+					            </div>           
+					            AM:
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.sundaysAvailability[0]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.sundaysAvailability[1]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.sundaysAvailability[2]"></label>
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.sundaysAvailability[3]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.sundaysAvailability[4]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.sundaysAvailability[5]"></label>
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.sundaysAvailability[6]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.sundaysAvailability[7]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.sundaysAvailability[8]"></label>
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.sundaysAvailability[9]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.sundaysAvailability[10]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.sundaysAvailability[11]"></label>       
+					            <div></div> 
+					            PM:
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.sundaysAvailability[12]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.sundaysAvailability[13]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.sundaysAvailability[14]"></label>
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.sundaysAvailability[15]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.sundaysAvailability[16]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.sundaysAvailability[17]"></label>
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.sundaysAvailability[18]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.sundaysAvailability[19]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.sundaysAvailability[20]"></label>
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.sundaysAvailability[21]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.sundaysAvailability[22]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.sundaysAvailability[23]"></label>    
+				            </div>
+				            <div ng-if="employee.daysAvailable[0]"></br></div>
+				            <div>
+								<label for="monday" style="font-size:25px">Monday</label>
+								<input type="checkbox" ng-change="setDetailsToChanged()" id="offMon" name="offMon" ng-model="employee.daysAvailable[1]">
+								<button ng-if="employee.daysAvailable[1]" ng-click="toggleAvailabilityFor(1,false)">Clear</button>
+								<button ng-if="employee.daysAvailable[1]" ng-click="toggleAvailabilityFor(1,true)">Fill</button>
+							</div>
+				            <div ng-if="employee.daysAvailable[1]">      	
+					            <div>
+					            	<span style="padding-left: 1.2em">12-1</span>
+					            	<span style="padding-left: .7em">1-2</span>
+									<span style="padding-left: .7em">2-3</span>
+									<span style="padding-left: .7em">3-4</span>
+									<span style="padding-left: .7em">4-5</span>
+									<span style="padding-left: .7em">5-6</span>
+									<span style="padding-left: .7em">6-7</span>
+									<span style="padding-left: .7em">7-8</span>
+									<span style="padding-left: .7em">8-9</span>
+									<span style="padding-left: .6em">9-10</span>
+									<span>10-11</span>
+									<span>11-12</span>		            	
+					            </div>           
+					            AM:
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.mondaysAvailability[0]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.mondaysAvailability[1]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.mondaysAvailability[2]"></label>
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.mondaysAvailability[3]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.mondaysAvailability[4]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.mondaysAvailability[5]"></label>
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.mondaysAvailability[6]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.mondaysAvailability[7]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.mondaysAvailability[8]"></label>
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.mondaysAvailability[9]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.mondaysAvailability[10]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.mondaysAvailability[11]"></label>       
+					            <div></div> 
+					            PM:
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.mondaysAvailability[12]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.mondaysAvailability[13]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.mondaysAvailability[14]"></label>
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.mondaysAvailability[15]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.mondaysAvailability[16]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.mondaysAvailability[17]"></label>
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.mondaysAvailability[18]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.mondaysAvailability[19]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.mondaysAvailability[20]"></label>
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.mondaysAvailability[21]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.mondaysAvailability[22]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.mondaysAvailability[23]"></label>    
+				            </div>
+				            <div ng-if="employee.daysAvailable[1]"></br></div>
+				            <div>
+								<label for="tuesday" style="font-size:25px">Tuesday</label>
+								<input type="checkbox" ng-change="setDetailsToChanged()" id="offTues" name="offTues" ng-model="employee.daysAvailable[2]">
+								<button ng-if="employee.daysAvailable[2]" ng-click="toggleAvailabilityFor(2,false)">Clear</button>
+								<button ng-if="employee.daysAvailable[2]" ng-click="toggleAvailabilityFor(2,true)">Fill</button>
+							</div>
+				            <div ng-if="employee.daysAvailable[2]">      	
+					            <div>
+					            	<span style="padding-left: 1.2em">12-1</span>
+					            	<span style="padding-left: .7em">1-2</span>
+									<span style="padding-left: .7em">2-3</span>
+									<span style="padding-left: .7em">3-4</span>
+									<span style="padding-left: .7em">4-5</span>
+									<span style="padding-left: .7em">5-6</span>
+									<span style="padding-left: .7em">6-7</span>
+									<span style="padding-left: .7em">7-8</span>
+									<span style="padding-left: .7em">8-9</span>
+									<span style="padding-left: .6em">9-10</span>
+									<span>10-11</span>
+									<span>11-12</span>		            	
+					            </div>           
+					            AM:
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.tuesdaysAvailability[0]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.tuesdaysAvailability[1]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.tuesdaysAvailability[2]"></label>
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.tuesdaysAvailability[3]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.tuesdaysAvailability[4]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.tuesdaysAvailability[5]"></label>
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.tuesdaysAvailability[6]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.tuesdaysAvailability[7]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.tuesdaysAvailability[8]"></label>
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.tuesdaysAvailability[9]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.tuesdaysAvailability[10]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.tuesdaysAvailability[11]"></label>       
+					            <div></div> 
+					            PM:
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.tuesdaysAvailability[12]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.tuesdaysAvailability[13]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.tuesdaysAvailability[14]"></label>
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.tuesdaysAvailability[15]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.tuesdaysAvailability[16]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.tuesdaysAvailability[17]"></label>
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.tuesdaysAvailability[18]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.tuesdaysAvailability[19]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.tuesdaysAvailability[20]"></label>
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.tuesdaysAvailability[21]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.tuesdaysAvailability[22]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.tuesdaysAvailability[23]"></label>    
+				            </div>
+				            <div ng-if="employee.daysAvailable[2]"></br></div>
+				            <div>
+								<label for="wednesday" style="font-size:25px">Wednesday</label>
+								<input type="checkbox" ng-change="setDetailsToChanged()" id="offWed" name="offWed" ng-model="employee.daysAvailable[3]">
+								<button ng-if="employee.daysAvailable[3]" ng-click="toggleAvailabilityFor(3,false)">Clear</button>
+								<button ng-if="employee.daysAvailable[3]" ng-click="toggleAvailabilityFor(3,true)">Fill</button>
+							</div>
+				            <div ng-if="employee.daysAvailable[3]">      	
+					            <div>
+					            	<span style="padding-left: 1.2em">12-1</span>
+					            	<span style="padding-left: .7em">1-2</span>
+									<span style="padding-left: .7em">2-3</span>
+									<span style="padding-left: .7em">3-4</span>
+									<span style="padding-left: .7em">4-5</span>
+									<span style="padding-left: .7em">5-6</span>
+									<span style="padding-left: .7em">6-7</span>
+									<span style="padding-left: .7em">7-8</span>
+									<span style="padding-left: .7em">8-9</span>
+									<span style="padding-left: .6em">9-10</span>
+									<span>10-11</span>
+									<span>11-12</span>		            	
+					            </div>           
+					            AM:
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.wednesdaysAvailability[0]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.wednesdaysAvailability[1]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.wednesdaysAvailability[2]"></label>
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.wednesdaysAvailability[3]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.wednesdaysAvailability[4]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.wednesdaysAvailability[5]"></label>
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.wednesdaysAvailability[6]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.wednesdaysAvailability[7]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.wednesdaysAvailability[8]"></label>
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.wednesdaysAvailability[9]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.wednesdaysAvailability[10]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.wednesdaysAvailability[11]"></label>       
+					            <div></div> 
+					            PM:
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.wednesdaysAvailability[12]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.wednesdaysAvailability[13]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.wednesdaysAvailability[14]"></label>
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.wednesdaysAvailability[15]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.wednesdaysAvailability[16]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.wednesdaysAvailability[17]"></label>
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.wednesdaysAvailability[18]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.wednesdaysAvailability[19]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.wednesdaysAvailability[20]"></label>
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.wednesdaysAvailability[21]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.wednesdaysAvailability[22]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.wednesdaysAvailability[23]"></label>    
+				            </div>
+				            <div ng-if="employee.daysAvailable[3]"></br></div>
+				            <div>
+								<label for="thursday" style="font-size:25px">Thursday</label>
+								<input type="checkbox" ng-change="setDetailsToChanged()" id="offThurs" name="offThurs" ng-model="employee.daysAvailable[4]">
+								<button ng-if="employee.daysAvailable[4]" ng-click="toggleAvailabilityFor(4,false)">Clear</button>
+								<button ng-if="employee.daysAvailable[4]" ng-click="toggleAvailabilityFor(4,true)">Fill</button>
+							</div>
+				            <div ng-if="employee.daysAvailable[4]">      	
+					            <div>
+					            	<span style="padding-left: 1.2em">12-1</span>
+					            	<span style="padding-left: .7em">1-2</span>
+									<span style="padding-left: .7em">2-3</span>
+									<span style="padding-left: .7em">3-4</span>
+									<span style="padding-left: .7em">4-5</span>
+									<span style="padding-left: .7em">5-6</span>
+									<span style="padding-left: .7em">6-7</span>
+									<span style="padding-left: .7em">7-8</span>
+									<span style="padding-left: .7em">8-9</span>
+									<span style="padding-left: .6em">9-10</span>
+									<span>10-11</span>
+									<span>11-12</span>		            	
+					            </div>           
+					            AM:
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.thursdaysAvailability[0]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.thursdaysAvailability[1]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.thursdaysAvailability[2]"></label>
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.thursdaysAvailability[3]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.thursdaysAvailability[4]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.thursdaysAvailability[5]"></label>
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.thursdaysAvailability[6]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.thursdaysAvailability[7]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.thursdaysAvailability[8]"></label>
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.thursdaysAvailability[9]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.thursdaysAvailability[10]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.thursdaysAvailability[11]"></label>       
+					            <div></div> 
+					            PM:
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.thursdaysAvailability[12]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.thursdaysAvailability[13]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.thursdaysAvailability[14]"></label>
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.thursdaysAvailability[15]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.thursdaysAvailability[16]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.thursdaysAvailability[17]"></label>
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.thursdaysAvailability[18]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.thursdaysAvailability[19]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.thursdaysAvailability[20]"></label>
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.thursdaysAvailability[21]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.thursdaysAvailability[22]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.thursdaysAvailability[23]"></label>    
+				            </div>
+				            <div ng-if="employee.daysAvailable[4]"></br></div>
+							<div>
+								<label for="friday" style="font-size:25px">Friday</label>
+								<input type="checkbox" ng-change="setDetailsToChanged()" id="offFri" name="offFri" ng-model="employee.daysAvailable[5]">
+								<button ng-if="employee.daysAvailable[5]" ng-click="toggleAvailabilityFor(5,false)">Clear</button>
+								<button ng-if="employee.daysAvailable[5]" ng-click="toggleAvailabilityFor(5,true)">Fill</button>
+							</div>
+				            <div ng-if="employee.daysAvailable[5]">      	
+					            <div>
+					            	<span style="padding-left: 1.2em">12-1</span>
+					            	<span style="padding-left: .7em">1-2</span>
+									<span style="padding-left: .7em">2-3</span>
+									<span style="padding-left: .7em">3-4</span>
+									<span style="padding-left: .7em">4-5</span>
+									<span style="padding-left: .7em">5-6</span>
+									<span style="padding-left: .7em">6-7</span>
+									<span style="padding-left: .7em">7-8</span>
+									<span style="padding-left: .7em">8-9</span>
+									<span style="padding-left: .6em">9-10</span>
+									<span>10-11</span>
+									<span>11-12</span>		            	
+					            </div>           
+					            AM:
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.fridaysAvailability[0]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.fridaysAvailability[1]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.fridaysAvailability[2]"></label>
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.fridaysAvailability[3]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.fridaysAvailability[4]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.fridaysAvailability[5]"></label>
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.fridaysAvailability[6]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.fridaysAvailability[7]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.fridaysAvailability[8]"></label>
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.fridaysAvailability[9]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.fridaysAvailability[10]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.fridaysAvailability[11]"></label>       
+					            <div></div> 
+					            PM:
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.fridaysAvailability[12]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.fridaysAvailability[13]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.fridaysAvailability[14]"></label>
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.fridaysAvailability[15]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.fridaysAvailability[16]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.fridaysAvailability[17]"></label>
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.fridaysAvailability[18]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.fridaysAvailability[19]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.fridaysAvailability[20]"></label>
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.fridaysAvailability[21]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.fridaysAvailability[22]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.fridaysAvailability[23]"></label>    
+				            </div>
+				            <div ng-if="employee.daysAvailable[5]"></br></div>
+				            <div>
+								<label for="saturday" style="font-size:25px">Saturday</label>
+								<input type="checkbox" ng-change="setDetailsToChanged()" id="offSat" name="offSat" ng-model="employee.daysAvailable[6]">
+								<button ng-if="employee.daysAvailable[6]" ng-click="toggleAvailabilityFor(6,false)">Clear</button>
+								<button ng-if="employee.daysAvailable[6]" ng-click="toggleAvailabilityFor(6,true)">Fill</button>
+							</div>
+				            <div ng-if="employee.daysAvailable[6]">      	
+					            <div>
+					            	<span style="padding-left: 1.2em">12-1</span>
+					            	<span style="padding-left: .7em">1-2</span>
+									<span style="padding-left: .7em">2-3</span>
+									<span style="padding-left: .7em">3-4</span>
+									<span style="padding-left: .7em">4-5</span>
+									<span style="padding-left: .7em">5-6</span>
+									<span style="padding-left: .7em">6-7</span>
+									<span style="padding-left: .7em">7-8</span>
+									<span style="padding-left: .7em">8-9</span>
+									<span style="padding-left: .6em">9-10</span>
+									<span>10-11</span>
+									<span>11-12</span>		            	
+					            </div>           
+					            AM:
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.saturdaysAvailability[0]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.saturdaysAvailability[1]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.saturdaysAvailability[2]"></label>
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.saturdaysAvailability[3]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.saturdaysAvailability[4]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.saturdaysAvailability[5]"></label>
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.saturdaysAvailability[6]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.saturdaysAvailability[7]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.saturdaysAvailability[8]"></label>
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.saturdaysAvailability[9]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.saturdaysAvailability[10]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.saturdaysAvailability[11]"></label>       
+					            <div></div> 
+					            PM:
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.saturdaysAvailability[12]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.saturdaysAvailability[13]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.saturdaysAvailability[14]"></label>
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.saturdaysAvailability[15]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.saturdaysAvailability[16]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.saturdaysAvailability[17]"></label>
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.saturdaysAvailability[18]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.saturdaysAvailability[19]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.saturdaysAvailability[20]"></label>
+					            <label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.saturdaysAvailability[21]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.saturdaysAvailability[22]"></label>
+								<label class="checkbox-inline"><input type="checkbox" ng-change="setDetailsToChanged()" ng-model="employee.saturdaysAvailability[23]"></label>    
+				            </div>
+				            <span class="glyphicon form-control-feedback"></span>
+				            <br>
+				            <div style="float:right" class="rightAlign">
+							    <button ng-if="isEmployeeChangeValid(employee)"  class="rightAlign inline okEmployeeButton" ng-click="ok()" >OK</button>
+							    <button ng-if="isEmployeeChangeValid(employee)" class="rightAlign  inline cancelEmployeeButton" style="margin-left:10px" ng-click="cancel()">Cancel</button>
+						    </div>
+				        </div>
+   					</div>
+	    		</div>
+	    	</div>
+
 	    	<div overflow-y:auto; ng-if="isSet('Requests')">
 	    		<div style="width:90%;margin-left:5%" ng-controller="VacationController"  ng-init="listEmployees()">
 				  
@@ -103,7 +482,7 @@
 				</div>
 	    	</div>
 	    	<div ng-if="isSet('Details')" class = 'rightAlign'>
-	    		<form name="employeeForm" ng-init="listCustomFields()" role="form" style="overflow-y:auto;height:80vh;margin-right:3%">
+	    		<form name="employeeForm" ng-init="listCustomFields()" role="form" style="overflow-y:auto;height:80vh;margin-right:8%">
 			        <div>
 			            <label for="first" class="inline employeeDetails" >First</label>
 			            <input ng-change="setDetailsToChanged()" type="text" class="form-control inline input-large rightAlign nameInput" id="first" name="first" required ng-model="employee.first">
@@ -111,7 +490,7 @@
 			        
 			        <div>
 			            <label for="initial" class="inline employeeDetails">Initial</label>
-			            <input ng-change="setDetailsToChanged()" type="text" class="inline form-control input-large rightAlign nameInput" id="initial" name="initial" required ng-model="employee.initial">
+			            <input ng-change="setDetailsToChanged()" type="text" class="inline form-control input-large rightAlign nameInput" id="initial" name="initial"  ng-model="employee.initial">
 			        </div>
 			    
 				     <div>
@@ -120,32 +499,32 @@
 			        	</div>
 				        <div style="display:inline-block">
 				        	<label for="female" style="font-size:20px">Female</label>
-				        	<input type="radio"  name="gender" value="female" style="height:21px;width:21px" ng-model="employee.gender"/>
+				        	<input ng-change="setDetailsToChanged()" type="radio"  name="gender" value="female" style="height:21px;width:21px" ng-model="employee.gender"/>
 				        </div>
 				        <div style="display:inline-block">
 				        	<label for="male" style="font-size:20px">Male</label>
-				        	<input type="radio"  class="input-large" name="gender" style="height:21px;width:21px" value="male" ng-model="employee.gender" />
+				        	<input ng-change="setDetailsToChanged()" type="radio"  class="input-large" name="gender" style="height:21px;width:21px" value="male" ng-model="employee.gender" />
 				        </div>
 				    </div>
 				    
 			        <div>
 			            <label class="employeeDetails">No Cats</label>
-			            <input type="checkbox" id="noCats" name="noCats"  style="height:20px;width:20px" ng-model="employee.noCats">
+			            <input ng-change="setDetailsToChanged()" type="checkbox" id="noCats" name="noCats"  style="height:20px;width:20px" ng-model="employee.noCats">
 			        </div>
 			        
 			        <div>
 			            <label for="smoker" class="employeeDetails">Smoker</label>
-			            <input type="checkbox" id="smoker" name="smoker"  style="height:20px;width:20px"  ng-model="employee.smoker">
+			            <input ng-change="setDetailsToChanged()" type="checkbox" id="smoker" name="smoker"  style="height:20px;width:20px"  ng-model="employee.smoker">
 			        </div>
 			        
 			        <div>
 			            <label for="signing" class="employeeDetails">Signing</label>
-			            <input type="checkbox" id="signing" name="signing" style="height:20px;width:20px" ng-model="employee.signing">
+			            <input ng-change="setDetailsToChanged()" type="checkbox" id="signing" name="signing" style="height:20px;width:20px" ng-model="employee.signing">
 			        </div>
 			        
 			        <div>
 			            <label for="medPassCertified" class="employeeDetails">Med Pass Certified</label>
-			            <input type="checkbox" id="medPassCertified" name="medPassCertified" style="height:20px;width:20px" ng-model="employee.medPassCertified">
+			            <input ng-change="setDetailsToChanged()" type="checkbox" id="medPassCertified" name="medPassCertified" style="height:20px;width:20px" ng-model="employee.medPassCertified">
 			        </div>
 
 	        	    <div ng-if="customFieldDataEditing">
@@ -159,37 +538,37 @@
         
 			        <div>
 			            <label for="requestsExtraShifts" class="employeeDetails">Requests Extra Shifts</label>
-			            <input type="checkbox" id="requestsExtraShifts" name="requestsExtraShifts" style="height:20px;width:20px" ng-model="employee.requestsExtraShifts">
+			            <input ng-change="setDetailsToChanged()" type="checkbox" id="requestsExtraShifts" name="requestsExtraShifts" style="height:20px;width:20px" ng-model="employee.requestsExtraShifts">
 			        </div>
 			        
 			        <div>
 			            <label for="offAlternateWeekends" class="employeeDetails">Off Alternate Weekends</label>
-			            <input type="checkbox" id="offAlternateWeekends" name="offAlternateWeekends" style="height:20px;width:20px" ng-model="employee.offAlternateWeekends">
+			            <input ng-change="setDetailsToChanged()" type="checkbox" id="offAlternateWeekends" name="offAlternateWeekends" style="height:20px;width:20px" ng-model="employee.offAlternateWeekends">
 			        </div>
 			        
 			        <div>
 			            <label for="fixedSchedule" class="employeeDetails">Fixed Schedule</label>
-			            <input type="checkbox" id="fixedSchedule" name="fixedSchedule" style="height:20px;width:20px" ng-model="employee.fixedSchedule">
+			            <input ng-change="setDetailsToChanged()" type="checkbox" id="fixedSchedule" name="fixedSchedule" style="height:20px;width:20px" ng-model="employee.fixedSchedule">
 			        </div>
 			        
 					<div>
 			            <label for="inactive" class="employeeDetails">Inactive</label>
-			            <input type="checkbox" id="inactive" name="inactive" style="height:20px;width:20px" ng-model="employee.inactive">
+			            <input ng-change="setDetailsToChanged()" type="checkbox" id="inactive" name="inactive" style="height:20px;width:20px" ng-model="employee.inactive">
 			        </div>
 			    
 			    	<div>
 			           <label for="startDate" class="employeeDetails">Hire Date</label>
-			           <input type="date" ng-model="employee.hireDate" placeholder="Date"/>
+			           <input ng-change="setDetailsToChanged()" type="date" ng-model="employee.hireDate" placeholder="Date"/>
 			        </div>
 			            
 					<div>
 			            <label for="minHours" class="employeeDetails">Minimum Requested Hours</label>
-			            <input type="text" id="minHours" name="minHours"  size="15" ng-model="employee.minHours">
+			            <input ng-change="setDetailsToChanged()" type="text" id="minHours" name="minHours"  size="15" ng-model="employee.minHours">
 			        </div>
 			        
 			        <div>
 			            <label for="maxHours" class="employeeDetails">Maximum Requested Hours</label>
-			            <input type="text" id="maxHours" name="maxHours" size="15" ng-model="employee.maxHours">
+			            <input ng-change="setDetailsToChanged()" type="text" id="maxHours" name="maxHours" size="15" ng-model="employee.maxHours">
 			        </div>
         
        			    <div style="float:right" class="rightAlign">
