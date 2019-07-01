@@ -16,7 +16,7 @@ import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
 
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Employee {
+public class Employee implements Comparable{
 	@Id
 	@Column(length = 40)
 	@GeneratedValue(generator = "randomId")
@@ -89,6 +89,13 @@ public class Employee {
 		thursdaysAvailability = new boolean[24];
 		fridaysAvailability = new boolean[24];
 		saturdaysAvailability = new boolean[24];
+	}
+	
+	@Override
+	public int compareTo(Object arg0) {
+		Employee employee = (Employee)arg0;
+		
+		return getFirst().toLowerCase().compareTo(employee.getFirst().toLowerCase());
 	}
 
 	public int cleanDuplicateVacationDays() {

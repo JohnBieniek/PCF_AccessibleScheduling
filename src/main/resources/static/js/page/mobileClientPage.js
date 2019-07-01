@@ -89,7 +89,7 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
         });
     }
 	$scope.setClient = function(newClient){
-		if($scope.client == null || $scope.client== undefined || $scope.client.id !==newClient.id){
+//		if($scope.client == null || $scope.client== undefined || $scope.client.id !==newClient.id){
 		  $scope.detailsChanged=false;
 	      $scope.client = newClient;
 	      $scope.listRequests(newClient);
@@ -101,7 +101,7 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
 			      $scope.getClientCustomFieldData($scope.client,$scope.customFields[index],index);
 		      }
 	      }
-		}
+//		}
 	}
 	 $scope.listCustomFields = function listCustomFields() {
          $scope.customFields = CustomFields.query();
@@ -248,7 +248,7 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
     };
     
     $scope.isClientSet = function(client){
-        return $scope.client === client && client !==null;
+        return client !==null && $scope.client !==null && client !==undefined && $scope.client !==undefined && $scope.client.id === client.id;
       };
       
       $scope.isClientChangeValid = function(client){
@@ -806,7 +806,7 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
         .then(function(response) {
         	if(response.data){
                 Status.success("Client saved");
-        		$scope.client = response.data;
+        		//$scope.client = response.data;
             	$scope.detailsChanged=false;
         	}
         	else{
@@ -878,7 +878,7 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
         .then(function(response) {
         	$scope.detailsChanged=false;
         	if(response.data){
-        		$scope.client = response.data;
+        		$scope.setClient(response.data);
         	}
         });
     };

@@ -1,6 +1,8 @@
 package org.cloudfoundry.samples.music.web;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 
 import javax.validation.Valid;
 
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import accessiblesolutions.accessiblescheduling.domain.Client;
 import accessiblesolutions.accessiblescheduling.domain.Employee;
 
 @RestController
@@ -35,7 +38,9 @@ public class EmployeeController {
     
     @RequestMapping(method = RequestMethod.GET)
     public Iterable<Employee> employees() {
-        return repository.findAll();
+    	List<Employee> employees = (List<Employee>) repository.findAll();
+        Collections.sort(employees);
+		return employees;
     }
 
     @RequestMapping(method = RequestMethod.PUT)

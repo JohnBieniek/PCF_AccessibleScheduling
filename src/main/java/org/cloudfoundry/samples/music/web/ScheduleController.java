@@ -12,6 +12,7 @@ import org.cloudfoundry.samples.music.managers.ShiftGenerationManager;
 import org.cloudfoundry.samples.music.managers.ShiftManager;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoClientRepository;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoClientRequestRepository;
+import org.cloudfoundry.samples.music.repositories.mongodb.MongoEmployeeRepository;
 import org.cloudfoundry.samples.music.repositories.mongodb.ScheduleStatusRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.core.JsonParseException;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import accessiblesolutions.accessiblescheduling.domain.Client;
 import accessiblesolutions.accessiblescheduling.domain.ClientRequest;
+import accessiblesolutions.accessiblescheduling.domain.Employee;
 import accessiblesolutions.accessiblescheduling.domain.ScheduleStatus;
 import accessiblesolutions.accessiblescheduling.domain.Shift;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
@@ -64,21 +66,39 @@ public class ScheduleController {
     private MongoClientRepository clientRepository;
     
     @Autowired
+    private MongoEmployeeRepository employeeRepository;
+    
+    @Autowired
     public ScheduleController(ScheduleManager manager) {
         this.manager=manager;
     }
     
-    
     @RequestMapping(value = "/clientShiftsForWeek",method = RequestMethod.GET)
     public Iterable<Shift> clientShiftsForWeek(@RequestParam String clientId, @RequestParam String month, @RequestParam String day, @RequestParam String year) {
     	return manager.getClientShiftsForWeek(clientId,month,day,year);
+    }
+     
+    @RequestMapping(value = "/employeeShiftsForWeek",method = RequestMethod.GET)
+    public Iterable<Shift> employeeShiftsForWeek(@RequestParam String employeeId, @RequestParam String month, @RequestParam String day, @RequestParam String year) {
+    	return manager.getEmployeeShiftsForWeek(employeeId,month,day,year);
     }
     
 //    @RequestMapping(value = "/currentWeek",method = RequestMethod.GET)
 //    public String currentWeek() {
 //    	return manager.getCurrentWeek();
 //    }
-    
+    @RequestMapping(value = "/createEmployee",method = RequestMethod.POST)
+    public Iterable<Employee> createEmployee() {
+    	Employee employee =new Employee();
+    	
+    	employee.setFirst("An employee");
+    	
+    	employeeRepository.save(employee);
+
+        List<Employee> employees = employeeRepository.findAll();
+        Collections.sort(employees);
+		return employees;
+    }    
     @RequestMapping(value = "/createClient",method = RequestMethod.POST)
     public Iterable<Client> createClient() {
     	Client client =new Client();
@@ -91,7 +111,26 @@ public class ScheduleController {
         Collections.sort(clients);
 		return clients;
     }
-    
+
+    @RequestMapping(value = "/updateEmployee",method = RequestMethod.POST)
+    public Employee updateEmployee(@RequestParam String param) {
+    	Employee employee =null;
+
+    	ObjectMapper mapper = new ObjectMapper();
+    	
+    	try {
+			employee = mapper.readValue(param, Employee.class);
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+    	employeeRepository.save(employee);
+        
+        return employeeRepository.findOne(employee.getId());
+    }
     @RequestMapping(value = "/updateClient",method = RequestMethod.POST)
     public Client updateClient(@RequestParam String param) {
     	Client client =null;

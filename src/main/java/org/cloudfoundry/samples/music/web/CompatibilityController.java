@@ -646,6 +646,74 @@ public class CompatibilityController {
     	return dto;
     }
     
+    @RequestMapping(method = RequestMethod.POST, value= "/employeeCustomFieldData")
+    public @ResponseBody UpdateTO getEmployeeCustomFieldData(HttpServletRequest request) throws ProccessingException, CorruptDataException{
+    	Employee employee =null;
+    	CustomField customField =null;
+    	int index = 0;
+    	String param1= request.getParameter("employee");
+    	String param2= request.getParameter("customField");
+    	String param3= request.getParameter("index");
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+    	
+    	try {
+			employee = mapper.readValue(param1, Employee.class);
+			customField = mapper.readValue(param2, CustomField.class);
+			index = mapper.readValue(param3, Integer.class);
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+    	UpdateTO dto = new UpdateTO();
+    	
+    	if(employee!=null){
+    		dto.setId(employee.getId());
+    	}
+    	
+    	dto.setBooleanResponse(customDataManager.getCustomFieldDatasValueOrCreateIfMissing(employee,customField));
+    	dto.setNumericResponse(index);
+    	return dto;
+    }
+    
+    @RequestMapping(method = RequestMethod.POST, value= "/setEmployeeCustomFieldData")
+    public @ResponseBody UpdateTO setEmployeeCustomFieldData(HttpServletRequest request) throws ProccessingException, CorruptDataException{
+    	Employee employee =null;
+    	CustomField customField =null;
+    	boolean value = true;
+    	String param1= request.getParameter("employee");
+    	String param2= request.getParameter("customField");
+    	String param3= request.getParameter("value");
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    	try {
+			employee = mapper.readValue(param1, Employee.class);
+			customField = mapper.readValue(param2, CustomField.class);
+			value = mapper.readValue(param3, Boolean.class);
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+    	UpdateTO dto = new UpdateTO();
+    	
+    	if(employee!=null){
+    		customDataManager.setCustomFieldData(employee,customField,value);
+    		dto.setId(employee.getId());
+        	dto.setBooleanResponse(true);
+    	}
+    	
+
+    	return dto;
+    }
+    
     @RequestMapping(method = RequestMethod.POST, value= "/setCustomFieldData")
     public @ResponseBody UpdateTO setCustomFieldData(HttpServletRequest request) throws ProccessingException, CorruptDataException{
     	Employee employee =null;
