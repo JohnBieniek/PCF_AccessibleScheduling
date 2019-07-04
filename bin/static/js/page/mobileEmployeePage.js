@@ -239,9 +239,8 @@ function MobileEmployeeController($scope, $modal, $http, Clients, Client,Shifts,
         shift.displayValue = (startHour!=0?startHour:"12")+":"+startMinute+startModifier+"-";
         shift.displayValue += (endHour!=0?endHour:"12")+":"+endMinute+endModifier;
 		 
-		 if(shift.staffName!=null){
-			 shift.displayValue+=" with "+shift.staffName;
-		 }
+			 shift.displayValue+=" with "+shift.clientName;
+		 
 		 shift.displayValue+= ".";
      }
      

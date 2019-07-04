@@ -52,7 +52,7 @@ public class EmployeeController {
     @RequestMapping(method = RequestMethod.POST)
     public Employee update(@RequestBody @Valid Employee employee) {
         logger.info("Updating employee " + employee.getId());
-
+        employee.fixInvalidAvailability();
         return repository.save(employee);
     }
 

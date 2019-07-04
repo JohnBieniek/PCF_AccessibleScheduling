@@ -1,6 +1,8 @@
 package accessiblesolutions.accessiblescheduling.domain;
 
 import java.time.DayOfWeek;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 
 import javax.persistence.Column;
@@ -8,6 +10,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONObject;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -17,6 +21,30 @@ import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Employee implements Comparable{
+	public String[] getStartTimes() {
+		return startTimes;
+	}
+
+	public void setStartTimes(String[] startTimes) {
+		this.startTimes = startTimes;
+	}
+
+	public String[] getEndTimes() {
+		return endTimes;
+	}
+
+	public void setEndTimes(String[] endTimes) {
+		this.endTimes = endTimes;
+	}
+
+	public String[] getDays() {
+		return days;
+	}
+
+	public void setDays(String[] days) {
+		this.days = days;
+	}
+
 	@Id
 	@Column(length = 40)
 	@GeneratedValue(generator = "randomId")
@@ -45,7 +73,10 @@ public class Employee implements Comparable{
 	private int maxHours;
 
 	private String[] requestedOff;
-
+	private Object[] availability;
+	private String[] startTimes;
+	private String[] endTimes;
+	private String[] days;
 	private boolean[] daysAvailable;
 	private boolean[] sundaysAvailability;
 	private boolean[] mondaysAvailability;
@@ -57,6 +88,10 @@ public class Employee implements Comparable{
 
 	public Employee() {
 		requestedOff = new String[0];
+		availability = new Object[0];//new JSONObject();
+		startTimes = new String[0];
+		endTimes = new String[0];
+		days = new String[0];
 		gender = Gender.FEMALE;
 		minHours = 1;
 		maxHours = 40;
@@ -74,6 +109,10 @@ public class Employee implements Comparable{
 
 	public Employee(String first, String initial) {
 		requestedOff = new String[0];
+		availability = new Object[0];
+		startTimes = new String[0];
+		endTimes = new String[0];
+		days = new String[0];
 		gender = Gender.FEMALE;
 		minHours = 1;
 		maxHours = 40;
@@ -90,7 +129,18 @@ public class Employee implements Comparable{
 		fridaysAvailability = new boolean[24];
 		saturdaysAvailability = new boolean[24];
 	}
-	
+	public void fixInvalidAvailability() {
+		for(int index=0; index< startTimes.length;index++) {
+			LocalTime start = LocalTime.of(Integer.parseInt(startTimes[index].split(":")[0]), Integer.parseInt(startTimes[index].split(":")[1]));
+			LocalTime end = LocalTime.of(Integer.parseInt(endTimes[index].split(":")[0]), Integer.parseInt(endTimes[index].split(":")[1]));
+			if(start.isAfter(end)) {
+				startTimes[index]=endTimes[index];
+			}
+			if(end.isBefore(start)) {
+				endTimes[index]=startTimes[index];
+			}
+		}
+	}
 	@Override
 	public int compareTo(Object arg0) {
 		Employee employee = (Employee)arg0;
