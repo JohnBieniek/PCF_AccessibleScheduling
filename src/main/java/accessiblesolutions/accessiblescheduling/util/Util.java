@@ -20,6 +20,10 @@ public abstract class Util {
 		return !(day.length()!=2 || !day.matches("^[0-9]{2}$"));
 	}
 	
+	public static LocalDateTime getEndOfWeekFromLocalDateTime(LocalDateTime time) throws ProccessingException {
+		return Util.getLocalDateOfDayInWeek(time.getYear(), time.getMonthValue(), Util.getWeekOfDate(Util.getDateFromLocalDateTime(time))).atStartOfDay();
+	}
+	
 	/**Returns if the event is present in the list
 	 * 
 	 * @param events an ArrayList<Event> of valid events

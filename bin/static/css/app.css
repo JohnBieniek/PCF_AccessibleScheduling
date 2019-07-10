@@ -29,6 +29,18 @@ html,body
     
 }
 
+.availabilityTile{
+    float:right;
+    margin: 5px;
+    /*width: 345px;*/
+    align-content: center;
+    text-align: center;
+    padding: 10px;
+    background-color: #d3d7cf;
+
+    border-radius: 25px; 
+}
+
 
 .inline{
 	display: inline-block;
@@ -69,6 +81,10 @@ html,body
 .red{
 	color: #cc0000;
 }
+.green{
+  color:#3d9e03;
+}
+
 .errored{
 	border-color: #cc0000!important;
 	background-color: #cc0000!important;
@@ -394,10 +410,16 @@ html,body
     width: 110px;
 }
 
-.weekDay{
+.availableWeekDay{
+  width:100%;
+  margin-right: 5px;
+  float:right;
 	font-size:25px;	
 }
-
+.weekDay{
+  font-size:25px; 
+}
+}
 .addShift{
     margin-right: 0px;
 	margin-left:auto;

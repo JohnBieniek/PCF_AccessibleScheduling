@@ -3547,10 +3547,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		boolean[] availability = new boolean[24];
 		availability[10]=true;
 		availability[11]=true;
-		employee.setWednesdaysAvailability(availability);
 		boolean[] days= new boolean[7];
 		days[3]=true;
-		employee.setDaysAvailable(days);
 		
 		boolean errored = false;
 		boolean available = false;
@@ -3582,12 +3580,9 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		boolean[] availability = new boolean[24];
 		availability[23]=true;
 		availability[0]=true;
-		employee.setSaturdaysAvailability(availability);
-		employee.setSundaysAvailability(availability);
 		boolean[] days= new boolean[7];
 		days[6]=true;
 		days[0]=true;
-		employee.setDaysAvailable(days);
 		
 		boolean errored = false;
 		boolean available = false;
@@ -3619,11 +3614,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		boolean[] availability = new boolean[24];
 		availability[23]=true;
 		availability[0]=true;
-		employee.setSaturdaysAvailability(availability);
-		employee.setSundaysAvailability(availability);
 		boolean[] days= new boolean[7];
 		days[6]=true;
-		employee.setDaysAvailable(days);
 		
 		boolean errored = false;
 		boolean available = false;
@@ -3655,11 +3647,9 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		boolean[] availability = new boolean[24];
 		availability[23]=true;
 		availability[0]=true;
-		employee.setSaturdaysAvailability(availability);
 		boolean[] days= new boolean[7];
 		days[6]=true;
 		days[0]=true;
-		employee.setDaysAvailable(days);
 		
 		boolean errored = false;
 		boolean available = false;
@@ -3776,10 +3766,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		boolean[] availability = new boolean[24];
 		availability[10]=true;
 		availability[11]=true;
-		employee.setWednesdaysAvailability(availability);
 		boolean[] days= new boolean[7];
 		days[3]=true;
-		employee.setDaysAvailable(days);
 		
 		boolean errored = false;
 		boolean available = false;
@@ -3811,12 +3799,9 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		boolean[] availability = new boolean[24];
 		availability[23]=true;
 		availability[0]=true;
-		employee.setSaturdaysAvailability(availability);
-		employee.setSundaysAvailability(availability);
 		boolean[] days= new boolean[7];
 		days[6]=true;
 		days[0]=true;
-		employee.setDaysAvailable(days);
 		
 		boolean errored = false;
 		boolean available = false;
@@ -3848,11 +3833,8 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		boolean[] availability = new boolean[24];
 		availability[23]=true;
 		availability[0]=true;
-		employee.setSaturdaysAvailability(availability);
-		employee.setSundaysAvailability(availability);
 		boolean[] days= new boolean[7];
 		days[6]=true;
-		employee.setDaysAvailable(days);
 		
 		boolean errored = false;
 		boolean available = false;
@@ -3884,11 +3866,9 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		boolean[] availability = new boolean[24];
 		availability[23]=true;
 		availability[0]=true;
-		employee.setSaturdaysAvailability(availability);
 		boolean[] days= new boolean[7];
 		days[6]=true;
 		days[0]=true;
-		employee.setDaysAvailable(days);
 		
 		boolean errored = false;
 		boolean available = false;
@@ -3929,14 +3909,6 @@ public class EmployeeShiftCompatibilityManagerSpec {
 			    	availability[i]=true;
 			    }
 		    }
-		    assignedOneDay.setSundaysAvailability(daysAvailability);
-		    assignedOneDay.setMondaysAvailability(daysAvailability);
-		    assignedOneDay.setTuesdaysAvailability(daysAvailability);
-		    assignedOneDay.setWednesdaysAvailability(daysAvailability);
-		    assignedOneDay.setThursdaysAvailability(daysAvailability);
-		    assignedOneDay.setFridaysAvailability(daysAvailability);
-		    assignedOneDay.setSaturdaysAvailability(daysAvailability);
-		    assignedOneDay.setDaysAvailable(availability);
 		try {
 			unassigned = fixture.isAssignableFor(assignedOneDay,inOvertimeShift1,options);
 		} catch (ProccessingException e) {
@@ -3974,14 +3946,6 @@ public class EmployeeShiftCompatibilityManagerSpec {
 			    	availability[i]=true;
 			    }
 		    }
-		    assignedOneDay.setSundaysAvailability(daysAvailability);
-		    assignedOneDay.setMondaysAvailability(daysAvailability);
-		    assignedOneDay.setTuesdaysAvailability(daysAvailability);
-		    assignedOneDay.setWednesdaysAvailability(daysAvailability);
-		    assignedOneDay.setThursdaysAvailability(daysAvailability);
-		    assignedOneDay.setFridaysAvailability(daysAvailability);
-		    assignedOneDay.setSaturdaysAvailability(daysAvailability);
-		    assignedOneDay.setDaysAvailable(availability);
 		    ScheduleOptions options = new ScheduleOptions();
 		try {
 			unassigned = fixture.isAssignableFor(assignedOneDay,inOvertimeShift1,options);
@@ -4078,14 +4042,6 @@ public class EmployeeShiftCompatibilityManagerSpec {
 			    	availability[i]=true;
 			    }
 		    }
-		    assignedOneDay.setSundaysAvailability(daysAvailability);
-		    assignedOneDay.setMondaysAvailability(daysAvailability);
-		    assignedOneDay.setTuesdaysAvailability(daysAvailability);
-		    assignedOneDay.setWednesdaysAvailability(daysAvailability);
-		    assignedOneDay.setThursdaysAvailability(daysAvailability);
-		    assignedOneDay.setFridaysAvailability(daysAvailability);
-		    assignedOneDay.setSaturdaysAvailability(daysAvailability);
-		    assignedOneDay.setDaysAvailable(availability);
 		    ScheduleOptions options = new ScheduleOptions();
 		try {
 			unassigned = fixture.isAssignableFor(assignedOneDay,inOvertimeShift1,options);
@@ -4114,14 +4070,6 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		    	availability[i]=true;
 		    }
 	    }
-	    employee.setSundaysAvailability(daysAvailability);
-	    employee.setMondaysAvailability(daysAvailability);
-	    employee.setTuesdaysAvailability(daysAvailability);
-	    employee.setWednesdaysAvailability(daysAvailability);
-	    employee.setThursdaysAvailability(daysAvailability);
-	    employee.setFridaysAvailability(daysAvailability);
-	    employee.setSaturdaysAvailability(daysAvailability);
-	    employee.setDaysAvailable(availability);
 		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
 		
 		shift.setStartDate("2017-06-04");
@@ -4145,14 +4093,6 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		    	availability[i]=true;
 		    }
 	    }
-	    employee.setSundaysAvailability(daysAvailability);
-	    employee.setMondaysAvailability(daysAvailability);
-	    employee.setTuesdaysAvailability(daysAvailability);
-	    employee.setWednesdaysAvailability(daysAvailability);
-	    employee.setThursdaysAvailability(daysAvailability);
-	    employee.setFridaysAvailability(daysAvailability);
-	    employee.setSaturdaysAvailability(daysAvailability);
-	    employee.setDaysAvailable(availability);
 		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
 		
 		shift.setStartDate("2017-06-03");
@@ -4176,14 +4116,6 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		    	availability[i]=true;
 		    }
 	    }
-	    employee.setSundaysAvailability(daysAvailability);
-	    employee.setMondaysAvailability(daysAvailability);
-	    employee.setTuesdaysAvailability(daysAvailability);
-	    employee.setWednesdaysAvailability(daysAvailability);
-	    employee.setThursdaysAvailability(daysAvailability);
-	    employee.setFridaysAvailability(daysAvailability);
-	    employee.setSaturdaysAvailability(daysAvailability);
-	    employee.setDaysAvailable(availability);
 		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
 		
 		shift.setStartDate("2017-05-04");
@@ -4654,14 +4586,6 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		    	availability[i]=true;
 		    }
 	    }
-	    employee.setSundaysAvailability(daysAvailability);
-	    employee.setMondaysAvailability(daysAvailability);
-	    employee.setTuesdaysAvailability(daysAvailability);
-	    employee.setWednesdaysAvailability(daysAvailability);
-	    employee.setThursdaysAvailability(daysAvailability);
-	    employee.setFridaysAvailability(daysAvailability);
-	    employee.setSaturdaysAvailability(daysAvailability);
-	    employee.setDaysAvailable(availability);
 	    employee.setId("alwaysOnEmployee");
 		Shift shift = new Shift();
 		ScheduleOptions options = new ScheduleOptions();
@@ -4699,14 +4623,6 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		    }
 	    }
 	    employee.setNoCats(true);
-	    employee.setSundaysAvailability(daysAvailability);
-	    employee.setMondaysAvailability(daysAvailability);
-	    employee.setTuesdaysAvailability(daysAvailability);
-	    employee.setWednesdaysAvailability(daysAvailability);
-	    employee.setThursdaysAvailability(daysAvailability);
-	    employee.setFridaysAvailability(daysAvailability);
-	    employee.setSaturdaysAvailability(daysAvailability);
-	    employee.setDaysAvailable(availability);
 		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
 		
 		shift.setStartDate("2018-01-04");
@@ -4743,14 +4659,6 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		    	availability[i]=true;
 		    }
 	    }
-	    employee.setSundaysAvailability(daysAvailability);
-	    employee.setMondaysAvailability(daysAvailability);
-	    employee.setTuesdaysAvailability(daysAvailability);
-	    employee.setWednesdaysAvailability(daysAvailability);
-	    employee.setThursdaysAvailability(daysAvailability);
-	    employee.setFridaysAvailability(daysAvailability);
-	    employee.setSaturdaysAvailability(daysAvailability);
-	    employee.setDaysAvailable(availability);
 		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
 		
 		shift.setStartDate("2018-07-01");
@@ -4825,14 +4733,6 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		    	availability[i]=true;
 		    }
 	    }
-	    employee.setSundaysAvailability(daysAvailability);
-	    employee.setMondaysAvailability(daysAvailability);
-	    employee.setTuesdaysAvailability(daysAvailability);
-	    employee.setWednesdaysAvailability(daysAvailability);
-	    employee.setThursdaysAvailability(daysAvailability);
-	    employee.setFridaysAvailability(daysAvailability);
-	    employee.setSaturdaysAvailability(daysAvailability);
-	    employee.setDaysAvailable(availability);
 		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
 		
 		shift.setStartDate("2018-05-01");
@@ -4870,14 +4770,6 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		    	availability[i]=true;
 		    }
 	    }
-	    employee.setSundaysAvailability(daysAvailability);
-	    employee.setMondaysAvailability(daysAvailability);
-	    employee.setTuesdaysAvailability(daysAvailability);
-	    employee.setWednesdaysAvailability(daysAvailability);
-	    employee.setThursdaysAvailability(daysAvailability);
-	    employee.setFridaysAvailability(daysAvailability);
-	    employee.setSaturdaysAvailability(daysAvailability);
-	    employee.setDaysAvailable(availability);
 		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
 		
 		shift.setStartDate("2018-05-01");
@@ -4915,14 +4807,6 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		    	availability[i]=true;
 		    }
 	    }
-	    employee.setSundaysAvailability(daysAvailability);
-	    employee.setMondaysAvailability(daysAvailability);
-	    employee.setTuesdaysAvailability(daysAvailability);
-	    employee.setWednesdaysAvailability(daysAvailability);
-	    employee.setThursdaysAvailability(daysAvailability);
-	    employee.setFridaysAvailability(daysAvailability);
-	    employee.setSaturdaysAvailability(daysAvailability);
-	    employee.setDaysAvailable(availability);
 		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
 		
 		shift.setStartDate("2018-05-01");
@@ -4959,14 +4843,6 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		    	availability[i]=true;
 		    }
 	    }
-	    employee.setSundaysAvailability(daysAvailability);
-	    employee.setMondaysAvailability(daysAvailability);
-	    employee.setTuesdaysAvailability(daysAvailability);
-	    employee.setWednesdaysAvailability(daysAvailability);
-	    employee.setThursdaysAvailability(daysAvailability);
-	    employee.setFridaysAvailability(daysAvailability);
-	    employee.setSaturdaysAvailability(daysAvailability);
-	    employee.setDaysAvailable(availability);
 		employee.setOffAlternateWeekends(true);
 		employee.setId("assignedOneDay");
 		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
@@ -5004,14 +4880,6 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		    	availability[i]=true;
 		    }
 	    }
-	    employee.setSundaysAvailability(daysAvailability);
-	    employee.setMondaysAvailability(daysAvailability);
-	    employee.setTuesdaysAvailability(daysAvailability);
-	    employee.setWednesdaysAvailability(daysAvailability);
-	    employee.setThursdaysAvailability(daysAvailability);
-	    employee.setFridaysAvailability(daysAvailability);
-	    employee.setSaturdaysAvailability(daysAvailability);
-	    employee.setDaysAvailable(availability);
 		employee.setOffAlternateWeekends(true);
 		employee.setId("assignedOneDay");
 		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
@@ -5048,14 +4916,6 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		    	availability[i]=true;
 		    }
 	    }
-	    employee.setSundaysAvailability(daysAvailability);
-	    employee.setMondaysAvailability(daysAvailability);
-	    employee.setTuesdaysAvailability(daysAvailability);
-	    employee.setWednesdaysAvailability(daysAvailability);
-	    employee.setThursdaysAvailability(daysAvailability);
-	    employee.setFridaysAvailability(daysAvailability);
-	    employee.setSaturdaysAvailability(daysAvailability);
-	    employee.setDaysAvailable(availability);
 		employee.setOffAlternateWeekends(true);
 		employee.setId("assignedFiveDay");
 		Shift shift = new Shift();
@@ -5236,14 +5096,6 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		    	availability[i]=true;
 		    }
 	    }
-	    employee.setSundaysAvailability(daysAvailability);
-	    employee.setMondaysAvailability(daysAvailability);
-	    employee.setTuesdaysAvailability(daysAvailability);
-	    employee.setWednesdaysAvailability(daysAvailability);
-	    employee.setThursdaysAvailability(daysAvailability);
-	    employee.setFridaysAvailability(daysAvailability);
-	    employee.setSaturdaysAvailability(daysAvailability);
-	    employee.setDaysAvailable(availability);
 	    employee.setId("alwaysOnEmployee");
 	    
 		Shift shift = new Shift();ScheduleOptions options = new ScheduleOptions();
