@@ -15,6 +15,7 @@ import java.time.DayOfWeek;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
 import accessiblesolutions.accessiblescheduling.to.Availability;
+import accessiblesolutions.accessiblescheduling.util.Util;
 
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -45,9 +46,14 @@ public class Employee implements Comparable{
 	
 	public Availability getAvailability(int index) {
 		Availability availability = new Availability();
-		availability.day= DayOfWeek.valueOf(getDays()[index]);
+		System.out.println("get availability for day:"+getDays()[index]);
+		availability.day= DayOfWeek.of(Util.getDayInt(getDays()[index]));
+		System.out.println("day:"+availability.day.toString());
+		System.out.println("startTimes:"+getStartTimes().toString());
 		availability.startTime=LocalTime.parse(getStartTimes()[index]);
+		System.out.println("startTime:"+availability.startTime.toString());
 		availability.endTime=LocalTime.parse(getEndTimes()[index]);
+		System.out.println("availability:"+availability.toString());
 		return availability;
 	}
 

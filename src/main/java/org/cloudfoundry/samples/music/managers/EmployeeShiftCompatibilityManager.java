@@ -796,7 +796,7 @@ public class EmployeeShiftCompatibilityManager {
 	 * @TestsInvalid
 	 */
 	public boolean isAvailableFor(Employee employee, Shift shift) throws CorruptDataException, ProccessingException{
-		boolean available = true;
+		boolean available = false;
 		
 		if(null==employee||null==shift) {
 			throw new ProccessingException("Null employee or shift provided to isAvailableFor");
@@ -813,12 +813,14 @@ public class EmployeeShiftCompatibilityManager {
 		}
 		
 		LocalDateTime weeksEnd =  Util.getEndOfWeekFromLocalDateTime(shift.getStartsLocalDateTime());
-		
+		System.out.println("getting availability");
 		if(!shift.getOvernight()){
 			LocalDateTime availableUntil = shift.getStartsLocalDateTime();
-			
+			System.out.println("not overnight");
 			for(int run = 0; run<employee.getDays().length;run++) {
+				System.out.println("run:"+run);
 				for(int index = 0; index<employee.getDays().length;index++) {
+					System.out.println("available until"+availableUntil.toString());
 					Availability availability = employee.getAvailability(index);
 
 					LocalDate availabilityDay = weeksEnd.toLocalDate();
@@ -830,10 +832,12 @@ public class EmployeeShiftCompatibilityManager {
 					}
 					LocalDateTime availabilityStart= LocalDateTime.of(availabilityDay, availability.startTime);
 					LocalDateTime availabilityEnd= LocalDateTime.of(availabilityDay, availability.endTime);
-					
+					System.out.println("availability start:"+availabilityStart.toString() + " availablitity end:"+ availabilityEnd);
 					if(Util.isOverlapping(shift.getStartsLocalDateTime(), shift.getEndsLocalDateTime(), availabilityStart,availabilityEnd)) {
+						System.out.println("availability overlaps shift");
 						if(availableUntil.isAfter(availabilityStart) || availableUntil.isEqual(availabilityStart)){
 							availableUntil=availabilityEnd;
+							
 						}
 					}
 					
@@ -843,12 +847,54 @@ public class EmployeeShiftCompatibilityManager {
 				}
 				
 				if(availableUntil.isAfter(shift.getEndsLocalDateTime())||availableUntil.isEqual(shift.getEndsLocalDateTime())) {
+					available=true;
 					break;
 				}
 			}
 		}
 		else{
-			
+			LocalDateTime availableUntil = shift.getStartsLocalDateTime();
+			System.out.println("overnight");
+			for(int run = 0; run<employee.getDays().length;run++) {
+				System.out.println("run:"+run);
+				for(int index = 0; index<employee.getDays().length;index++) {
+					System.out.println("available until"+availableUntil.toString());
+					Availability availability = employee.getAvailability(index);
+
+					LocalDate availabilityDay = weeksEnd.toLocalDate();
+					if(availability.day.getValue()<6) {
+						availabilityDay=availabilityDay.minusDays(6-availability.day.getValue());
+					}
+					else if(availability.day.getValue()==7) {
+						availabilityDay=availabilityDay.minusDays(6);
+					}
+					System.out.println("availabilityDay.getDayOfWeek().equals(DayOfWeek.SUNDAY)"+availabilityDay.getDayOfWeek().equals(DayOfWeek.SUNDAY));
+					System.out.println("shift.getStartsLocalDate().getDayOfWeek().equals(DayOfWeek.SATURDAY)"+shift.getStartsLocalDate().getDayOfWeek().equals(DayOfWeek.SATURDAY));
+					if(availabilityDay.getDayOfWeek().equals(DayOfWeek.SUNDAY)&& shift.getStartsLocalDate().getDayOfWeek().equals(DayOfWeek.SATURDAY)) {
+						availabilityDay=availabilityDay.plusWeeks(1);
+					}
+					
+					LocalDateTime availabilityStart= LocalDateTime.of(availabilityDay, availability.startTime);
+					LocalDateTime availabilityEnd= LocalDateTime.of(availabilityDay, availability.endTime);
+					System.out.println("availability start:"+availabilityStart.toString() + " availablitity end:"+ availabilityEnd);
+					if(Util.isOverlapping(shift.getStartsLocalDateTime(), shift.getEndsLocalDateTime(), availabilityStart,availabilityEnd)) {
+						System.out.println("availability overlaps shift");
+						if(availableUntil.isAfter(availabilityStart.minusMinutes(2))){
+							availableUntil=availabilityEnd;
+							
+						}
+					}
+					
+					if(availableUntil.isAfter(shift.getEndsLocalDateTime())||availableUntil.isEqual(shift.getEndsLocalDateTime())) {
+						break;
+					}
+				}
+				
+				if(availableUntil.isAfter(shift.getEndsLocalDateTime())||availableUntil.isEqual(shift.getEndsLocalDateTime())) {
+					available=true;
+					break;
+				}
+			}
 		}
 		
 		return available;

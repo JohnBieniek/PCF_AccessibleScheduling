@@ -3544,14 +3544,19 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		shift.setClientId("onAlwaysClient");
 		
 		Employee employee = new Employee();
-		boolean[] availability = new boolean[24];
-		availability[10]=true;
-		availability[11]=true;
-		boolean[] days= new boolean[7];
-		days[3]=true;
+		String[] startTimes = new String[1];
+		startTimes[0]="10:00";
+		String[] endTimes = new String[1];
+		endTimes[0]="12:00";
+		employee.setStartTimes(startTimes);
+		employee.setEndTimes(endTimes);
+		String[] startDays = new String[1];
+		startDays[0]="Wednesday";
+		employee.setDays(startDays);
 		
 		boolean errored = false;
 		boolean available = false;
+		
 		try {
 			available = fixture.isAvailableFor(employee,shift);
 		} catch (CorruptDataException e) {
@@ -3577,12 +3582,18 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		shift.setClientId("onAlwaysClient");
 		
 		Employee employee = new Employee();
-		boolean[] availability = new boolean[24];
-		availability[23]=true;
-		availability[0]=true;
-		boolean[] days= new boolean[7];
-		days[6]=true;
-		days[0]=true;
+		String[] startTimes = new String[2];
+		startTimes[0]="10:00";
+		startTimes[1]="00:00";
+		String[] endTimes = new String[2];
+		endTimes[0]="23:59";
+		endTimes[1]="23:59";
+		employee.setStartTimes(startTimes);
+		employee.setEndTimes(endTimes);
+		String[] startDays = new String[2];
+		startDays[0]="Saturday";
+		startDays[1]="Sunday";
+		employee.setDays(startDays);
 		
 		boolean errored = false;
 		boolean available = false;

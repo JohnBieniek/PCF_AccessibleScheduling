@@ -109,7 +109,7 @@ public class ShiftAssignmentManager {
     	ArrayList<Shift> shifts = shiftManager.getUnassignedNonEventShiftsForMonth(month);
 		ArrayList<Shift> unassignedShiftsForWeek = ShiftWorker.getShiftsStartingWeekOfMonth(shifts, week, month,year);
 		ArrayList<Shift> unassignedShiftsForWeekdays= ShiftWorker.getWeekdayShifts(unassignedShiftsForWeek);
-		//System.out.println("scheduling weekday shifts:"+unassignedShiftsForWeekdays.size());
+		System.out.println("scheduling weekday shifts:"+unassignedShiftsForWeekdays.size());
 		scheduleShifts(unassignedShiftsForWeekdays,week,month,year,options);
     }
     
@@ -117,7 +117,7 @@ public class ShiftAssignmentManager {
     	ArrayList<Shift> shifts = shiftManager.getUnassignedNonEventShiftsForMonth(month);
 		ArrayList<Shift> unassignedShiftsForWeek = ShiftWorker.getShiftsStartingWeekOfMonth(shifts, week, month,year);
 		ArrayList<Shift> unassignedShiftsForWeekends= ShiftWorker.getWeekendShifts(unassignedShiftsForWeek);
-		//System.out.println("scheduling weekend shifts:"+unassignedShiftsForWeekends.size());
+		System.out.println("scheduling weekend shifts:"+unassignedShiftsForWeekends.size());
 		scheduleShifts(unassignedShiftsForWeekends,week,month,year,options);
     }
     
