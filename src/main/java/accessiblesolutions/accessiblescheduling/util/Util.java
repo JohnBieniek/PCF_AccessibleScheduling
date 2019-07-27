@@ -20,9 +20,6 @@ public abstract class Util {
 		return !(day.length()!=2 || !day.matches("^[0-9]{2}$"));
 	}
 	
-	public static LocalDateTime getEndOfWeekFromLocalDateTime(LocalDateTime time) throws ProccessingException {
-		return Util.getLocalDateOfDayInWeek(time.getYear(), time.getMonthValue(), Util.getWeekOfDate(Util.getDateFromLocalDateTime(time))).atStartOfDay();
-	}
 	
 	/**Returns if the event is present in the list
 	 * 
@@ -50,6 +47,7 @@ public abstract class Util {
 		if(null==time){
 			throw new ProccessingException("No time supplied to getDateFromLocalDateTime");
 		}
+		
 		String date = "";
 		date+=time.getYear()+"-";
 		int month = time.getMonthValue();
@@ -256,7 +254,7 @@ public abstract class Util {
 			
 			for(int day =0 ; day<32;day++) {
 				try {
-					if(getWeekOfDate(dateCursor.toString())==selectedWeek) {
+					if(getWeekOfDate(dateCursor.toString())==selectedWeek && dateCursor.getMonthValue()==month) {
 						sampleDay = dateCursor;
 					}
 				} catch (ProccessingException e) {
