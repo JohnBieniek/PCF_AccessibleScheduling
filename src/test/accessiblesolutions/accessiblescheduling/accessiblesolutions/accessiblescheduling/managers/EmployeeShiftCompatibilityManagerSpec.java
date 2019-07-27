@@ -3958,6 +3958,37 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	public void isAssignableForReturnsTrueForAlternateClientAfter30Minutes() {
 		Employee assignedOneDay = new Employee("In","Overtime");
 		assignedOneDay.setId("inOvertime");
+		String[] startTimes = new String[8];
+		startTimes[0]="00:00";
+		startTimes[1]="00:00";
+		startTimes[2]="00:00";
+		startTimes[3]="00:00";
+		startTimes[4]="00:00";
+		startTimes[5]="00:00";
+		startTimes[6]="00:00";
+		startTimes[7]="00:00";
+		String[] endTimes = new String[8];
+		endTimes[0]="23:59";
+		endTimes[1]="23:59";
+		endTimes[2]="23:59";
+		endTimes[3]="23:59";
+		endTimes[4]="23:59";
+		endTimes[5]="23:59";
+		endTimes[6]="23:59";
+		endTimes[7]="23:59";
+		assignedOneDay.setStartTimes(startTimes);
+		assignedOneDay.setEndTimes(endTimes);
+		String[] startDays = new String[8];
+		startDays[0]="Sunday";
+		startDays[1]="Monday";
+		startDays[0]="Tuesday";
+		startDays[1]="Wednesday";
+		startDays[0]="Thursday";
+		startDays[1]="Friday";
+		startDays[0]="Saturday";
+		startDays[1]="Sunday";
+		assignedOneDay.setDays(startDays);
+		
 		 Shift inOvertimeShift1 = new Shift();
 		    inOvertimeShift1.setStaffId("inOvertime");
 		    inOvertimeShift1.setClientId("inOvertimeClient2");
@@ -3969,14 +4000,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		boolean errored=false;
 		boolean unassigned = false;
 		
-		 boolean[] daysAvailability = new boolean[24];
-		    boolean[] availability = new boolean[7];
-		    for(int i=0 ; i<24;i++) {
-			    daysAvailability[i]=true;
-			    if(i<7) {
-			    	availability[i]=true;
-			    }
-		    }
+
 		    ScheduleOptions options = new ScheduleOptions();
 		try {
 			unassigned = fixture.isAssignableFor(assignedOneDay,inOvertimeShift1,options);
@@ -4054,6 +4078,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	public void isAssignableForReturnsTrueForAlmostOverlappingShiftOfSameClient() {
 		Employee assignedOneDay = new Employee("In","Overtime");
 		assignedOneDay.setId("inOvertime");
+		
 		 Shift inOvertimeShift1 = new Shift();
 		    inOvertimeShift1.setStaffId("inOvertime");
 		    inOvertimeShift1.setClientId("inOvertimeClient");
@@ -4139,7 +4164,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		Employee employee = new Employee();
 		String[] requestedDays = new String[]{"2017-06-04"};
 		employee.setRequestedOff(requestedDays);
-		String[] startTimes = new String[2];
+		String[] startTimes = new String[8];
 		startTimes[0]="00:00";
 		startTimes[1]="00:00";
 		startTimes[2]="00:00";
@@ -4148,7 +4173,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		startTimes[5]="00:00";
 		startTimes[6]="00:00";
 		startTimes[7]="00:00";
-		String[] endTimes = new String[2];
+		String[] endTimes = new String[8];
 		endTimes[0]="23:59";
 		endTimes[1]="23:59";
 		endTimes[2]="23:59";
@@ -4159,7 +4184,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		endTimes[7]="23:59";
 		employee.setStartTimes(startTimes);
 		employee.setEndTimes(endTimes);
-		String[] startDays = new String[2];
+		String[] startDays = new String[8];
 		startDays[0]="Sunday";
 		startDays[1]="Monday";
 		startDays[0]="Tuesday";
@@ -5146,7 +5171,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		EmployeeShiftCompatibilities compatibilities = new EmployeeShiftCompatibilities();
 		ArrayList<EmployeeShiftCompatibility> innerCompatibilities = new ArrayList<EmployeeShiftCompatibility>();
 		Employee employee = new Employee();
-		String[] startTimes = new String[2];
+		String[] startTimes = new String[8];
 		startTimes[0]="00:00";
 		startTimes[1]="00:00";
 		startTimes[2]="00:00";
@@ -5155,7 +5180,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		startTimes[5]="00:00";
 		startTimes[6]="00:00";
 		startTimes[7]="00:00";
-		String[] endTimes = new String[2];
+		String[] endTimes = new String[8];
 		endTimes[0]="23:59";
 		endTimes[1]="23:59";
 		endTimes[2]="23:59";
@@ -5166,7 +5191,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		endTimes[7]="23:59";
 		employee.setStartTimes(startTimes);
 		employee.setEndTimes(endTimes);
-		String[] startDays = new String[2];
+		String[] startDays = new String[8];
 		startDays[0]="Sunday";
 		startDays[1]="Monday";
 		startDays[0]="Tuesday";
