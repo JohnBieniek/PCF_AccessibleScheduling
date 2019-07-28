@@ -840,7 +840,7 @@ public class EmployeeShiftCompatibilityManager {
 					System.out.println("availability start:"+availabilityStart.toString() + " availablitity end:"+ availabilityEnd);
 					if(Util.isOverlapping(shift.getStartsLocalDateTime(), shift.getEndsLocalDateTime(), availabilityStart,availabilityEnd)) {
 						System.out.println("availability overlaps shift");
-						if(availableUntil.isAfter(availabilityStart) || availableUntil.isEqual(availabilityStart)){
+						if(availableUntil.isAfter(availabilityStart.minusMinutes(2))){
 							availableUntil=availabilityEnd;
 							System.out.println("availability updated as iit's after avaiilable until or equal to avail start");
 						}
