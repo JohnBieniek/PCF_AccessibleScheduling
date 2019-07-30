@@ -478,7 +478,29 @@ public class EmployeeShiftManagerSpec {
 	
 	
 	@Test
-	public void getHoursScheduledWeekOfMonthReturnsSumOfShiftsCrossWeekOrMonth() {
+	public void getHoursScheduledWeekOfMonthReturnsSumOfShiftsCrossMonth() {
+		boolean errored = false;
+		float hours = -1;
+
+		Employee crossMonth = new Employee("Cross","Month");
+		crossMonth.setId("crossMonth");
+	    
+		try {
+			hours = fixture.getHoursScheduledWeekOfMonth(crossMonth,0,6);
+		} catch (CorruptDataException e) {
+			errored=true;
+			e.printStackTrace();
+		} catch (ProccessingException e) {
+			errored=true;
+			e.printStackTrace();
+		}
+		
+		assertFalse(errored);
+		assertTrue(14==hours);
+	}
+	
+	@Test
+	public void getHoursScheduledWeekOfMonthReturnsSumOfShiftsCrossWeek() {
 		boolean errored = false;
 		float hours = -1;
 

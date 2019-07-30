@@ -391,7 +391,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	}
 	
 	@Test
-	public void getHoursScheduledWeekOfShiftReturnsSumOfShiftsCrossWeekOrMonth() throws CorruptDataException, ProccessingException {
+	public void getHoursScheduledWeekOfShiftReturnsSumOfShiftsCrossMonth() throws CorruptDataException, ProccessingException {
 		boolean errored = false;
 		float hours = -1;
 		Employee crossMonth = new Employee("Cross","Month");
@@ -437,7 +437,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	    
 	    ArrayList<Shift> crossMonthShifts = new ArrayList<Shift>();
 	    crossMonthShifts.add(crossMonthShift1);
-	
+
 		try {
 			hours = fixture.getHoursScheduledWeekOfShift(crossMonth,crossMonthShift1);
 		} catch (CorruptDataException e) {
@@ -449,7 +449,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		}
 		
 		assertFalse(errored);
-		assertTrue(10==hours);
+		assertTrue(14==hours);
 	}
 	
 	@Test

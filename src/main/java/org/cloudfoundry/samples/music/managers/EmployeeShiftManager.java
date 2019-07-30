@@ -78,16 +78,21 @@ public class EmployeeShiftManager {
   	 */
   	public ArrayList<Shift> getAssignedShiftsForEmployeeForWeekOfMonth(String employeeId, int week, int month) throws CorruptDataException{
 		ArrayList<Shift> assignedShiftsForEmployeeForMonth =getAssignedShiftsForEmployeeForMonth(employeeId,month);
-		
+		System.out.println("getting assigned shifts for week:"+week+" of month : "+month);
 		ArrayList<Shift> assignedShiftsForEmployeeForWeekOfMonth = new ArrayList<Shift>();
 		if(assignedShiftsForEmployeeForMonth!=null){
 			for(Shift shift: assignedShiftsForEmployeeForMonth){
+				System.out.println("shift:"+shift.toString());
+				System.out.println("shift start week:"+shift.getStartWeek()+" requested start week:"+week);
 				if(shift.getStartWeek()==week){
 					assignedShiftsForEmployeeForWeekOfMonth.add(shift);
 				}
 			}
 		}
 		System.out.println("got "+assignedShiftsForEmployeeForMonth.size()+ " shifts for "+employeeId + " week:"+week);
+		if(assignedShiftsForEmployeeForMonth.size()>0) {
+			System.out.println("for week we have :"+assignedShiftsForEmployeeForWeekOfMonth.size());
+		}
 		return assignedShiftsForEmployeeForWeekOfMonth;
 	}
   	
@@ -177,6 +182,7 @@ public class EmployeeShiftManager {
 				}
 			}
 		}
+		System.out.println("shiftForEmployeeForMonth.size=:"+assignedShiftsForEmployeeForMonth.size());
 		return assignedShiftsForEmployeeForMonth;
 	}
   
@@ -277,22 +283,44 @@ public class EmployeeShiftManager {
 		String[] endTime = null;//For  a shift on the last day of the week going overnight
 		int hoursThisWeek = 0;//For  a shift on the last day of the week going overnight
 		int minutesThisWeek = 0;//For  a shift on the last day of the week going overnight
+		
+		int previousMonth=month-1;
+		
+		if(previousMonth==0) {
+			previousMonth=12;
+		}
 		if(null!=employee){
 			shiftsForWeek = getAssignedShiftsForEmployeeForWeekOfMonth(employee.getId(), week, month);
 			
 			if(null!=shiftsForWeek){
+				System.out.println("found assigned shifts"+shiftsForWeek.size());
 				for(Shift scheduledShift : shiftsForWeek){
+					System.out.println("assigned shift:"+scheduledShift.toString());
+					System.out.println("assigned shift duration:"+scheduledShift.getDuration());
 					hours+= scheduledShift.getDuration();
 				}
 			}
 			LocalDate localDate = Util.getLocalDateOfDayInWeek(2018, month,  week);
 			if(null!=localDate) {
+				if(week==0 && localDate.getDayOfMonth()<7) {//handle the possibility that there are shifts from the previous month this week
+					int weekInPreviousMonth = Util.getWeekOfDate(localDate.minusDays(localDate.getDayOfMonth()).toString());
+					shiftsForWeek = getAssignedShiftsForEmployeeForWeekOfMonth(employee.getId(), weekInPreviousMonth, previousMonth);
+					for(Shift scheduledShift : shiftsForWeek){
+						System.out.println("assigned shift:"+scheduledShift.toString());
+						System.out.println("assigned shift duration:"+scheduledShift.getDuration());
+						hours+= scheduledShift.getDuration();
+					}
+				}
 				//Handle the possibility of a shift on the last day of the week going overnight
 				weekBefore = Util.getWeekBeforeDate(Util.getLocalDateOfDayInWeek(2018, month,  week).toString());
-				shiftsForPreviousWeek = getAssignedShiftsForEmployeeForWeekOfMonth(employee.getId(), weekBefore, month);
-				
+				shiftsForPreviousWeek = getAssignedShiftsForEmployeeForWeekOfMonth(employee.getId(), weekBefore, weekBefore>week?previousMonth:month);
+				System.out.println("right after get shifts"+getAssignedShiftsForEmployeeForWeekOfMonth(employee.getId(), weekBefore, month).toString());
+//
 				if(null!=shiftsForPreviousWeek){
+					System.out.println("found shifts for previous week"+shiftsForPreviousWeek.size());
 					for(Shift scheduledShift : shiftsForPreviousWeek){
+						System.out.println("  previous week shift:"+scheduledShift.toString());
+						System.out.println("  previous week shift isvalid?:"+scheduledShift.isValid());
 						if(scheduledShift.isValid() &&
 								Util.getWeekOfDate(scheduledShift.getEndsLocalDate().toString())==week) {
 							endTime = scheduledShift.getEndTime().split(":");
