@@ -450,6 +450,7 @@ public abstract class Util {
 			int dayCursorInt = dayCursor.getDayOfMonth();
 			
 			if(dayCursorInt==day){
+				System.out.println("week of date:"+date.toString()+ " is : "+weekCursor);
 				return weekCursor;
 			}
 			

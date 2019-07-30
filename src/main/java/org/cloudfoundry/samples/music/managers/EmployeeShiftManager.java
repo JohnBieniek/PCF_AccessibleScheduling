@@ -293,10 +293,7 @@ public class EmployeeShiftManager {
 			shiftsForWeek = getAssignedShiftsForEmployeeForWeekOfMonth(employee.getId(), week, month);
 			
 			if(null!=shiftsForWeek){
-				System.out.println("found assigned shifts"+shiftsForWeek.size());
 				for(Shift scheduledShift : shiftsForWeek){
-					System.out.println("assigned shift:"+scheduledShift.toString());
-					System.out.println("assigned shift duration:"+scheduledShift.getDuration());
 					hours+= scheduledShift.getDuration();
 				}
 			}
@@ -306,21 +303,15 @@ public class EmployeeShiftManager {
 					int weekInPreviousMonth = Util.getWeekOfDate(localDate.minusDays(localDate.getDayOfMonth()).toString());
 					shiftsForWeek = getAssignedShiftsForEmployeeForWeekOfMonth(employee.getId(), weekInPreviousMonth, previousMonth);
 					for(Shift scheduledShift : shiftsForWeek){
-						System.out.println("assigned shift:"+scheduledShift.toString());
-						System.out.println("assigned shift duration:"+scheduledShift.getDuration());
 						hours+= scheduledShift.getDuration();
 					}
 				}
 				//Handle the possibility of a shift on the last day of the week going overnight
 				weekBefore = Util.getWeekBeforeDate(Util.getLocalDateOfDayInWeek(2018, month,  week).toString());
 				shiftsForPreviousWeek = getAssignedShiftsForEmployeeForWeekOfMonth(employee.getId(), weekBefore, weekBefore>week?previousMonth:month);
-				System.out.println("right after get shifts"+getAssignedShiftsForEmployeeForWeekOfMonth(employee.getId(), weekBefore, month).toString());
 //
 				if(null!=shiftsForPreviousWeek){
-					System.out.println("found shifts for previous week"+shiftsForPreviousWeek.size());
 					for(Shift scheduledShift : shiftsForPreviousWeek){
-						System.out.println("  previous week shift:"+scheduledShift.toString());
-						System.out.println("  previous week shift isvalid?:"+scheduledShift.isValid());
 						if(scheduledShift.isValid() &&
 								Util.getWeekOfDate(scheduledShift.getEndsLocalDate().toString())==week) {
 							endTime = scheduledShift.getEndTime().split(":");

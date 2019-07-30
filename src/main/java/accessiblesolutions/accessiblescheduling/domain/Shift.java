@@ -380,14 +380,14 @@ public class Shift implements Comparable{
     	}
     	
     	int week = -1;
-    	
+ 
     	try{
     		week = Util.getWeekOfDate(startDate);
     	}
     	catch(ProccessingException e){
     		throw new CorruptDataException(e);
     	}
-    	
+
     	return week;
     }
 

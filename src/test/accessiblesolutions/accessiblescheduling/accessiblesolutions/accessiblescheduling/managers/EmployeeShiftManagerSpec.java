@@ -124,6 +124,20 @@ public class EmployeeShiftManagerSpec {
 	    when(shiftRepository.findByStartMonth(6)).thenReturn(crossMonthShifts);
 	    when(employeeCrud.findOne("crossMonth")).thenReturn(crossMonthEmployee);
 	    when(employeeRepository.findOne("crossMonth")).thenReturn(crossMonthEmployee);
+	    
+	    Employee crossWeekEmployee = new Employee("Cross","Week");
+	    ArrayList<Shift> crossWeekShifts = new ArrayList<Shift>();
+	    Shift crossWeekShift1 = new Shift();
+	    crossWeekShift1.setStaffId("crossWeek");
+	    crossWeekShift1.setClientId("crossWeekClient");
+	    crossWeekShift1.setStartDate("2018-09-22");
+	    crossWeekShift1.setEndDate("2018-09-23");
+	    crossWeekShift1.setStartTime("20:00");
+	    crossWeekShift1.setEndTime("10:00");
+	    crossWeekShifts.add(crossWeekShift1);
+	    when(shiftRepository.findByStartMonth(9)).thenReturn(crossWeekShifts);
+	    when(employeeCrud.findOne("crossWeek")).thenReturn(crossWeekEmployee);
+	    when(employeeRepository.findOne("crossWeek")).thenReturn(crossWeekEmployee);
 	}
 	
 	@Test
@@ -504,11 +518,11 @@ public class EmployeeShiftManagerSpec {
 		boolean errored = false;
 		float hours = -1;
 
-		Employee crossMonth = new Employee("Cross","Month");
-		crossMonth.setId("crossMonth");
+		Employee crossWeek = new Employee("Cross","Week");
+		crossWeek.setId("crossWeek");
 	    
 		try {
-			hours = fixture.getHoursScheduledWeekOfMonth(crossMonth,0,6);
+			hours = fixture.getHoursScheduledWeekOfMonth(crossWeek,4,9);
 		} catch (CorruptDataException e) {
 			errored=true;
 			e.printStackTrace();
@@ -518,6 +532,7 @@ public class EmployeeShiftManagerSpec {
 		}
 		
 		assertFalse(errored);
+		System.out.println("hours:"+hours);
 		assertTrue(10==hours);
 	}
 	
