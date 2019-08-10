@@ -6,6 +6,8 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import org.cloudfoundry.samples.music.repositories.mongodb.MongoCustomFieldDataRepository;
+import org.cloudfoundry.samples.music.repositories.mongodb.MongoShiftRepository;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -23,14 +25,18 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import accessiblesolutions.accessiblescheduling.domain.Client;
+import accessiblesolutions.accessiblescheduling.domain.CustomFieldData;
 import accessiblesolutions.accessiblescheduling.domain.Employee;
+import accessiblesolutions.accessiblescheduling.domain.Shift;
 
 @RestController
 @RequestMapping(value = "/employees")
 public class EmployeeController {
     private static final Logger logger = LoggerFactory.getLogger(EmployeeController.class);
     private CrudRepository<Employee, String> repository;
-
+    private MongoCustomFieldDataRepository customDataRepository;
+    private MongoShiftRepository shiftRepository;
+    
     @Autowired
     public EmployeeController(CrudRepository<Employee, String> repository) {
         this.repository = repository;
@@ -70,6 +76,26 @@ public class EmployeeController {
     public void deleteById(@PathVariable String id) {
         logger.info("Deleting employee " + id);
         repository.delete(id);
+        
+        List<CustomFieldData> customFieldData = customDataRepository.findByOwnerId(id);
+        for(CustomFieldData entry:customFieldData) {
+        	customDataRepository.delete(entry.getId());
+        }
+        
+        List<Shift> shifts = shiftRepository.findByStaffId(id);
+        for(Shift shift:shifts) {
+        	shift.setAssigned(false);
+        	shift.setStaffId(null);
+        	shift.setStaffName(null);
+        	shiftRepository.save(shift);
+        }
+        
+        shifts = shiftRepository.findByRequestedStaffId(id);
+        for(Shift shift:shifts) {
+        	shift.setRequestedStaffId(null);
+        	shift.setRequestedStaffName(null);
+        	shiftRepository.save(shift);
+        }
     }
     
     @RequestMapping(value = "/set", method = RequestMethod.POST)

@@ -83,9 +83,12 @@ public class ShiftAssignmentManager {
     	scheduleStatusCrud.save(status);
     	
     	try {
+    		System.out.println("staffing preassigned shifts:"+options.toString());
+
 			staffPreassignedShifts(options);
 			
 			for(int week = 0; week<6;week++){
+				System.out.println("scheduling shifts for week :"+week);
 	    		scheduleWeekendShifts(week,month,year,options);
 	    		scheduleWeekdayShifts(week,month,year,options);
 	    	}
@@ -107,6 +110,7 @@ public class ShiftAssignmentManager {
     
     public void scheduleWeekdayShifts(int week, int month,int year, ScheduleOptions options) throws ProccessingException, CorruptDataException {
     	ArrayList<Shift> shifts = shiftManager.getUnassignedNonEventShiftsForMonth(month);
+		System.out.println("scheudling :"+ shifts.size()+" shifts formonth");
 		ArrayList<Shift> unassignedShiftsForWeek = ShiftWorker.getShiftsStartingWeekOfMonth(shifts, week, month,year);
 		ArrayList<Shift> unassignedShiftsForWeekdays= ShiftWorker.getWeekdayShifts(unassignedShiftsForWeek);
 		System.out.println("scheduling weekday shifts:"+unassignedShiftsForWeekdays.size());
@@ -115,9 +119,10 @@ public class ShiftAssignmentManager {
     
     public void scheduleWeekendShifts(int week, int month,int year, ScheduleOptions options) throws ProccessingException, CorruptDataException {
     	ArrayList<Shift> shifts = shiftManager.getUnassignedNonEventShiftsForMonth(month);
+		System.out.println("scheudling :"+ shifts.size()+" shifts formonth");
 		ArrayList<Shift> unassignedShiftsForWeek = ShiftWorker.getShiftsStartingWeekOfMonth(shifts, week, month,year);
 		ArrayList<Shift> unassignedShiftsForWeekends= ShiftWorker.getWeekendShifts(unassignedShiftsForWeek);
-		System.out.println("scheduling weekend shifts:"+unassignedShiftsForWeekends.size());
+		System.out.println("scheduling weekend shifts:"+unassignedShiftsForWeekends.size());//TODO last known print
 		scheduleShifts(unassignedShiftsForWeekends,week,month,year,options);
     }
     
@@ -136,6 +141,7 @@ public class ShiftAssignmentManager {
 						Shift shift = getShift(week,options,unassignedShifts);
 						
 						if(null!=shift) {
+							System.out.println("attmepting to scheduleShiftSafely:"+shift.toString());
 							unassignedShifts.remove(shift);
 						
 							boolean assigned = scheduleShiftSafely(shift,options);
@@ -270,11 +276,12 @@ public class ShiftAssignmentManager {
     public Shift getShift(int year, ScheduleOptions options, ArrayList<Shift> shifts) throws CorruptDataException, ProccessingException{
 		int possible = 9001;
 		Shift selected = null;
-		
+		System.out.println("getting a shift to assign");
 		if(null!=shifts) {
 			selected=shifts.get(0);
 			
 			for(Shift shift : shifts){
+				System.out.println("seeing if the next shift we should assign is :"+shift.toString());
 				EmployeeShiftCompatibilities compatibilities = employeeShiftCompatibilityManager.getValidCompatibilities(employeeShiftCompatibilityManager.getEmployeeShiftCompatibilitiesForShift(shift),options);
 				if(compatibilities.compatibilities.size()<possible&&compatibilities.compatibilities.size()>0){
 					possible=compatibilities.compatibilities.size();
@@ -308,8 +315,8 @@ public class ShiftAssignmentManager {
     	else if(!shift.isValid()) {
     		System.out.println("Invalid shift provided to scheduleShiftSafely");
     		throw new CorruptDataException("Invalid shift provided to scheduleShiftSafely");
-    	}
-    	System.out.println("Scheduling:"+shift.toString());
+    	}//TODO look here
+    	System.out.println("Scheduling the following shift:"+shift.toString());
     	//Get all those valid to work this shift
     	shiftCompatibilities = employeeShiftCompatibilityManager.getValidCompatibilities(employeeShiftCompatibilityManager.getEmployeeShiftCompatibilitiesForShift(shift),options);
 	

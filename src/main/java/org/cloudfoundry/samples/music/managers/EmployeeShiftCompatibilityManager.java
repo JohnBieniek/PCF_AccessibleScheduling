@@ -676,7 +676,7 @@ public class EmployeeShiftCompatibilityManager {
 		if(null==compatibilities||null == compatibilities.compatibilities) {
 			throw new ProccessingException("Null compatibilities provided to getValidCompatibilities");
 		}
-		
+
 		for(EmployeeShiftCompatibility compatibility :compatibilities.compatibilities){
 			if(null==compatibility) {
 				throw new ProccessingException("Null compatibility provided to getValidCompatibilities");
@@ -687,11 +687,12 @@ public class EmployeeShiftCompatibilityManager {
 			
 			shift = null;
 			shift = compatibility.getShift();
-
+			
 			if(null == employee || null == shift) {
 				throw new ProccessingException("Null shift or employee provided to getValidCompatibilities");
 			}
-			//System.out.println("shift is checking validity of options:"+shift.toString()+"  employee:"+employee.toString());
+			System.out.println("getting valid employees for shift:"+shift.toString());
+			System.out.println("shift is checking validity of shift:"+shift.toString()+"  employee:"+employee.getFirst());
 			if(isValidFor(employee,shift,options)){
 				validCompatibilities.add(compatibility);
 			}
@@ -1012,14 +1013,14 @@ public class EmployeeShiftCompatibilityManager {
 	 */
 	public boolean isValidFor(Employee employee, Shift shift,ScheduleOptions options) throws CorruptDataException, ProccessingException{
 		boolean validity=false;
-		//System.out.println("checking validity of:"+shift.toString());
+		
 		if(null==employee||null==shift ||null==options) {
 			throw new ProccessingException("Null options, employee or shift provided to isCompatibleWith");
 		}
 		else if(!shift.isValid()) {
 			throw new CorruptDataException("Invalid shift provided to isCompatibleWith");
 		}
-		
+		System.out.println("checking validity of:"+shift.toString());
 		if(isCompatibleWith(employee,shift)){
 			if(isAssignableFor(employee,shift,options)){
 				if(options.isAllowInactive() || !employee.getInactive()){

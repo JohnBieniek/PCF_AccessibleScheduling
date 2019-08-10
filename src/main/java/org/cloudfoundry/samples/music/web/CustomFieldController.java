@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import org.cloudfoundry.samples.music.repositories.mongodb.MongoCustomFieldDataRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,13 +16,15 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import accessiblesolutions.accessiblescheduling.domain.CustomField;
+import accessiblesolutions.accessiblescheduling.domain.CustomFieldData;
 
 @RestController
 @RequestMapping(value = "/customFields")
 public class CustomFieldController {
     private static final Logger logger = LoggerFactory.getLogger(CustomFieldController.class);
     private CrudRepository<CustomField, String> repository;
-
+    private MongoCustomFieldDataRepository customDataRepository;
+    
     @Autowired
     public CustomFieldController(CrudRepository<CustomField, String> repository) {
         this.repository = repository;
@@ -54,6 +57,11 @@ public class CustomFieldController {
     public void deleteById(@PathVariable String id) {
         logger.info("Deleting customField " + id);
         repository.delete(id);
+        
+        List<CustomFieldData> customFieldData = customDataRepository.findByCustomFieldId(id);
+        for(CustomFieldData entry:customFieldData) {
+        	customDataRepository.delete(entry.getId());
+        }
     }
     
     @RequestMapping(value = "/set", method = RequestMethod.POST)
