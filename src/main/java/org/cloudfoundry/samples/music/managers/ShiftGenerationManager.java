@@ -167,6 +167,7 @@ public class ShiftGenerationManager {
     	shift.setEndTime(request.getEndTime());
     	shift.setStartMonth(time.getMonthValue());
     	shift.setStartYear(time.getYear());
+    	System.out.println("about to call getweek of date while generating shift for request at time:"+time.toString());
     	shift.setStartWeek(Util.getWeekOfDate(time.toLocalDate().toString()));
     	shift.setDisplayDate();
     	
@@ -202,9 +203,15 @@ public class ShiftGenerationManager {
 		    					timeCursor=timeCursor.plusDays(initialTime.getDayOfMonth()-1);//gives only shift
 		    				}
 		    				else {//on dayOfWeek for weekOfMonth of request
-		    					while(Util.getWeekOfDate(Util.getDateFromLocalDateTime(timeCursor))>
-		    							Util.getWeekOfDate(Util.getDateFromLocalDateTime(initialTime))){
+		    					for(int index=0;index<7;index++){
+		    						System.out.println("trying ot find out when to generate a shift for:"+request.toString()+" looking at:"+timeCursor.toString());
+
 		    						timeCursor=timeCursor.plusWeeks(1);
+
+		    						if(Util.getWeekOfDate(Util.getDateFromLocalDateTime(initialTime))==
+		    								Util.getWeekOfDate(Util.getDateFromLocalDateTime(timeCursor))){
+		    							break;
+		    						}
 		    					}
 		    					
 		    					int shift = initialTime.getDayOfWeek().getValue()-timeCursor.getDayOfWeek().getValue();

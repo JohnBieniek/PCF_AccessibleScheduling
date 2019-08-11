@@ -253,6 +253,7 @@ public abstract class Util {
 			LocalDate dateCursor = LocalDate.of(year,month,1);
 			
 			for(int day =0 ; day<32;day++) {
+				System.out.println("gettinig last day of week for week"+selectedWeek);
 				try {
 					if(getWeekOfDate(dateCursor.toString())==selectedWeek && dateCursor.getMonthValue()==month) {
 						sampleDay = dateCursor;
@@ -359,7 +360,7 @@ public abstract class Util {
 	public static int getWeekAfterDate(String date) throws ProccessingException{
 		LocalDate dayCursor = getLocalDateOfString(date);
 		dayCursor = dayCursor.plusWeeks(1);
-		
+		System.out.println("gettingWeekAfterDAte"+date.toString());
 		return getWeekOfDate(dayCursor.toString());
 	}
 	
@@ -373,7 +374,7 @@ public abstract class Util {
 	public static int getWeekBeforeDate (String date) throws ProccessingException{
 		LocalDate dayCursor = getLocalDateOfString(date);
 		dayCursor = dayCursor.minusWeeks(1);
-		
+		System.out.println("gettingWeekBeforeDAte"+date.toString());
 		return getWeekOfDate(dayCursor.toString());
 	}
 	
@@ -445,7 +446,7 @@ public abstract class Util {
 		int weekCursor = 0;
 		
 		LocalDate dayCursor = LocalDate.of(year,month, 1);
-		
+		System.out.println("getting week of date:"+date.toString());
 		while(weekCursor < 6){
 			int dayCursorInt = dayCursor.getDayOfMonth();
 			

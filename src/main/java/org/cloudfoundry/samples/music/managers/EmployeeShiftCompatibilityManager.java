@@ -596,6 +596,7 @@ public class EmployeeShiftCompatibilityManager {
 		
 		if(null!=employee && null !=shift){
 			if(shift.isValid()) {
+				System.out.println("Seeing how many hours "+employee.getFirst()+ " is scheduled week of shift:"+shift.toString());
 				int week = Util.getWeekOfDate(shift.getStartDate());
 				
 				try {
