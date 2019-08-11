@@ -57,7 +57,7 @@ public class ShiftGenerationManager {
     	String response = "Generated ";
     	int shiftsGenerated = 0;
     	Iterable<ClientRequest> requests = requestRepository.findAll();
-    	System.out.println("generating shifts");
+    	System.out.println("generating shifts for "+selectedMonth);
     	for(ClientRequest request: requests) {
     		try {
 				shiftsGenerated+=generateShiftsForRequest(request,selectedMonth,Integer.parseInt(selectedYear));
@@ -98,7 +98,9 @@ public class ShiftGenerationManager {
 				month = splitDate[1];
 			}
 			
-			if(!request.isRepeats()) {
+			if(!request.isRepeats() && Integer.parseInt(selectedMonth)==request.getStartsLocalDate().getMonthValue()) {
+				System.out.println("adding shift for"+request.getStartsLocalDateTime());
+				System.out.println("requested month:"+selectedMonth);
     			try {
 					Shift shift = getShiftForRequestAtTime(request,request.getStartsLocalDateTime());
 					shifts.add(shift);
@@ -128,8 +130,9 @@ public class ShiftGenerationManager {
 								}
 							}
 						}
-						System.out.println("getting shift for :"+ time+included);
-						if(included) {
+						System.out.println("generating shifts for request:"+request.toString()+" at time:"+time);
+						if(included && Integer.parseInt(month)==time.getMonthValue()) {
+							System.out.println("getting shift for :"+ time+included);
 							shifts.add(getShiftForRequestAtTime(request,time));
 						}
 					}
