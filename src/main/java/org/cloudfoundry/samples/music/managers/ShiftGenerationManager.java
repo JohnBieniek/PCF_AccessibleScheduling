@@ -98,17 +98,21 @@ public class ShiftGenerationManager {
 				month = splitDate[1];
 			}
 			
-			if(!request.isRepeats() && Integer.parseInt(selectedMonth)==request.getStartsLocalDate().getMonthValue()) {
-				System.out.println("adding shift for"+request.getStartsLocalDateTime());
-				System.out.println("requested month:"+selectedMonth);
+			if(!request.isRepeats()) {
+				System.out.println("considering adding shift for"+request.getStartsLocalDateTime());
+				System.out.println("requested month:"+Integer.parseInt(month)+Integer.parseInt(selectedMonth));
     			try {
-					Shift shift = getShiftForRequestAtTime(request,request.getStartsLocalDateTime());
-					shifts.add(shift);
+    				if(Integer.parseInt(month)==Integer.parseInt(selectedMonth)){
+    					System.out.println("adding shift for"+request.getStartsLocalDateTime());
+						Shift shift = getShiftForRequestAtTime(request,request.getStartsLocalDateTime());
+						shifts.add(shift);
+    				}
 	    		} catch (CorruptDataException e) {
 					System.out.println("ERROR: Corrupt time for shift provided"+e.getMessage());
 				}
     		}
 			else {
+				System.out.println("considering adding recurring shift for"+request.getStartsLocalDateTime());
 				ArrayList<LocalDateTime> times = new ArrayList<LocalDateTime>();
 				
 				try {
@@ -131,6 +135,7 @@ public class ShiftGenerationManager {
 							}
 						}
 						System.out.println("generating shifts for request:"+request.toString()+" at time:"+time);
+						System.out.println("included:"+included+" month:"+Integer.parseInt(month)+"time.getMonthValue()"+time.getMonthValue());
 						if(included && Integer.parseInt(month)==time.getMonthValue()) {
 							System.out.println("getting shift for :"+ time+included);
 							shifts.add(getShiftForRequestAtTime(request,time));
