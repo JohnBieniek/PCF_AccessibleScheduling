@@ -136,7 +136,7 @@ public class ShiftGenerationManager {
 						}
 						System.out.println("generating shifts for request:"+request.toString()+" at time:"+time);
 						System.out.println("included:"+included+" month:"+Integer.parseInt(month)+"time.getMonthValue()"+time.getMonthValue());
-						if(included && Integer.parseInt(month)==time.getMonthValue()) {
+						if(included && Integer.parseInt(selectedMonth)==time.getMonthValue()) {
 							System.out.println("getting shift for :"+ time+included);
 							shifts.add(getShiftForRequestAtTime(request,time));
 						}
@@ -255,7 +255,7 @@ public class ShiftGenerationManager {
 	    				boolean working = request.getDays()[index];
 	    				LocalDateTime selectedDay = timeCursor.minusDays(6-index);
 	    				System.out.println("making shifts for day "+selectedDay.getDayOfWeek().toString() + " "+working +" monthValue:"+selectedDay.getMonthValue()+" selectedMonth"+selectedMonth);
-	    				if(working && selectedDay.getMonthValue()==selectedMonth && selectedDay.isAfter(request.getStartsLocalDateTime())) {
+	    				if(working && selectedDay.getMonthValue()==selectedMonth && (selectedDay.isAfter(request.getStartsLocalDateTime()) || selectedDay.isEqual(request.getStartsLocalDateTime()))) {
 	    					times.add(selectedDay);
 	    					System.out.println("Added time:"+selectedDay.toString());
 	    				}

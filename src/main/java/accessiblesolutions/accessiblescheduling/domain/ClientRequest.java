@@ -2,6 +2,7 @@ package accessiblesolutions.accessiblescheduling.domain;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -326,12 +327,7 @@ public class ClientRequest {
 		this.repeatsEvery = repeatsEvery;
 	}
 
-	@Override
-	public String toString() {
-		return "ShiftRequest [id=" + id + ", clientName=" + clientName + ", staffName=" + staffName + ", clientId="
-				+ clientId + ", requestEmployee=" + requestEmployee + ", staffId=" + staffId + ", startDate="
-				+ startDate + ", startTime=" + startTime + ", endDate=" + endDate + ", endTime=" + endTime + "]";
-	}
+
 
 	public boolean[] getDays() {
 		return days;
@@ -373,5 +369,16 @@ public class ClientRequest {
 
 	public void setExceptions(String[] exceptions) {
 		this.exceptions = exceptions;
+	}
+
+
+	@Override
+	public String toString() {
+		return "ClientRequest [id=" + id + ", clientName=" + clientName + ", staffName=" + staffName + ", clientId="
+				+ clientId + ", requestEmployee=" + requestEmployee + ", staffId=" + staffId + ", startDate="
+				+ startDate + ", startTime=" + startTime + ", endDate=" + endDate + ", endTime=" + endTime
+				+ ", repeats=" + repeats + ", repeatsEvery=" + repeatsEvery + ", days=" + Arrays.toString(days)
+				+ ", interval=" + interval + ", monthInterval=" + monthInterval + ", yearInterval=" + yearInterval
+				+ ", exceptions=" + Arrays.toString(exceptions) + "]";
 	}
 }
