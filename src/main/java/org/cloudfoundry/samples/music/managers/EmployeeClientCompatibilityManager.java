@@ -83,6 +83,7 @@ public class EmployeeClientCompatibilityManager {
 	    		}
 	    	}
     	}
+    	System.out.println("getting compatibleWith for "+employee.toString()+ client.toString()+ "compatible?"+compatible);
     	
     	return compatible;
     }

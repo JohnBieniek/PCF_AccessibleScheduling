@@ -693,7 +693,7 @@ public class EmployeeShiftCompatibilityManager {
 				throw new ProccessingException("Null shift or employee provided to getValidCompatibilities");
 			}
 			System.out.println("getting valid employees for shift:"+shift.toString());
-			System.out.println("shift is checking validity of shift:"+shift.toString()+"  employee:"+employee.getFirst());
+			System.out.println("get valid compatibilities is checking validity of shift:"+shift.toString()+"  employee:"+employee.getFirst());
 			if(isValidFor(employee,shift,options)){
 				validCompatibilities.add(compatibility);
 			}
@@ -776,7 +776,7 @@ public class EmployeeShiftCompatibilityManager {
 		if(!employee.requestedOff(shift)){
 			//System.out.println("not requested off");
     		if(isUnassignedFor(employee,shift)){
-    			//System.out.println("unassinged");
+    			System.out.println("checking availability of "+employee.toString()+shift.toString());
     			if(options.isAllowUnavailable() || isAvailableFor(employee,shift)){
     				assignable=true;
     			}
@@ -804,7 +804,7 @@ public class EmployeeShiftCompatibilityManager {
 		else if(!shift.isValid()) {
 			throw new CorruptDataException("Invalid shift provided to isAvailableFor");
 		}
-		System.out.println("getting available");
+		System.out.println("running  isAvailableFor");
 		LocalDate date = LocalDate.of(shift.getStartYear(), shift.getStartMonth(), shift.getStartDay());
 		DayOfWeek day = date.getDayOfWeek();
 		int dayInt = day.getValue();
@@ -1023,6 +1023,7 @@ public class EmployeeShiftCompatibilityManager {
 		}
 		System.out.println("checking validity of:"+shift.toString());
 		if(isCompatibleWith(employee,shift)){
+			System.out.println("checking assignability of:"+shift.toString()+employee.toString());
 			if(isAssignableFor(employee,shift,options)){
 				if(options.isAllowInactive() || !employee.getInactive()){
 					if(employee.getId().equalsIgnoreCase(shift.getRequestedStaffId()) || !employee.getFixedSchedule()){
