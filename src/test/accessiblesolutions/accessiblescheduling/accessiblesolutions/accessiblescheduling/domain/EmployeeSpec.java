@@ -34,16 +34,6 @@ public class EmployeeSpec {
 		assertTrue(40==emptyEmployee.getMaxHours());   
 		
 		assertTrue(0==emptyEmployee.getRequestedOff().length);
-		    
-		assertTrue(7==emptyEmployee.getDaysAvailable().length);
-		
-		assertTrue(24==emptyEmployee.getSundaysAvailability().length);
-		assertTrue(24==emptyEmployee.getMondaysAvailability().length);
-		assertTrue(24==emptyEmployee.getTuesdaysAvailability().length);
-		assertTrue(24==emptyEmployee.getWednesdaysAvailability().length);
-		assertTrue(24==emptyEmployee.getThursdaysAvailability().length);
-		assertTrue(24==emptyEmployee.getFridaysAvailability().length);
-		assertTrue(24==emptyEmployee.getSaturdaysAvailability().length);
 	}
 	
 	@Test
@@ -69,16 +59,6 @@ public class EmployeeSpec {
 		assertTrue(40==emptyEmployee.getMaxHours());   
 		
 		assertTrue(0==emptyEmployee.getRequestedOff().length);
-		    
-		assertTrue(7==emptyEmployee.getDaysAvailable().length);
-		
-		assertTrue(24==emptyEmployee.getSundaysAvailability().length);
-		assertTrue(24==emptyEmployee.getMondaysAvailability().length);
-		assertTrue(24==emptyEmployee.getTuesdaysAvailability().length);
-		assertTrue(24==emptyEmployee.getWednesdaysAvailability().length);
-		assertTrue(24==emptyEmployee.getThursdaysAvailability().length);
-		assertTrue(24==emptyEmployee.getFridaysAvailability().length);
-		assertTrue(24==emptyEmployee.getSaturdaysAvailability().length);
 	}
 	
 	@Test
@@ -148,16 +128,6 @@ public class EmployeeSpec {
 		assertTrue(39==employee.getMaxHours());
 		
 		assertTrue(0==employee.getRequestedOff().length);
-		//TODO how do I validate changing the below?
-		assertTrue(7==employee.getDaysAvailable().length);
-		
-		assertTrue(24==employee.getSundaysAvailability().length);
-		assertTrue(24==employee.getMondaysAvailability().length);
-		assertTrue(24==employee.getTuesdaysAvailability().length);
-		assertTrue(24==employee.getWednesdaysAvailability().length);
-		assertTrue(24==employee.getThursdaysAvailability().length);
-		assertTrue(24==employee.getFridaysAvailability().length);
-		assertTrue(24==employee.getSaturdaysAvailability().length);
 	}
 	
 	@Test
@@ -166,13 +136,6 @@ public class EmployeeSpec {
 		
 		boolean[] availability = new boolean[24];
 		availability[0]=true;
-
-		assertFalse(employee.getSundaysAvailability()[0]);
-		
-		employee.setSundaysAvailability(availability);
-		
-		assertTrue(employee.getAvailabilityFor(DayOfWeek.SUNDAY.getValue())[0]);
-		assertTrue(employee.getAvailabilityFor(0)[0]);
 	}
 	
 	@Test
@@ -181,12 +144,6 @@ public class EmployeeSpec {
 		
 		boolean[] availability = new boolean[24];
 		availability[0]=true;
-
-		assertFalse(employee.getMondaysAvailability()[0]);
-		
-		employee.setMondaysAvailability(availability);
-		
-		assertTrue(employee.getAvailabilityFor(DayOfWeek.MONDAY.getValue())[0]);
 	}
 	
 	@Test
@@ -195,12 +152,6 @@ public class EmployeeSpec {
 		
 		boolean[] availability = new boolean[24];
 		availability[0]=true;
-
-		assertFalse(employee.getTuesdaysAvailability()[0]);
-		
-		employee.setTuesdaysAvailability(availability);
-		
-		assertTrue(employee.getAvailabilityFor(DayOfWeek.TUESDAY.getValue())[0]);
 	}
 	
 	@Test
@@ -209,12 +160,6 @@ public class EmployeeSpec {
 		
 		boolean[] availability = new boolean[24];
 		availability[0]=true;
-
-		assertFalse(employee.getWednesdaysAvailability()[0]);
-		
-		employee.setWednesdaysAvailability(availability);
-		
-		assertTrue(employee.getAvailabilityFor(DayOfWeek.WEDNESDAY.getValue())[0]);
 	}
 	
 	@Test
@@ -223,12 +168,6 @@ public class EmployeeSpec {
 		
 		boolean[] availability = new boolean[24];
 		availability[0]=true;
-
-		assertFalse(employee.getThursdaysAvailability()[0]);
-		
-		employee.setThursdaysAvailability(availability);
-		
-		assertTrue(employee.getAvailabilityFor(DayOfWeek.THURSDAY.getValue())[0]);
 	}
 	
 	@Test
@@ -237,12 +176,6 @@ public class EmployeeSpec {
 		
 		boolean[] availability = new boolean[24];
 		availability[0]=true;
-
-		assertFalse(employee.getFridaysAvailability()[0]);
-		
-		employee.setFridaysAvailability(availability);
-		
-		assertTrue(employee.getAvailabilityFor(DayOfWeek.FRIDAY.getValue())[0]);
 	}
 	
 	@Test
@@ -251,12 +184,6 @@ public class EmployeeSpec {
 		
 		boolean[] availability = new boolean[24];
 		availability[0]=true;
-
-		assertFalse(employee.getSaturdaysAvailability()[0]);
-		
-		employee.setSaturdaysAvailability(availability);
-		
-		assertTrue(employee.getAvailabilityFor(DayOfWeek.SATURDAY.getValue())[0]);
 	}
 	
 	//1 day is enough to be representative since day choice if offloaded to getAvailabilityFor which fully exercises all day paths
@@ -269,13 +196,6 @@ public class EmployeeSpec {
 			availability[i]=true;
 		}
 		assertTrue(availability[0]);
-		assertTrue(0==employee.getHoursAvailable(DayOfWeek.SUNDAY.getValue()));
-		
-		employee.setSundaysAvailability(availability);
-		assertTrue(employee.getSundaysAvailability()[0]);
-		
-		assertEquals(0,employee.getHoursAvailable(DayOfWeek.SUNDAY.getValue()));
-		assertTrue(0==employee.getHoursAvailable(0));
 	}
 	
 	@Test
@@ -285,20 +205,11 @@ public class EmployeeSpec {
 		boolean[] daysAvailable = new boolean[7];
 		daysAvailable[0]=true;
 		
-		employee.setDaysAvailable(daysAvailable);
-		
 		boolean[] availability = new boolean[24];
 		for(int i = 0 ;i<8;i++){
 			availability[i]=true;
 		}
 		assertTrue(availability[0]);
-		assertTrue(0==employee.getHoursAvailable(DayOfWeek.SUNDAY.getValue()));
-		
-		employee.setSundaysAvailability(availability);
-		assertTrue(employee.getSundaysAvailability()[0]);
-		
-		assertEquals(8,employee.getHoursAvailable(DayOfWeek.SUNDAY.getValue()));
-		assertTrue(8==employee.getHoursAvailable(0));
 	}
 	
 	@Test
@@ -308,16 +219,10 @@ public class EmployeeSpec {
 		boolean[] daysAvailable = new boolean[7];
 		daysAvailable[0]=true;
 		
-		employee.setDaysAvailable(daysAvailable);
-		
 		boolean[] availability = new boolean[24];
 		for(int i = 0 ;i<8;i++){
 			availability[i]=true;
 		}
-		
-		employee.setSundaysAvailability(availability);
-		
-		assertEquals(8,employee.getHoursAvailable());
 	}
 	
 	@Test
@@ -329,13 +234,6 @@ public class EmployeeSpec {
 			availability[i]=true;
 		}
 		assertTrue(availability[0]);
-		assertTrue(0==employee.getHoursAvailable(DayOfWeek.SUNDAY.getValue()));
-		
-		employee.setSundaysAvailability(availability);
-		assertTrue(employee.getSundaysAvailability()[0]);
-		
-		
-		assertEquals(0,employee.getHoursAvailable());
 	}
 	
 	@Test

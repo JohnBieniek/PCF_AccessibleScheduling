@@ -1,6 +1,7 @@
 package org.cloudfoundry.samples.music.managers;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import accessiblesolutions.accessiblescheduling.domain.EmployeeShiftCompatibilit
 import accessiblesolutions.accessiblescheduling.domain.Shift;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
+import accessiblesolutions.accessiblescheduling.to.Availability;
 import accessiblesolutions.accessiblescheduling.to.ScheduleOptions;
 import accessiblesolutions.accessiblescheduling.util.Util;
 import accessiblesolutions.accessiblescheduling.worker.ShiftWorker;
@@ -594,12 +596,11 @@ public class EmployeeShiftCompatibilityManager {
 		
 		if(null!=employee && null !=shift){
 			if(shift.isValid()) {
+				System.out.println("Seeing how many hours "+employee.getFirst()+ " is scheduled week of shift:"+shift.toString());
 				int week = Util.getWeekOfDate(shift.getStartDate());
 				
 				try {
-					//System.out.println("getting hours");
 					hours = employeeShiftManager.getHoursScheduledWeekOfMonth(employee,week,shift.getStartMonth());
-					//System.out.println("got "+hours+" hours");
 				} catch (CorruptDataException e) {
 					throw new ProccessingException(e);
 				}
@@ -676,7 +677,7 @@ public class EmployeeShiftCompatibilityManager {
 		if(null==compatibilities||null == compatibilities.compatibilities) {
 			throw new ProccessingException("Null compatibilities provided to getValidCompatibilities");
 		}
-		
+
 		for(EmployeeShiftCompatibility compatibility :compatibilities.compatibilities){
 			if(null==compatibility) {
 				throw new ProccessingException("Null compatibility provided to getValidCompatibilities");
@@ -687,11 +688,12 @@ public class EmployeeShiftCompatibilityManager {
 			
 			shift = null;
 			shift = compatibility.getShift();
-
+			
 			if(null == employee || null == shift) {
 				throw new ProccessingException("Null shift or employee provided to getValidCompatibilities");
 			}
-			//System.out.println("shift is checking validity of options:"+shift.toString()+"  employee:"+employee.toString());
+			System.out.println("getting valid employees for shift:"+shift.toString());
+			System.out.println("get valid compatibilities is checking validity of shift:"+shift.toString()+"  employee:"+employee.getFirst());
 			if(isValidFor(employee,shift,options)){
 				validCompatibilities.add(compatibility);
 			}
@@ -774,7 +776,7 @@ public class EmployeeShiftCompatibilityManager {
 		if(!employee.requestedOff(shift)){
 			//System.out.println("not requested off");
     		if(isUnassignedFor(employee,shift)){
-    			//System.out.println("unassinged");
+    			System.out.println("checking availability of "+employee.toString()+shift.toString());
     			if(options.isAllowUnavailable() || isAvailableFor(employee,shift)){
     				assignable=true;
     			}
@@ -791,11 +793,10 @@ public class EmployeeShiftCompatibilityManager {
 	 * @return boolean if the employee has themselves listed as willing to work during the days and times covered by the shift
 	 * @throws CorruptDataException invalid shift
 	 * @throws ProccessingException null employee or shift
-	 * @Tested
-	 * @Refactor to be cleaner after availability has been updated
+	 * @TestsInvalid
 	 */
 	public boolean isAvailableFor(Employee employee, Shift shift) throws CorruptDataException, ProccessingException{
-		boolean available = true;
+		boolean available = false;
 		
 		if(null==employee||null==shift) {
 			throw new ProccessingException("Null employee or shift provided to isAvailableFor");
@@ -803,90 +804,120 @@ public class EmployeeShiftCompatibilityManager {
 		else if(!shift.isValid()) {
 			throw new CorruptDataException("Invalid shift provided to isAvailableFor");
 		}
-
+		System.out.println("running  isAvailableFor");
 		LocalDate date = LocalDate.of(shift.getStartYear(), shift.getStartMonth(), shift.getStartDay());
 		DayOfWeek day = date.getDayOfWeek();
 		int dayInt = day.getValue();
 		if(dayInt==7){
 			dayInt=0;
 		}
-		//System.out.println("day:"+dayInt);
-		
-		if(!shift.getOvernight()){
-			//System.out.println("not overnight");
-			if(employee.getDaysAvailable()[dayInt]){
-				//System.out.println("available day");
-				boolean[] availability = employee.getAvailabilityFor(dayInt);
-				
-				String start = shift.getStartTime();
-				int startHour = (int) Integer.parseInt(start.split(":")[0]);
-				
-				String end = shift.getEndTime();
-				int endHour = (int) Integer.parseInt(end.split(":")[0]);
-				int endMinute = (int) Integer.parseInt(end.split(":")[1]);
-				
-				for(int hourCursor = startHour;hourCursor<=endHour;hourCursor++){
-					if(hourCursor!=endHour){
-    					if(!availability[hourCursor]){
-    						available = false;
-    					}
+		System.out.println("startDate:"+shift.getStartsLocalDateTime());
+		System.out.println("week of start date:"+Util.getWeekOfDate(shift.getStartsLocalDate().toString()));
+		 //Get the end of the week to find the availabiliities day
+		LocalDate weeksEnd =  Util.getLocalDateOfDayInWeek(shift.getStartYear(), shift.getStartMonth(), Util.getWeekOfDate(shift.getStartsLocalDate().toString()));
+		System.out.println("getting availability, week ends:"+weeksEnd.toString());
+		//if(!shift.getOvernight()){//Get availability for single day shifts
+			LocalDateTime availableUntil = shift.getStartsLocalDateTime();//Try to prove availability from start to finish
+			System.out.println("not overnight");
+			for(int run = 0; run<employee.getDays().length;run++) {//Go over each availability n^2 times to ensure we get everything
+				for(int index = 0; index<employee.getDays().length;index++) {
+					System.out.println("run:"+run+index+1);
+					System.out.println("available until"+availableUntil.toString());
+					Availability availability = employee.getAvailability(index);
+					System.out.println(availability.toString());
+					LocalDate availabilityDay = weeksEnd;//Localize the availability for this week					
+					if(availability.day.getValue()==shift.getStartsLocalDate().getDayOfWeek().getValue()) {
+						availabilityDay=shift.getStartsLocalDate();
 					}
-					else if(endMinute!=0){
-						if(!availability[hourCursor]){
-							available = false;
-    					}
+					if(availability.day.getValue()==shift.getEndsLocalDate().getDayOfWeek().getValue()) {
+						availabilityDay=shift.getEndsLocalDate();
+					}
+					//availabilityDay = availabilityDay.minusDays(6-shift.getStartsLocalDate().getDayOfWeek().getValue());//Sunday will get wrong week
+					
+					System.out.println("availabilityDay:"+availabilityDay);
+					LocalDateTime availabilityStart= LocalDateTime.of(availabilityDay, availability.startTime);
+					LocalDateTime availabilityEnd= LocalDateTime.of(availabilityDay, availability.endTime);
+					System.out.println("availability start:"+availabilityStart.toString() + " availablitity end:"+ availabilityEnd);
+					if(Util.isOverlapping(shift.getStartsLocalDateTime(), shift.getEndsLocalDateTime(), availabilityStart,availabilityEnd)) {
+						System.out.println("availability overlaps shift");
+						if(availableUntil.isAfter(availabilityStart.minusMinutes(2))){
+							availableUntil=availabilityEnd;
+							System.out.println("availability updated as iit's after avaiilable until or equal to avail start");
+						}
+					}
+					
+//					if(shift.getStartsLocalDate().getDayOfWeek().getValue()==DayOfWeek.SUNDAY.getValue()) {
+//						availabilityDay = availabilityDay.minusDays(7);
+//					
+//						System.out.println("availabilityDay:"+availabilityDay);
+//						availabilityStart= LocalDateTime.of(availabilityDay, availability.startTime);
+//						availabilityEnd= LocalDateTime.of(availabilityDay, availability.endTime);
+//						System.out.println("availability start:"+availabilityStart.toString() + " availablitity end:"+ availabilityEnd);
+//						if(Util.isOverlapping(shift.getStartsLocalDateTime(), shift.getEndsLocalDateTime(), availabilityStart,availabilityEnd)) {
+//							System.out.println("availability overlaps shift");
+//							if(availableUntil.isAfter(availabilityStart) || availableUntil.isEqual(availabilityStart)){
+//								availableUntil=availabilityEnd;
+//								System.out.println("availability updated as iit's after avaiilable until or equal to avail start");
+//							}
+//						}
+//					}
+					
+					
+					if(availableUntil.isAfter(shift.getEndsLocalDateTime())||availableUntil.isEqual(shift.getEndsLocalDateTime())) {
+						break;
 					}
 				}
-			}
-			else{
-				available = false;
-			}
-		}
-		else{
-			if(employee.getDaysAvailable()[dayInt]){
-				boolean[] availability = employee.getAvailabilityFor(dayInt);
 				
-				String start = shift.getStartTime();
-				int startHour = (int) Integer.parseInt(start.split(":")[0]);
-				for(int hourCursor = startHour;hourCursor<24;hourCursor++){
-					if(!availability[hourCursor]){
-						available = false;
-					}
+				if(availableUntil.isAfter(shift.getEndsLocalDateTime())||availableUntil.isEqual(shift.getEndsLocalDateTime())) {
+					available=true;
+					break;
 				}
-				
-				dayInt++;
-				if(dayInt==7){
-    				dayInt=0;
-    			}
-				
-				String end = shift.getEndTime();
-				int endHour = (int) Integer.parseInt(end.split(":")[0]);
-				int endMinute = (int) Integer.parseInt(end.split(":")[1]);
-				
-				availability = employee.getAvailabilityFor(dayInt);
-				
-				if(employee.getDaysAvailable()[dayInt]){
-					for(int hourCursor =0;hourCursor<endHour;hourCursor++){
-    					if(hourCursor!=endHour){
-	    					if(!availability[hourCursor]){
-	    						available = false;
-	    					}
-    					}
-    					else if(endMinute!=0){
-							if(!availability[hourCursor]){
-								available = false;
-	    					}
-    					}
-    				}
-				}
-				else{
-					available = false;
-    			}
 			}
-			else{
-				available = false;
-			}
-		}
+		//}
+		//else{
+//			LocalDateTime availableUntil = shift.getStartsLocalDateTime();
+//			System.out.println("overnight");
+//			for(int run = 0; run<employee.getDays().length;run++) {
+//				System.out.println("run:"+run);
+//				for(int index = 0; index<employee.getDays().length;index++) {
+//					System.out.println("available until"+availableUntil.toString());
+//					Availability availability = employee.getAvailability(index);
+//
+//					LocalDate availabilityDay = shift.getStartsLocalDate();
+//					if(availability.day.getValue()<6) {
+//						availabilityDay=availabilityDay.minusDays(6-availability.day.getValue());
+//					}
+//					else if(availability.day.getValue()==7) {
+//						availabilityDay=availabilityDay.minusDays(6);
+//					}
+//					System.out.println("availabilityDay.getDayOfWeek().equals(DayOfWeek.SUNDAY)"+availabilityDay.getDayOfWeek().equals(DayOfWeek.SUNDAY));
+//					System.out.println("shift.getStartsLocalDate().getDayOfWeek().equals(DayOfWeek.SATURDAY)"+shift.getStartsLocalDate().getDayOfWeek().equals(DayOfWeek.SATURDAY));
+//					if(availabilityDay.getDayOfWeek().equals(DayOfWeek.SUNDAY)&& shift.getStartsLocalDate().getDayOfWeek().equals(DayOfWeek.SATURDAY)) {
+//						availabilityDay=availabilityDay.plusWeeks(1);
+//					}
+//					System.out.println("availabilityDay:"+availabilityDay);
+//					LocalDateTime availabilityStart= LocalDateTime.of(availabilityDay, availability.startTime);
+//					LocalDateTime availabilityEnd= LocalDateTime.of(availabilityDay, availability.endTime);
+//					System.out.println("availability start:"+availabilityStart.toString() + " availablitity end:"+ availabilityEnd);
+//					if(Util.isOverlapping(shift.getStartsLocalDateTime(), shift.getEndsLocalDateTime(), availabilityStart,availabilityEnd)) {
+//						System.out.println("availability overlaps shift");
+//						if(availableUntil.isAfter(availabilityStart.minusMinutes(2))){
+//							availableUntil=availabilityEnd;
+//							
+//						}
+//					}
+//					
+//					if(availableUntil.isAfter(shift.getEndsLocalDateTime())||availableUntil.isEqual(shift.getEndsLocalDateTime())) {
+//						break;
+//					}
+//				}
+//				
+//				if(availableUntil.isAfter(shift.getEndsLocalDateTime())||availableUntil.isEqual(shift.getEndsLocalDateTime())) {
+//					available=true;
+//					break;
+//				}
+//			}
+		//}
 		
 		return available;
 	}
@@ -983,15 +1014,16 @@ public class EmployeeShiftCompatibilityManager {
 	 */
 	public boolean isValidFor(Employee employee, Shift shift,ScheduleOptions options) throws CorruptDataException, ProccessingException{
 		boolean validity=false;
-		//System.out.println("checking validity of:"+shift.toString());
+		
 		if(null==employee||null==shift ||null==options) {
 			throw new ProccessingException("Null options, employee or shift provided to isCompatibleWith");
 		}
 		else if(!shift.isValid()) {
 			throw new CorruptDataException("Invalid shift provided to isCompatibleWith");
 		}
-		
+		System.out.println("checking validity of:"+shift.toString());
 		if(isCompatibleWith(employee,shift)){
+			System.out.println("checking assignability of:"+shift.toString()+employee.toString());
 			if(isAssignableFor(employee,shift,options)){
 				if(options.isAllowInactive() || !employee.getInactive()){
 					if(employee.getId().equalsIgnoreCase(shift.getRequestedStaffId()) || !employee.getFixedSchedule()){

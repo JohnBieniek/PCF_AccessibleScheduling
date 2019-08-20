@@ -1,6 +1,14 @@
 package org.cloudfoundry.samples.music.web;
 
-import accessiblesolutions.accessiblescheduling.domain.Event;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+
+import javax.validation.Valid;
+
+import org.cloudfoundry.samples.music.repositories.mongodb.MongoCustomFieldDataRepository;
+import org.cloudfoundry.samples.music.repositories.mongodb.MongoShiftRepository;
+import org.cloudfoundry.samples.music.repositories.mongodb.MongoShiftRequestRepository;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -8,27 +16,28 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.core.JsonParseException;
-import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.databind.DeserializationFeature;
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.databind.JsonMappingException;
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import accessiblesolutions.accessiblescheduling.domain.Client;
-import accessiblesolutions.accessiblescheduling.domain.CustomField;
-
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
+import accessiblesolutions.accessiblescheduling.domain.CustomFieldData;
+import accessiblesolutions.accessiblescheduling.domain.Shift;
+import accessiblesolutions.accessiblescheduling.domain.ShiftRequest;
 
 @RestController
 @RequestMapping(value = "/clients")
 public class ClientController {
     private static final Logger logger = LoggerFactory.getLogger(ClientController.class);
     private CrudRepository<Client, String> repository;
+    private MongoShiftRepository shiftRepository;
+    private MongoShiftRequestRepository requestRepository;
+    private MongoCustomFieldDataRepository customDataRepository;
 
     @Autowired
     public ClientController(CrudRepository<Client, String> repository) {
@@ -66,6 +75,21 @@ public class ClientController {
         repository.delete(id);
     	List<Client> clients = (List<Client>) repository.findAll();
         Collections.sort(clients);
+        
+        List<Shift> shifts = shiftRepository.findByClientId(id);
+        for(Shift shift:shifts) {
+        	shiftRepository.delete(shift.getId());
+        }
+        
+        List<ShiftRequest> shiftRequests = requestRepository.findByClientId(id);
+        for(ShiftRequest shiftRequest:shiftRequests) {
+        	requestRepository.delete(shiftRequest.getId());
+        }
+        
+        List<CustomFieldData> customFieldData = customDataRepository.findByOwnerId(id);
+        for(CustomFieldData entry:customFieldData) {
+        	customDataRepository.delete(entry.getId());
+        }
         
 		return clients;
     }
