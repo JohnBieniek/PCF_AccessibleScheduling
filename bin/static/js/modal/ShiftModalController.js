@@ -1,9 +1,10 @@
-function ShiftModalController($scope, $modalInstance, $http, shift, client,clients,employees,date, action) {
+function ShiftModalController($scope, $modalInstance, $http, Status, shift, client,clients,employees,date, action) {
     $scope.shiftAction = action;
     $scope.shift = shift;
     $scope.client=client;
     $scope.employees=employees;
     $scope.showEmployee=true;
+    $scope.assignable=false;
     if(shift.clientId==null||shift.clientName==undefined){
     	shift.clientId=client.id;
     }
@@ -45,6 +46,7 @@ function ShiftModalController($scope, $modalInstance, $http, shift, client,clien
 		$scope.isValid($scope.shift);
 	}
     $scope.isValid = function(shift){
+    	$scope.assignable=false;
     	$http({
             url: '/shifts/validity',
             method: 'POST',
@@ -57,10 +59,80 @@ function ShiftModalController($scope, $modalInstance, $http, shift, client,clien
         })
         .then(function(response) {
     		$scope.valid = response.data;
+    		
+    		if($scope.valid){
+    			$scope.getAssignable(shift);
+    		}
         });
     }
     
+    $scope.getAssignable = function (shift) {
+    	$http({
+            url: '/schedule/staffShift',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            params: {
+            	param: shift
+            }
+        })
+        .then(function(response) {
+    		if(response.data==0){
+        		$scope.assignable=false;
+    		}
+    		else{
+        		$scope.assignable=true;
+    		}
 
+        });
+    };
+    
+    $scope.isAssignDisabled = function(){
+	   	if($scope.assignable){
+	   		return false;
+	   	}
+	   	else{
+	   		return true;
+	   	}
+     };
+    $scope.assign = function (shift) {
+    	console.log("assigning shift");
+    	$http({
+            url: '/schedule/staffShift',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            params: {
+            	param: shift
+            }
+        })
+        .then(function(response) {
+    		$scope.selectedEmployee = response.data;
+    		
+    		if($scope.selectedEmployee==0){
+        		$scope.assignable=false;
+    		}
+    		else{
+        		$scope.assignable=true;
+        		$http({
+                    url: '/shifts/validity',
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    params: {
+                    	shift: shift
+                    }
+                })
+                .then(function(response) {
+            		$scope.valid = response.data;
+                });
+    		}
+        });
+    };
+    
     $scope.ok = function () {
         console.log("oking shift:"+$scope.shift);
         console.log("oking employee:"+$scope.employee);

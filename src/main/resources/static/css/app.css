@@ -116,6 +116,26 @@ html,body
     text-align: center;
     background-color: #cc0000;  		
 }
+
+.assignable{
+    background-color: #4e9a06 !important;  		
+}
+
+.disabledButton {
+  opacity: 0.55; 
+  cursor: not-allowed;
+  pointer-events: none;
+  text-decoration: none;
+}
+
+.assignButton{
+    float: left;
+    color: black;
+    text-align: center;
+    font-size: 14px;
+    padding: 6px;
+    background-color: #babdb6;  		
+}
 .okClientButton{
 	width: 90px;
     margin-right: 0px;

@@ -374,6 +374,72 @@ public class ShiftAssignmentManager {
     	return assigned;
     }
     
+    public Employee suggestScheduleShiftSafely(Shift shift,ScheduleOptions options) throws CorruptDataException,ProccessingException{
+    	boolean assigned = false;
+    	Employee employee=null;
+    	EmployeeShiftCompatibilities shiftCompatibilities;
+    	
+    	if(null == shift) {
+    		System.out.println("Null shift provided to scheduleShiftSafely");
+    		throw new ProccessingException("Null shift provided to scheduleShiftSafely");
+    	}
+    	else if(!shift.isValid()) {
+    		System.out.println("Invalid shift provided to scheduleShiftSafely");
+    		throw new CorruptDataException("Invalid shift provided to scheduleShiftSafely");
+    	}//TODO look here
+    	System.out.println("Scheduling the following shift:"+shift.toString());
+    	//Get all those valid to work this shift
+    	shiftCompatibilities = employeeShiftCompatibilityManager.getValidCompatibilities(employeeShiftCompatibilityManager.getEmployeeShiftCompatibilitiesForShift(shift),options);
+	
+    	//If we have at least one valid employee for this shift
+    	if(null!=shiftCompatibilities && null != shiftCompatibilities.compatibilities && 
+    	   shiftCompatibilities.compatibilities.size() >0) {
+    		//System.out.println("options.isAllowOvertime() when at least one available:"+options.isAllowOvertime() );
+    		//If we have only 1 valid employee give them the shift regardless
+    		if(shiftCompatibilities.compatibilities.size()==1 && 
+    				( options.isAllowOvertime() || 
+					!employeeShiftCompatibilityManager.getAssignmentWouldIncurOvertime(shiftCompatibilities.compatibilities.get(0)))) {
+    			employee=shiftCompatibilities.compatibilities.get(0).getEmployee();
+    			if(employee!=null) {
+	    			shift.setAssignmentReason("Only " + employee.getFirst() +" was compatible and available. ");
+	    			assigned=true;
+    			}
+    		}
+    		
+    		//Assign to the person with the most time needed to meet their minimum
+    		if(!assigned) {
+    			employee = employeeShiftCompatibilityManager.getEmployeeWithMostNeeded(shiftCompatibilities);
+    			if(employeeShiftCompatibilityManager.hoursNeededWeekOfShift(employee, shift)>0) {
+    				shift.setAssignmentReason(employee.getFirst() +" needed the most hours.");
+	    			assigned=true;
+    			}
+    		}
+    		
+    		//Assign to the person with the most time
+    		if(!assigned) {
+    			//System.out.println("trying to assign to most time");
+    			employee=employeeShiftCompatibilityManager.getEmployeeWithMostTimeSafely(shiftCompatibilities);
+    			if(null!=employee) {
+    				shift.setAssignmentReason(employee.getFirst() +" had the most time before overtime");
+	    			assigned=true;
+    			}
+			}
+    		
+    		//If scheduling when already in overtime is allowed, give to the person with the fewest hours
+    		if(!assigned && options.isAllowOvertime()){
+				employee=employeeShiftCompatibilityManager.getEmployeeWithFewestHours(shiftCompatibilities);
+				
+				if(null!=employee) {
+					shift.setAssignmentReason(employee.getFirst() +" had the fewest hours when overtime was allowed");
+	    			assigned=true;
+				}
+    		}
+    	}
+    	
+    	System.out.println("assigned:"+assigned);
+    	
+    	return employee;
+    }
     public void scheduleShift(Shift shift, Employee employee) throws ProccessingException {
     	if(null == shift || null == employee) {
     		throw new ProccessingException("Null shift or employee provided to scheduleShift");

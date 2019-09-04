@@ -94,6 +94,7 @@ function ClientsController($scope, $modal, $http, Clients, Client, CustomFields,
          });
      }
      
+       
      $scope.getClientCustomFieldData = function (client,customField,index){
      	$http({
              url: '/compatibility/clientCustomFieldData',

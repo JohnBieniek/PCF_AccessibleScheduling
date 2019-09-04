@@ -2,7 +2,7 @@
     <h3 ng-show="shiftAction === 'add'">Add a shift</h3>
     <h3 ng-show="shiftAction === 'update'">Edit a shift</h3>
 </div>
-<div class="modal-body">
+<div class="modal-body" ng-init="getAssignable(shift)">
     <form name="shiftForm" role="form">
     	<div ng-if="shift.eventName">
     		<label style="font-size:25px">Event Name:</label>
@@ -51,6 +51,7 @@
     </form>
 </div>
 <div class="modal-footer">
+    <button class="assignButton" ng-class="{ disabledButton: isAssignDisabled(shift) }" ng-click="assign(shift)">Assign</button>
     <button id="ok" class="btn btn-primary btn-md" ng-show="valid" ng-click="ok()">OK</button>
     <button class="btn btn-warning btn-md active" ng-click="cancel()">Cancel</button>
 </div>
