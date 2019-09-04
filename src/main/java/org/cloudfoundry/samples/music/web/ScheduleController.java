@@ -13,6 +13,7 @@ import org.cloudfoundry.samples.music.managers.ShiftManager;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoClientRepository;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoClientRequestRepository;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoEmployeeRepository;
+import org.cloudfoundry.samples.music.repositories.mongodb.MongoShiftRepository;
 import org.cloudfoundry.samples.music.repositories.mongodb.ScheduleStatusRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.core.JsonParseException;
@@ -32,6 +33,7 @@ import accessiblesolutions.accessiblescheduling.domain.Shift;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
 import accessiblesolutions.accessiblescheduling.to.ScheduleOptions;
+import accessiblesolutions.accessiblescheduling.util.Util;
 
 @RestController
 @RequestMapping(value = "/schedule")
@@ -66,11 +68,51 @@ public class ScheduleController {
     private MongoClientRepository clientRepository;
     
     @Autowired
+    private MongoShiftRepository shiftRepository;
+    
+    @Autowired
     private MongoEmployeeRepository employeeRepository;
+    
+    @Autowired 
+    ShiftAssignmentManager shiftAssignmentManager;
     
     @Autowired
     public ScheduleController(ScheduleManager manager) {
         this.manager=manager;
+    }
+    
+    @RequestMapping(value = "/staffShift",method = RequestMethod.POST)
+    public Employee staffShift(@RequestParam String param) {
+    	Shift shift =null;
+    	System.out.println(param);
+    	ObjectMapper mapper = new ObjectMapper();
+    	
+    	try {
+			shift = mapper.readValue(param, Shift.class);
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+    	System.out.println(shift.toString());
+    	//shiftRepository.save(shift);
+        ScheduleOptions options = new ScheduleOptions();
+        options.setDailyMax(true);
+        options.setWeeklyMax(true);
+        options.setYear(shift.getStartYear()+"");
+        options.setMonth(shift.getStartMonth()+"");
+        
+        Employee employee = null;
+        try {
+			employee = shiftAssignmentManager.suggestScheduleShiftSafely(shift, options);
+		} catch (CorruptDataException | ProccessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
+        return employee;
     }
     
     @RequestMapping(value = "/clientShiftsForWeek",method = RequestMethod.GET)

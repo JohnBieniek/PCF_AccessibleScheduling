@@ -20,6 +20,7 @@ public abstract class Util {
 		return !(day.length()!=2 || !day.matches("^[0-9]{2}$"));
 	}
 	
+	
 	/**Returns if the event is present in the list
 	 * 
 	 * @param events an ArrayList<Event> of valid events
@@ -46,6 +47,7 @@ public abstract class Util {
 		if(null==time){
 			throw new ProccessingException("No time supplied to getDateFromLocalDateTime");
 		}
+		
 		String date = "";
 		date+=time.getYear()+"-";
 		int month = time.getMonthValue();
@@ -251,8 +253,9 @@ public abstract class Util {
 			LocalDate dateCursor = LocalDate.of(year,month,1);
 			
 			for(int day =0 ; day<32;day++) {
+				System.out.println("gettinig last day of week for week"+selectedWeek);
 				try {
-					if(getWeekOfDate(dateCursor.toString())==selectedWeek) {
+					if(getWeekOfDate(dateCursor.toString())==selectedWeek && dateCursor.getMonthValue()==month) {
 						sampleDay = dateCursor;
 					}
 				} catch (ProccessingException e) {
@@ -357,7 +360,7 @@ public abstract class Util {
 	public static int getWeekAfterDate(String date) throws ProccessingException{
 		LocalDate dayCursor = getLocalDateOfString(date);
 		dayCursor = dayCursor.plusWeeks(1);
-		
+		System.out.println("gettingWeekAfterDAte"+date.toString());
 		return getWeekOfDate(dayCursor.toString());
 	}
 	
@@ -371,7 +374,7 @@ public abstract class Util {
 	public static int getWeekBeforeDate (String date) throws ProccessingException{
 		LocalDate dayCursor = getLocalDateOfString(date);
 		dayCursor = dayCursor.minusWeeks(1);
-		
+		System.out.println("gettingWeekBeforeDAte"+date.toString());
 		return getWeekOfDate(dayCursor.toString());
 	}
 	
@@ -443,11 +446,12 @@ public abstract class Util {
 		int weekCursor = 0;
 		
 		LocalDate dayCursor = LocalDate.of(year,month, 1);
-		
+		System.out.println("getting week of date:"+date.toString());
 		while(weekCursor < 6){
 			int dayCursorInt = dayCursor.getDayOfMonth();
 			
 			if(dayCursorInt==day){
+				System.out.println("week of date:"+date.toString()+ " is : "+weekCursor);
 				return weekCursor;
 			}
 			

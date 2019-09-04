@@ -13,5 +13,6 @@ import accessiblesolutions.accessiblescheduling.domain.Shift;
 @Profile("mongodb")
 public interface MongoCustomFieldDataRepository extends MongoRepository<CustomFieldData, String> {
 	CustomFieldData findByCustomFieldIdAndOwnerId(String customFieldId, String ownerId);
+	List<CustomFieldData> findByCustomFieldId(String customFieldId);
 	List<CustomFieldData> findByOwnerId(String ownerId);
 }

@@ -57,7 +57,7 @@ public class ShiftGenerationManager {
     	String response = "Generated ";
     	int shiftsGenerated = 0;
     	Iterable<ClientRequest> requests = requestRepository.findAll();
-    	System.out.println("generating shifts");
+    	System.out.println("generating shifts for "+selectedMonth);
     	for(ClientRequest request: requests) {
     		try {
 				shiftsGenerated+=generateShiftsForRequest(request,selectedMonth,Integer.parseInt(selectedYear));
@@ -99,14 +99,20 @@ public class ShiftGenerationManager {
 			}
 			
 			if(!request.isRepeats()) {
+				System.out.println("considering adding shift for"+request.getStartsLocalDateTime());
+				System.out.println("requested month:"+Integer.parseInt(month)+Integer.parseInt(selectedMonth));
     			try {
-					Shift shift = getShiftForRequestAtTime(request,request.getStartsLocalDateTime());
-					shifts.add(shift);
+    				if(Integer.parseInt(month)==Integer.parseInt(selectedMonth)){
+    					System.out.println("adding shift for"+request.getStartsLocalDateTime());
+						Shift shift = getShiftForRequestAtTime(request,request.getStartsLocalDateTime());
+						shifts.add(shift);
+    				}
 	    		} catch (CorruptDataException e) {
 					System.out.println("ERROR: Corrupt time for shift provided"+e.getMessage());
 				}
     		}
 			else {
+				System.out.println("considering adding recurring shift for"+request.getStartsLocalDateTime());
 				ArrayList<LocalDateTime> times = new ArrayList<LocalDateTime>();
 				
 				try {
@@ -128,8 +134,10 @@ public class ShiftGenerationManager {
 								}
 							}
 						}
-						System.out.println("getting shift for :"+ time+included);
-						if(included) {
+						System.out.println("generating shifts for request:"+request.toString()+" at time:"+time);
+						System.out.println("included:"+included+" month:"+Integer.parseInt(month)+"time.getMonthValue()"+time.getMonthValue());
+						if(included && Integer.parseInt(selectedMonth)==time.getMonthValue()) {
+							System.out.println("getting shift for :"+ time+included);
 							shifts.add(getShiftForRequestAtTime(request,time));
 						}
 					}
@@ -167,6 +175,7 @@ public class ShiftGenerationManager {
     	shift.setEndTime(request.getEndTime());
     	shift.setStartMonth(time.getMonthValue());
     	shift.setStartYear(time.getYear());
+    	System.out.println("about to call getweek of date while generating shift for request at time:"+time.toString());
     	shift.setStartWeek(Util.getWeekOfDate(time.toLocalDate().toString()));
     	shift.setDisplayDate();
     	
@@ -202,9 +211,15 @@ public class ShiftGenerationManager {
 		    					timeCursor=timeCursor.plusDays(initialTime.getDayOfMonth()-1);//gives only shift
 		    				}
 		    				else {//on dayOfWeek for weekOfMonth of request
-		    					while(Util.getWeekOfDate(Util.getDateFromLocalDateTime(timeCursor))>
-		    							Util.getWeekOfDate(Util.getDateFromLocalDateTime(initialTime))){
+		    					for(int index=0;index<7;index++){
+		    						System.out.println("trying ot find out when to generate a shift for:"+request.toString()+" looking at:"+timeCursor.toString());
+
 		    						timeCursor=timeCursor.plusWeeks(1);
+
+		    						if(Util.getWeekOfDate(Util.getDateFromLocalDateTime(initialTime))==
+		    								Util.getWeekOfDate(Util.getDateFromLocalDateTime(timeCursor))){
+		    							break;
+		    						}
 		    					}
 		    					
 		    					int shift = initialTime.getDayOfWeek().getValue()-timeCursor.getDayOfWeek().getValue();
@@ -240,7 +255,7 @@ public class ShiftGenerationManager {
 	    				boolean working = request.getDays()[index];
 	    				LocalDateTime selectedDay = timeCursor.minusDays(6-index);
 	    				System.out.println("making shifts for day "+selectedDay.getDayOfWeek().toString() + " "+working +" monthValue:"+selectedDay.getMonthValue()+" selectedMonth"+selectedMonth);
-	    				if(working && selectedDay.getMonthValue()==selectedMonth && selectedDay.isAfter(request.getStartsLocalDateTime())) {
+	    				if(working && selectedDay.getMonthValue()==selectedMonth && (selectedDay.isAfter(request.getStartsLocalDateTime()) || selectedDay.isEqual(request.getStartsLocalDateTime()))) {
 	    					times.add(selectedDay);
 	    					System.out.println("Added time:"+selectedDay.toString());
 	    				}

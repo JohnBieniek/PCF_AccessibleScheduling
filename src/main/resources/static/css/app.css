@@ -29,6 +29,18 @@ html,body
     
 }
 
+.availabilityTile{
+    float:right;
+    margin: 5px;
+    /*width: 345px;*/
+    align-content: center;
+    text-align: center;
+    padding: 10px;
+    background-color: #d3d7cf;
+
+    border-radius: 25px; 
+}
+
 
 .inline{
 	display: inline-block;
@@ -69,6 +81,10 @@ html,body
 .red{
 	color: #cc0000;
 }
+.green{
+  color:#3d9e03;
+}
+
 .errored{
 	border-color: #cc0000!important;
 	background-color: #cc0000!important;
@@ -99,6 +115,26 @@ html,body
     font-weight: bold;
     text-align: center;
     background-color: #cc0000;  		
+}
+
+.assignable{
+    background-color: #4e9a06 !important;  		
+}
+
+.disabledButton {
+  opacity: 0.55; 
+  cursor: not-allowed;
+  pointer-events: none;
+  text-decoration: none;
+}
+
+.assignButton{
+    float: left;
+    color: black;
+    text-align: center;
+    font-size: 14px;
+    padding: 6px;
+    background-color: #babdb6;  		
 }
 .okClientButton{
 	width: 90px;
@@ -394,10 +430,16 @@ html,body
     width: 110px;
 }
 
-.weekDay{
+.availableWeekDay{
+  width:100%;
+  margin-right: 5px;
+  float:right;
 	font-size:25px;	
 }
-
+.weekDay{
+  font-size:25px; 
+}
+}
 .addShift{
     margin-right: 0px;
 	margin-left:auto;

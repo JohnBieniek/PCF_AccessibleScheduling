@@ -38,7 +38,7 @@ function EmployeesController($scope, $modal, $http, Employees, Employee, CustomF
 	 function clone (obj) {
 	        return JSON.parse(JSON.stringify(obj));
      }
-	 
+ 
 	 function saveEmployee(employee) {
         Employees.save(employee,
             function (response) {

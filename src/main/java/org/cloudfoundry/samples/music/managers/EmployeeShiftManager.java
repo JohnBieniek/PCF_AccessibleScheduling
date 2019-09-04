@@ -39,6 +39,7 @@ public class EmployeeShiftManager {
 	    	LocalDate weekAftersDate = shift.getStartsLocalDate().plusWeeks(1);
 			String month = weekAftersDate.getMonth().getValue()>9?weekAftersDate.getMonth().getValue()+"":"0"+weekAftersDate.getMonth().getValue();
 			String day = weekAftersDate.getDayOfMonth()>9?weekAftersDate.getDayOfMonth()+"":"0"+weekAftersDate.getDayOfMonth();
+			System.out.println("getting assign shisfts for employee for week after shift, calling get week of date:"+weekAftersDate.toString());
 			int weekAfter = Util.getWeekOfDate(weekAftersDate.getYear()+"-"+month+"-"+day);
 			
 			shifts = getAssignedShiftsForEmployeeForWeekOfMonth(employeeId,weekAfter,weekAftersDate.getMonthValue());
@@ -78,16 +79,21 @@ public class EmployeeShiftManager {
   	 */
   	public ArrayList<Shift> getAssignedShiftsForEmployeeForWeekOfMonth(String employeeId, int week, int month) throws CorruptDataException{
 		ArrayList<Shift> assignedShiftsForEmployeeForMonth =getAssignedShiftsForEmployeeForMonth(employeeId,month);
-		
+		System.out.println("getting assigned shifts for week:"+week+" of month : "+month);
 		ArrayList<Shift> assignedShiftsForEmployeeForWeekOfMonth = new ArrayList<Shift>();
 		if(assignedShiftsForEmployeeForMonth!=null){
 			for(Shift shift: assignedShiftsForEmployeeForMonth){
+				System.out.println("shift:"+shift.toString());
+				System.out.println("shift start week:"+shift.getStartWeek()+" requested start week:"+week);
 				if(shift.getStartWeek()==week){
 					assignedShiftsForEmployeeForWeekOfMonth.add(shift);
 				}
 			}
 		}
 		System.out.println("got "+assignedShiftsForEmployeeForMonth.size()+ " shifts for "+employeeId + " week:"+week);
+		if(assignedShiftsForEmployeeForMonth.size()>0) {
+			System.out.println("for week we have :"+assignedShiftsForEmployeeForWeekOfMonth.size());
+		}
 		return assignedShiftsForEmployeeForWeekOfMonth;
 	}
   	
@@ -177,6 +183,7 @@ public class EmployeeShiftManager {
 				}
 			}
 		}
+		System.out.println("shiftForEmployeeForMonth.size=:"+assignedShiftsForEmployeeForMonth.size());
 		return assignedShiftsForEmployeeForMonth;
 	}
   
@@ -250,6 +257,7 @@ public class EmployeeShiftManager {
 	  		LocalDate weekBeforesDate = shift.getStartsLocalDate().minusWeeks(1);
 			String month = weekBeforesDate.getMonth().getValue()>9?weekBeforesDate.getMonth().getValue()+"":"0"+weekBeforesDate.getMonth().getValue();
 			String day = weekBeforesDate.getDayOfMonth()>9?weekBeforesDate.getDayOfMonth()+"":"0"+weekBeforesDate.getDayOfMonth();
+			System.out.println("getting assign shisfts for employee for week before shift, calling get week of date:"+weekBeforesDate.toString());
 			int weekBefore = Util.getWeekOfDate(weekBeforesDate.getYear()+"-"+month+"-"+day);
 	  		
 			shifts = getAssignedShiftsForEmployeeForWeekOfMonth(employeeId,weekBefore,weekBeforesDate.getMonthValue());
@@ -277,6 +285,12 @@ public class EmployeeShiftManager {
 		String[] endTime = null;//For  a shift on the last day of the week going overnight
 		int hoursThisWeek = 0;//For  a shift on the last day of the week going overnight
 		int minutesThisWeek = 0;//For  a shift on the last day of the week going overnight
+		
+		int previousMonth=month-1;
+		
+		if(previousMonth==0) {
+			previousMonth=12;
+		}
 		if(null!=employee){
 			shiftsForWeek = getAssignedShiftsForEmployeeForWeekOfMonth(employee.getId(), week, month);
 			
@@ -287,12 +301,21 @@ public class EmployeeShiftManager {
 			}
 			LocalDate localDate = Util.getLocalDateOfDayInWeek(2018, month,  week);
 			if(null!=localDate) {
+				if(week==0 && localDate.getDayOfMonth()<7) {//handle the possibility that there are shifts from the previous month this week
+					System.out.println("getting week of date in getHoursScheduledWeekOfMonth");
+					int weekInPreviousMonth = Util.getWeekOfDate(localDate.minusDays(localDate.getDayOfMonth()).toString());
+					shiftsForWeek = getAssignedShiftsForEmployeeForWeekOfMonth(employee.getId(), weekInPreviousMonth, previousMonth);
+					for(Shift scheduledShift : shiftsForWeek){
+						hours+= scheduledShift.getDuration();
+					}
+				}
 				//Handle the possibility of a shift on the last day of the week going overnight
 				weekBefore = Util.getWeekBeforeDate(Util.getLocalDateOfDayInWeek(2018, month,  week).toString());
-				shiftsForPreviousWeek = getAssignedShiftsForEmployeeForWeekOfMonth(employee.getId(), weekBefore, month);
-				
+				shiftsForPreviousWeek = getAssignedShiftsForEmployeeForWeekOfMonth(employee.getId(), weekBefore, weekBefore>week?previousMonth:month);
+//
 				if(null!=shiftsForPreviousWeek){
 					for(Shift scheduledShift : shiftsForPreviousWeek){
+						System.out.println("getting week of date in getHoursScheduledWeekOfMonth");
 						if(scheduledShift.isValid() &&
 								Util.getWeekOfDate(scheduledShift.getEndsLocalDate().toString())==week) {
 							endTime = scheduledShift.getEndTime().split(":");
