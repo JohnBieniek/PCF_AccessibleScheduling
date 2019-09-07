@@ -18,7 +18,11 @@
 	            </div>
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 	    <link rel="stylesheet" type="text/css" href="webjars/bootstrap/3.1.1/css/bootstrap.css">
+        <meta name="google-signin-scope" content="profile email">
+	    <meta name="google-signin-client_id" content="728962972693-5uudecgh1ir6if7imo2hb6cv9qa9nrk3.apps.googleusercontent.com">
+	    <script src="https://apis.google.com/js/platform.js" async defer></script>
 	</head>
+	
     <body  style="background-color: #6a0000;
 				font-size: 40px;
 				color: white !important;
@@ -26,24 +30,46 @@
 				margin-left: auto;
 			  	margin-right: auto;
 			  	 margin: 0 auto;">
-        <!-- <div th:if="${param.error}">
-            Invalid username and password.
-        </div> 
-        <div th:if="${param.logout}">
-            You have been logged out.
-        </div>-->
         <div>
         	<div class="row">
 	            <div ng-include="'templates/util/header.html'"></div>
 	        </div>
-	
+			<html lang="en">
+
 	        <div id="body">
 				<br>
 	             <form th:action="@{/login}" method="post">
 		            <div><label> User Name : <input style="color: black !important; width: 420px;" "type="text" name="username"/> </label></div>
 		            <div><label> Password: <input style="color: black !important; width: 450px;"  type="password" name="password"/> </label></div>
 		            <br>
-		            <div style="color: black !important;"><input type="submit" value="Sign In"/></div>
+		            <div class="inline" style="color: black !important;">
+		            	<input type="submit" value="Sign In"/>
+		            	<div class="centered g-signin2" style="font-size:14px !important" data-onsuccess="onSignIn" data-theme="dark"></div>
+					    <script>
+					      function onSignIn(googleUser) {
+					        // Useful data for your client-side scripts:
+					        var profile = googleUser.getBasicProfile();
+					        console.log("ID: " + profile.getId()); // Don't send this directly to your server!
+					        console.log('Full Name: ' + profile.getName());
+					        console.log('Given Name: ' + profile.getGivenName());
+					        console.log('Family Name: ' + profile.getFamilyName());
+					        console.log("Image URL: " + profile.getImageUrl());
+					        console.log("Email: " + profile.getEmail());
+					
+					        // The ID token you need to pass to your backend:
+					        var id_token = googleUser.getAuthResponse().id_token;
+					        console.log("ID Token: " + id_token);
+					        
+					        var xhr = new XMLHttpRequest();
+					        xhr.open('POST', 'https://accessiblescheduling-dev.cfapps.io/auth/tokensignin');
+					        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+					        xhr.onload = function() {
+					          console.log('Signed in as: ' + xhr.responseText);
+					        };
+					        xhr.send('idtoken=' + id_token);
+					      }
+					    </script>
+		            </div>
 		        </form>
 	        </div>
 	
