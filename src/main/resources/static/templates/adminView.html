@@ -3,7 +3,7 @@
  	<div style="display:inline-block;text-align:right">
           <p style="display:inline-block"  class="titleText" ng-click="setPage('scheduler')">Accessible Scheduling</p>
           </div>
-	        <div style="display:inline-block;float:right;margin-top:7px!important;">
+	        <div ng-if="user" style="display:inline-block;float:right;margin-top:7px!important;">
 	        	<div class="navAllign" ng-click="setPage('client')">
 	       			<i style = "margin-left:5px !important" class="glyphicon glyphicon-user"/>
         			<br>
@@ -14,17 +14,17 @@
         			<br>
         			<span class="centered">Staff</span>
 	          	</div>
-	          	<div class="navAllign" ng-click="setPage('shiftList')">
+	          	<div ng-if="admin" class="navAllign" ng-click="setPage('shiftList')">
         			<i style = "margin-left:5px !important" class="glyphicon glyphicon-align-justify"/>
         			<br>
         			<span class="centered">Shifts</span>
 	          	</div>
-	          	<div class="navAllign" ng-click="setPage('scheduler')">
+	          	<div ng-if="manager" class="navAllign" ng-click="setPage('scheduler')">
         			<i style = "margin-left:5px !important" class="glyphicon glyphicon-dashboard " />
         			<br>
         			<span class="centered">Scheduler</span>
 	          	</div>
-				<div class="navAllign" ng-click="setPage('settings')">
+				<div ng-if="manager" class="navAllign" ng-click="setPage('settings')">
         			<i style = "margin-left:5px !important" class="glyphicon glyphicon-cog"/>
         			<br>
         			<span class="centered">Settings</span>

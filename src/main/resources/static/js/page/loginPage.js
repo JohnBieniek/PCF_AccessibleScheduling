@@ -27,6 +27,7 @@ function LoginController($scope, $modal, $http,Status) {
 		console.log("$scope.page"+$scope.page);
 	    // Useful data for your client-side scripts:
 	    var profile = googleUser.getBasicProfile();
+        $scope.profile=profile;
 	    console.log("ID: " + profile.getId()); // Don't send this directly to your server!
 	    console.log('Full Name: ' + profile.getName());
 	    console.log('Given Name: ' + profile.getGivenName());
@@ -43,6 +44,9 @@ function LoginController($scope, $modal, $http,Status) {
 	    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 	    xhr.onload = function() {
 	        console.log('Signed in as: ' + xhr.responseText);
+	        $scope.setUser(true);
+		    $scope.$apply();
+	        $scope.manager=false;
 		    $scope.setPage('employee');
 		    $scope.$apply();
 	    };

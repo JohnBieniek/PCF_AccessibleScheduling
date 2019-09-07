@@ -70,7 +70,9 @@ function MainNavigationController($scope, $modal, $http, Status) {
 	 $scope.init = function() {
         $scope.setPage("login");
         $scope.sortDescending = false;
-        
+        $scope.user=false;
+        $scope.manager=false;
+        $scope.admin=false;
  
         $scope.selectedMonth=1;
 	   	$scope.selectedYear=2019;
@@ -92,6 +94,9 @@ function MainNavigationController($scope, $modal, $http, Status) {
 	 $scope.changeSortOrder = function(){
 		 $scope.sortDescending = !$scope.sortDescending;
 	 }
+	 $scope.setUser = function (isUser) {
+	        $scope.user = isUser;
+	    };
     $scope.setPage = function (viewName) {
     	console.log("Setting page to:"+viewName);
         $scope.page = "templates/page/" + viewName + ".html";

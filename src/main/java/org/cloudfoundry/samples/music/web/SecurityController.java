@@ -52,8 +52,10 @@ public class SecurityController {
     		System.out.println("calling :"+"https://www.googleapis.com/oauth2/v2/tokeninfo?id_token="+idtoken);
     		 RestTemplate restTemplate = new RestTemplate();
     	     String json = restTemplate.getForObject("https://www.googleapis.com/oauth2/v2/tokeninfo?id_token="+idtoken, String.class);
+    	     JSONObject jsonObject = new JSONObject(json);
+    	     
     	    	System.out.println("token info:"+json);
-    		return json;
+    		return "user";
     	}
     	if (gIdToken != null) {
     	  Payload payload = gIdToken.getPayload();
