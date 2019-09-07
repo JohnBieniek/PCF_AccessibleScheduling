@@ -528,13 +528,9 @@ function MobileEmployeeController($scope, $modal, $http, Clients, Client,Shifts,
             }
         })
         .then(function(response) {
-        	console.log("got shifts:");
-        	console.log(response.data);
     		$scope.shifts = response.data;
     	});
     }
-   
- 
     
     $scope.listCurrentShifts = function listCurrentShifts(){
     	let id = "-1";

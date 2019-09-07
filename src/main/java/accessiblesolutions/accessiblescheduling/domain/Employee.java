@@ -62,11 +62,14 @@ public class Employee implements Comparable{
 	@GeneratedValue(generator = "randomId")
 	@GenericGenerator(name = "randomId", strategy = "org.cloudfoundry.samples.music.domain.RandomIdGenerator")
 	private String id;
+	private String userId;
+	private boolean manager;
+	private boolean admin;
 	private String first;
 	private String initial;
 	private String hireDate;
 	private String gender;
-
+	
 	public String compatibile;// For proccessing only, needs refactored out
 
 	private boolean noCats;
@@ -342,5 +345,29 @@ public class Employee implements Comparable{
 
 	public String toString() {
 		return getFirst() + " " + getInitial() + " id:" + getId();
+	}
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
+	public boolean isManager() {
+		return manager;
+	}
+
+	public void setManager(boolean manager) {
+		this.manager = manager;
+	}
+
+	public boolean isAdmin() {
+		return admin;
+	}
+
+	public void setAdmin(boolean admin) {
+		this.admin = admin;
 	}
 }

@@ -504,8 +504,6 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
             }
         })
         .then(function(response) {
-        	console.log("got shifts:");
-        	console.log(response.data);
     		$scope.shifts = response.data;
     	});
     }

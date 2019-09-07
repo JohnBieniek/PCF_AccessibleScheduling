@@ -70,6 +70,8 @@ function MainNavigationController($scope, $modal, $http, Status) {
 	 $scope.init = function() {
         $scope.setPage("login");
         $scope.sortDescending = false;
+        $scope.profile = null;
+        $scope.idToken = null;
         $scope.user=false;
         $scope.manager=false;
         $scope.admin=false;
@@ -94,8 +96,17 @@ function MainNavigationController($scope, $modal, $http, Status) {
 	 $scope.changeSortOrder = function(){
 		 $scope.sortDescending = !$scope.sortDescending;
 	 }
+	 $scope.setIdToken = function (idToken) {
+	        $scope.idToken = idToken;
+	    };
 	 $scope.setUser = function (isUser) {
 	        $scope.user = isUser;
+	    };
+	    $scope.setManager = function (isManager) {
+	        $scope.manager = isManager;
+	    };
+	    $scope.setAdmin = function (isAdmin) {
+	        $scope.admin = isAdmin;
 	    };
     $scope.setPage = function (viewName) {
     	console.log("Setting page to:"+viewName);
