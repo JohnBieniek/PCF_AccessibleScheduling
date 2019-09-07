@@ -68,7 +68,7 @@ angular.module('mainNavigation', ['ngResource', 'ui.bootstrap']).
 
 function MainNavigationController($scope, $modal, $http, Status) {
 	 $scope.init = function() {
-        $scope.setPage("scheduler");
+        $scope.setPage("login");
         $scope.sortDescending = false;
         
  
