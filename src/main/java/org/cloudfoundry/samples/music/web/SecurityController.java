@@ -1,4 +1,6 @@
 package org.cloudfoundry.samples.music.web;
+import java.util.ArrayList;
+
 import org.cloudfoundry.samples.music.managers.AccessibleSecurityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -6,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import accessiblesolutions.accessiblescheduling.domain.AccessRequest;
 import accessiblesolutions.accessiblescheduling.domain.Shift;
 import accessiblesolutions.accessiblescheduling.domain.User;
 
@@ -25,6 +28,11 @@ public class SecurityController {
 		System.out.println("id:"+idtoken);
 		System.out.println("name"+name);
 		return manager.signUp(idtoken,name).toString();
+    }
+	
+	@RequestMapping(value = "/approve",method = RequestMethod.GET)
+    public ArrayList<AccessRequest> approve(@RequestParam String userId,String employeeId) {
+		return manager.approve(userId,employeeId);
     }
 	
 	@RequestMapping(value = "/signedup",method = RequestMethod.GET)

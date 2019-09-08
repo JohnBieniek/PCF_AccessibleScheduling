@@ -8,23 +8,23 @@ import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.J
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AccessRequest {
   	@Id
-    private String userId;
+    private String id;
   	private String name;
 
     public AccessRequest() {
     }
     
-    public AccessRequest(String userId, String name) {
-    	this.userId=userId;
+    public AccessRequest(String id, String name) {
+    	this.id=id;
     	this.name=name;
     }
 
-	public String getUserId() {
-		return userId;
+	public String getId() {
+		return id;
 	}
 
-	public void setUserID(String userID) {
-		this.userId = userID;
+	public void setId(String id) {
+		this.id = id;
 	}
 
 	public String getName() {
@@ -37,6 +37,6 @@ public class AccessRequest {
 
 	@Override
 	public String toString() {
-		return "AccessRequest [userId=" + userId + ", name=" + name + "]";
+		return "AccessRequest [userId=" + id + ", name=" + name + "]";
 	}
 }

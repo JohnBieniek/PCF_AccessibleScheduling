@@ -54,6 +54,24 @@ function AlertsController($scope, $modal, $http, Employees, Employee, CustomFiel
 	        	$scope.alerts=response.data;
 	        });
 	    }
+	
+	  $scope.assignSelectedEmployee = function(alert,employee){
+	    	$http({
+	            url: '/auth/approve',
+	            method: 'GET',
+	            headers: {
+	                'Content-Type': 'application/x-www-form-urlencoded'
+	            },
+	            params: {
+	            	userId: alert.id,
+	            	employeeId: employee.id
+	            }
+	        })
+	        .then(function(response) {
+	        	console.log(response.data);
+	        	$scope.alerts=response.data;
+	        });
+	     }
 	  
 	 function saveEmployee(employee) {
         Employees.save(employee,

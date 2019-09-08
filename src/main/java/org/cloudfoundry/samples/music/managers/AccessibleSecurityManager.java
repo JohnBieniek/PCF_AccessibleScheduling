@@ -1,5 +1,6 @@
 package org.cloudfoundry.samples.music.managers;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoAccessRequestRepository;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoCustomFieldDataRepository;
@@ -45,7 +46,7 @@ public class AccessibleSecurityManager {
     	User user = getUser(idToken);
     	
     	if(null!=user) {
-        	AccessRequest request = accessCrud.findByUserId(user.getUserId());
+        	AccessRequest request = accessCrud.findOne(user.getUserId());
         	if(null!=request) {
         		return true;
         	}
@@ -59,7 +60,7 @@ public class AccessibleSecurityManager {
     	AccessRequest request = null;
     	
     	if(null!=user) {
-    		request = accessCrud.findByUserId(user.getUserId());
+    		request = accessCrud.findOne(user.getUserId());
     		if(null==request) {
     			return accessCrud.insert(new AccessRequest(user.getUserId(),name));
     		}
@@ -117,4 +118,20 @@ public class AccessibleSecurityManager {
     	
     	return user;
     }
+
+	public ArrayList<AccessRequest> approve(String userId, String employeeId) {
+    	if(null!=userId) {
+    	   	Employee employee = employeeCrud.findOne(employeeId);
+    	   	
+    	   	employee.setUserId(userId);
+    	   	employeeCrud.save(employee);
+    	   	AccessRequest request = accessCrud.findOne(userId);
+    	   	if(request!=null) {
+        	   	System.out.println("deleteing request for "+request.getName());
+        		accessCrud.delete(request);    	   		
+    	   	}
+    	};
+    	
+    	return (ArrayList<AccessRequest>) accessCrud.findAll();
+	}
 }
