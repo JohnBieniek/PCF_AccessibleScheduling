@@ -1,6 +1,7 @@
 <div ng-controller="AlertsController" ng-init="listAlerts()">
 	<div ng-if="user" style="display:inline-block;width:97%">
 		<h2 class="centered">Requests from staff can be handled below.</h2> 
+		<h3 class="centered" ng-if="noAlertsFound()">Currently all requests have been answered. You're all set!</h3>
 		<div ng-repeat="alert in alerts">
 			<div class = "shift">
 				<span ng-click="" style="display:inline-block">

@@ -65,6 +65,7 @@ public class Employee implements Comparable{
 	private String userId;
 	private boolean manager;
 	private boolean admin;
+	private String role;
 	private String first;
 	private String initial;
 	private String hireDate;
@@ -369,5 +370,13 @@ public class Employee implements Comparable{
 
 	public void setAdmin(boolean admin) {
 		this.admin = admin;
+	}
+
+	public String getRole() {
+		return role;
+	}
+
+	public void setRole(String role) {
+		this.role = role;
 	}
 }

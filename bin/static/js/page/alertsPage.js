@@ -54,7 +54,15 @@ function AlertsController($scope, $modal, $http, Employees, Employee, CustomFiel
 	        	$scope.alerts=response.data;
 	        });
 	    }
-	
+	  $scope.noAlertsFound = function (){
+		  let enable = true;
+		  
+		  if(typeof myVar !== 'undefined'){
+			  enable=false;
+		  }
+		  console.log("enable:"+enable);
+		  return enable;
+	  }
 	  $scope.assignSelectedEmployee = function(alert,employee){
 	    	$http({
 	            url: '/auth/approve',

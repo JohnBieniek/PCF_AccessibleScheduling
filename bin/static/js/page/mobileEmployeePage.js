@@ -115,6 +115,9 @@ function MobileEmployeeController($scope, $modal, $http, Clients, Client,Shifts,
 	$scope.setEmployee = function(newEmployee){
 		//if($scope.employee == null || $scope.employee== undefined || $scope.employee.id !==newEmployee.id){
 		  $scope.detailsChanged=false;
+		  if(newEmployee.role==null){
+			  newEmployee.role="user";
+		  }
 	      $scope.employee = newEmployee;
 	      $scope.employeeModel = clone(newEmployee);
 	      $scope.listShifts();
@@ -160,6 +163,9 @@ function MobileEmployeeController($scope, $modal, $http, Clients, Client,Shifts,
      }
      
      $scope.saveEmployee = function saveEmployee(employee) {
+		 console.log("role");
+		 console.log(employee);
+		 console.log(employee.role)
      	if(employee.availability){
 	     	for(var index = 0; index<employee.availability.length;index++){
 	     		employee.availabilityStartTimes
@@ -678,7 +684,9 @@ function MobileEmployeeController($scope, $modal, $http, Clients, Client,Shifts,
 	            });
 	        }
 	    }
-        
+    	 console.log("role");
+		 console.log($scope.employee);
+		 console.log($scope.employee.role)
     	$http({
             url: '/schedule/updateEmployee',
             method: 'POST',

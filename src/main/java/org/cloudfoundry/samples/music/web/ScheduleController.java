@@ -162,6 +162,13 @@ public class ScheduleController {
     	
     	try {
 			employee = mapper.readValue(param, Employee.class);
+			if(employee.getRole()=="manager") {
+				employee.setManager(true);
+			}
+			else if(employee.getRole()=="admin") {
+				employee.setAdmin(true);
+				employee.setManager(true);
+			}
 		} catch (JsonParseException e) {
 			e.printStackTrace();
 		} catch (JsonMappingException e) {
