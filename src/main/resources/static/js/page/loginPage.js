@@ -22,7 +22,7 @@ angular.module('login', ['ngResource', 'ui.bootstrap']).
     });
 
 function LoginController($scope, $modal, $http,Status) {
-
+	
 	function onSignIn(googleUser) {
 		console.log("$scope.page"+$scope.page);
 	    // Useful data for your client-side scripts:
@@ -45,8 +45,8 @@ function LoginController($scope, $modal, $http,Status) {
 	    xhr.onload = function() {
 	        console.log('Signed in: ');
 	        console.log( xhr.responseText);
-	        $scope.profile = JSON.parse(xhr.responseText);
-	        
+	        $scope.setProfile(JSON.parse(xhr.responseText));
+	        $scope.$apply();
 	        $scope.setUser($scope.profile.user);
 	        $scope.setManager($scope.profile.manager);
 	        $scope.setAdmin($scope.profile.admin);

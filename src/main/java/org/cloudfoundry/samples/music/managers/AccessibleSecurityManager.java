@@ -110,15 +110,29 @@ public class AccessibleSecurityManager {
     public User getUserDetails(User user){
     	Employee employee = employeeCrud.findByUserId(user.getUserId());
     	
-    	//if(null!=employee && employee.getId()!=null) {
+    	if(null!=employee && employee.getId()!=null) {
     		user.setUser(true);
-    		user.setManager(true);//employee.isManager());
-    		user.setAdmin(true);//employee.isAdmin());
-    	//}
+    		user.setManager(employee.isManager());
+    		user.setAdmin(employee.isAdmin());
+    		user.setEmployeeId(employee.getId());
+    	}
     	
     	return user;
     }
 
+    public ArrayList<AccessRequest> deny(String userId) {
+    	if(null!=userId) {
+    	   	AccessRequest request = accessCrud.findOne(userId);
+    	   	
+    	   	if(request!=null) {
+        	   	System.out.println("deleteing request for "+request.getName());
+        		accessCrud.delete(request);    	   		
+    	   	}
+    	};
+    	
+    	return (ArrayList<AccessRequest>) accessCrud.findAll();
+	}
+    
 	public ArrayList<AccessRequest> approve(String userId, String employeeId) {
     	if(null!=userId) {
     	   	Employee employee = employeeCrud.findOne(employeeId);

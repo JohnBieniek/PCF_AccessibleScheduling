@@ -57,13 +57,14 @@ function AlertsController($scope, $modal, $http, Employees, Employee, CustomFiel
 	  $scope.noAlertsFound = function (){
 		  let enable = true;
 		  
-		  if(typeof myVar !== 'undefined'){
+		  if(typeof $scope.alerts !== 'undefined' && $scope.alerts !=null && $scope.alerts.length>0){
 			  enable=false;
 		  }
 		  console.log("enable:"+enable);
 		  return enable;
 	  }
 	  $scope.assignSelectedEmployee = function(alert,employee){
+		  if(confirm("Are you sure you want to give "+alert.name +" access to the profile of " +employee.first+"?")){
 	    	$http({
 	            url: '/auth/approve',
 	            method: 'GET',
@@ -76,10 +77,10 @@ function AlertsController($scope, $modal, $http, Employees, Employee, CustomFiel
 	            }
 	        })
 	        .then(function(response) {
-	        	console.log(response.data);
 	        	$scope.alerts=response.data;
 	        });
 	     }
+	  }
 	  
 	 function saveEmployee(employee) {
         Employees.save(employee,
@@ -224,17 +225,24 @@ function AlertsController($scope, $modal, $http, Employees, Employee, CustomFiel
         });
     }
 
-    $scope.deleteEmployee = function (employee) {
-    	if(confirm("Are you sure to delete info for "+employee.first+"?")){
-	        Employee.delete({id: employee.id},
-	            function () {
-	                Status.success("Employee deleted");
-	                $scope.listEmployees();
-	            },
-	            function (result) {
-	                Status.error("Error deleting employee: " + result.status);
-	            }
-	        );
+    $scope.deleteAlert = function (alert) {
+    	console.log("deleting alert");
+    	console.log(alert);
+    	if(confirm("Are you sure you want to deny access for "+alert.name+"?")){
+        	$http({
+                url: '/auth/deny',
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                params: {
+                    userId: alert.id
+                }
+            })
+	        .then(function(response) {
+	        	console.log(response.data);
+	        	$scope.alerts=response.data;
+	        });
     	}
     };
 }

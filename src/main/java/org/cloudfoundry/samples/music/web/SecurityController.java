@@ -35,6 +35,11 @@ public class SecurityController {
 		return manager.approve(userId,employeeId);
     }
 	
+	@RequestMapping(value = "/deny",method = RequestMethod.GET)
+    public ArrayList<AccessRequest> deny(@RequestParam String userId) {
+		return manager.deny(userId);
+    }
+	
 	@RequestMapping(value = "/signedup",method = RequestMethod.GET)
     public Boolean signUp2(@RequestParam String idtoken) {
 		System.out.println("id:"+idtoken);

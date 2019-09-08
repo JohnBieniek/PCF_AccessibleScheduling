@@ -94,10 +94,8 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
 	      $scope.client = newClient;
 	      $scope.listRequests(newClient);
 	      $scope.listShifts();
-	      console.log("$scope.customFields:"+$scope.customFields);
 	      if($scope.client!=null && $scope.customFields !=null){
 		      for(var index = 0; index<$scope.customFields.length;index++){
-		    	  console.log("$scope.customFields[index]:"+$scope.customFields[index]);
 			      $scope.getClientCustomFieldData($scope.client,$scope.customFields[index],index);
 		      }
 	      }
@@ -489,7 +487,6 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
     		id=$scope.client.id;
     	}
     	$scope.getDisplayWeek();
-    	console.log($scope.week);
     	$http({
             url: '/schedule/clientShiftsForWeek',
             method: 'GET',
@@ -548,8 +545,6 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
             }
         })
         .then(function(response) {
-        	console.log("shifts");
-        	console.log(response.data);
     		$scope.currentShifts = response.data;
     	});
     }
@@ -600,7 +595,6 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
   };
   
     $scope.addRequest = function (selectedClient,employees) {
-		 console.log("attempting to open requestForm and RequestModalController");
        var addModal = $modal.open({
            templateUrl: 'templates/modal/requestForm.html',
            controller: RequestModalController,
@@ -825,7 +819,6 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
              }
          })
          .then(function(response) {
-         	console.log(response);
          	if(response){
                  Status.success("Shift deleted.");
                  $scope.listShifts();
@@ -849,7 +842,6 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
             }
         })
         .then(function(response) {
-        	console.log(response);
         	if(response){
                 Status.success("Client deleted.");
         		$scope.clients =response.data;

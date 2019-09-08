@@ -28,6 +28,7 @@ public class User{
 	private boolean user;
 	private boolean manager;
 	private boolean admin;
+	private String employeeId;
 
 	public User() {
 	}
@@ -120,10 +121,19 @@ public class User{
 		this.admin = admin;
 	}
 
+	public String getEmployeeId() {
+		return employeeId;
+	}
+
+	public void setEmployeeId(String employeeId) {
+		this.employeeId = employeeId;
+	}
+
 	@Override
 	public String toString() {
 		return "User [issuedTo=" + issuedTo + ", audience=" + audience + ", userId=" + userId + ", expiresIn="
 				+ expiresIn + ", email=" + email + ", verifiedEmail=" + verifiedEmail + ", issuer=" + issuer
-				+ ", issuedAt=" + issuedAt + ", user=" + user + ", manager=" + manager + ", admin=" + admin + "]";
+				+ ", issuedAt=" + issuedAt + ", user=" + user + ", manager=" + manager + ", admin=" + admin
+				+ ", employeeId=" + employeeId + "]";
 	}
 }
