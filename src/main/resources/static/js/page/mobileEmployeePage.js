@@ -137,17 +137,19 @@ function MobileEmployeeController($scope, $modal, $http, Clients, Client,Shifts,
 	$scope.setEmployee = function(newEmployee){
 		//if($scope.employee == null || $scope.employee== undefined || $scope.employee.id !==newEmployee.id){
 		  $scope.detailsChanged=false;
+		  
 		  if(newEmployee.role==null){
 			  newEmployee.role="user";
 		  }
 	      $scope.employee = newEmployee;
 	      $scope.employeeModel = clone(newEmployee);
-	      $scope.listShifts();
 	      if($scope.employee!=null && $scope.customFields !=null){
 		      for(var index = 0; index<$scope.customFields.length;index++){
 			      $scope.getEmployeeCustomFieldData($scope.employee,$scope.customFields[index],index);
 		      }
 	      }
+
+	      $scope.listShifts();
 		//}
 	}
 	 $scope.listCustomFields = function listCustomFields() {
@@ -506,10 +508,10 @@ function MobileEmployeeController($scope, $modal, $http, Clients, Client,Shifts,
     	var newEmployees=Employees.query();
         $scope.employees = newEmployees;
         
-//        if($scope.employee==null){
-//        	$scope.employee = $scope.employees[0];
-//        }
-        $scope.setEmployeeToUser();
+        if($scope.employee==null){
+             $scope.setEmployeeToUser();
+        }
+
 
         $scope.listClients();
 		$scope.getDisplayWeek();

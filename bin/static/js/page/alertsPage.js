@@ -63,23 +63,32 @@ function AlertsController($scope, $modal, $http, Employees, Employee, CustomFiel
 		  console.log("enable:"+enable);
 		  return enable;
 	  }
+	
 	  $scope.assignSelectedEmployee = function(alert,employee){
-		  if(confirm("Are you sure you want to give "+alert.name +" access to the profile of " +employee.first+"?")){
-	    	$http({
-	            url: '/auth/approve',
-	            method: 'GET',
-	            headers: {
-	                'Content-Type': 'application/x-www-form-urlencoded'
-	            },
-	            params: {
-	            	userId: alert.id,
-	            	employeeId: employee.id
-	            }
-	        })
-	        .then(function(response) {
-	        	$scope.alerts=response.data;
-	        });
-	     }
+		  console.log(employee);
+		  console.log(employee==undefined);
+		  if(typeof employee !== 'undefined' && employee !=null && employee != undefined && employee !=false){
+			  if(confirm("Are you sure you want to give "+alert.name +" access to the profile of " +employee.first+"?")){
+		    	$http({
+		            url: '/auth/approve',
+		            method: 'GET',
+		            headers: {
+		                'Content-Type': 'application/x-www-form-urlencoded'
+		            },
+		            params: {
+		            	userId: alert.id,
+		            	employeeId: employee.id
+		            }
+		        })
+		        .then(function(response) {
+		        	Status.success("Access granted.");
+		        	$scope.alerts=response.data;
+		        });
+		     }
+		  }
+		  else{
+			  confirm("Select an employee to grant "+alert.name +" access to.");
+		  }
 	  }
 	  
 	 function saveEmployee(employee) {
@@ -226,9 +235,8 @@ function AlertsController($scope, $modal, $http, Employees, Employee, CustomFiel
     }
 
     $scope.deleteAlert = function (alert) {
-    	console.log("deleting alert");
-    	console.log(alert);
-    	if(confirm("Are you sure you want to deny access for "+alert.name+"?")){
+    	let alertName = alert.name;
+    	if(confirm("Are you sure you want to deny access for "+alertName+"?")){
         	$http({
                 url: '/auth/deny',
                 method: 'GET',
@@ -240,7 +248,7 @@ function AlertsController($scope, $modal, $http, Employees, Employee, CustomFiel
                 }
             })
 	        .then(function(response) {
-	        	console.log(response.data);
+	        	Status.success("Access denied to "+alertName+".");
 	        	$scope.alerts=response.data;
 	        });
     	}

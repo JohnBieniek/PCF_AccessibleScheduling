@@ -1,15 +1,15 @@
 <div ng-controller="AlertsController" ng-init="listAlerts()">
-	<div ng-if="user" style="display:inline-block;width:97%">
+	<div ng-if="user" style="display:inline-block;width:100%">
 		<br>
 		<h1 class="centered">Requests from staff can be handled below.</h2>
 		<br ng-if="noAlertsFound()">  
 		<h3 class="centered" ng-if="noAlertsFound()">Currently all requests have been answered. You're all set!</h2>
 		<div ng-repeat="alert in alerts">
-			<div class = "shift">
+			<div style="width:90% !important; margin-left:5% !important"class = "shift">
 				<span ng-click="" style="display:inline-block">
 					Access requested: {{alert.name}}
 				</span>
-				<div ng-init="listEmployees()" style="float:right" class="inline rightAlign form-group has-feedback" ng-class="{'has-warning': recurringShiftNeedForm.staffName.$invalid, 'has-success': recurringShiftNeedForm.staffName.$valid}">
+				<div ng-init="listEmployees()" style="float:right" class="inline rightAlign has-feedback" ng-class="{'has-warning': recurringShiftNeedForm.staffName.$invalid, 'has-success': recurringShiftNeedForm.staffName.$valid}">
 		            <label for="staffName" class="inline" style="font-size:25px">Staff Name</label>
 		            <select name="mySelect" 
 		                    id="mySelect"
@@ -23,7 +23,7 @@
 		                {{employee.first}}
 		            </select>
 		            <span ng-click="assignSelectedEmployee(alert,selectedEmployee)" style="font-size:23px" class="inline green glyphicon glyphicon-ok"></span>                  
-   		            <span ng-click="deleteAlert(alert)" style="font-size:23px" class="inline red glyphicon glyphicon-trash"></span>                    
+   		            <span ng-click="deleteAlert(alert)" style="font-size:23px;margin-left:10px" class="inline red glyphicon glyphicon-trash"></span>                    
 		            <input type="text" ng-hide="true" id="staffId" name="staffId" ng-model="shift.staffId" ng-value="shift.staffId=selectedEmployee.id">
 		            <input type="text" ng-hide="true" id="staffName" name="staffName" ng-model="shift.staffName" ng-value="shift.staffName=selectedEmployee.first">
 		        </div>

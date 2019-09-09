@@ -95,7 +95,15 @@ function MainNavigationController($scope, $modal, $http, Status) {
    	 	$scope.customFieldDataEditing=true;//TODO factor out this flag
 	 };
 	 
-	
+	 $scope.loggedIn = function loggedIn() {
+		 if($scope.idToken!=null){
+			 return true;
+		 }
+		 else{
+			 return false;
+		 }
+
+	  }
 	 $scope.signOut = function signOut() {
 		 $scope.manager=false;
 		 $scope.admin=false;

@@ -3,8 +3,8 @@
 	 	<div ng-if="user" style="display:inline-block;text-align:right">
 	          <p ng-if="user" style="display:inline-block"  class="titleText" ng-click="setPage('scheduler')">Accessible Scheduling</p>
 	    </div>
-	    <div ng-if="!user">
-	          <p class="centered titleText inline">Accessible Scheduling</p>
+	    <div ng-if="!user" class="inline" style="width: 50%; margin-left: 25%;margin-bottom:10px"> 
+	          <p class="centered titleText">Accessible Scheduling</p>
 	    </div>
         <div style="display:inline-block;float:right;margin-top:7px!important;">
         	<div  ng-if="manager" class="navAllign" ng-click="setPage('client')">
@@ -37,7 +37,7 @@
        			<br>
        			<span class="centered">Settings</span>
           	</div>
-  			<div class="navAllign" ng-click="signOut();setPage('login');">
+  			<div  ng-if="loggedIn()" class="navAllign" ng-click="signOut();setPage('login');">
        			<i style = "margin-right:10px !important" class="glyphicon glyphicon-log-out"/>
        			<br>
        			<span class="centered">Sign out</span>
