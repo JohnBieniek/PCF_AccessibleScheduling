@@ -65,6 +65,14 @@ function MobileEmployeeController($scope, $modal, $http, Clients, Client,Shifts,
 		 $scope.week = new Date();//.getTime();
 	 }
 
+	 $scope.init = function(){
+		 if($scope.manager){
+			 $scope.listEmployees();
+		 }
+		 
+		 $scope.setEmployeeToUser();
+		 $scope.listShifts();
+	 }
 
 	$scope.newDate=$scope.week.getFullYear()+"-"+(($scope.week.getMonth()+1)<10?"0"+($scope.week.getMonth()+1):($scope.week.getMonth()+1))+"-"+$scope.week.getDate();
 

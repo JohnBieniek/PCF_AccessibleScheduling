@@ -1,4 +1,4 @@
-<div ng-controller="MobileEmployeeController" ng-init="listEmployees()">
+<div ng-controller="MobileEmployeeController" ng-init="init()">
 	<div ng-if="user" style="display:inline-block;width:100%">
 	 	<div ng-if="manager" style="display:inline-block;width:25%">
 			<ul>
@@ -8,7 +8,7 @@
 			    	</div>
 		    	</div>
 				<div style="overflow-y:auto;height:90vh" class="monthSelector">
-					<div ng-repeat="employee in employees" ng-init="setEmployee(employees[0])">
+					<div ng-repeat="employee in employees">
 						<div class = "employeeTab" ng-class="{ active: isEmployeeSet(employee) }">
 					    	<div>
 					       		<p ng-click="setEmployee(employee)">{{employee.first}} {{employee.initial}}</p>
