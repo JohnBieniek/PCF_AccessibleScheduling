@@ -29,6 +29,11 @@ html,body
     
 }
 
+.signUpButton{
+	font-size: 25px;
+    margin-left: 40% !important;
+    width: 20%;
+}
 .availabilityTile{
     float:right;
     margin: 5px;
@@ -134,7 +139,7 @@ html,body
     text-align: center;
     font-size: 14px;
     padding: 6px;
-    background-color: #babdb6;  		
+    background-color: #d3d7cf;  		
 }
 .okClientButton{
 	width: 90px;

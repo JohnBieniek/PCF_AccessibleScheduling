@@ -1,0 +1,16 @@
+<div ng-controller="SignUpController">
+	<br>
+	<h1 class="centered">Welcome to our newest user!</h1>
+	<br>
+	<br>
+	<h2 class="centered">Before you can continue we need to get you signed up.</h2>
+	<h3 class="centered">To proceed simply type your name below and hit request access.</h3>
+	<br>
+	 <div class="centered">
+        <input type="text" class="input-large nameInput" ng-model="profile.name">
+    </div>
+   	<br>
+ 	<button class="signUpButton centered" type="button" ng-click="requestSignUp()">Request Access</button>
+	
+    <script type="text/javascript" src="js/page/signUpPage.js"></script>
+</div>

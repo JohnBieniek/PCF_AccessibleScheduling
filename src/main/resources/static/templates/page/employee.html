@@ -1,14 +1,14 @@
-<div ng-controller="MobileEmployeeController" ng-init="listEmployees()">
-	<div style="display:inline-block;width:100%">
-	 	<div style="display:inline-block;width:25%">
+<div ng-controller="MobileEmployeeController" ng-init="init()">
+	<div ng-if="user" style="display:inline-block;width:100%">
+	 	<div ng-if="manager" style="display:inline-block;width:25%">
 			<ul>
-				<div class = "newEmployeeTab">
+				<div ng-if="admin" class = "newEmployeeTab">
 			    	<div >
 			       		<p ng-click="newEmployee()"><span class="glyphicon glyphicon-plus" style="position:static !important"></span>&nbsp;New Staff</p>
 			    	</div>
 		    	</div>
-				<div style="overflow-y:auto;height:80vh" class="monthSelector">
-					<div ng-repeat="employee in employees" ng-init="setEmployee(employees[0])">
+				<div style="overflow-y:auto;height:90vh" class="monthSelector">
+					<div ng-repeat="employee in employees">
 						<div class = "employeeTab" ng-class="{ active: isEmployeeSet(employee) }">
 					    	<div>
 					       		<p ng-click="setEmployee(employee)">{{employee.first}} {{employee.initial}}</p>
@@ -18,7 +18,16 @@
 		    	</div>
 	    	</ul>
 	   	</div>
-	   	<div ng-if="isEmployeeSet(employee)" style="display:inline-block; vertical-align: top; width:72%;height:82vh">
+	   	<div ng-if="!manager" style="display:inline-block;width:25%">
+	   		<ul>
+			   	<div class = "employeeTab">
+			    	<div>
+			       		<p>{{employee.first}} {{employee.initial}}</p>
+			    	</div>
+			   	</div>
+			</ul>
+		</div>
+	   	<div style="display:inline-block; vertical-align: top; width:72%;height:90vh">
 			<div style="width:100%;text-align: center;">
 				<div style="display:inline-block" class = "employeeRecTab" ng-class="{ active: isSet('Schedule') }">
 			    	<div >
@@ -35,7 +44,7 @@
 			       		<p ng-click="setTab('Requests')">Requests</p>
 			    	</div>
 		    	</div>
-		    	<div style="display:inline-block;" class = "employeeRecTab" ng-class="{ active: isSet('Details') }">
+		    	<div ng-if="manager" style="display:inline-block;" class = "employeeRecTab" ng-class="{ active: isSet('Details') }">
 			    	<div >
 			       		<p ng-click="setTab('Details')">Details</p>
 			    	</div>
@@ -48,7 +57,8 @@
 	    				<div class="inline" style="margin-left:32%;width:40%;text-align: center;">
 		    				<div class = 'inline centered'>
 					    		<div>
-						    		<h1 class = 'centered'>{{monthName}}  {{year}}</h1>
+					    			<h1 class = 'centered'>Schedule for {{employee.first}}</h1>
+						    		<h2 class = 'centered'>{{monthName}}  {{year}}</h2>
 					    		</div>
 					    		<div>
 						    		<button class="inline" ng-click="decrementWeek()"><span class="changeWeek glyphicon glyphicon-chevron-left"></span></button>
@@ -79,16 +89,20 @@
 					  <h2 class ="centered">{{employee.first}} {{employee.initial}} is available the following times weekly<h2/>
    						<div ng-repeat="day in days">
    							<br>
-				    		<div class='availableWeekDay rightAlign'>
+				    		<div ng-if="manager" class='availableWeekDay rightAlign'>
 				    			<span ng-click="addAvailability(day)" class="glyphicon glyphicon-plus">{{day}}</span>
+				    		</div>
+				    		<div ng-if="!manager" class='availableWeekDay rightAlign'>
+				    			<span>{{day}}</span>
 				    		</div>
 				    		<br>
 				    		<div ng-repeat="availabilitysDay in employee.days track by $index" style="margin-right:20px">
 				    			<div ng-if="isAvailabilityDay($index,day)" class="inline availabilityTile">
-				    				<input max = "employee.endTimes[$index]" ng-blur="saveEmployee(employee)" style="font-size:23px ;margin-left: 5px" type="time" ng-model="employee.startTimes[$index]">
-				    				to
-				    				<input min="employee.startTimes[$index]" ng-blur="saveEmployee(employee)" style="font-size:23px;margin-left: 5px" type="time" ng-model="employee.endTimes[$index]">
-				    				<span ng-click="deleteAvailability($index)" style="display:inline-block;float:right;font-size: 25px;margin-left: 12px" class="glyphicon inline rightAlign red trash glyphicon-trash"></span>
+				    				<input ng-if="manager" max = "employee.endTimes[$index]" ng-blur="saveEmployee(employee)" style="font-size:23px ;margin-left: 5px" type="time" ng-model="employee.startTimes[$index]"> 
+				    				<p ng-if="!manager" style="font-size:23px ;margin-left: 5px">{{employee.startTimes[$index]}} to {{employee.endTimes[$index]}}</p>
+				    				<span ng-if="manager" style="display:inline-block;font-size: 25px;" class="inline"> to </span>
+				    				<input ng-if="manager" min="employee.startTimes[$index]" ng-blur="saveEmployee(employee)" style="font-size:23px;margin-left: 5px" type="time" ng-model="employee.endTimes[$index]">
+				    				<span ng-if="manager" ng-click="deleteAvailability($index)" style="display:inline-block;float:right;font-size: 25px;margin-left: 12px" class="glyphicon inline rightAlign red trash glyphicon-trash"></span>
 								</div>
 							</div>
 						</div>
@@ -97,8 +111,7 @@
 	    	</div>
 
 	    	<div overflow-y:auto; ng-if="isSet('Requests')">
-	    		<div style="width:90%;margin-left:5%" ng-controller="VacationController"  ng-init="listEmployees()">
-				  
+	    		<div style="width:90%;margin-left:5%" ng-controller="VacationController"  ng-init="listEmployees()">	  
 				  <div>
 					  <h2 class ="centered">Days requested off for {{employee.first}} {{employee.initial}}<h2/>
 					  </br>
@@ -109,7 +122,7 @@
 					      	        <div style="display:inline-block">
 						           		<span style="font-size: 25px">{{requestedDay}}</span>
 						           	</div>
-					   		        <div style="display:inline-block">
+					   		        <div ng-if="manager" style="display:inline-block">
 							           	<a href="" ng-click="removeAbsence(employee,requestedDay)">
 							           		<div style="display:inline-block">
 							           			<span style="font-size: 25px" class="glyphicon glyphicon-trash red"></span>
@@ -119,7 +132,7 @@
 						         </li>
 						     </ul>
 					     </div>
-					     <div class="inline rightAlign" style="float: right;">
+					     <div ng-if="manager" class="inline rightAlign" style="float: right;">
 							  <form ng-submit="addAbsence(newDate)">
 						           <input style="font-size: 25px" type="date" ng-model="newDate" placeholder="Date" ng-required/>
 						           <a href="" style="font-size: 25px" ng-click="addAbsence(employee,newDate)"><span class="glyphicon glyphicon-plus"></span>Add date</a>
@@ -142,6 +155,23 @@
 			            <input ng-change="setDetailsToChanged()" type="text" class="inline form-control input-large rightAlign nameInput" id="initial" name="initial"  ng-model="employee.initial">
 			        </div>
 			    
+  				     <div ng-if="admin">
+			        	<div style="display:inline-block">
+				        	<label for="gender" class="employeeDetails">Role:</label>
+			        	</div>
+				        <div style="display:inline-block">
+				        	<label style="font-size:20px">User</label>
+				        	<input ng-change="setDetailsToChanged()" name="role" type="radio" style="height:21px;width:21px" value="user" ng-model="employee.role"/>
+				        </div>
+						<div style="display:inline-block">
+				        	<label style="font-size:20px">Manager</label>
+				        	<input ng-change="setDetailsToChanged()" name="role" type="radio" style="height:21px;width:21px" value="manager" ng-model="employee.role"/>
+				        </div>
+				        <div style="display:inline-block">
+				        	<label style="font-size:20px">Admin</label>
+				        	<input ng-change="setDetailsToChanged()" name="role" type="radio" style="height:21px;width:21px" value="admin" ng-model="employee.role"/>
+				        </div>
+				    </div>
 				     <div>
 			        	<div style="display:inline-block">
 				        	<label for="gender" class="employeeDetails">Gender:</label>
@@ -225,7 +255,7 @@
 					    <button ng-if="isEmployeeChangeValid(employee)" class="rightAlign  inline cancelEmployeeButton" style="margin-left:10px" ng-click="cancel()">Cancel</button>
 				    </div>
 				    
-	  			    <button class="deleteEmployeeButton" ng-click="delete()" >Delete</button>
+	  			    <button ng-if="admin" class="deleteEmployeeButton" ng-click="delete()" >Delete</button>
 			    </form>
 	    	</div>
 		 </div>

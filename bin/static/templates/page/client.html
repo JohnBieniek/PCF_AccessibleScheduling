@@ -1,8 +1,8 @@
 <div ng-controller="MobileClientController" ng-init="listClients()">
-	<div style="display:inline-block;width:100%">
+	<div ng-if="user" style="display:inline-block;width:100%">
 	 	<div style="display:inline-block;width:25%">
 			<ul>
-				<div class = "newClientTab">
+				<div ng-if="admin" class = "newClientTab">
 			    	<div >
 			       		<p ng-click="newClient()"><span class="glyphicon glyphicon-plus" style="position:static !important"></span>&nbsp;New Client</p>
 			    	</div>
@@ -52,7 +52,7 @@
 					    		</div>
 				    		</div>
 			    		</div>
-   			    		<button  class="inline rightAlign newShiftButton" ng-click="addShift(client)"><span class="glyphicon glyphicon-plus"></span>&nbsp;New Shift</button>
+   			    		<button ng-if="manager" class="inline rightAlign newShiftButton" ng-click="addShift(client)"><span class="glyphicon glyphicon-plus"></span>&nbsp;New Shift</button>
 		    		</div>
 		 			<div style="overflow-y:auto;height:70vh;">
    						<div ng-repeat="day in displayDays">
@@ -138,7 +138,7 @@
 					    <button ng-if="isClientChangeValid(client)" class="rightAlign  inline cancelClientButton" style="margin-left:10px" ng-click="cancel()">Cancel</button>
 				    </div>
 				    
-	  			    <button class="deleteClientButton" ng-click="delete()" >Delete</button>
+	  			    <button ng-if="admin" class="deleteClientButton" ng-click="delete()" >Delete</button>
 			    </form>
 	    	</div>
 		 </div>

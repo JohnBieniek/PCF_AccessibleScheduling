@@ -68,9 +68,14 @@ angular.module('mainNavigation', ['ngResource', 'ui.bootstrap']).
 
 function MainNavigationController($scope, $modal, $http, Status) {
 	 $scope.init = function() {
-        $scope.setPage("scheduler");
+        $scope.setPage("login");
         $scope.sortDescending = false;
-        
+        console.log("nulling profile");
+        $scope.profile = null;
+        $scope.idToken = null;
+        $scope.user=false;
+        $scope.manager=false;
+        $scope.admin=false;
  
         $scope.selectedMonth=1;
 	   	$scope.selectedYear=2019;
@@ -89,9 +94,48 @@ function MainNavigationController($scope, $modal, $http, Status) {
    	 	$scope.multiTableEditing=false;//Have I fixed in table editing? No
    	 	$scope.customFieldDataEditing=true;//TODO factor out this flag
 	 };
+	 
+	 $scope.loggedIn = function loggedIn() {
+		 if($scope.idToken!=null){
+			 return true;
+		 }
+		 else{
+			 return false;
+		 }
+
+	  }
+	 $scope.signOut = function signOut() {
+		 $scope.manager=false;
+		 $scope.admin=false;
+		 $scope.user=false;
+		 $scope.idToken=null;
+		 $scope.profile=null;
+		  console.log("called sign out");
+	    var auth2 = gapi.auth2.getAuthInstance();
+	    auth2.signOut().then(function () {
+	      console.log('User signed out.');
+	    });
+	  }
+//	 window.signOut=signOut;
+	 
 	 $scope.changeSortOrder = function(){
 		 $scope.sortDescending = !$scope.sortDescending;
 	 }
+	 $scope.setIdToken = function (idToken) {
+	        $scope.idToken = idToken;
+	    };
+	    $scope.setProfile = function (profile) {
+	        $scope.profile = profile;
+	    };
+	 $scope.setUser = function (isUser) {
+	        $scope.user = isUser;
+	    };
+	    $scope.setManager = function (isManager) {
+	        $scope.manager = isManager;
+	    };
+	    $scope.setAdmin = function (isAdmin) {
+	        $scope.admin = isAdmin;
+	    };
     $scope.setPage = function (viewName) {
     	console.log("Setting page to:"+viewName);
         $scope.page = "templates/page/" + viewName + ".html";

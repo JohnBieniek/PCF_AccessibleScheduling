@@ -40,6 +40,9 @@ function EmployeesController($scope, $modal, $http, Employees, Employee, CustomF
      }
  
 	 function saveEmployee(employee) {
+		 console.log("role");
+		 console.log(employee);
+		 console.log(employee.role)
         Employees.save(employee,
             function (response) {
 	        	employee.id=response.id;

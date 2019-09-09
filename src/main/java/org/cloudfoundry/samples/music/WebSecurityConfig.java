@@ -16,9 +16,10 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		http
-			.authorizeRequests()
-				.anyRequest().authenticated()
-				.and()
+			.authorizeRequests().antMatchers("/*").permitAll().and()
+//			.authorizeRequests()
+//				.anyRequest().authenticated()
+//				.and()
 			.formLogin()
 				.loginPage("/login.html").permitAll().defaultSuccessUrl("/index.html", true)
 				.and()

@@ -1,4 +1,4 @@
-<div style="width:80%;margin-left:10%" class="col-xs-12" ng-controller="ShiftsController"  ng-init="list()">
+<div ng-if="admin" style="width:80%;margin-left:10%" class="col-xs-12" ng-controller="ShiftsController"  ng-init="list()">
 	<div>
 		<h2 style="display:inline-block">Shifts</h2>
 		<div style="display:inline-block">
@@ -17,7 +17,7 @@
 	    <table class="table table-striped">
 	       <thead>
 		       <tr>
-     			       <th>Year</th>
+     			   <th>Year</th>
 			       <th>Month</th>
 			       <th>Week</th>
 			       <th>Hide assigned shifts</th>
