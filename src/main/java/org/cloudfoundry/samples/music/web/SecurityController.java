@@ -1,6 +1,8 @@
 package org.cloudfoundry.samples.music.web;
 import java.util.ArrayList;
 
+import javax.security.sasl.AuthenticationException;
+
 import org.cloudfoundry.samples.music.managers.AccessibleSecurityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,11 +22,14 @@ public class SecurityController {
 	
 	@RequestMapping(value = "/tokensignin",method = RequestMethod.POST)
     public User tokenSignIn(@RequestParam String idtoken)throws Exception {
-    	return manager.getUserDetails(idtoken);
+		User user = manager.getUserDetails(idtoken);
+		user.setManager(true);
+		user.setAdmin(true);
+    	return user;
     }
 	
 	@RequestMapping(value = "/signup",method = RequestMethod.GET)
-    public String signUp2(@RequestParam String idtoken, @RequestParam String name) {
+    public String signUp2(@RequestParam String idtoken, @RequestParam String name) throws AuthenticationException {
 		System.out.println("id:"+idtoken);
 		System.out.println("name"+name);
 		return manager.signUp(idtoken,name).toString();
@@ -41,7 +46,7 @@ public class SecurityController {
     }
 	
 	@RequestMapping(value = "/signedup",method = RequestMethod.GET)
-    public Boolean signUp2(@RequestParam String idtoken) {
+    public Boolean signUp2(@RequestParam String idtoken) throws AuthenticationException {
 		System.out.println("id:"+idtoken);
 		return manager.signedUp(idtoken);
     }

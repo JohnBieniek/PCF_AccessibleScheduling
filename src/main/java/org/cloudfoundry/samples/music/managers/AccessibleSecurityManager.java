@@ -1,48 +1,79 @@
 package org.cloudfoundry.samples.music.managers;
-import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.security.sasl.AuthenticationException;
+
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoAccessRequestRepository;
-import org.cloudfoundry.samples.music.repositories.mongodb.MongoCustomFieldDataRepository;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoEmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import accessiblesolutions.accessiblescheduling.constants.Constants;
 import accessiblesolutions.accessiblescheduling.domain.AccessRequest;
-import accessiblesolutions.accessiblescheduling.domain.CustomField;
-import accessiblesolutions.accessiblescheduling.domain.CustomFieldData;
+import accessiblesolutions.accessiblescheduling.domain.CallAuth;
 import accessiblesolutions.accessiblescheduling.domain.Employee;
 import accessiblesolutions.accessiblescheduling.domain.User;
+import accessiblesolutions.accessiblescheduling.proxy.SecurityProxy;
 
 @Component
 public class AccessibleSecurityManager {
 	@Autowired
-	private CrudRepository<CustomField,String> customFieldCrud;
-	
-	@Autowired
 	private MongoEmployeeRepository employeeCrud;
-	
 	
 	@Autowired
 	private MongoAccessRequestRepository accessCrud;
 	
-	@Autowired
-    private MongoCustomFieldDataRepository customFieldDataRepository;
-
-	@Autowired
-    private CrudRepository<CustomFieldData, String> customFieldDataCrud;
-    
 	RestTemplate restTemplate = new RestTemplate();
     
     public AccessibleSecurityManager() {}
     
-    public boolean signedUp(String idToken) {
+    public CallAuth authorize(String idToken, String requiredRole) throws AuthenticationException {
+    	CallAuth auth = null;
+    	
+    	User user = getUser(idToken);
+    	
+    	if(null!=user) {
+    		if(!Constants.CLIENT_ID.equalsIgnoreCase(user.getIssuedTo())) {
+    			System.out.println("invalid client id");
+    			throw new AuthenticationException();
+    		}
+    		else if(!Constants.TOKEN_ISSUER.equalsIgnoreCase(user.getIssuer())) {
+    			System.out.println("invalid id issuer");
+    			throw new AuthenticationException();
+    		}
+    		else if(user.getExpiresIn()<=0) {
+    			System.out.println("expired token");
+    			throw new AuthenticationException();
+    		}
+    		else if(!user.isVerifiedEmail()) {
+    			System.out.println("e-mail not verified");
+    			throw new AuthenticationException();
+    		}
+    		
+    		user= getUserDetails(user);
+    		
+    		if(!requiredRole.equalsIgnoreCase("guest") && !user.isUser()) {
+    			System.out.println("not signed in");
+       			throw new AuthenticationException();
+    		}
+    		else if(requiredRole.equalsIgnoreCase("manager") && (!user.isManager() && !user.isAdmin())) {
+    			System.out.println("not a manager");
+       			throw new AuthenticationException();
+    		}
+    		else if(requiredRole.equalsIgnoreCase("admin") && !user.isAdmin()) {
+    			System.out.println("not a manager");
+    			throw new AuthenticationException();
+    		}
+    		
+    		auth= new CallAuth(user.isManager(),user.isAdmin());
+    	}
+    	
+    	return auth;
+    }
+    public boolean signedUp(String idToken) throws AuthenticationException {
     	User user = getUser(idToken);
     	
     	if(null!=user) {
@@ -55,7 +86,7 @@ public class AccessibleSecurityManager {
     	return false;
     }
     
-    public  AccessRequest signUp(String idToken, String name) {
+    public  AccessRequest signUp(String idToken, String name) throws AuthenticationException {
     	User user = getUser(idToken);
     	AccessRequest request = null;
     	
@@ -69,42 +100,20 @@ public class AccessibleSecurityManager {
     	return null;
     }
     
-    public boolean isAdmin(String idToken) {
+    public boolean isAdmin(String idToken) throws AuthenticationException {
     	return getUserDetails(idToken).isAdmin();
     }
     
-    public boolean isManager(String idToken) {
+    public boolean isManager(String idToken) throws AuthenticationException {
     	return getUserDetails(idToken).isManager();
     }
     
-    public boolean isUser(String idToken) {
+    public boolean isUser(String idToken) throws AuthenticationException {
     	return getUserDetails(idToken).isUser();
     }
     
-    public User getUserDetails(String idToken) {
+    public User getUserDetails(String idToken) throws AuthenticationException {
     	return getUserDetails(getUser(idToken));
-    }
-    
-    public User getUser(String idToken){
-    	String tokenInfo = restTemplate.getForObject("https://www.googleapis.com/oauth2/v2/tokeninfo?id_token="+idToken, String.class);
-    	
-    	ObjectMapper mapper = new ObjectMapper();
-    	User user = null;
-    	
-		try {
-			user = mapper.readValue(tokenInfo, User.class);
-		} catch (JsonParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    	
-    	return user;
     }
     
     public User getUserDetails(User user){
@@ -148,4 +157,19 @@ public class AccessibleSecurityManager {
     	
     	return (ArrayList<AccessRequest>) accessCrud.findAll();
 	}
+	
+	public User getUser(String idToken) throws AuthenticationException{
+    	String tokenInfo = restTemplate.getForObject("https://www.googleapis.com/oauth2/v2/tokeninfo?id_token="+idToken, String.class);
+    	
+    	ObjectMapper mapper = new ObjectMapper();
+    	User user = null;
+    	
+		try {
+			user = mapper.readValue(tokenInfo, User.class);
+		} catch (Exception e) {	
+			throw new AuthenticationException();
+		}
+    	System.out.println("user found:"+user.toString());
+    	return user;
+    }
 }

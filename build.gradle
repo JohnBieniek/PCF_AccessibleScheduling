@@ -41,6 +41,9 @@ sourceSets {
     }
 }
 dependencies {// https://mvnrepository.com/artifact/javax.persistence/persistence-api
+	// https://mvnrepository.com/artifact/io.springfox/springfox-swagger2
+	compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
+
  compile 'com.google.api-client:google-api-client:1.30.2'//signin
  // Dependency for Google Sign-In
 

@@ -44,7 +44,7 @@ function AlertsController($scope, $modal, $http, Employees, Employee, CustomFiel
 	            url: '/alerts/findAll',
 	            method: 'GET',
 	            headers: {
-	                'Content-Type': 'application/x-www-form-urlencoded'
+	                'Authorization': $scope.idToken
 	            },
 	            params: {
 	            }
