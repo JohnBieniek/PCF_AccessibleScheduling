@@ -1,10 +1,12 @@
 package org.cloudfoundry.samples.music.web;//Ignore complaints
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.security.sasl.AuthenticationException;
+
+import org.cloudfoundry.samples.music.managers.AccessibleSecurityManager;
 import org.cloudfoundry.samples.music.managers.EmployeeShiftMapManager;
 import org.cloudfoundry.samples.music.managers.ScheduleManager;
 import org.cloudfoundry.samples.music.managers.ShiftAssignmentManager;
@@ -20,11 +22,14 @@ import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.core.JsonPar
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.databind.JsonMappingException;
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import accessiblesolutions.accessiblescheduling.constants.Constants;
+import accessiblesolutions.accessiblescheduling.domain.CallAuth;
 import accessiblesolutions.accessiblescheduling.domain.Client;
 import accessiblesolutions.accessiblescheduling.domain.ClientRequest;
 import accessiblesolutions.accessiblescheduling.domain.Employee;
@@ -33,11 +38,13 @@ import accessiblesolutions.accessiblescheduling.domain.Shift;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
 import accessiblesolutions.accessiblescheduling.to.ScheduleOptions;
-import accessiblesolutions.accessiblescheduling.util.Util;
 
 @RestController
 @RequestMapping(value = "/schedule")
 public class ScheduleController {
+	@Autowired 
+	AccessibleSecurityManager securityManager;
+	
     private ScheduleManager manager;
     
     @Autowired
@@ -82,7 +89,8 @@ public class ScheduleController {
     }
     
     @RequestMapping(value = "/staffShift",method = RequestMethod.POST)
-    public Employee staffShift(@RequestParam String param) {
+    public Employee staffShift(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam String param) throws AuthenticationException {
+    	securityManager.authorize(idToken, Constants.MANAGER);
     	Shift shift =null;
     	System.out.println(param);
     	ObjectMapper mapper = new ObjectMapper();
@@ -116,21 +124,29 @@ public class ScheduleController {
     }
     
     @RequestMapping(value = "/clientShiftsForWeek",method = RequestMethod.GET)
-    public Iterable<Shift> clientShiftsForWeek(@RequestParam String clientId, @RequestParam String month, @RequestParam String day, @RequestParam String year) {
+    public Iterable<Shift> clientShiftsForWeek(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam String clientId, @RequestParam String month, @RequestParam String day, @RequestParam String year) throws AuthenticationException {
+    	securityManager.authorize(idToken, Constants.MANAGER);
+    	
     	return manager.getClientShiftsForWeek(clientId,month,day,year);
     }
      
     @RequestMapping(value = "/employeeShiftsForWeek",method = RequestMethod.GET)
-    public Iterable<Shift> employeeShiftsForWeek(@RequestParam String employeeId, @RequestParam String month, @RequestParam String day, @RequestParam String year) {
+    public Iterable<Shift> employeeShiftsForWeek(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam String employeeId, @RequestParam String month, @RequestParam String day, @RequestParam String year) throws AuthenticationException {
+    	CallAuth auth = securityManager.authorize(idToken, Constants.USER);
+    	
+    	if(auth.getEmployeeId()!=employeeId) {
+    		if(!auth.isAdmin() && !auth.isManager()) {
+    			throw new AuthenticationException();
+    		}
+    	}
+    	
     	return manager.getEmployeeShiftsForWeek(employeeId,month,day,year);
     }
     
-//    @RequestMapping(value = "/currentWeek",method = RequestMethod.GET)
-//    public String currentWeek() {
-//    	return manager.getCurrentWeek();
-//    }
     @RequestMapping(value = "/createEmployee",method = RequestMethod.POST)
-    public Iterable<Employee> createEmployee() {
+    public Iterable<Employee> createEmployee(@RequestHeader(value="Authorization", required=false) String idToken) throws AuthenticationException {
+    	securityManager.authorize(idToken, Constants.ADMIN);
+    	
     	Employee employee =new Employee();
     	
     	employee.setFirst("An employee");
@@ -142,7 +158,9 @@ public class ScheduleController {
 		return employees;
     }    
     @RequestMapping(value = "/createClient",method = RequestMethod.POST)
-    public Iterable<Client> createClient() {
+    public Iterable<Client> createClient(@RequestHeader(value="Authorization", required=false) String idToken) throws AuthenticationException {
+    	securityManager.authorize(idToken, Constants.ADMIN);
+    	
     	Client client =new Client();
     	
     	client.setFirst("A client");
@@ -155,7 +173,9 @@ public class ScheduleController {
     }
 
     @RequestMapping(value = "/updateEmployee",method = RequestMethod.POST)
-    public Employee updateEmployee(@RequestParam String param) {
+    public Employee updateEmployee(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam String param) throws AuthenticationException {
+    	securityManager.authorize(idToken, Constants.MANAGER);
+    	
     	Employee employee =null;
 
     	ObjectMapper mapper = new ObjectMapper();
@@ -186,7 +206,9 @@ public class ScheduleController {
         return employeeRepository.findOne(employee.getId());
     }
     @RequestMapping(value = "/updateClient",method = RequestMethod.POST)
-    public Client updateClient(@RequestParam String param) {
+    public Client updateClient(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam String param) throws AuthenticationException {
+    	securityManager.authorize(idToken, Constants.MANAGER);
+    	
     	Client client =null;
 
     	ObjectMapper mapper = new ObjectMapper();
@@ -206,7 +228,9 @@ public class ScheduleController {
     }
 
     @RequestMapping(value = "/deleteRequest", method = RequestMethod.GET)
-    public List<ClientRequest> deleteById(@RequestParam String id) {
+    public List<ClientRequest> deleteById(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam String id) throws AuthenticationException {
+    	securityManager.authorize(idToken, Constants.MANAGER);
+    	
     	ClientRequest request = mongoRepository.findOne(id);
     	String clientId=request.getClientId();
     	mongoRepository.delete(id);
@@ -215,13 +239,18 @@ public class ScheduleController {
     }
     
     @RequestMapping(value = "/clientsRequests", method = RequestMethod.GET)
-    public Iterable<ClientRequest> clientsRequests(@RequestParam String clientId) {
-        return mongoRepository.findByClientId(clientId);
+    public Iterable<ClientRequest> clientsRequests(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam String clientId) throws AuthenticationException {
+    	securityManager.authorize(idToken, Constants.MANAGER);
+    	
+    	
+    	return mongoRepository.findByClientId(clientId);
     }
 
     @RequestMapping(value = "/byMonth", method = RequestMethod.DELETE)
-    public Iterable<ScheduleStatus> deleteByMonth(@RequestParam("month") String  month) {
-    	 ScheduleStatus status = new ScheduleStatus();
+    public Iterable<ScheduleStatus> deleteByMonth(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam("month") String  month) throws AuthenticationException {
+    	securityManager.authorize(idToken, Constants.ADMIN);
+    	
+    	ScheduleStatus status = new ScheduleStatus();
          
      	status.setMonth(month);
      	    	
@@ -233,43 +262,17 @@ public class ScheduleController {
     	return scheduleStatusCrud.findAll();
     }
     
-    @RequestMapping(value = "/staffSuggestion", method = RequestMethod.GET)
-    public void staffSuggestion(@RequestParam("shiftId") String shiftId) throws CorruptDataException, ProccessingException {
-        //return assignmentManager.getStaffSuggestion();
-    }
-    
     @RequestMapping(value = "/durationOfWeeksShifts", method = RequestMethod.GET)
-    public float durationOfWeeksShifts(@RequestParam("week") String week,@RequestParam("month") String month,@RequestParam("year") String year) throws CorruptDataException, ProccessingException {
-        return shiftManager.getDurationOfShiftsStartingWeekOfMonth(Integer.parseInt(week),Integer.parseInt(month),Integer.parseInt(year));
+    public float durationOfWeeksShifts(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam("week") String week,@RequestParam("month") String month,@RequestParam("year") String year) throws CorruptDataException, ProccessingException, AuthenticationException {
+    	securityManager.authorize(idToken, Constants.MANAGER);
+    	
+    	return shiftManager.getDurationOfShiftsStartingWeekOfMonth(Integer.parseInt(week),Integer.parseInt(month),Integer.parseInt(year));
     }
-    
-//    @RequestMapping(value = "/staffWeekdayShift", method = RequestMethod.GET)
-//    public String staffWeekdayShift(@RequestParam("week") String week,@RequestParam("month") String month,@RequestParam("year") String year) throws CorruptDataException, ProccessingException {
-//        return assignmentManager.scheduleWeekdayShiftStartingWeekOfMonth(Integer.parseInt(week),Integer.parseInt(month),Integer.parseInt(year));
-//    }
-//    
-//    @RequestMapping(value = "/staffWeekdayShifts", method = RequestMethod.GET)
-//    public String staffWeekdayShifts(@RequestParam("week") String week,@RequestParam("month") String month,@RequestParam("year") String year) throws CorruptDataException, ProccessingException {
-//        return assignmentManager.scheduleWeekdayShiftsStartingWeekOfMonth(Integer.parseInt(week),Integer.parseInt(month),Integer.parseInt(year));
-//    }
-//    
-//    @RequestMapping(value = "/staffWeekendShift", method = RequestMethod.GET)
-//    public String staffWeekendShift(@RequestParam("week") String week,@RequestParam("month") String month,@RequestParam("year") String year) throws CorruptDataException, ProccessingException {
-//        return assignmentManager.scheduleWeekendShiftStartingWeekOfMonth(Integer.parseInt(week),Integer.parseInt(month),Integer.parseInt(year));
-//    }
-//    
-//    @RequestMapping(value = "/staffWeekendShifts", method = RequestMethod.GET)
-//    public String staffWeekendShifts(@RequestParam("week") String week,@RequestParam("month") String month,@RequestParam("year") String year) throws CorruptDataException, ProccessingException {
-//        return assignmentManager.scheduleWeekendShiftsStartingWeekOfMonth(Integer.parseInt(week),Integer.parseInt(month),Integer.parseInt(year));
-//    }
-//    
-//    @RequestMapping(value = "/staffWeeksShifts", method = RequestMethod.GET)
-//    public String staffWeeksShifts(@RequestParam("week") String week,@RequestParam("month") String month,@RequestParam("year") String year) throws CorruptDataException, ProccessingException {
-//        return assignmentManager.scheduleShiftsStartingWeekOfMonth(Integer.parseInt(week),Integer.parseInt(month),Integer.parseInt(year));
-//    }
     
     @RequestMapping(value = "/staffPreassignedShifts", method = RequestMethod.GET)
-    public String staffPreassignedShifts(@RequestParam("month") String month,@RequestParam("year") String year) throws CorruptDataException, ProccessingException {
+    public String staffPreassignedShifts(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam("month") String month,@RequestParam("year") String year) throws CorruptDataException, ProccessingException, AuthenticationException {
+    	securityManager.authorize(idToken, Constants.ADMIN);
+    	
     	ScheduleOptions options = new ScheduleOptions();
     	options.setMonth(month);
     	options.setYear(year);
@@ -277,14 +280,17 @@ public class ScheduleController {
     }
     
     @RequestMapping(value = "/staffShiftsSafely", method = RequestMethod.GET)
-    public Iterable<ScheduleStatus> staffShiftsSafely(@RequestParam("month") String month
+    public Iterable<ScheduleStatus> staffShiftsSafely(@RequestHeader(value="Authorization", required=false) String idToken,
+    													@RequestParam("month") String month
     													,@RequestParam("year") String year
     													,@RequestParam("allowOvertime") boolean allowOvertime
     													,@RequestParam("allowInactive") boolean allowInactive
     													,@RequestParam("allowUnavailable") boolean allowUnavailable
     													,@RequestParam("prioritizeSecondShift") boolean prioritizeSecondShift
     													,@RequestParam("dailyMax") boolean dailyMax
-    													,@RequestParam("weeklyMax") boolean weeklyMax) {
+    													,@RequestParam("weeklyMax") boolean weeklyMax) throws AuthenticationException {
+    	securityManager.authorize(idToken, Constants.ADMIN);
+    	
     	System.out.println("Starting assignment");
     	ScheduleStatus status = scheduleStatusCrud.findOne(month);
     	scheduleStatusRepository.deleteByMonth(month);
@@ -309,33 +315,45 @@ public class ScheduleController {
     }
     
     @RequestMapping(value = "/assigning", method = RequestMethod.GET)
-    public boolean assigning(@RequestParam("month") String month) {
+    public boolean assigning(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam("month") String month) throws AuthenticationException {
+    	securityManager.authorize(idToken, Constants.ADMIN);
+    	
     	return assignmentManager.scheduleStatus(month).isAssigning();
     }
     
     @RequestMapping(value = "/statusList", method = RequestMethod.GET)
-    public Iterable<ScheduleStatus> scheduleStatusList() {
-        return scheduleStatusCrud.findAll();
+    public Iterable<ScheduleStatus> scheduleStatusList(@RequestHeader(value="Authorization", required=false) String idToken) throws AuthenticationException {
+    	securityManager.authorize(idToken, Constants.ADMIN);
+    	
+    	return scheduleStatusCrud.findAll();
     }
     
     @RequestMapping(value = "/unscheduled", method = RequestMethod.GET)
-    public int unscheduled(@RequestParam("month") String month) throws NumberFormatException, ProccessingException {
-        return shiftManager.getUnassignedShiftsForMonth(Integer.parseInt(month)).size();
+    public int unscheduled(@RequestHeader(value="Authorization", required=false) String idToken,@RequestParam("month") String month) throws NumberFormatException, ProccessingException, AuthenticationException {
+    	securityManager.authorize(idToken, Constants.ADMIN);
+    	
+    	return shiftManager.getUnassignedShiftsForMonth(Integer.parseInt(month)).size();
     }
     
     @RequestMapping(value = "/scheduled", method = RequestMethod.GET)
-    public int scheduled(@RequestParam("month") String month) throws NumberFormatException, ProccessingException {
-        return shiftManager.getAssignedShiftsForMonth(Integer.parseInt(month)).size();
+    public int scheduled(@RequestHeader(value="Authorization", required=false) String idToken,@RequestParam("month") String month) throws NumberFormatException, ProccessingException, AuthenticationException {
+    	securityManager.authorize(idToken, Constants.ADMIN);
+    	
+    	return shiftManager.getAssignedShiftsForMonth(Integer.parseInt(month)).size();
     }
     
     @RequestMapping(value = "/generateStatusList", method = RequestMethod.GET)
-    public Iterable<ScheduleStatus> generateStatusList() {
+    public Iterable<ScheduleStatus> generateStatusList(@RequestHeader(value="Authorization", required=false) String idToken) throws AuthenticationException {
+    	securityManager.authorize(idToken, Constants.ADMIN);
+    	
     	scheduleManager.generateStatusList();
         return scheduleStatusCrud.findAll();
     }
     
     @RequestMapping(value = "/finishAssignment", method = RequestMethod.GET)
-    public Iterable<ScheduleStatus> finishAssignment(@RequestParam("month") String month) throws CorruptDataException {
+    public Iterable<ScheduleStatus> finishAssignment(@RequestHeader(value="Authorization", required=false) String idToken,@RequestParam("month") String month) throws CorruptDataException, AuthenticationException {
+    	securityManager.authorize(idToken, Constants.ADMIN);
+    	
     	ScheduleStatus status = assignmentManager.scheduleStatus(month);
     	System.out.println("finishing assignment for "+month);
     	if(null==status) {
@@ -357,7 +375,9 @@ public class ScheduleController {
     }
     
     @RequestMapping(value = "/stopAssignment", method = RequestMethod.GET)
-    public Iterable<ScheduleStatus> stopAssignment(@RequestParam("month") String month) throws CorruptDataException, InterruptedException {
+    public Iterable<ScheduleStatus> stopAssignment(@RequestHeader(value="Authorization", required=false) String idToken,@RequestParam("month") String month) throws CorruptDataException, InterruptedException, AuthenticationException {
+    	securityManager.authorize(idToken, Constants.ADMIN);
+    	
     	ScheduleStatus status = scheduleStatusCrud.findOne(month);
     	scheduleStatusRepository.deleteByMonth(month);
     	
@@ -371,50 +391,36 @@ public class ScheduleController {
 		status.setStopped(true);
     	scheduleStatusCrud.save(status);
     	Thread.sleep(5000);
-    	finishAssignment(month);
+    	finishAssignment(idToken, month);
         return scheduleStatusCrud.findAll();
     }
     
     @RequestMapping(value = "/generateShifts", method = RequestMethod.GET)
-    public Iterable<ScheduleStatus> generateShifts(@RequestParam("month") String month,@RequestParam("year") String year) throws CorruptDataException {
-    	generationManager.generateShifts(month,year);//manager.generateShifts(month);
+    public Iterable<ScheduleStatus> generateShifts(@RequestHeader(value="Authorization", required=false) String idToken,@RequestParam("month") String month,@RequestParam("year") String year) throws CorruptDataException, AuthenticationException {
+    	securityManager.authorize(idToken, Constants.ADMIN);
+    	
+    	generationManager.generateShifts(month,year);
         return scheduleStatusCrud.findAll();
     }
     
     @RequestMapping(value = "/generateSingleShifts", method = RequestMethod.GET)
-    public String generateSingleShifts(@RequestParam("month") String month) throws CorruptDataException {
-        return manager.generateSingleShifts(month);
+    public String generateSingleShifts(@RequestHeader(value="Authorization", required=false) String idToken,@RequestParam("month") String month) throws CorruptDataException, AuthenticationException {
+    	securityManager.authorize(idToken, Constants.ADMIN);
+    	
+    	return manager.generateSingleShifts(month);
     }
     
-//    @RequestMapping(value = "/staffShifts", method = RequestMethod.GET)
-//    public String staffShifts(@RequestParam("month") String month,@RequestParam("year") String year) throws CorruptDataException, ProccessingException {
-//        ScheduleOptions options = new ScheduleOptions();
-//        options.setMonth(month);
-//        options.setYear(year);
-//    	return manager.staffShifts(options);
-//    }
-    
     @RequestMapping(value = "/getShiftsForMonth", method = RequestMethod.GET)
-    public String getShiftsForOfMonth(@RequestParam("month") String month) {
-        return shiftManager.getShiftsForMonth(Integer.parseInt(month)).toString();
+    public String getShiftsForOfMonth(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam("month") String month) throws AuthenticationException {
+    	securityManager.authorize(idToken, Constants.MANAGER);
+    	
+    	return shiftManager.getShiftsForMonth(Integer.parseInt(month)).toString();
     }
     
     @RequestMapping(value = "/getShiftsPerEmployeeForMonth", method = RequestMethod.GET)
-    public String getShiftsPerEmployeeForOfMonth(@RequestParam("month") String month) throws ProccessingException {
-        return employeeShiftMapManager.getAssignedShiftsPerEmployeeForMonth(Integer.parseInt(month)).toString();
-    }
-    
-    //TODO kill it
-    @RequestMapping(value = "/getAssignedShiftsForEmployeeForMonth", method = RequestMethod.GET)
-    public ArrayList<Shift> getAssignedShiftsForEmployeeForMonth(@RequestParam("employee") String employee) throws ProccessingException  {
-    	return employeeShiftMapManager.getAssignedShiftsPerEmployeeForMonth(4).get(employee);
-    	//return manager.getAssignedShiftsForEmployeeForMonth("584890232b3acf554ef8d88f", Integer.parseInt(month));
-    }
-    
-  //TODO kill it
-    @RequestMapping(value = "/getAssignedShiftsForEmployeeForMonth2", method = RequestMethod.GET)
-    public String getAssignedShiftsForEmployeeForMonth2(@RequestParam("month") String month) throws ProccessingException {
-    	return employeeShiftMapManager.getAssignedShiftsPerEmployeeForMonth(Integer.parseInt(month)).keySet().toArray().toString();
-    	//return manager.getAssignedShiftsForEmployeeForMonth("584890232b3acf554ef8d88f", Integer.parseInt(month));
+    public String getShiftsPerEmployeeForOfMonth(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam("month") String month) throws ProccessingException, AuthenticationException {
+    	securityManager.authorize(idToken, Constants.MANAGER);
+    	
+    	return employeeShiftMapManager.getAssignedShiftsPerEmployeeForMonth(Integer.parseInt(month)).toString();
     }
 }

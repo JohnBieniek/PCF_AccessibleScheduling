@@ -33,6 +33,12 @@ public class AccessibleSecurityManager {
     public CallAuth authorize(String idToken, String requiredRole) throws AuthenticationException {
     	CallAuth auth = null;
     	
+    	System.out.println("for role:"+requiredRole+"authorizing:"+idToken);
+    	if(null==idToken || idToken.isEmpty()) {
+			System.out.println("invalid id token");
+			throw new AuthenticationException();
+    	}
+    	
     	User user = getUser(idToken);
     	
     	if(null!=user) {
@@ -59,6 +65,10 @@ public class AccessibleSecurityManager {
     			System.out.println("not signed in");
        			throw new AuthenticationException();
     		}
+    		else if(requiredRole.equalsIgnoreCase("user") && !user.isUser()) {
+    			System.out.println("not a user");
+       			throw new AuthenticationException();
+    		}
     		else if(requiredRole.equalsIgnoreCase("manager") && (!user.isManager() && !user.isAdmin())) {
     			System.out.println("not a manager");
        			throw new AuthenticationException();
@@ -69,8 +79,10 @@ public class AccessibleSecurityManager {
     		}
     		
     		auth= new CallAuth(user.isManager(),user.isAdmin());
+    		auth.setEmployeeId(user.getEmployeeId());
     	}
     	
+    	System.out.println("Call Auth found:"+auth.toString());
     	return auth;
     }
     public boolean signedUp(String idToken) throws AuthenticationException {

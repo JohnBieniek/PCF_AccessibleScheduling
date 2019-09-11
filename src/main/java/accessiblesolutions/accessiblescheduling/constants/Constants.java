@@ -1,6 +1,7 @@
 package accessiblesolutions.accessiblescheduling.constants;
 
 public abstract class Constants {
+	public static final String USER = "user";
 	public static final String MANAGER = "manager";
 	public static final String ADMIN = "admin";
 	public static final String CLIENT_ID = "728962972693-5uudecgh1ir6if7imo2hb6cv9qa9nrk3.apps.googleusercontent.com";

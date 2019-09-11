@@ -402,16 +402,40 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
 	 }
 
 	 $scope.listClients = function listClients() {
-        $scope.clients = Clients.query();
-        $scope.clients = $scope.clients.sort(function(a, b){return a.first > b.first});
-        if($scope.client==null){
-        	$scope.client = $scope.clients[0];
-        }
-        $scope.employees = Employees.query();
+    	 console.log("listing clients");
+    	 console.log($scope.idToken);
+		$http({
+	        url: '/clients',
+	        method: 'GET',
+	        headers: {
+	            'Authorization': $scope.idToken
+	        },
+	        params: {
+	        }
+	    })
+	    .then(function(response) {
+	    	$scope.clients=response.data;
+	    	
+	        if($scope.client==null){
+	        	$scope.client = $scope.clients[0];
+	        }
+	        $scope.employees = Employees.query();
+	    });
     }
     
     $scope.listEmployees = function listEmployees() {
-        $scope.employees = Employees.query();
+  		$http({
+	        url: '/employees',
+	        method: 'GET',
+	        headers: {
+	            'Authorization': $scope.idToken
+	        },
+	        params: {
+	        }
+	    })
+	    .then(function(response) {
+	    	$scope.employees=response.data;
+	    });
     }
     
     function saveShift(shift) {
@@ -491,6 +515,7 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
             url: '/schedule/clientShiftsForWeek',
             method: 'GET',
             headers: {
+	            'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
@@ -516,6 +541,7 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
             url: '/schedule/clientsRequests',
             method: 'GET',
             headers: {
+	            'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
@@ -538,6 +564,7 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
             url: '/schedule/currentShifts',
             method: 'GET',
             headers: {
+	            'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
@@ -582,6 +609,7 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
                url: '/clientRequests',
                method: 'POST',
                headers: {
+            	   'Authorization': $scope.idToken
                    'Content-Type': 'application/x-www-form-urlencoded'
                },
                params: {
@@ -630,6 +658,7 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
                 url: '/clientRequests',
                 method: 'POST',
                 headers: {
+    	            'Authorization': $scope.idToken,
                     'Content-Type': 'application/x-www-form-urlencoded'
                 },
                 params: {
@@ -732,6 +761,7 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
                url: '/schedule/deleteRequest',
                method: 'GET',
                headers: {
+            	   'Authorization': $scope.idToken,
                    'Content-Type': 'application/x-www-form-urlencoded'
                },
                params: {
@@ -749,6 +779,7 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
             url: '/schedule/createClient',
             method: 'POST',
             headers: {
+	            'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
@@ -775,6 +806,7 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
                 url: '/compatibility/setClientCustomFieldData',
                 method: 'POST',
                 headers: {
+    	            'Authorization': $scope.idToken,
                     'Content-Type': 'application/x-www-form-urlencoded'
                 },
                 params: {
@@ -789,6 +821,7 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
             url: '/schedule/updateClient',
             method: 'POST',
             headers: {
+	            'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
@@ -813,6 +846,7 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
              url: '/shifts/'+shift.id,
              method: 'DELETE',
              headers: {
+ 	            'Authorization': $scope.idToken,
                  'Content-Type': 'application/x-www-form-urlencoded'
              },
              params: {
@@ -836,6 +870,7 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
             url: '/clients/'+$scope.client.id,
             method: 'DELETE',
             headers: {
+	            'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
@@ -860,6 +895,7 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
             url: '/clients/'+$scope.client.id,
             method: 'GET',
             headers: {
+	            'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {

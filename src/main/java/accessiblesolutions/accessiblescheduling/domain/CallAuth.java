@@ -1,6 +1,7 @@
 package accessiblesolutions.accessiblescheduling.domain;
 
 public class CallAuth{
+	private String employeeId;
 	private boolean manager;
 	private boolean admin;
 
@@ -27,9 +28,17 @@ public class CallAuth{
 	public void setAdmin(boolean admin) {
 		this.admin = admin;
 	}
+	
+	public String getEmployeeId() {
+		return employeeId;
+	}
+
+	public void setEmployeeId(String employeeId) {
+		this.employeeId = employeeId;
+	}
 
 	@Override
 	public String toString() {
-		return "CallAuth [manager=" + manager + ", admin=" + admin + "]";
+		return "CallAuth [employeeId=" + employeeId + ", manager=" + manager + ", admin=" + admin + "]";
 	}
 }
