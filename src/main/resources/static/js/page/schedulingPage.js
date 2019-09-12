@@ -1,10 +1,4 @@
 angular.module('vacation', ['ngResource', 'ui.bootstrap']).
-	factory('Clients', function ($resource) {
-	    return $resource('employees');
-	}).
-	factory('Client', function ($resource) {
-	    return $resource('employees/:id', {id: '@id'});
-	}).
 	factory("EditorStatus", function () {
         var editorEnabled = {};
 
@@ -27,14 +21,29 @@ angular.module('vacation', ['ngResource', 'ui.bootstrap']).
         }
     });
 
-function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
+function SchedulingController($scope, $modal, $http,Status) {
 	 $scope.multiTableEditing=false;
 	 
 	 function clone (obj) {
 	        return JSON.parse(JSON.stringify(obj));
      }
     
-    $scope.listClients = function listClients() {
-        $scope.clients = Clients.query();
-    }
+		$scope.listClients = function listClients() {
+			$http({
+		        url: '/clients',
+		        method: 'GET',
+		        headers: {
+		            'Authorization': $scope.idToken
+		        },
+		        params: {
+		        }
+		    })
+		    .then(function(response) {
+		    	$scope.clients=response.data;
+		    	
+		        if($scope.client==null){
+		        	$scope.client = $scope.clients[0];
+		        }
+		    });
+	    }
 }

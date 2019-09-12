@@ -1,13 +1,4 @@
 angular.module('employees', ['ngResource', 'ui.bootstrap']).
-	factory('Employees', function ($resource) {
-	    return $resource('employees');
-	}).
-	factory('Employee', function ($resource) {
-	    return $resource('employees/:id', {id: '@id'});
-	}).
-	factory('CustomFields', function ($resource) {
-        return $resource('customFields');
-    }).
 	factory("EditorStatus", function () {
         var editorEnabled = {};
 
@@ -30,7 +21,7 @@ angular.module('employees', ['ngResource', 'ui.bootstrap']).
         }
     });
 
-function EmployeesController($scope, $modal, $http, Employees, Employee, CustomFields, Status) {
+function EmployeesController($scope, $modal, $http, Status) {
 	 $scope.multiTableEditing=false;
 	 $scope.customFieldDataEditing=true;
 	 $scope.sortField="first";
@@ -40,11 +31,18 @@ function EmployeesController($scope, $modal, $http, Employees, Employee, CustomF
      }
  
 	 function saveEmployee(employee) {
-		 console.log("role");
-		 console.log(employee);
-		 console.log(employee.role)
-        Employees.save(employee,
-            function (response) {
+	    	$http({
+	            url: '/employees',
+	            method: 'POST',
+	            headers: {
+	                'Authorization': $scope.idToken,
+	                'Content-Type': 'application/x-www-form-urlencoded'
+	            },
+	            params: {
+	                employee: employee
+	            }
+	        })
+	        .then(function (response) {//TODO handle error state
 	        	employee.id=response.id;
 	            if(employee.customFields){
 	            	var size = employee.customFields.length;
@@ -67,10 +65,8 @@ function EmployeesController($scope, $modal, $http, Employees, Employee, CustomF
 	            }
                 Status.success("Employee saved");
                 $scope.listEmployees();
-            },
-            function (result) {
-                Status.error("Error saving employee: " + result.status);
-            }
+            });
+        
         );
     }
 	   
@@ -137,11 +133,35 @@ function EmployeesController($scope, $modal, $http, Employees, Employee, CustomF
     	$scope.listEmployees();
     }
     $scope.listEmployees = function listEmployees() {
-        $scope.employees = Employees.query();
+    	$http({
+            url: '/employees/',
+            method: 'GET',
+            headers: {
+	            'Authorization': $scope.idToken,
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            params: {
+            }
+        })
+        .then(function(response) {
+        	$scope.employees=response.data;
+        });
     }
     
     $scope.listCustomFields = function listCustomFields() {
-        $scope.customFields = CustomFields.query();
+    	$http({
+            url: '/customFields/',
+            method: 'GET',
+            headers: {
+	            'Authorization': $scope.idToken,
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            params: {
+            }
+        })
+        .then(function(response) {
+        	$scope.customFields=response.data;
+        });
     }
     
     $scope.getCustomFieldData = function (employee,customField,index){
@@ -189,16 +209,21 @@ function EmployeesController($scope, $modal, $http, Employees, Employee, CustomF
     }
 
     $scope.deleteEmployee = function (employee) {
-    	if(confirm("Are you sure to delete info for "+employee.first+"?")){
-	        Employee.delete({id: employee.id},
-	            function () {
-	                Status.success("Employee deleted");
-	                $scope.listEmployees();
+    	if(confirm("Are you sure to remove information for "+employee.first+"?")){
+    		$http({
+	            url: '/employees/'+employee.id,
+	            method: 'DELETE',
+	            headers: {
+	                'Authorization': $scope.idToken,
+	                'Content-Type': 'application/x-www-form-urlencoded'
 	            },
-	            function (result) {
-	                Status.error("Error deleting employee: " + result.status);
+	            params: {
 	            }
-	        );
+	        })
+	        .then(function (response) {//TODO handle error state
+                Status.success("Employee removed.");
+                $scope.listEmployees();
+            });
     	}
     };
 }

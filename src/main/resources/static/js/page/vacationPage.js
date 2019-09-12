@@ -1,10 +1,4 @@
 angular.module('vacation', ['ngResource', 'ui.bootstrap']).
-	factory('Employees', function ($resource) {
-	    return $resource('employees');
-	}).
-	factory('Employee', function ($resource) {
-	    return $resource('employees/:id', {id: '@id'});
-	}).
 	factory("EditorStatus", function () {
         var editorEnabled = {};
 
@@ -47,38 +41,74 @@ function VacationController($scope, $modal, $http, Employees, Employee,Status) {
 	    }
       }
 	    
-	 function saveEmployee(employee) {
-        Employees.save(employee,
-            function (response) {
-	        	employee.id=response.id;
-	            if(employee.customFields){
-	            	var size = employee.customFields.length;
-	            
-		            for(var i = 0; i < size ;i++){
-		                $http({
-		                    url: 'https://scheduleaccessqa.cfapps.io/compatibility/setCustomFieldData',
-		                    method: 'POST',
-		                    headers: {
-		                        'Content-Type': 'application/x-www-form-urlencoded'
-		                    },
-		                    params: {
-		                        employee: employee,
-		                        customField: employee.customFields[i],
-		                        value:employee.customValue[i],
-		                    }
-		                });
-		            }
+    $scope.saveEmployee = function saveEmployee(employee) {
+     	if(employee.availability){
+	     	for(var index = 0; index<employee.availability.length;index++){
+	     		employee.availabilityStartTimes
+				if(!employee.availabilityStartTimes){
+					employee.availabilityStartTimes=[];
+				}
+				if(!employee.availabilityEndTimes){
+					employee.availabilityEndTimes=[];
+				}			
+				if(!employee.availabilityDays){
+					employee.availabilityDays=[];
+				}
+				employee.availabilityStartTimes.push(employee.availability[index].startTime);
+				employee.availabilityEndTimes.push(employee.availability[index].endTime);
+				employee.days.push(employee.availability[index].day);	
+			}
+      	}
+ 	   $http({
+           url: '/employees',
+           method: 'POST',
+           headers: {
+               'Authorization': $scope.idToken,
+               'Content-Type': 'application/x-www-form-urlencoded'
+           },
+           params: {
+        	   employee: employee
+           }
+       })
+       .then(function (response) {//TODO handle error state
+    	   $scope.employee=response.data;
+       	   employee.id=response.data.id;
+           if(employee.customFields){
+	            var size = employee.customFields.length;
+	           
+	            for(var i = 0; i < size ;i++){
+	                $http({
+	                    url: 'https://scheduleaccessqa.cfapps.io/compatibility/setCustomFieldData',
+	                    method: 'POST',
+	                    headers: {
+	                        'Content-Type': 'application/x-www-form-urlencoded'
+	                    },
+	                    params: {
+	                        employee: employee,
+	                        customField: employee.customFields[i],
+	                        value:employee.customValue[i],
+	                    }
+	                });
 	            }
-                Status.success("Employee saved");
-                $scope.listEmployees();
-            },
-            function (result) {
-                Status.error("Error saving employee: " + result.status);
-            }
-        );
+           }
+           
+           Status.success("Employee saved");
+       });
     }
     
     $scope.listEmployees = function listEmployees() {
-        $scope.employees = Employees.query();
+    	$http({
+            url: '/employees/',
+            method: 'GET',
+            headers: {
+	            'Authorization': $scope.idToken,
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            params: {
+            }
+        })
+        .then(function(response) {
+        	$scope.employees=response.data;
+        });
     }
 }

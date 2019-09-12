@@ -1,10 +1,4 @@
 angular.module('settings', ['ngResource', 'ui.bootstrap']).
-	factory('CustomFields', function ($resource) {
-	    return $resource('customFields');
-	}).
-	factory('CustomFields', function ($resource) {
-	    return $resource('customFields/:id', {id: '@id'});
-	}).
 	factory("EditorStatus", function () {
         var editorEnabled = {};
 
@@ -27,11 +21,7 @@ angular.module('settings', ['ngResource', 'ui.bootstrap']).
         }
     });
 
-function SettingsController($scope, $modal, $http, CustomFields, CustomField,Status) {
-	 $scope.data = {
-			    model: null
-			   };//TODO delete this
-	 
+function SettingsController($scope, $modal, $http,Status) {
 	 $scope.multiTableEditing=false;
 	 
 	 function clone (obj) {
@@ -39,15 +29,22 @@ function SettingsController($scope, $modal, $http, CustomFields, CustomField,Sta
      }
 	 
 	 function saveCustomField(customField) {
-        CustomFields.save(customField,
-            function () {
-                Status.success("Custom Field saved");
-                $scope.listCustomFields();
-            },
-            function (result) {
-                Status.error("Error saving custom field: " + result.status);
-            }
-        );
+		 $http({
+	           url: '/customFields',
+	           method: 'POST',
+	           headers: {
+	               'Authorization': $scope.idToken,
+	               'Content-Type': 'application/x-www-form-urlencoded'
+	           },
+	           params: {
+	        	   customField: customField
+	           }
+	       })
+	       .then(function (response) {//TODO handle error state
+               Status.success("Custom Field saved");
+               
+               $scope.listCustomFields();
+	       });
      }
      
      $scope.addCustomField = function () {
@@ -88,19 +85,37 @@ function SettingsController($scope, $modal, $http, CustomFields, CustomField,Sta
          });
      };
     
-     $scope.listCustomFields=function listCustomFields() {
-         $scope.customFields = CustomFields.query();
-     }
+     $scope.listCustomFields = function listCustomFields() {
+ 		$http({
+             url: '/customFields/',
+             method: 'GET',
+             headers: {
+ 	            'Authorization': $scope.idToken,
+                 'Content-Type': 'application/x-www-form-urlencoded'
+             },
+             params: {
+             }
+         })
+         .then(function(response) {
+         	$scope.customFields=response.data;
+         });
+      }
     
     $scope.deleteCustomField = function (customField) {
-        CustomField.delete({id: customField.id},
-            function () {
-                Status.success("CustomField deleted");
-                $scope.listCustomFields();
+    	$http({
+            url: '/customFields/'+$scope.customField.id,
+            method: 'DELETE',
+            headers: {
+                'Authorization': $scope.idToken,
+                'Content-Type': 'application/x-www-form-urlencoded'
             },
-            function (result) {
-                Status.error("Error deleting Custom Field: " + result.status);
+            params: {
             }
-        );
+        })
+        .then(function(response) {
+            Status.success("CustomField deleted");
+            
+            $scope.listCustomFields();
+        });
     };
 }

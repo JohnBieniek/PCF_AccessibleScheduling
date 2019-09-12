@@ -1,10 +1,4 @@
 angular.module('vacation', ['ngResource', 'ui.bootstrap']).
-	factory('Clients', function ($resource) {
-	    return $resource('employees');
-	}).
-	factory('Client', function ($resource) {
-	    return $resource('employees/:id', {id: '@id'});
-	}).
 	factory("EditorStatus", function () {
         var editorEnabled = {};
 
@@ -27,32 +21,29 @@ angular.module('vacation', ['ngResource', 'ui.bootstrap']).
         }
     });
 
-function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
-
-	 $scope.week = new Date();
-	 console.log("week"+$scope.week);
-	 if($scope.year==null ||$scope.year==undefined){
+function SchedulingController($scope, $modal, $http, Status) {
+	$scope.week = new Date();
+	$scope.allowOvertime=false;
+	$scope.allowUnavailable=false;
+	$scope.prioritizeSecondShift=false;
+	$scope.useDailyMax=true;
+	$scope.useWeeklyMax=true;
+	$scope.allowInactive=false;
+	$scope.generatedBool = false;
+	$scope.generated="Generated";
+	$scope.assigned="Unassigned";
+	$scope.monthName="January";
+	$scope.statusList=[];
+	$scope.unscheduled=0;
+	$scope.scheduled=0;
+	if($scope.year==null ||$scope.year==undefined){
 		 $scope.year=parseInt($scope.week.getYear())+1900;
 		 $scope.month=parseInt($scope.week.getMonth()+2);
 		 $scope.tab=$scope.month;
-	 }
-	 $scope.allowOvertime=false;
-	 $scope.allowUnavailable=false;
-	 $scope.prioritizeSecondShift=false;
-	 $scope.useDailyMax=true;
-	 $scope.useWeeklyMax=true;
-	 $scope.allowInactive=false;
-	 $scope.generatedBool = false;
-	 $scope.generated="Generated";
-	 $scope.assigned="Unassigned";
-
-	 $scope.monthName="January";
-	 $scope.statusList=[];
-	 $scope.unscheduled=0;
-	 $scope.scheduled=0;
+	}
 	 
 	$scope.setTab = function(newTab){
-	  if($scope.statusList && $scope.statusList[$scope.tab-1])$scope.generatedBool = $scope.statusList[$scope.tab-1].generated;
+	if($scope.statusList && $scope.statusList[$scope.tab-1])$scope.generatedBool = $scope.statusList[$scope.tab-1].generated;
       $scope.tab = newTab;
       
       $scope.getUnscheduled(newTab);
@@ -177,8 +168,7 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
     };
           
     $scope.isNotAssignable = function(month){
-    	assignable = true;
-    	  
+    	assignable = true;  	  
 
 		if($scope.statusList && $scope.statusList[month-1]){
 			if($scope.statusList[month-1].generated=="false"){
@@ -215,8 +205,23 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
 	        $scope.month = month;
 	}
 	
-    $scope.listClients = function listClients() {
-        $scope.clients = Clients.query();
+	$scope.listClients = function listClients() {
+		$http({
+	        url: '/clients',
+	        method: 'GET',
+	        headers: {
+	            'Authorization': $scope.idToken
+	        },
+	        params: {
+	        }
+	    })
+	    .then(function(response) {
+	    	$scope.clients=response.data;
+	    	
+	        if($scope.client==null){
+	        	$scope.client = $scope.clients[0];
+	        }
+	    });
     }
     
     $scope.deleteShifts = function(month){
@@ -332,7 +337,6 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
     }
     
     $scope.generateShifts = function(month){
-    	console.log("generating shifts with year:"+$scope.year);
     	$http({
             url: '/schedule/generateShifts',
             method: 'GET',
@@ -347,14 +351,15 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
         })
         .then(function(response) {
         	$scope.statusList = response.data.sort(function(a, b){return a.month-b.month});
+        	
     		$scope.setTab($scope.tab);
-    		
         });
     }
     
     $scope.assignShifts = function(month, allowOvertime,allowInactive,allowUnavailable,prioritizeSecondShift,dailyMax,weeklyMax){
     	$scope.statusList[month-1].assigning=true;
     	$scope.assigned="Assigning";
+    	
     	$http({
             url: '/schedule/staffShiftsSafely',
             method: 'GET',
@@ -375,6 +380,7 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
         })
         .then(function(response) {
         	$scope.statusList = response.data.sort(function(a, b){return a.month-b.month});
+        	
     		$scope.setTab($scope.tab);
         });
     }
