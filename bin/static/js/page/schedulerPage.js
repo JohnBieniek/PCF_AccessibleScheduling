@@ -141,79 +141,80 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
     
     $scope.isTabGenerated = function(month){
     	if($scope.statusList && $scope.statusList[month-1]) return $scope.statusList[month-1].generated && $scope.tab != month && !$scope.statusList[month-1].assigned&& !$scope.statusList[month-1].assigning;
-  	  return false;
-      };
-      $scope.isTabAssigned = function(month){
+  	  	return false;
+    };
+    $scope.isTabAssigned = function(month){
     	  if($scope.statusList && $scope.statusList[month-1])return $scope.statusList[month-1].assigned && $scope.tab != month&& !$scope.statusList[month-1].assigning ;
     	  return false;
-        }
+    }
     $scope.isGenerated = function(month){
     	if($scope.statusList && $scope.statusList[month-1])return $scope.statusList[month-1].generated;
-  	  return false;
-      };
+  	    return false;
+    };
       
-      $scope.isWorking = function(month){
+    $scope.isWorking = function(month){
     	  if($scope.statusList && $scope.statusList[month-1])return $scope.statusList[month-1].assigning  && $scope.tab != month;
     	  return false;
-        };
+    };
       
-      $scope.isAssigned = function(month){
+    $scope.isAssigned = function(month){
     	  if($scope.statusList && $scope.statusList[month-1])return $scope.statusList[month-1].assigned;
     	  return false;
-        };
+    };
     $scope.isErrored = function(month){
     	if($scope.statusList && $scope.statusList[month-1])return $scope.statusList[month-1].errored;
-  	  return false;
-      };
+  	    return false;
+    };
+    
     $scope.isAssigning = function(month){
     	if($scope.statusList && $scope.statusList[month-1])return $scope.statusList[month-1].assigning
-  	  return false;
-      };
+  	    return false;
+    };
       
-      $scope.isStopped = function(month){
+    $scope.isStopped = function(month){
     	  if($scope.statusList && $scope.statusList[month-1])return $scope.statusList[month-1].stopped
     	  return false;
-        };
+    };
           
-      $scope.isNotAssignable = function(month){
-    	  assignable = true;
+    $scope.isNotAssignable = function(month){
+    	assignable = true;
     	  
-    	  console.log("assignable:"+assignable);
-    	  if($scope.statusList && $scope.statusList[month-1]){
-    		  if($scope.statusList[month-1].generated=="false"){
-    	 
+
+		if($scope.statusList && $scope.statusList[month-1]){
+			if($scope.statusList[month-1].generated=="false"){
 	    		  assignable=false;
-	    	  }
-    	  }
+	    	}
+    	}
     	  
-	   	  console.log("assignable:"+assignable);
 	   	if($scope.statusList && $scope.statusList[month-1]){ 
 		   	if($scope.statusList[month-1].assigning=="true"){
-	  		  assignable=false;
-	  	  }
+		   		assignable=false;
+		   	}
 	   	}
   	  
-	   	  console.log("assignable:"+assignable);
 	   	if($scope.statusList && $scope.statusList[month-1]){ 
 		   	if($scope.statusList[month-1].assigned=="true"){
 	  		  assignable=false;
-	  	  }
+		   	}
 	   	}
-  	  unassignable = !assignable;
-	   	      	return unassignable;
-       };
+	   	
+	   	unassignable = !assignable;
+	   	
+	   	return unassignable;
+    };
       
-	 $scope.isSet = function(tabNum){
+	$scope.isSet = function(tabNum){
       return $scope.tab === tabNum;
     };
     
-	 function clone (obj) {
+	function clone (obj) {
 	        return JSON.parse(JSON.stringify(obj));
-     }
+    }
     
-	 $scope.setMonth = function setMonth(month) {
+	$scope.setMonth = function setMonth(month) {
 	        $scope.month = month;
-	    }
+	}
+	
     $scope.listClients = function listClients() {
         $scope.clients = Clients.query();
     }
@@ -224,6 +225,7 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
 	            url: '/schedule/byMonth',
 	            method: 'DELETE',
 	            headers: {
+	                'Authorization': $scope.idToken,
 	                'Content-Type': 'application/x-www-form-urlencoded'
 	            },
 	            params: {
@@ -243,6 +245,7 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
             url: '/schedule/statusList',
             method: 'GET',
             headers: {
+                'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
@@ -262,6 +265,7 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
             url: '/schedule/scheduled',
             method: 'GET',
             headers: {
+                'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
@@ -278,6 +282,7 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
             url: '/schedule/unscheduled',
             method: 'GET',
             headers: {
+                'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
@@ -294,6 +299,7 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
             url: '/schedule/finishAssignment',
             method: 'GET',
             headers: {
+                'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
@@ -307,11 +313,11 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
 
     $scope.stopAssignment = function(month){
     	if(confirm("Are you sure you want to stop assigning shifts for "+$scope.monthName+"?")){
-	    	//$scope.assigned="Stopping";
 	    	$http({
 	            url: '/schedule/stopAssignment',
 	            method: 'GET',
 	            headers: {
+	                'Authorization': $scope.idToken,
 	                'Content-Type': 'application/x-www-form-urlencoded'
 	            },
 	            params: {
@@ -331,6 +337,7 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
             url: '/schedule/generateShifts',
             method: 'GET',
             headers: {
+                'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
@@ -352,6 +359,7 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
             url: '/schedule/staffShiftsSafely',
             method: 'GET',
             headers: {
+                'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
@@ -366,10 +374,10 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
             }
         })
         .then(function(response) {
-        	
         	$scope.statusList = response.data.sort(function(a, b){return a.month-b.month});
     		$scope.setTab($scope.tab);
         });
     }
+    
     $scope.listStatusItems();
 }

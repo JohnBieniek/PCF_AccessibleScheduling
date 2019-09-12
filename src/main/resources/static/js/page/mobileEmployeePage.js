@@ -89,7 +89,8 @@ function MobileEmployeeController($scope, $modal, $http, Clients, Client,Shifts,
 	        $scope.employee.endTimes.splice(availability,1); 
 	        $scope.saveEmployee($scope.employee);
 	    }
-      }
+    }
+	
 	$scope.addAvailability= function(day){
 		if($scope.employee){
 			$scope.employee.days.push(day);
@@ -102,11 +103,13 @@ function MobileEmployeeController($scope, $modal, $http, Clients, Client,Shifts,
 	$scope.isAvailabilityDay= function(availability,day){
 		return day==$scope.employee.days[availability];
 	}
+	
 	$scope.getEmployeeCustomFieldData = function (employee,customField,index){
      	$http({
             url: '/compatibility/employeeCustomFieldData',
             method: 'POST',
             headers: {
+                'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
@@ -119,21 +122,19 @@ function MobileEmployeeController($scope, $modal, $http, Clients, Client,Shifts,
         	$scope.customValue[response.data.numericResponse] = response.data.booleanResponse;
         });
     }
+	
 	$scope.setEmployeeToUser = function(){
-		console.log("setting emplyoee to user");
-		console.log($scope.profile);
 		$http({
             url: '/employees/'+$scope.profile.employeeId,
             method: 'GET',
             headers: {
+                'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
             }
         })
         .then(function(response) {
-        	console.log("setEmployeetoUIserReponse");
-        	console.log(response);
         	$scope.employee=response.data;
         	if(typeof $scope.employee !== 'undefined' && $scope.employee!=null && $scope.employee.role==null){
   			  $scope.employee.role="user";
@@ -142,27 +143,28 @@ function MobileEmployeeController($scope, $modal, $http, Clients, Client,Shifts,
         	$scope.setEmployee($scope.employee);
         });
 	}
-	$scope.setEmployee = function(newEmployee){
-		//if($scope.employee == null || $scope.employee== undefined || $scope.employee.id !==newEmployee.id){
-		  $scope.detailsChanged=false;
-		  
-		  if(newEmployee.role==null){
-			  newEmployee.role="user";
-		  }
-	      $scope.employee = newEmployee;
-	      $scope.employeeModel = clone(newEmployee);
-	      if($scope.employee!=null && $scope.customFields !=null){
-		      for(var index = 0; index<$scope.customFields.length;index++){
-			      $scope.getEmployeeCustomFieldData($scope.employee,$scope.customFields[index],index);
-		      }
+	
+	$scope.setEmployee = function(newEmployee){		
+	  $scope.detailsChanged=false;
+	  
+	  if(newEmployee.role==null){
+		  newEmployee.role="user";
+	  }
+      $scope.employee = newEmployee;
+      $scope.employeeModel = clone(newEmployee);
+      if($scope.employee!=null && $scope.customFields !=null){
+	      for(var index = 0; index<$scope.customFields.length;index++){
+		      $scope.getEmployeeCustomFieldData($scope.employee,$scope.customFields[index],index);
 	      }
+      }
 
-	      $scope.listShifts();
-		//}
+      $scope.listShifts();
 	}
+	
 	 $scope.listCustomFields = function listCustomFields() {
          $scope.customFields = CustomFields.query();
      }
+	 
 	$scope.setInterval = function(newInterval){
       $scope.interval = newInterval;
 	}
@@ -170,6 +172,7 @@ function MobileEmployeeController($scope, $modal, $http, Clients, Client,Shifts,
 	$scope.setDetailsToChanged = function(){
       $scope.detailsChanged=true;;
 	}
+	
      $scope.isDay = function(shift, day){
     	 return day.toUpperCase().includes(shift.startsLocalDate.dayOfWeek.toUpperCase());
      }
@@ -193,9 +196,6 @@ function MobileEmployeeController($scope, $modal, $http, Clients, Client,Shifts,
      }
      
      $scope.saveEmployee = function saveEmployee(employee) {
-		 console.log("role");
-		 console.log(employee);
-		 console.log(employee.role)
      	if(employee.availability){
 	     	for(var index = 0; index<employee.availability.length;index++){
 	     		employee.availabilityStartTimes
@@ -236,7 +236,6 @@ function MobileEmployeeController($scope, $modal, $http, Clients, Client,Shifts,
 		            }
 	            }
                 Status.success("Employee saved");
-                //$scope.listEmployees();
             },
             function (result) {
                 Status.error("Error saving employee: " + result.status);
@@ -357,18 +356,18 @@ function MobileEmployeeController($scope, $modal, $http, Clients, Client,Shifts,
         return employee !==null && $scope.employee !==null && employee !==undefined && $scope.employee !==undefined && $scope.employee.id === employee.id;
       };
       
-      $scope.isEmployeeChangeValid = function(employee){
-          let valid = true;
-          
-          if(employee.first ==undefined || employee.first.length<1){
-        	  valid=false;
-          }
-          if(!$scope.detailsChanged){
-        	  valid=false;
-          }
-
-          return valid;
-        };
+	$scope.isEmployeeChangeValid = function(employee){
+	      let valid = true;
+	      
+	      if(employee.first ==undefined || employee.first.length<1){
+	    	  valid=false;
+	      }
+	      if(!$scope.detailsChanged){
+	    	  valid=false;
+	      }
+	
+	      return valid;
+	};
     
 	 function clone (obj) {
 	        return JSON.parse(JSON.stringify(obj));
@@ -382,9 +381,7 @@ function MobileEmployeeController($scope, $modal, $http, Clients, Client,Shifts,
 			 request.days=[false,false,false,false,false,false,false];
 		 }
 	 }
-	 
-	 
-	    
+	 	    
 	 $scope.getDisplayValue = function getDisplayValue(request) {
 		 if(request.startsLocalDateTime==null || request.startsLocalDateTime==undefined){
 			 return null;
@@ -520,7 +517,6 @@ function MobileEmployeeController($scope, $modal, $http, Clients, Client,Shifts,
              $scope.setEmployeeToUser();
         }
 
-
         $scope.listClients();
 		$scope.getDisplayWeek();
     }
@@ -549,6 +545,7 @@ function MobileEmployeeController($scope, $modal, $http, Clients, Client,Shifts,
             url: '/schedule/employeeShiftsForWeek',
             method: 'GET',
             headers: {
+                'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
@@ -574,6 +571,7 @@ function MobileEmployeeController($scope, $modal, $http, Clients, Client,Shifts,
             url: '/schedule/currentShifts',
             method: 'GET',
             headers: {
+                'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
@@ -644,6 +642,7 @@ function MobileEmployeeController($scope, $modal, $http, Clients, Client,Shifts,
             url: '/schedule/createEmployee',
             method: 'POST',
             headers: {
+                'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
@@ -699,6 +698,7 @@ function MobileEmployeeController($scope, $modal, $http, Clients, Client,Shifts,
 	                url: '/compatibility/setEmployeeCustomFieldData',
 	                method: 'POST',
 	                headers: {
+		                'Authorization': $scope.idToken,
 	                    'Content-Type': 'application/x-www-form-urlencoded'
 	                },
 	                params: {
@@ -713,6 +713,7 @@ function MobileEmployeeController($scope, $modal, $http, Clients, Client,Shifts,
             url: '/schedule/updateEmployee',
             method: 'POST',
             headers: {
+                'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
@@ -737,6 +738,7 @@ function MobileEmployeeController($scope, $modal, $http, Clients, Client,Shifts,
              url: '/shifts/'+shift.id,
              method: 'DELETE',
              headers: {
+                'Authorization': $scope.idToken,
                  'Content-Type': 'application/x-www-form-urlencoded'
              },
              params: {
@@ -761,6 +763,7 @@ function MobileEmployeeController($scope, $modal, $http, Clients, Client,Shifts,
             url: '/employees/'+$scope.employee.id,
             method: 'DELETE',
             headers: {
+                'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
@@ -785,6 +788,7 @@ function MobileEmployeeController($scope, $modal, $http, Clients, Client,Shifts,
             url: '/employees/'+$scope.employee.id,
             method: 'GET',
             headers: {
+                'Authorization': $scope.idToken
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {

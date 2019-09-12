@@ -54,6 +54,7 @@ function EmployeesController($scope, $modal, $http, Employees, Employee, CustomF
 		                    url: '/compatibility/setCustomFieldData',
 		                    method: 'POST',
 		                    headers: {
+		    	                'Authorization': $scope.idToken,
 		                        'Content-Type': 'application/x-www-form-urlencoded'
 		                    },
 		                    params: {
@@ -148,6 +149,7 @@ function EmployeesController($scope, $modal, $http, Employees, Employee, CustomF
             url: '/compatibility/customFieldData',
             method: 'POST',
             headers: {
+                'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
@@ -175,6 +177,7 @@ function EmployeesController($scope, $modal, $http, Employees, Employee, CustomF
             url: '/compatibility/setCustomFieldData',
             method: 'POST',
             headers: {
+                'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {

@@ -57,6 +57,7 @@ function ShiftController($scope, $modal, $http, Shifts, Employees, Status) {
             url: '/shifts/duration',
             method: 'POST',
             headers: {
+                'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
@@ -73,6 +74,7 @@ function ShiftController($scope, $modal, $http, Shifts, Employees, Status) {
             url: '/compatibility/shifts',
             method: 'POST',
             headers: {
+                'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
@@ -94,6 +96,7 @@ function ShiftController($scope, $modal, $http, Shifts, Employees, Status) {
             url: '/compatibility/hours',
             method: 'POST',
             headers: {
+                'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
@@ -115,6 +118,7 @@ function ShiftController($scope, $modal, $http, Shifts, Employees, Status) {
             url: '/compatibility/hoursNeeded',
             method: 'POST',
             headers: {
+                'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
@@ -136,6 +140,7 @@ function ShiftController($scope, $modal, $http, Shifts, Employees, Status) {
             url: '/compatibility/hoursNeededAfterAssignment',
             method: 'POST',
             headers: {
+                'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
@@ -157,6 +162,7 @@ function ShiftController($scope, $modal, $http, Shifts, Employees, Status) {
             url: '/compatibility/hoursAvailable',
             method: 'POST',
             headers: {
+                'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
@@ -178,6 +184,7 @@ function ShiftController($scope, $modal, $http, Shifts, Employees, Status) {
             url: '/compatibility/hoursAvailableAfterAssignment',
             method: 'POST',
             headers: {
+                'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
@@ -199,6 +206,7 @@ function ShiftController($scope, $modal, $http, Shifts, Employees, Status) {
             url: '/compatibility/unassigned',
             method: 'POST',
             headers: {
+                'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
@@ -220,6 +228,7 @@ function ShiftController($scope, $modal, $http, Shifts, Employees, Status) {
             url: '/compatibility/requestedOff',
             method: 'POST',
             headers: {
+                'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
@@ -241,6 +250,7 @@ function ShiftController($scope, $modal, $http, Shifts, Employees, Status) {
             url: '/compatibility/assignmentViolatesOffAlternateWeekends',
             method: 'POST',
             headers: {
+                'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
@@ -262,6 +272,7 @@ function ShiftController($scope, $modal, $http, Shifts, Employees, Status) {
             url: '/compatibility/assignmentIncursOvertime',
             method: 'POST',
             headers: {
+                'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
@@ -283,6 +294,7 @@ function ShiftController($scope, $modal, $http, Shifts, Employees, Status) {
             url: '/compatibility/workedLastWeekend',
             method: 'POST',
             headers: {
+                'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
@@ -304,6 +316,7 @@ function ShiftController($scope, $modal, $http, Shifts, Employees, Status) {
             url: '/compatibility/workedLastWeekend',
             method: 'POST',
             headers: {
+                'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
@@ -325,6 +338,7 @@ function ShiftController($scope, $modal, $http, Shifts, Employees, Status) {
             url: '/compatibility/workingNextWeekend',
             method: 'POST',
             headers: {
+                'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
@@ -346,6 +360,7 @@ function ShiftController($scope, $modal, $http, Shifts, Employees, Status) {
             url: '/compatibility/availability',
             method: 'POST',
             headers: {
+                'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
@@ -367,6 +382,7 @@ function ShiftController($scope, $modal, $http, Shifts, Employees, Status) {
             url: '/compatibility/validity',
             method: 'POST',
             headers: {
+                'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
@@ -388,6 +404,7 @@ function ShiftController($scope, $modal, $http, Shifts, Employees, Status) {
             url: '/compatibility/assignability',
             method: 'POST',
             headers: {
+                'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
@@ -409,6 +426,7 @@ function ShiftController($scope, $modal, $http, Shifts, Employees, Status) {
             url: '/compatibility/compatibility',
             method: 'POST',
             headers: {
+                'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {

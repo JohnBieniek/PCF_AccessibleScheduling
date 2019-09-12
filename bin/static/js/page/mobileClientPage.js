@@ -64,7 +64,7 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
 	 $scope.detailsChanged=false;
 	 $scope.customFieldDateEditing=true;
 	 if($scope.week==undefined || $scope.week ==null){
-		 $scope.week = new Date();//.getTime();
+		 $scope.week = new Date();
 	 }
 
 	 $scope.days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
@@ -76,6 +76,7 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
             url: '/compatibility/clientCustomFieldData',
             method: 'POST',
             headers: {
+                'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
@@ -89,17 +90,15 @@ function MobileClientController($scope, $modal, $http, Clients, Client,Shifts,Sh
         });
     }
 	$scope.setClient = function(newClient){
-//		if($scope.client == null || $scope.client== undefined || $scope.client.id !==newClient.id){
-		  $scope.detailsChanged=false;
-	      $scope.client = newClient;
-	      $scope.listRequests(newClient);
-	      $scope.listShifts();
-	      if($scope.client!=null && $scope.customFields !=null){
-		      for(var index = 0; index<$scope.customFields.length;index++){
-			      $scope.getClientCustomFieldData($scope.client,$scope.customFields[index],index);
-		      }
+	  $scope.detailsChanged=false;
+      $scope.client = newClient;
+      $scope.listRequests(newClient);
+      $scope.listShifts();
+      if($scope.client!=null && $scope.customFields !=null){
+	      for(var index = 0; index<$scope.customFields.length;index++){
+		      $scope.getClientCustomFieldData($scope.client,$scope.customFields[index],index);
 	      }
-//		}
+      }
 	}
 	 $scope.listCustomFields = function listCustomFields() {
          $scope.customFields = CustomFields.query();
