@@ -1,5 +1,6 @@
 package accessiblesolutions.accessiblescheduling.domain;
 
+import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.ArrayList;
 
@@ -8,9 +9,12 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import java.time.DayOfWeek;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
@@ -42,6 +46,20 @@ public class Employee implements Comparable{
 
 	public void setDays(String[] days) {
 		this.days = days;
+	}
+	
+	public JSONObject getUserSafeEmployeeData() throws JSONException {
+		JSONObject json = new JSONObject();
+		
+		json.append("id", getId());
+		json.append("first", getFirst());
+		json.append("initial", getInitial());
+		json.append("requestedOff", getRequestedOff());
+		json.append("startTimes", getStartTimes());
+		json.append("endTimes", getEndTimes());
+		json.append("days", getDays());
+		
+		return json;
 	}
 	
 	public Availability getAvailability(int index) {
@@ -378,5 +396,13 @@ public class Employee implements Comparable{
 
 	public void setRole(String role) {
 		this.role = role;
+	}
+
+	public String getCompatibile() {
+		return compatibile;
+	}
+
+	public void setCompatibile(String compatibile) {
+		this.compatibile = compatibile;
 	}
 }

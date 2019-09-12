@@ -17,11 +17,6 @@
        			<br>
        			<span class="centered">Staff</span>
           	</div>
-          	<div ng-if="admin" class="navAllign" ng-click="setPage('shiftList')">
-       			<i style = "margin-right:5px !important" class="glyphicon glyphicon-align-justify"/>
-       			<br>
-       			<span class="centered">Shifts</span>
-          	</div>
           	<div ng-if="admin" class="navAllign" ng-click="setPage('scheduler')">
        			<i style = "margin-right:5px !important" class="glyphicon glyphicon-dashboard " />
        			<br>
@@ -43,7 +38,7 @@
        			<span class="centered">Sign out</span>
           	</div>
        	</div>
-      </div>
+    </div>
     <div class="row">
         <div ng-include src="'templates/util/status.html'"></div>
     </div>

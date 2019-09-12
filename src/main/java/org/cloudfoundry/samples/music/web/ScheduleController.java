@@ -134,7 +134,7 @@ public class ScheduleController {
     public Iterable<Shift> employeeShiftsForWeek(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam String employeeId, @RequestParam String month, @RequestParam String day, @RequestParam String year) throws AuthenticationException {
     	CallAuth auth = securityManager.authorize(idToken, Constants.USER);
     	
-    	if(auth.getEmployeeId()!=employeeId) {
+    	if(!auth.getEmployeeId().equalsIgnoreCase(employeeId)) {
     		if(!auth.isAdmin() && !auth.isManager()) {
     			throw new AuthenticationException();
     		}

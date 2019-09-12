@@ -76,7 +76,7 @@ public class CompatibilityController {
 			e.printStackTrace();
 		}
     	
-    	if(auth.getEmployeeId()!=employee.getId()) {
+    	if(!auth.getEmployeeId().equalsIgnoreCase(employee.getId())) {
     		if(!auth.isAdmin() && !auth.isManager()) {
     			throw new AuthenticationException();
     		}
@@ -115,7 +115,7 @@ public class CompatibilityController {
 			e.printStackTrace();
 		}
     	
-    	if(auth.getEmployeeId()!=employee.getId()) {
+    	if(!auth.getEmployeeId().equalsIgnoreCase(employee.getId())) {
     		if(!auth.isAdmin() && !auth.isManager()) {
     			throw new AuthenticationException();
     		}
@@ -720,7 +720,7 @@ public class CompatibilityController {
 			e.printStackTrace();
 		}
     	
-    	if(auth.getEmployeeId()!=employee.getId()) {
+    	if(!auth.getEmployeeId().equalsIgnoreCase(employee.getId())) {
     		if(!auth.isAdmin() && !auth.isManager()) {
     			throw new AuthenticationException();
     		}

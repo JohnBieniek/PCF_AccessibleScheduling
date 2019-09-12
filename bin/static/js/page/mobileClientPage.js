@@ -88,9 +88,21 @@ function MobileClientController($scope, $modal, $http, Status) {
       }
 	}
 	
-	$scope.listCustomFields = function listCustomFields() {
-		$scope.customFields = CustomFields.query();
-    }
+	 $scope.listCustomFields = function listCustomFields() {
+		$http({
+            url: '/customFields/',
+            method: 'GET',
+            headers: {
+	            'Authorization': $scope.idToken,
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            params: {
+            }
+        })
+        .then(function(response) {
+        	$scope.customFields=response.data;
+        });
+     }
 	
 	$scope.setInterval = function(newInterval){
       $scope.interval = newInterval;
@@ -261,12 +273,10 @@ function MobileClientController($scope, $modal, $http, Status) {
     }
     
 	 $scope.setMonth = function setMonth(month) {
-	        $scope.month = month;
+		 $scope.month = month;
 	 }
 	 
 	 $scope.setInitialDays = function setInitialDays(request){
-		 console.log("days initial");
-		 console.log(request.days);
 		 if(request.days==null || request.days==undefined){
 			 request.days=[false,false,false,false,false,false,false];
 		 }
@@ -605,7 +615,7 @@ function MobileClientController($scope, $modal, $http, Status) {
                url: '/clientRequests',
                method: 'POST',
                headers: {
-            	   'Authorization': $scope.idToken
+            	   'Authorization': $scope.idToken,
                    'Content-Type': 'application/x-www-form-urlencoded'
                },
                params: {

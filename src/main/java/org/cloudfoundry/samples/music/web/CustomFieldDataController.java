@@ -63,7 +63,7 @@ public class CustomFieldDataController {
     	
     	CustomFieldData customFieldData = repository.findOne(id);
     	
-    	if(auth.getEmployeeId()!=customFieldData.getOwnerId()) {
+    	if(!auth.getEmployeeId().equalsIgnoreCase(customFieldData.getOwnerId())) {
     		if(!auth.isAdmin() && !auth.isManager()) {
     			throw new AuthenticationException();
     		}

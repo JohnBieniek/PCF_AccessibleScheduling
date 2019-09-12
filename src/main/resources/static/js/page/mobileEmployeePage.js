@@ -43,11 +43,10 @@ function MobileEmployeeController($scope, $modal, $http, Status) {
 		 $scope.customFieldDateEditing=true;
 		 $scope.days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 		 
-		 $scope.newDate=$scope.week.getFullYear()+"-"+(($scope.week.getMonth()+1)<10?"0"+($scope.week.getMonth()+1):($scope.week.getMonth()+1))+"-"+$scope.week.getDate();
-
 		 if($scope.week==undefined || $scope.week ==null){
 			 $scope.week = new Date();
 		 }
+		 $scope.newDate=$scope.week.getFullYear()+"-"+(($scope.week.getMonth()+1)<10?"0"+($scope.week.getMonth()+1):($scope.week.getMonth()+1))+"-"+$scope.week.getDate();
 		 
 		 if($scope.manager){
 			 $scope.listEmployees();

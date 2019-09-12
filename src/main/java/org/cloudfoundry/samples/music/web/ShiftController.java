@@ -153,7 +153,7 @@ public class ShiftController {
     	CallAuth auth = securityManager.authorize(idToken, Constants.USER);
     	
     	Shift shift = repository.findOne(id);
-    	if(auth.getEmployeeId()!=shift.getStaffId()) {
+    	if(!auth.getEmployeeId().equalsIgnoreCase(shift.getStaffId())) {
     		if(!auth.isAdmin() && !auth.isManager()) {
     			throw new AuthenticationException();
     		}
