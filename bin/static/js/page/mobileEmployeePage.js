@@ -652,6 +652,9 @@ function MobileEmployeeController($scope, $modal, $http, Status) {
 	           templateUrl: 'templates/modal/shiftForm.html',
 	           controller: ShiftModalController,
 	           resolve: {
+	        	   idToken: function(){
+	        		   return clone($scope.idToken);
+	        	   },
 	               shift: function() {
 	                   return clone(shift);
 	               },

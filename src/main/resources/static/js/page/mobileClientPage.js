@@ -249,11 +249,11 @@ function MobileClientController($scope, $modal, $http, Status) {
      
 	$scope.isSet = function(tabNum){
       return $scope.tab === tabNum;
-    };
+    }
     
     $scope.isClientSet = function(client){
         return client !==null && $scope.client !==null && client !==undefined && $scope.client !==undefined && $scope.client.id === client.id;
-    };
+    }
       
     $scope.isClientChangeValid = function(client){
       let valid = true;
@@ -266,7 +266,7 @@ function MobileClientController($scope, $modal, $http, Status) {
       }
 
       return valid;
-    };
+    }
     
     function clone (obj) {
     	return JSON.parse(JSON.stringify(obj));
@@ -441,15 +441,22 @@ function MobileClientController($scope, $modal, $http, Status) {
     }
     
     function saveShift(shift) {
-        Shifts.save(shift,
-            function () {
-                Status.success("Shift saved");
-                $scope.listShifts();
+    	$http({
+            url: '/shifts',
+            method: 'POST',
+            headers: {
+                'Authorization': $scope.idToken,
+                'Content-Type': 'application/x-www-form-urlencoded'
             },
-            function (result) {
-                Status.error("Error saving shift: " + result.status);
+            params: {
+            	shift: shift
             }
-        );
+        })
+        .then(function(response) {
+        	Status.success("Shift saved");
+        	
+            $scope.listShifts();
+        });
     }
     
     $scope.addShift = function () {
@@ -457,6 +464,9 @@ function MobileClientController($scope, $modal, $http, Status) {
             templateUrl: 'templates/modal/shiftForm.html',
             controller: ShiftModalController,
             resolve: {
+            	idToken: function(){
+         		   return clone($scope.idToken);
+         	    },
             	shift: function(){
             		return {};
             	},
@@ -489,7 +499,7 @@ function MobileClientController($scope, $modal, $http, Status) {
         	
             saveShift(shift);
         });
-    };
+    }
     
     
     $scope.deleteShift = function (shift) {
@@ -508,7 +518,7 @@ function MobileClientController($scope, $modal, $http, Status) {
             
             $scope.listEmployees();
         });
-    };
+    }
     
     $scope.listShifts = function listShifts(){
     	let id = "-1";
@@ -626,7 +636,7 @@ function MobileClientController($scope, $modal, $http, Status) {
         		$scope.requests = response.data;
            });
       	});
-	};
+	}
   
     $scope.addRequest = function (selectedClient,employees) {
        var addModal = $modal.open({
@@ -675,7 +685,7 @@ function MobileClientController($scope, $modal, $http, Status) {
             	$scope.requests = response.data;
             });
        });
-   };
+   }
    
    function clone (obj) {
        return JSON.parse(JSON.stringify(obj));
@@ -705,6 +715,9 @@ function MobileClientController($scope, $modal, $http, Status) {
            templateUrl: 'templates/modal/shiftForm.html',
            controller: ShiftModalController,
            resolve: {
+        	   idToken: function(){
+        		   return clone($scope.idToken);
+        	   },
                shift: function() {
                    return clone(shift);
                },
@@ -729,7 +742,7 @@ function MobileClientController($scope, $modal, $http, Status) {
        updateModal.result.then(function (shift) {
            saveShift(shift);
        });
-   };
+   }
    
    $scope.updateShiftRequest = function (selectedClient, shiftRequest,employees) {
 	   var selectedEmployee = employees.filter(function( employee ) {
@@ -766,7 +779,7 @@ function MobileClientController($scope, $modal, $http, Status) {
        updateModal.result.then(function (shiftRequest) {
            saveShiftRequest(shiftRequest);
        });
-   };
+   }
    
    $scope.deleteShiftRequest = function (shiftRequest) {
 	   if(confirm("Are you sure to delete info for the following request?"+shiftRequest.displayValue)){
@@ -785,7 +798,7 @@ function MobileClientController($scope, $modal, $http, Status) {
            		$scope.requests = response.data;
            });
 	   }
-    };
+    }
     
     $scope.newClient = function () {
     	$http({
@@ -808,7 +821,7 @@ function MobileClientController($scope, $modal, $http, Status) {
         		Status.error("Failed to save client info.")
         	}
         });
-    };
+    }
     
     $scope.ok = function () {
     	$scope.detailsChanged=false;
@@ -851,7 +864,7 @@ function MobileClientController($scope, $modal, $http, Status) {
         		Status.error("Failed to save client info.")
         	}
         });
-    };
+    }
     
     $scope.deleteShift = function (shift) {
   	   if(confirm("Are you sure you want to delete the following shift? "+shift.display)){
@@ -875,7 +888,7 @@ function MobileClientController($scope, $modal, $http, Status) {
          	}
          });
   	   }
-     };
+     }
      
     $scope.delete = function () {
  	   if(confirm("Are you sure you want to delete info for "+$scope.client.first + " "+$scope.client.initial+"?")){
@@ -901,7 +914,7 @@ function MobileClientController($scope, $modal, $http, Status) {
         	}
         });
  	   }
-    };
+    }
     
     $scope.cancel = function () {
     	$http({
@@ -921,5 +934,5 @@ function MobileClientController($scope, $modal, $http, Status) {
         		$scope.setClient(response.data);
         	}
         });
-    };
+    }
 }

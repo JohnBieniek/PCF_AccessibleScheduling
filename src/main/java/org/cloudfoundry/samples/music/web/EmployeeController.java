@@ -10,25 +10,21 @@ import javax.validation.Valid;
 import org.cloudfoundry.samples.music.managers.AccessibleSecurityManager;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoCustomFieldDataRepository;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoShiftRepository;
-import org.codehaus.jettison.json.JSONObject;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.core.JsonParseException;
-import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.databind.JsonMappingException;
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import accessiblesolutions.accessiblescheduling.constants.Constants;
@@ -45,8 +41,11 @@ public class EmployeeController {
 	@Autowired 
 	AccessibleSecurityManager securityManager;
 	
+	@Autowired
     private CrudRepository<Employee, String> repository;
+	@Autowired
     private MongoCustomFieldDataRepository customDataRepository;
+	@Autowired
     private MongoShiftRepository shiftRepository;
     
     @Autowired
@@ -78,11 +77,9 @@ public class EmployeeController {
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public @ResponseBody String getById(@RequestHeader(value="Authorization", required=false) String idToken, @PathVariable String id) throws AuthenticationException, org.codehaus.jettison.json.JSONException, JsonProcessingException {
-    	String response = null;
+    public Employee getById(@RequestHeader(value="Authorization", required=false) String idToken, @PathVariable String id) throws AuthenticationException {
     	CallAuth auth = securityManager.authorize(idToken, Constants.USER);
-    	System.out.println("auth.getEmployeeId():"+auth.getEmployeeId());
-    	System.out.println("id"+id);
+    	
     	if(!auth.getEmployeeId().equalsIgnoreCase(id)) {
     		if(!auth.isAdmin() && !auth.isManager()) {
     			throw new AuthenticationException();
@@ -92,17 +89,8 @@ public class EmployeeController {
         
         Employee employee = repository.findOne(id);
        
-        if(!auth.isAdmin() && !auth.isManager()) {
-        	response = employee.getUserSafeEmployeeData().toString();
-		}
-        else {
-        	ObjectMapper mapper = new ObjectMapper();
-
-        	response = mapper.writeValueAsString(employee);
-
-        }
         
-        return response;
+        return employee;
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
@@ -139,7 +127,7 @@ public class EmployeeController {
 			JSONArray jsonArray = new JSONArray(json);
 
 			for(int i = 0; i < jsonArray.length(); i++){
-				org.json.JSONObject jsonObject= jsonArray.getJSONObject(i);
+				JSONObject jsonObject= jsonArray.getJSONObject(i);
 				
 				ObjectMapper objectMapper = new ObjectMapper();
 				Employee employee = objectMapper.readValue(jsonObject.toString(), Employee.class);

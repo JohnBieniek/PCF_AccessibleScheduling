@@ -48,7 +48,7 @@ public class Employee implements Comparable{
 		this.days = days;
 	}
 	
-	public JSONObject getUserSafeEmployeeData() throws JSONException {
+	public JSONObject userSafeEmployeeData() throws JSONException {
 		JSONObject json = new JSONObject();
 		
 		json.append("id", getId());

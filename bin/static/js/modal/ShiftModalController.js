@@ -1,4 +1,5 @@
-function ShiftModalController($scope, $modalInstance, $http, Status, shift, client,clients,employees,date, action) {
+function ShiftModalController($scope, $modalInstance, $http, Status, idToken,shift, client,clients,employees,date, action) {
+	$scope.idToken = idToken;
     $scope.shiftAction = action;
     $scope.shift = shift;
     $scope.client=client;
@@ -51,6 +52,7 @@ function ShiftModalController($scope, $modalInstance, $http, Status, shift, clie
             url: '/shifts/validity',
             method: 'POST',
             headers: {
+         	    'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
@@ -71,6 +73,7 @@ function ShiftModalController($scope, $modalInstance, $http, Status, shift, clie
             url: '/schedule/staffShift',
             method: 'POST',
             headers: {
+         	    'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
@@ -102,6 +105,7 @@ function ShiftModalController($scope, $modalInstance, $http, Status, shift, clie
             url: '/schedule/staffShift',
             method: 'POST',
             headers: {
+         	   'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
@@ -120,6 +124,7 @@ function ShiftModalController($scope, $modalInstance, $http, Status, shift, clie
                     url: '/shifts/validity',
                     method: 'POST',
                     headers: {
+                 	   'Authorization': $scope.idToken,
                         'Content-Type': 'application/x-www-form-urlencoded'
                     },
                     params: {

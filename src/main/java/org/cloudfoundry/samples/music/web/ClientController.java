@@ -42,8 +42,11 @@ public class ClientController {
 	
     private static final Logger logger = LoggerFactory.getLogger(ClientController.class);
     private CrudRepository<Client, String> repository;
+    @Autowired
     private MongoShiftRepository shiftRepository;
+    @Autowired
     private MongoShiftRequestRepository requestRepository;
+    @Autowired
     private MongoCustomFieldDataRepository customDataRepository;
 
     @Autowired
