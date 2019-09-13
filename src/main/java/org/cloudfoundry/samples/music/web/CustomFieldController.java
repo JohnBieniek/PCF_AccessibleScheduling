@@ -30,7 +30,9 @@ public class CustomFieldController {
 	@Autowired 
 	AccessibleSecurityManager securityManager;
 	
+	
     private CrudRepository<CustomField, String> repository;
+    @Autowired
     private MongoCustomFieldDataRepository customDataRepository;
     
     @Autowired
@@ -45,16 +47,18 @@ public class CustomFieldController {
     }
 
     @RequestMapping(method = RequestMethod.PUT)
-    public CustomField add(@RequestHeader(value="Authorization", required=false) String idToken, @RequestBody @Valid CustomField customField) throws AuthenticationException {
+    public CustomField add(@RequestHeader(value="Authorization", required=false) String idToken, @RequestBody CustomField customField) throws AuthenticationException {
     	securityManager.authorize(idToken, Constants.ADMIN);
     	logger.info("Adding customField " + customField.getId());
         return repository.save(customField);
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public CustomField update(@RequestHeader(value="Authorization", required=false) String idToken, @RequestBody @Valid CustomField customField) throws AuthenticationException {
+    public CustomField update(@RequestHeader(value="Authorization", required=false) String idToken, @RequestBody CustomField customField) throws AuthenticationException {
     	securityManager.authorize(idToken, Constants.ADMIN);
-    	logger.info("Updating customField " + customField.getId());
+    	if(null!=customField) {
+    		logger.info("Updating customField " + customField.toString());
+    	}
         return repository.save(customField);
     }
 

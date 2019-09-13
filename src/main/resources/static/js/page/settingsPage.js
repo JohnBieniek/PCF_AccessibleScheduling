@@ -34,7 +34,7 @@ function SettingsController($scope, $modal, $http,Status) {
 	           method: 'POST',
 	           headers: {
 	               'Authorization': $scope.idToken,
-	               'Content-Type': 'application/x-www-form-urlencoded'
+	                'Content-Type': 'application/x-www-form-urlencoded'
 	           },
 	           params: {
 	        	   customField: customField
