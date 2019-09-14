@@ -22,11 +22,7 @@ angular.module('signUp', ['ngResource', 'ui.bootstrap']).
     });
 
 function SignUpController($scope, $modal, $http, Status) {
-
 	$scope.requestSignUp = function requestSignUp() { 
-		console.log("requesting sign up id, name");
-		console.log($scope.idToken);
-		console.log($scope.profile.name);
     	$http({
             url: '/auth/signup',
             method: 'GET',
@@ -39,7 +35,6 @@ function SignUpController($scope, $modal, $http, Status) {
             }
         })
         .then(function(response) {
-        	console.log("response:"+response);
 		    $scope.setPage('awaitingAccess');
 		    $scope.$apply();
         });

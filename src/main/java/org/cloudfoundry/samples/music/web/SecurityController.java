@@ -23,8 +23,6 @@ public class SecurityController {
 	@RequestMapping(value = "/tokensignin",method = RequestMethod.POST)
     public User tokenSignIn(@RequestParam String idtoken)throws Exception {
 		User user = manager.getUserDetails(idtoken);
-		user.setManager(true);
-		user.setAdmin(true);
     	return user;
     }
 	

@@ -2,8 +2,10 @@ package org.cloudfoundry.samples.music.web;
 
 import java.io.IOException;
 
+import javax.security.sasl.AuthenticationException;
 import javax.servlet.http.HttpServletRequest;
 
+import org.cloudfoundry.samples.music.managers.AccessibleSecurityManager;
 import org.cloudfoundry.samples.music.managers.CustomDataManager;
 import org.cloudfoundry.samples.music.managers.EmployeeShiftCompatibilityManager;
 import org.cloudfoundry.samples.music.managers.EmployeeShiftManager;
@@ -13,11 +15,14 @@ import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.core.JsonPar
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.databind.DeserializationFeature;
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.databind.JsonMappingException;
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import accessiblesolutions.accessiblescheduling.constants.Constants;
+import accessiblesolutions.accessiblescheduling.domain.CallAuth;
 import accessiblesolutions.accessiblescheduling.domain.Client;
 import accessiblesolutions.accessiblescheduling.domain.CustomField;
 import accessiblesolutions.accessiblescheduling.domain.Employee;
@@ -33,6 +38,9 @@ import accessiblesolutions.accessiblescheduling.to.UpdateTO;
 @RestController
 @RequestMapping(value = "/compatibility")
 public class CompatibilityController {
+	@Autowired 
+	AccessibleSecurityManager securityManager;
+	
 	@Autowired
 	EmployeeShiftManager employeeShiftManager;
 	
@@ -48,7 +56,8 @@ public class CompatibilityController {
     public CompatibilityController() {}
 
     @RequestMapping(method = RequestMethod.POST, value= "/shifts")
-    public @ResponseBody EmployeeUpdateTO getShiftsScheduled(HttpServletRequest request) throws CorruptDataException{
+    public @ResponseBody EmployeeUpdateTO getShiftsScheduled(@RequestHeader(value="Authorization", required=false) String idToken, HttpServletRequest request) throws CorruptDataException, AuthenticationException{
+    	CallAuth auth = securityManager.authorize(idToken, Constants.USER);
     	Employee employee =null;
     	Shift shift =null;
 
@@ -66,6 +75,12 @@ public class CompatibilityController {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+    	
+    	if(!auth.getEmployeeId().equalsIgnoreCase(employee.getId())) {
+    		if(!auth.isAdmin() && !auth.isManager()) {
+    			throw new AuthenticationException();
+    		}
+    	}
 
     	EmployeeUpdateTO to = new EmployeeUpdateTO();
     	
@@ -79,7 +94,9 @@ public class CompatibilityController {
     }
     
     @RequestMapping(method = RequestMethod.POST, value= "/hours")
-    public @ResponseBody EmployeeUpdateTO getHoursScheduled(HttpServletRequest request) throws CorruptDataException, ProccessingException{
+    public @ResponseBody EmployeeUpdateTO getHoursScheduled(@RequestHeader(value="Authorization", required=false) String idToken,
+    		HttpServletRequest request) throws CorruptDataException, ProccessingException, AuthenticationException{
+    	CallAuth auth = securityManager.authorize(idToken, Constants.USER);
     	Employee employee =null;
     	Shift shift =null;
 
@@ -97,6 +114,12 @@ public class CompatibilityController {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+    	
+    	if(!auth.getEmployeeId().equalsIgnoreCase(employee.getId())) {
+    		if(!auth.isAdmin() && !auth.isManager()) {
+    			throw new AuthenticationException();
+    		}
+    	}
 
     	EmployeeUpdateTO to = new EmployeeUpdateTO();
     	
@@ -109,7 +132,9 @@ public class CompatibilityController {
     	return to;
     }
     @RequestMapping(method = RequestMethod.POST, value= "/hoursNeeded")
-    public @ResponseBody EmployeeUpdateTO getHoursNeeded(HttpServletRequest request) throws CorruptDataException, ProccessingException{
+    public @ResponseBody EmployeeUpdateTO getHoursNeeded(@RequestHeader(value="Authorization", required=false) String idToken, 
+    		HttpServletRequest request) throws CorruptDataException, ProccessingException, AuthenticationException{
+    	securityManager.authorize(idToken, Constants.MANAGER);
     	Employee employee =null;
     	Shift shift =null;
 
@@ -144,7 +169,9 @@ public class CompatibilityController {
     	return to;
     }
     @RequestMapping(method = RequestMethod.POST, value= "/hoursNeededAfterAssignment")
-    public @ResponseBody EmployeeUpdateTO getHoursNeededAfterAssignment(HttpServletRequest request) throws CorruptDataException, ProccessingException{
+    public @ResponseBody EmployeeUpdateTO getHoursNeededAfterAssignment(@RequestHeader(value="Authorization", required=false) String idToken, 
+    		HttpServletRequest request) throws CorruptDataException, ProccessingException, AuthenticationException{
+    	securityManager.authorize(idToken, Constants.MANAGER);
     	Employee employee =null;
     	Shift shift =null;
 
@@ -174,7 +201,9 @@ public class CompatibilityController {
     	return to;
     }
     @RequestMapping(method = RequestMethod.POST, value= "/hoursAvailableAfterAssignment")
-    public @ResponseBody EmployeeUpdateTO getHoursAvailableAfterAssignment(HttpServletRequest request) throws CorruptDataException, ProccessingException{
+    public @ResponseBody EmployeeUpdateTO getHoursAvailableAfterAssignment(@RequestHeader(value="Authorization", required=false) String idToken, 
+    		HttpServletRequest request) throws CorruptDataException, ProccessingException, AuthenticationException{
+    	securityManager.authorize(idToken, Constants.MANAGER);
     	Employee employee =null;
     	Shift shift =null;
 
@@ -204,7 +233,8 @@ public class CompatibilityController {
     	return to;
     }
     @RequestMapping(method = RequestMethod.POST, value= "/hoursAvailable")
-    public @ResponseBody EmployeeUpdateTO getHoursAvailable(HttpServletRequest request) throws CorruptDataException, ProccessingException{
+    public @ResponseBody EmployeeUpdateTO getHoursAvailable(@RequestHeader(value="Authorization", required=false) String idToken, HttpServletRequest request) throws CorruptDataException, ProccessingException, AuthenticationException{
+    	securityManager.authorize(idToken, Constants.MANAGER);
     	Employee employee =null;
     	Shift shift =null;
 
@@ -234,7 +264,9 @@ public class CompatibilityController {
     	return to;
     }
     @RequestMapping(method = RequestMethod.POST, value= "/unassigned")
-    public @ResponseBody EmployeeUpdateTO getUnassigned(HttpServletRequest request) throws CorruptDataException, ProccessingException{
+    public @ResponseBody EmployeeUpdateTO getUnassigned(@RequestHeader(value="Authorization", required=false) String idToken, 
+    		HttpServletRequest request) throws CorruptDataException, ProccessingException, AuthenticationException{
+    	securityManager.authorize(idToken, Constants.MANAGER);
     	Employee employee =null;
     	Shift shift =null;
 
@@ -264,7 +296,9 @@ public class CompatibilityController {
     	return to;
     }
     @RequestMapping(method = RequestMethod.POST, value= "/requestedOff")
-    public @ResponseBody EmployeeUpdateTO getRequestedOff(HttpServletRequest request) throws ProccessingException, CorruptDataException{
+    public @ResponseBody EmployeeUpdateTO getRequestedOff(@RequestHeader(value="Authorization", required=false) String idToken,
+    		HttpServletRequest request) throws ProccessingException, CorruptDataException, AuthenticationException{
+    	securityManager.authorize(idToken, Constants.MANAGER);
     	Employee employee =null;
     	Shift shift =null;
 
@@ -294,7 +328,9 @@ public class CompatibilityController {
     	return to;
     }
     @RequestMapping(method = RequestMethod.POST, value= "/assignmentViolatesOffAlternateWeekends")
-    public @ResponseBody EmployeeUpdateTO getAssignmentViolatesOffAlternateWeekends(HttpServletRequest request) throws CorruptDataException, ProccessingException{
+    public @ResponseBody EmployeeUpdateTO getAssignmentViolatesOffAlternateWeekends(@RequestHeader(value="Authorization", required=false) String idToken, 
+    		HttpServletRequest request) throws CorruptDataException, ProccessingException, AuthenticationException{
+    	securityManager.authorize(idToken, Constants.MANAGER);
     	Employee employee =null;
     	Shift shift =null;
 
@@ -324,7 +360,9 @@ public class CompatibilityController {
     	return to;
     }
     @RequestMapping(method = RequestMethod.POST, value= "/assignmentIncursOvertime")
-    public @ResponseBody EmployeeUpdateTO getAssignmentIncursOvertime(HttpServletRequest request) throws CorruptDataException, ProccessingException{
+    public @ResponseBody EmployeeUpdateTO getAssignmentIncursOvertime(@RequestHeader(value="Authorization", required=false) String idToken, 
+    		HttpServletRequest request) throws CorruptDataException, ProccessingException, AuthenticationException{
+    	securityManager.authorize(idToken, Constants.MANAGER);
     	Employee employee =null;
     	Shift shift =null;
 
@@ -354,7 +392,9 @@ public class CompatibilityController {
     	return to;
     }
     @RequestMapping(method = RequestMethod.POST, value= "/workedLastWeekend")
-    public @ResponseBody EmployeeUpdateTO getWorkedLastWeekend(HttpServletRequest request) throws CorruptDataException, ProccessingException{
+    public @ResponseBody EmployeeUpdateTO getWorkedLastWeekend(@RequestHeader(value="Authorization", required=false) String idToken, 
+    		HttpServletRequest request) throws CorruptDataException, ProccessingException, AuthenticationException{
+    	securityManager.authorize(idToken, Constants.MANAGER);
     	Employee employee =null;
     	Shift shift =null;
 
@@ -385,7 +425,8 @@ public class CompatibilityController {
     }
     
     @RequestMapping(method = RequestMethod.POST, value= "/workingNextWeekend")
-    public @ResponseBody EmployeeUpdateTO getWorkingNextWeekend(HttpServletRequest request) throws CorruptDataException, ProccessingException{
+    public @ResponseBody EmployeeUpdateTO getWorkingNextWeekend(@RequestHeader(value="Authorization", required=false) String idToken, HttpServletRequest request) throws CorruptDataException, ProccessingException, AuthenticationException{
+    	securityManager.authorize(idToken, Constants.MANAGER);
     	Employee employee =null;
     	Shift shift =null;
 
@@ -415,7 +456,8 @@ public class CompatibilityController {
     	return to;
     }
     @RequestMapping(method = RequestMethod.POST, value= "/assignability")
-    public @ResponseBody EmployeeUpdateTO getAssignability(HttpServletRequest request) throws CorruptDataException, ProccessingException{
+    public @ResponseBody EmployeeUpdateTO getAssignability(@RequestHeader(value="Authorization", required=false) String idToken, HttpServletRequest request) throws CorruptDataException, ProccessingException, AuthenticationException{
+    	securityManager.authorize(idToken, Constants.MANAGER);
     	Employee employee =null;
     	Shift shift =null;
 
@@ -448,7 +490,8 @@ public class CompatibilityController {
     	return to;
     }
     @RequestMapping(method = RequestMethod.POST, value= "/validity")
-    public @ResponseBody EmployeeUpdateTO getValidity(HttpServletRequest request) throws CorruptDataException, ProccessingException{
+    public @ResponseBody EmployeeUpdateTO getValidity(@RequestHeader(value="Authorization", required=false) String idToken,HttpServletRequest request) throws CorruptDataException, ProccessingException, AuthenticationException{
+    	securityManager.authorize(idToken, Constants.MANAGER);
     	Employee employee =null;
     	Shift shift =null;
 
@@ -481,7 +524,8 @@ public class CompatibilityController {
     }
     
     @RequestMapping(method = RequestMethod.POST, value= "/availability")
-    public @ResponseBody EmployeeUpdateTO getAvailability(HttpServletRequest request) throws CorruptDataException, ProccessingException{
+    public @ResponseBody EmployeeUpdateTO getAvailability(@RequestHeader(value="Authorization", required=false) String idToken, HttpServletRequest request) throws CorruptDataException, ProccessingException, AuthenticationException{
+    	securityManager.authorize(idToken, Constants.MANAGER);
     	Employee employee =null;
     	Shift shift =null;
 
@@ -512,7 +556,8 @@ public class CompatibilityController {
     }
     
     @RequestMapping(method = RequestMethod.POST, value= "/compatibility")
-    public @ResponseBody CompatibilityDTO getCompatibility(HttpServletRequest request) throws ProccessingException, CorruptDataException{
+    public @ResponseBody CompatibilityDTO getCompatibility(@RequestHeader(value="Authorization", required=false) String idToken, HttpServletRequest request) throws ProccessingException, CorruptDataException, AuthenticationException{
+    	securityManager.authorize(idToken, Constants.MANAGER);
     	Employee employee =null;
     	Shift shift =null;
 
@@ -546,7 +591,8 @@ public class CompatibilityController {
     }
     
     @RequestMapping(method = RequestMethod.POST, value= "/customFieldData")
-    public @ResponseBody EmployeeUpdateTO getCustomFieldData(HttpServletRequest request) throws ProccessingException, CorruptDataException{
+    public @ResponseBody EmployeeUpdateTO getCustomFieldData(@RequestHeader(value="Authorization", required=false) String idToken, HttpServletRequest request) throws ProccessingException, CorruptDataException, AuthenticationException{
+    	securityManager.authorize(idToken, Constants.MANAGER);
     	Employee employee =null;
     	CustomField customField =null;
     	int index = 0;
@@ -579,7 +625,8 @@ public class CompatibilityController {
     }
     
     @RequestMapping(method = RequestMethod.POST, value= "/clientCustomFieldData")
-    public @ResponseBody UpdateTO getClientCustomFieldData(HttpServletRequest request) throws ProccessingException, CorruptDataException{
+    public @ResponseBody UpdateTO getClientCustomFieldData(@RequestHeader(value="Authorization", required=false) String idToken, HttpServletRequest request) throws ProccessingException, CorruptDataException, AuthenticationException{
+    	securityManager.authorize(idToken, Constants.MANAGER);
     	Client client =null;
     	CustomField customField =null;
     	int index = 0;
@@ -613,7 +660,8 @@ public class CompatibilityController {
     }
     
     @RequestMapping(method = RequestMethod.POST, value= "/setClientCustomFieldData")
-    public @ResponseBody UpdateTO setClientCustomFieldData(HttpServletRequest request) throws ProccessingException, CorruptDataException{
+    public @ResponseBody UpdateTO setClientCustomFieldData(@RequestHeader(value="Authorization", required=false) String idToken, HttpServletRequest request) throws ProccessingException, CorruptDataException, AuthenticationException{
+    	securityManager.authorize(idToken, Constants.MANAGER);
     	Client client =null;
     	CustomField customField =null;
     	boolean value = true;
@@ -647,7 +695,10 @@ public class CompatibilityController {
     }
     
     @RequestMapping(method = RequestMethod.POST, value= "/employeeCustomFieldData")
-    public @ResponseBody UpdateTO getEmployeeCustomFieldData(HttpServletRequest request) throws ProccessingException, CorruptDataException{
+    public @ResponseBody UpdateTO getEmployeeCustomFieldData(@RequestHeader(value="Authorization", required=false) String idToken, 
+    		HttpServletRequest request) throws ProccessingException, CorruptDataException, AuthenticationException{
+    	CallAuth auth = securityManager.authorize(idToken, Constants.USER);
+
     	Employee employee =null;
     	CustomField customField =null;
     	int index = 0;
@@ -668,6 +719,12 @@ public class CompatibilityController {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+    	
+    	if(!auth.getEmployeeId().equalsIgnoreCase(employee.getId())) {
+    		if(!auth.isAdmin() && !auth.isManager()) {
+    			throw new AuthenticationException();
+    		}
+    	}
 
     	UpdateTO dto = new UpdateTO();
     	
@@ -681,7 +738,8 @@ public class CompatibilityController {
     }
     
     @RequestMapping(method = RequestMethod.POST, value= "/setEmployeeCustomFieldData")
-    public @ResponseBody UpdateTO setEmployeeCustomFieldData(HttpServletRequest request) throws ProccessingException, CorruptDataException{
+    public @ResponseBody UpdateTO setEmployeeCustomFieldData(@RequestHeader(value="Authorization", required=false) String idToken, HttpServletRequest request) throws ProccessingException, CorruptDataException, AuthenticationException{
+    	securityManager.authorize(idToken, Constants.MANAGER);
     	Employee employee =null;
     	CustomField customField =null;
     	boolean value = true;
@@ -715,7 +773,8 @@ public class CompatibilityController {
     }
     
     @RequestMapping(method = RequestMethod.POST, value= "/setCustomFieldData")
-    public @ResponseBody UpdateTO setCustomFieldData(HttpServletRequest request) throws ProccessingException, CorruptDataException{
+    public @ResponseBody UpdateTO setCustomFieldData(@RequestHeader(value="Authorization", required=false) String idToken, HttpServletRequest request) throws ProccessingException, CorruptDataException, AuthenticationException{
+    	securityManager.authorize(idToken, Constants.MANAGER);
     	Employee employee =null;
     	CustomField customField =null;
     	boolean value = true;

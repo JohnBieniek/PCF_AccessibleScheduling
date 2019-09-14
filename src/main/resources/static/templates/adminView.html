@@ -1,7 +1,7 @@
 <div id="adminView" ng-init="init()">
  	<div class="head" style="margin-bottom:0px !important">
 	 	<div ng-if="user" style="display:inline-block;text-align:right">
-	          <p ng-if="user" style="display:inline-block"  class="titleText" ng-click="setPage('scheduler')">Accessible Scheduling</p>
+	          <p ng-if="user" style="display:inline-block"  class="titleText" ng-click="setPage('employee')">Accessible Scheduling</p>
 	    </div>
 	    <div ng-if="!user" class="inline" style="width: 50%; margin-left: 25%;margin-bottom:10px"> 
 	          <p class="centered titleText">Accessible Scheduling</p>
@@ -16,11 +16,6 @@
        			<i style = "margin-right:5px !important" class="glyphicon glyphicon-plus-sign"/>
        			<br>
        			<span class="centered">Staff</span>
-          	</div>
-          	<div ng-if="admin" class="navAllign" ng-click="setPage('shiftList')">
-       			<i style = "margin-right:5px !important" class="glyphicon glyphicon-align-justify"/>
-       			<br>
-       			<span class="centered">Shifts</span>
           	</div>
           	<div ng-if="admin" class="navAllign" ng-click="setPage('scheduler')">
        			<i style = "margin-right:5px !important" class="glyphicon glyphicon-dashboard " />
@@ -43,7 +38,7 @@
        			<span class="centered">Sign out</span>
           	</div>
        	</div>
-      </div>
+    </div>
     <div class="row">
         <div ng-include src="'templates/util/status.html'"></div>
     </div>

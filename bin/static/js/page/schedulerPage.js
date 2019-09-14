@@ -1,10 +1,4 @@
 angular.module('vacation', ['ngResource', 'ui.bootstrap']).
-	factory('Clients', function ($resource) {
-	    return $resource('employees');
-	}).
-	factory('Client', function ($resource) {
-	    return $resource('employees/:id', {id: '@id'});
-	}).
 	factory("EditorStatus", function () {
         var editorEnabled = {};
 
@@ -27,32 +21,29 @@ angular.module('vacation', ['ngResource', 'ui.bootstrap']).
         }
     });
 
-function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
-
-	 $scope.week = new Date();
-	 console.log("week"+$scope.week);
-	 if($scope.year==null ||$scope.year==undefined){
+function SchedulingController($scope, $modal, $http, Status) {
+	$scope.week = new Date();
+	$scope.allowOvertime=false;
+	$scope.allowUnavailable=false;
+	$scope.prioritizeSecondShift=false;
+	$scope.useDailyMax=true;
+	$scope.useWeeklyMax=true;
+	$scope.allowInactive=false;
+	$scope.generatedBool = false;
+	$scope.generated="Generated";
+	$scope.assigned="Unassigned";
+	$scope.monthName="January";
+	$scope.statusList=[];
+	$scope.unscheduled=0;
+	$scope.scheduled=0;
+	if($scope.year==null ||$scope.year==undefined){
 		 $scope.year=parseInt($scope.week.getYear())+1900;
 		 $scope.month=parseInt($scope.week.getMonth()+2);
 		 $scope.tab=$scope.month;
-	 }
-	 $scope.allowOvertime=false;
-	 $scope.allowUnavailable=false;
-	 $scope.prioritizeSecondShift=false;
-	 $scope.useDailyMax=true;
-	 $scope.useWeeklyMax=true;
-	 $scope.allowInactive=false;
-	 $scope.generatedBool = false;
-	 $scope.generated="Generated";
-	 $scope.assigned="Unassigned";
-
-	 $scope.monthName="January";
-	 $scope.statusList=[];
-	 $scope.unscheduled=0;
-	 $scope.scheduled=0;
+	}
 	 
 	$scope.setTab = function(newTab){
-	  if($scope.statusList && $scope.statusList[$scope.tab-1])$scope.generatedBool = $scope.statusList[$scope.tab-1].generated;
+	if($scope.statusList && $scope.statusList[$scope.tab-1])$scope.generatedBool = $scope.statusList[$scope.tab-1].generated;
       $scope.tab = newTab;
       
       $scope.getUnscheduled(newTab);
@@ -141,81 +132,96 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
     
     $scope.isTabGenerated = function(month){
     	if($scope.statusList && $scope.statusList[month-1]) return $scope.statusList[month-1].generated && $scope.tab != month && !$scope.statusList[month-1].assigned&& !$scope.statusList[month-1].assigning;
-  	  return false;
-      };
-      $scope.isTabAssigned = function(month){
+  	  	return false;
+    };
+    $scope.isTabAssigned = function(month){
     	  if($scope.statusList && $scope.statusList[month-1])return $scope.statusList[month-1].assigned && $scope.tab != month&& !$scope.statusList[month-1].assigning ;
     	  return false;
-        }
+    }
     $scope.isGenerated = function(month){
     	if($scope.statusList && $scope.statusList[month-1])return $scope.statusList[month-1].generated;
-  	  return false;
-      };
+  	    return false;
+    };
       
-      $scope.isWorking = function(month){
+    $scope.isWorking = function(month){
     	  if($scope.statusList && $scope.statusList[month-1])return $scope.statusList[month-1].assigning  && $scope.tab != month;
     	  return false;
-        };
+    };
       
-      $scope.isAssigned = function(month){
+    $scope.isAssigned = function(month){
     	  if($scope.statusList && $scope.statusList[month-1])return $scope.statusList[month-1].assigned;
     	  return false;
-        };
+    };
     $scope.isErrored = function(month){
     	if($scope.statusList && $scope.statusList[month-1])return $scope.statusList[month-1].errored;
-  	  return false;
-      };
+  	    return false;
+    };
+    
     $scope.isAssigning = function(month){
     	if($scope.statusList && $scope.statusList[month-1])return $scope.statusList[month-1].assigning
-  	  return false;
-      };
+  	    return false;
+    };
       
-      $scope.isStopped = function(month){
+    $scope.isStopped = function(month){
     	  if($scope.statusList && $scope.statusList[month-1])return $scope.statusList[month-1].stopped
     	  return false;
-        };
+    };
           
-      $scope.isNotAssignable = function(month){
-    	  assignable = true;
-    	  
-    	  console.log("assignable:"+assignable);
-    	  if($scope.statusList && $scope.statusList[month-1]){
-    		  if($scope.statusList[month-1].generated=="false"){
-    	 
+    $scope.isNotAssignable = function(month){
+    	assignable = true;  	  
+
+		if($scope.statusList && $scope.statusList[month-1]){
+			if($scope.statusList[month-1].generated=="false"){
 	    		  assignable=false;
-	    	  }
-    	  }
+	    	}
+    	}
     	  
-	   	  console.log("assignable:"+assignable);
 	   	if($scope.statusList && $scope.statusList[month-1]){ 
 		   	if($scope.statusList[month-1].assigning=="true"){
-	  		  assignable=false;
-	  	  }
+		   		assignable=false;
+		   	}
 	   	}
   	  
-	   	  console.log("assignable:"+assignable);
 	   	if($scope.statusList && $scope.statusList[month-1]){ 
 		   	if($scope.statusList[month-1].assigned=="true"){
 	  		  assignable=false;
-	  	  }
+		   	}
 	   	}
-  	  unassignable = !assignable;
-	   	      	return unassignable;
-       };
+	   	
+	   	unassignable = !assignable;
+	   	
+	   	return unassignable;
+    };
       
-	 $scope.isSet = function(tabNum){
+	$scope.isSet = function(tabNum){
       return $scope.tab === tabNum;
     };
     
-	 function clone (obj) {
+	function clone (obj) {
 	        return JSON.parse(JSON.stringify(obj));
-     }
+    }
     
-	 $scope.setMonth = function setMonth(month) {
+	$scope.setMonth = function setMonth(month) {
 	        $scope.month = month;
-	    }
-    $scope.listClients = function listClients() {
-        $scope.clients = Clients.query();
+	}
+	
+	$scope.listClients = function listClients() {
+		$http({
+	        url: '/clients',
+	        method: 'GET',
+	        headers: {
+	            'Authorization': $scope.idToken
+	        },
+	        params: {
+	        }
+	    })
+	    .then(function(response) {
+	    	$scope.clients=response.data;
+	    	
+	        if($scope.client==null){
+	        	$scope.client = $scope.clients[0];
+	        }
+	    });
     }
     
     $scope.deleteShifts = function(month){
@@ -224,6 +230,7 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
 	            url: '/schedule/byMonth',
 	            method: 'DELETE',
 	            headers: {
+	                'Authorization': $scope.idToken,
 	                'Content-Type': 'application/x-www-form-urlencoded'
 	            },
 	            params: {
@@ -243,6 +250,7 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
             url: '/schedule/statusList',
             method: 'GET',
             headers: {
+                'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
@@ -262,6 +270,7 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
             url: '/schedule/scheduled',
             method: 'GET',
             headers: {
+                'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
@@ -278,6 +287,7 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
             url: '/schedule/unscheduled',
             method: 'GET',
             headers: {
+                'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
@@ -294,6 +304,7 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
             url: '/schedule/finishAssignment',
             method: 'GET',
             headers: {
+                'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
@@ -307,11 +318,11 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
 
     $scope.stopAssignment = function(month){
     	if(confirm("Are you sure you want to stop assigning shifts for "+$scope.monthName+"?")){
-	    	//$scope.assigned="Stopping";
 	    	$http({
 	            url: '/schedule/stopAssignment',
 	            method: 'GET',
 	            headers: {
+	                'Authorization': $scope.idToken,
 	                'Content-Type': 'application/x-www-form-urlencoded'
 	            },
 	            params: {
@@ -326,11 +337,11 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
     }
     
     $scope.generateShifts = function(month){
-    	console.log("generating shifts with year:"+$scope.year);
     	$http({
             url: '/schedule/generateShifts',
             method: 'GET',
             headers: {
+                'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
@@ -340,18 +351,20 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
         })
         .then(function(response) {
         	$scope.statusList = response.data.sort(function(a, b){return a.month-b.month});
+        	
     		$scope.setTab($scope.tab);
-    		
         });
     }
     
     $scope.assignShifts = function(month, allowOvertime,allowInactive,allowUnavailable,prioritizeSecondShift,dailyMax,weeklyMax){
     	$scope.statusList[month-1].assigning=true;
     	$scope.assigned="Assigning";
+    	
     	$http({
             url: '/schedule/staffShiftsSafely',
             method: 'GET',
             headers: {
+                'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
@@ -366,10 +379,11 @@ function SchedulingController($scope, $modal, $http, Clients, Client,Status) {
             }
         })
         .then(function(response) {
-        	
         	$scope.statusList = response.data.sort(function(a, b){return a.month-b.month});
+        	
     		$scope.setTab($scope.tab);
         });
     }
+    
     $scope.listStatusItems();
 }
