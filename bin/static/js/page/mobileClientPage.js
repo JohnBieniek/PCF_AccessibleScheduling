@@ -32,7 +32,6 @@ function MobileClientController($scope, $modal, $http, Status) {
 	$scope.generatedBool = false;
 	$scope.generated="Generated";
 	$scope.assigned="Unassigned";
-	$scope.tab="Schedule";
 	$scope.monthName="January";
 	$scope.statusList=[];
 	$scope.customValue=[];
@@ -42,10 +41,9 @@ function MobileClientController($scope, $modal, $http, Status) {
 	$scope.detailsChanged=false;
 	$scope.customFieldDateEditing=true;
 	$scope.days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-
-	$scope.setTab = function(newTab){
-		$scope.tab = newTab;
-	} 
+	if($scope.tab!="Schedule" && $scope.tab!="Request" && $scope.tab!="Details"){
+		$scope.setTab("Schedule");
+	}
 	
 	$scope.getClientCustomFieldData = function (client,customField,index){
      	$http({

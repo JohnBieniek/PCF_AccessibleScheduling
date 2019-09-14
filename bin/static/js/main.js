@@ -35,6 +35,11 @@ function MainNavigationController($scope, $modal, $http, Status) {
         if($scope.week==undefined || $scope.week ==null){
 			 $scope.week = new Date();
 		}
+        
+        $scope.monthTab=$scope.week.getMonth()+2;
+
+		$scope.tab="Schedule";
+		$scope.employeeTab="Schedule";
         $scope.employee=null;
 	   	$scope.assignedFilter=false;
 	   	$scope.unassignedFilter= false;
@@ -68,6 +73,16 @@ function MainNavigationController($scope, $modal, $http, Status) {
 	      console.log('User signed out.');
 	    });
 	  }
+	 $scope.setMonthTab = function(monthTab){
+		 $scope.monthTab = monthTab;
+	 }
+	 $scope.setTab = function(newTab){
+	      $scope.tab = newTab;
+	 }
+	 $scope.setEmployeeTab = function(newTab){
+	      $scope.employeeTab = newTab;
+	 }
+	 
 	 $scope.setEmployee = function(employee){
 		 console.log("setting employee:");
 		 console.log(employee)

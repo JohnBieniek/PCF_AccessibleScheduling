@@ -30,7 +30,6 @@ function MobileEmployeeController($scope, $modal, $http, Status) {
 		 $scope.useWeeklyMax=true;
 		 $scope.allowInactive=false;
 		 $scope.generatedBool = false;
-		 $scope.tab="Schedule";
 		 $scope.monthName="January";
 		 $scope.statusList=[];
 		 $scope.customValue=[];
@@ -40,7 +39,6 @@ function MobileEmployeeController($scope, $modal, $http, Status) {
 		 $scope.detailsChanged=false;
 		 $scope.customFieldDateEditing=true;
 		 $scope.days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-		 
 		 
 		 $scope.maxMonth=$scope.week.getMonth();
 		 $scope.minMonth=$scope.maxMonth-1;
@@ -64,11 +62,6 @@ function MobileEmployeeController($scope, $modal, $http, Status) {
 		 $scope.setEmployeeToUser();
 		 $scope.listShifts();
 	}
-
-
-	$scope.setTab = function(newTab){
-      $scope.tab = newTab;
-	} 
 
 	$scope.deleteAvailability=function(availability){ 
 		if(confirm("Are you sure you want to delete the selected availability? for "+ $scope.employee.days[availability]+ "?")){
@@ -366,7 +359,7 @@ function MobileEmployeeController($scope, $modal, $http, Status) {
     }
      
 	$scope.isSet = function(tabNum){
-		return $scope.tab === tabNum;
+		return $scope.employeeTab === tabNum;
     };
     
     $scope.isEmployeeSet = function(employee){
@@ -376,7 +369,7 @@ function MobileEmployeeController($scope, $modal, $http, Status) {
 	$scope.isEmployeeChangeValid = function(employee){
 	      let valid = true;
 	      
-	      if(employee.first ==undefined || employee.first.length<1){
+	      if(employee == undefined || employee == null || employee.first ==undefined || employee.first.length<1){
 	    	  valid=false;
 	      }
 	      
@@ -714,7 +707,7 @@ function MobileEmployeeController($scope, $modal, $http, Status) {
                 
         		$scope.listEmployees();
         		
-        		$scope.tab="Schedule";
+        		$scope.setEmployeeTab("Schedule");
         	}
         	else{
         		Status.error("Failed to save employee info.")
@@ -839,7 +832,7 @@ function MobileEmployeeController($scope, $modal, $http, Status) {
                 Status.success("Employee deleted.");
         		$scope.listEmployees();
      			$scope.employee =response.data[0];
-        		$scope.tab="Schedule";
+        		$scope.setEmployeeTab("Schedule");
         	}
         	else{
         		Status.error("Failed to delete employee info.")
