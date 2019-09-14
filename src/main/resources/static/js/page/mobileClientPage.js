@@ -32,7 +32,6 @@ function MobileClientController($scope, $modal, $http, Status) {
 	$scope.generated="Generated";
 	$scope.assigned="Unassigned";
 	$scope.monthName="January";
-	$scope.statusList=[];
 	$scope.customValue=[];
 	$scope.unscheduled=0;
 	$scope.scheduled=0;
@@ -58,6 +57,11 @@ function MobileClientController($scope, $modal, $http, Status) {
         	$scope.customValue[response.data.numericResponse] = response.data.booleanResponse;
         });
     }
+	
+	$scope.setTabAndInfo = function(newTab){
+        $scope.setTab(newTab);
+		$scope.listShifts();
+	}
 	
 	$scope.setClientAndInfo = function(newClient){
 	  $scope.detailsChanged=false;
