@@ -1,5 +1,6 @@
 package org.cloudfoundry.samples.music.web;
 
+import java.io.IOException;
 import java.util.List;
 
 import javax.security.sasl.AuthenticationException;
@@ -10,17 +11,22 @@ import org.cloudfoundry.samples.music.repositories.mongodb.MongoCustomFieldDataR
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.core.JsonParseException;
+import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.databind.JsonMappingException;
+import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import accessiblesolutions.accessiblescheduling.constants.Constants;
 import accessiblesolutions.accessiblescheduling.domain.CustomField;
 import accessiblesolutions.accessiblescheduling.domain.CustomFieldData;
+import accessiblesolutions.accessiblescheduling.domain.Employee;
 
 @RestController
 @RequestMapping(value = "/customFields")
@@ -54,12 +60,26 @@ public class CustomFieldController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public CustomField update(@RequestHeader(value="Authorization", required=false) String idToken, @RequestBody CustomField customField) throws AuthenticationException {
+    public CustomField update(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam String param) throws AuthenticationException {
     	securityManager.authorize(idToken, Constants.ADMIN);
+    	CustomField customField=null;
+
+    	ObjectMapper mapper = new ObjectMapper();
+    	
+    	try {
+			customField = mapper.readValue(param, CustomField.class);
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
     	if(null!=customField) {
     		logger.info("Updating customField " + customField.toString());
     	}
-        return repository.save(customField);
+    	
+    	return repository.save(customField);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)

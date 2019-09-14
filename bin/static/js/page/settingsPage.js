@@ -37,7 +37,7 @@ function SettingsController($scope, $modal, $http,Status) {
 	                'Content-Type': 'application/x-www-form-urlencoded'
 	           },
 	           params: {
-	        	   customField: customField
+	        	   param: customField
 	           }
 	       })
 	       .then(function (response) {//TODO handle error state
@@ -103,7 +103,7 @@ function SettingsController($scope, $modal, $http,Status) {
     
     $scope.deleteCustomField = function (customField) {
     	$http({
-            url: '/customFields/'+$scope.customField.id,
+            url: '/customFields/'+customField.id,
             method: 'DELETE',
             headers: {
                 'Authorization': $scope.idToken,

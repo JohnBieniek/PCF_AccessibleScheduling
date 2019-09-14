@@ -449,7 +449,7 @@ function MobileClientController($scope, $modal, $http, Status) {
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
-            	shift: shift
+            	param: shift
             }
         })
         .then(function(response) {

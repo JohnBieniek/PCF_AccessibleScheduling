@@ -46,6 +46,19 @@ function MobileEmployeeController($scope, $modal, $http, Status) {
 		 if($scope.week==undefined || $scope.week ==null){
 			 $scope.week = new Date();
 		 }
+		 $scope.maxMonth=$scope.week.getMonth();
+		 $scope.minMonth=$scope.maxMonth-1;
+		 if($scope.minMonth<0){
+			 $scope.minMonth=11;
+		 }
+		 $scope.minMonth=$scope.minMonth-1;
+		 if($scope.minMonth<0){
+			 $scope.minMonth=11;
+		 }
+		 $scope.maxMonth=$scope.maxMonth+1;
+		 if($scope.maxMonth>11){
+			 $scope.maxMonth=0;
+		 }
 		 $scope.newDate=$scope.week.getFullYear()+"-"+(($scope.week.getMonth()+1)<10?"0"+($scope.week.getMonth()+1):($scope.week.getMonth()+1))+"-"+$scope.week.getDate();
 		 
 		 if($scope.manager){
@@ -180,15 +193,19 @@ function MobileEmployeeController($scope, $modal, $http, Status) {
 	}
      
      $scope.decrementWeek = function(){
-    	 $scope.week = $scope.week.addDays(-7);
-    	 $scope.getDisplayWeek();
-    	 $scope.listShifts();
+    	 if($scope.manager || $scope.admin || $scope.week.getMonth()>$scope.minMonth){
+	    	 $scope.week = $scope.week.addDays(-7);
+	    	 $scope.getDisplayWeek();
+	    	 $scope.listShifts();
+    	 }
      }
      
      $scope.incrementWeek = function(){
-    	 $scope.week = $scope.week.addDays(7);
-    	 $scope.getDisplayWeek();
-    	 $scope.listShifts();
+    	 if($scope.manager || $scope.admin || $scope.week.getMonth()<$scope.maxMonth){
+	    	 $scope.week = $scope.week.addDays(7);
+	    	 $scope.getDisplayWeek();
+	    	 $scope.listShifts();
+    	 }
      }
      
      $scope.saveEmployee = function saveEmployee(employee) {
@@ -529,26 +546,28 @@ function MobileEmployeeController($scope, $modal, $http, Status) {
     }
     
     $scope.listEmployees = function listEmployees() {
-    	$http({
-            url: '/employees/',
-            method: 'GET',
-            headers: {
-	            'Authorization': $scope.idToken,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            params: {
-            }
-        })
-        .then(function(response) {
-        	$scope.employees=response.data;
-        	
-        	if($scope.employee==null){
-                 $scope.setEmployeeToUser();
-            }
-
-            $scope.listClients();
-    		$scope.getDisplayWeek();
-        });
+    	if($scope.manager || $scope.admin){
+	    	$http({
+	            url: '/employees/',
+	            method: 'GET',
+	            headers: {
+		            'Authorization': $scope.idToken,
+	                'Content-Type': 'application/x-www-form-urlencoded'
+	            },
+	            params: {
+	            }
+	        })
+	        .then(function(response) {
+	        	$scope.employees=response.data;
+	        	
+	        	if($scope.employee==null){
+	                 $scope.setEmployeeToUser();
+	            }
+	
+	            $scope.listClients();
+	    		$scope.getDisplayWeek();
+	        });
+    	}
     }
     
     function saveShift(shift) {
@@ -578,24 +597,25 @@ function MobileEmployeeController($scope, $modal, $http, Status) {
     		id=$scope.employee.id;
     	}
     	$scope.getDisplayWeek();
-    	
-    	$http({
-            url: '/schedule/employeeShiftsForWeek',
-            method: 'GET',
-            headers: {
-                'Authorization': $scope.idToken,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            params: {
-            	employeeId:id,
-            	month:$scope.week.getMonth()+1,
-            	day: $scope.week.getDate(),
-            	year:$scope.week.getFullYear()
-            }
-        })
-        .then(function(response) {
-    		$scope.shifts = response.data;
-    	});
+    	if(id!=-1){
+	    	$http({
+	            url: '/schedule/employeeShiftsForWeek',
+	            method: 'GET',
+	            headers: {
+	                'Authorization': $scope.idToken,
+	                'Content-Type': 'application/x-www-form-urlencoded'
+	            },
+	            params: {
+	            	employeeId:id,
+	            	month:$scope.week.getMonth()+1,
+	            	day: $scope.week.getDate(),
+	            	year:$scope.week.getFullYear()
+	            }
+	        })
+	        .then(function(response) {
+	    		$scope.shifts = response.data;
+	    	});
+    	}
     }
     
     $scope.listCurrentShifts = function listCurrentShifts(){

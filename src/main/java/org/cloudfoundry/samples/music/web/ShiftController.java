@@ -22,11 +22,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import accessiblesolutions.accessiblescheduling.constants.Constants;
 import accessiblesolutions.accessiblescheduling.domain.CallAuth;
+import accessiblesolutions.accessiblescheduling.domain.CustomField;
 import accessiblesolutions.accessiblescheduling.domain.Shift;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 
@@ -132,8 +134,22 @@ public class ShiftController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public Shift update(@RequestHeader(value="Authorization", required=false) String idToken, @RequestBody @Valid Shift shift) throws AuthenticationException {
+    public Shift update(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam String param) throws AuthenticationException {
     	securityManager.authorize(idToken, Constants.MANAGER);
+    	
+    	Shift shift=null;
+
+    	ObjectMapper mapper = new ObjectMapper();
+    	
+    	try {
+			shift= mapper.readValue(param, Shift.class);
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
     	
         logger.info("Updating shift " + shift.getId());
         

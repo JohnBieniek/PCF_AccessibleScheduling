@@ -1,7 +1,9 @@
 package org.cloudfoundry.samples.music.web;//Ignore complaints
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import javax.security.sasl.AuthenticationException;
@@ -139,8 +141,27 @@ public class ScheduleController {
     			throw new AuthenticationException();
     		}
     	}
+    	Date maxMonthDate= new Date();
+    	int maxMonth= maxMonthDate.getMonth()+1;
+    	if(maxMonth>11) {
+    		maxMonth=1;
+    	}
+    	ArrayList<Shift> shifts = (ArrayList<Shift>) manager.getEmployeeShiftsForWeek(employeeId,month,day,year);
+    	ArrayList<Shift> returnValue = new ArrayList<Shift>();
+    	System.out.println("shifts found");
+    	if(!auth.isAdmin() && !auth.isManager()) {
+    		System.out.println("filteringShifts");
+	    	for(Shift shift: shifts) {
+	    		if(shift.getStartMonth()<maxMonth) {
+	    			returnValue.add(shift);
+	    		}
+	    	}
+    	}
+    	else {
+    		returnValue=shifts;
+    	}
     	
-    	return manager.getEmployeeShiftsForWeek(employeeId,month,day,year);
+    	return returnValue;
     }
     
     @RequestMapping(value = "/createEmployee",method = RequestMethod.POST)
