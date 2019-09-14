@@ -22,7 +22,6 @@ angular.module('client', ['ngResource', 'ui.bootstrap']).
     });
 
 function MobileClientController($scope, $modal, $http, Status) {
-	$scope.multiTableEditing=false;
 	$scope.allowOvertime=false;
 	$scope.allowUnavailable=false;
 	$scope.prioritizeSecondShift=false;
@@ -39,11 +38,7 @@ function MobileClientController($scope, $modal, $http, Status) {
 	$scope.scheduled=0;
 	$scope.selectedInterval="day(s)";
 	$scope.detailsChanged=false;
-	$scope.customFieldDateEditing=true;
 	$scope.days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-	if($scope.tab!="Schedule" && $scope.tab!="Request" && $scope.tab!="Details"){
-		$scope.setTab("Schedule");
-	}
 	
 	$scope.getClientCustomFieldData = function (client,customField,index){
      	$http({
@@ -64,10 +59,10 @@ function MobileClientController($scope, $modal, $http, Status) {
         });
     }
 	
-	$scope.setClient = function(newClient){
+	$scope.setClientAndInfo = function(newClient){
 	  $scope.detailsChanged=false;
-	  
-      $scope.client = newClient;
+	  console.log("setting clinet and info");
+      $scope.setClient(newClient);
       
       $scope.listRequests(newClient);
       
@@ -407,7 +402,7 @@ function MobileClientController($scope, $modal, $http, Status) {
 	    	$scope.clients=response.data;
 	    	
 	        if($scope.client==null){
-	        	$scope.client = $scope.clients[0];
+	        	$scope.setClientAndInfo($scope.clients[0]);
 	        }
 	        $scope.listEmployees();
 	    });
@@ -922,5 +917,9 @@ function MobileClientController($scope, $modal, $http, Status) {
         		$scope.setClient(response.data);
         	}
         });
+    }
+    
+    $scope.init = function(){
+    	//$scope.listClients();
     }
 }

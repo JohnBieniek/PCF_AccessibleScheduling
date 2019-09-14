@@ -7,11 +7,11 @@
 			       		<p ng-click="newClient()"><span class="glyphicon glyphicon-plus" style="position:static !important"></span>&nbsp;New Client</p>
 			    	</div>
 		    	</div>
-				<div style="overflow-y:auto;height:80vh" class="monthSelector">
-					<div ng-repeat="client in clients" ng-init="setClient(clients[0])">
+				<div style="overflow-y:auto;height:80vh" class="monthSelector" ng-init="init()">
+					<div ng-repeat="client in clients">
 						<div class = "clientTab" ng-class="{ active: isClientSet(client) }">
 					    	<div>
-					       		<p ng-click="setClient(client)">{{client.first}} {{client.initial}}</p>
+					       		<p ng-click="setClientAndInfo(client)">{{client.first}} {{client.initial}}</p>
 					    	</div>
 				    	</div>
 			    	</div>

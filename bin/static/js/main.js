@@ -25,7 +25,6 @@ function MainNavigationController($scope, $modal, $http, Status) {
 	 $scope.init = function() {
         $scope.setPage("login");
         $scope.sortDescending = false;
-        console.log("nulling profile");
         $scope.profile = null;
         $scope.idToken = null;
         $scope.user=false;
@@ -41,6 +40,7 @@ function MainNavigationController($scope, $modal, $http, Status) {
 		$scope.tab="Schedule";
 		$scope.employeeTab="Schedule";
         $scope.employee=null;
+        $scope.client=null;
 	   	$scope.assignedFilter=false;
 	   	$scope.unassignedFilter= false;
 	   	$scope.clientFilter = false;
@@ -73,6 +73,9 @@ function MainNavigationController($scope, $modal, $http, Status) {
 	      console.log('User signed out.');
 	    });
 	  }
+	 $scope.setClient = function (client){
+		 $scope.client = client;
+	 }
 	 $scope.setMonthTab = function(monthTab){
 		 $scope.monthTab = monthTab;
 	 }
