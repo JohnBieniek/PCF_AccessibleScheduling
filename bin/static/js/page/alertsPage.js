@@ -1,13 +1,4 @@
 angular.module('employees', ['ngResource', 'ui.bootstrap']).
-	factory('Employees', function ($resource) {
-	    return $resource('employees');
-	}).
-	factory('Employee', function ($resource) {
-	    return $resource('employees/:id', {id: '@id'});
-	}).
-	factory('CustomFields', function ($resource) {
-        return $resource('customFields');
-    }).
 	factory("EditorStatus", function () {
         var editorEnabled = {};
 
@@ -30,7 +21,7 @@ angular.module('employees', ['ngResource', 'ui.bootstrap']).
         }
     });
 
-function AlertsController($scope, $modal, $http, Employees, Employee, CustomFields, Status) {
+function AlertsController($scope, $modal, $http, Status) {
 	 $scope.multiTableEditing=false;
 	 $scope.customFieldDataEditing=true;
 	 $scope.sortField="first";

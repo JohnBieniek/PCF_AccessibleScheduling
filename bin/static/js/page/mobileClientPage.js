@@ -23,7 +23,6 @@ angular.module('client', ['ngResource', 'ui.bootstrap']).
 
 function MobileClientController($scope, $modal, $http, Status) {
 	$scope.multiTableEditing=false;
-	$scope.month=1;
 	$scope.allowOvertime=false;
 	$scope.allowUnavailable=false;
 	$scope.prioritizeSecondShift=false;
@@ -43,12 +42,7 @@ function MobileClientController($scope, $modal, $http, Status) {
 	$scope.detailsChanged=false;
 	$scope.customFieldDateEditing=true;
 	$scope.days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-	 
-	if($scope.week==undefined || $scope.week ==null){
-		 $scope.week = new Date();
-	}
 
-	
 	$scope.setTab = function(newTab){
 		$scope.tab = newTab;
 	} 
@@ -124,7 +118,7 @@ function MobileClientController($scope, $modal, $http, Status) {
 	}
      
     $scope.decrementWeek = function(){
-    	 $scope.week = $scope.week.addDays(-7);
+    	$scope.setWeek($scope.week.addDays(-7));
     	 
     	 $scope.getDisplayWeek();
     	 
@@ -132,7 +126,7 @@ function MobileClientController($scope, $modal, $http, Status) {
     }
      
     $scope.incrementWeek = function(){
-    	 $scope.week = $scope.week.addDays(7);
+    	$scope.setWeek($scope.week.addDays(7));
     	 
     	 $scope.getDisplayWeek();
     	 
@@ -271,11 +265,7 @@ function MobileClientController($scope, $modal, $http, Status) {
     function clone (obj) {
     	return JSON.parse(JSON.stringify(obj));
     }
-    
-	 $scope.setMonth = function setMonth(month) {
-		 $scope.month = month;
-	 }
-	 
+ 
 	 $scope.setInitialDays = function setInitialDays(request){
 		 if(request.days==null || request.days==undefined){
 			 request.days=[false,false,false,false,false,false,false];

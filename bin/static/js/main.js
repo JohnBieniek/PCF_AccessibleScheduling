@@ -1,49 +1,4 @@
 angular.module('mainNavigation', ['ngResource', 'ui.bootstrap']).
-    factory('Clients', function ($resource) {
-        return $resource('clients');
-    }).
-    factory('Client', function ($resource) {
-        return $resource('clients/:id', {id: '@id'});
-    }).
-    factory('Events', function ($resource) {
-	    return $resource('events');
-	}).
-	factory('Event', function ($resource) {
-	    return $resource('events/:id', {id: '@id'});
-	}).
-    factory('Employees', function ($resource) {
-        return $resource('employees');
-    }).
-    factory('Employee', function ($resource) {
-        return $resource('employees/:id', {id: '@id'});
-    }).
-    factory('CustomFields', function ($resource) {
-        return $resource('customFields');
-    }).
-    factory('CustomField', function ($resource) {
-        return $resource('customFields/:id', {id: '@id'});
-    }).
-    factory('Shifts', function ($resource) {
-        return $resource('shifts');
-    }).
-    factory('Shift', function ($resource) {
-        return $resource('shifts/:id', {id: '@id'});
-    }).
-    factory('Compatibility', function ($resource) {
-        return $resource('compatibility');
-    }).
-    factory('RecurringShiftNeeds', function ($resource) {
-        return $resource('recurringShiftNeeds');
-    }).
-    factory('RecurringShiftNeed', function ($resource) {
-        return $resource('recurringShiftNeeds/:id', {id: '@id'});
-    }).
-    factory('ShiftRequests', function ($resource) {
-        return $resource('shiftRequests');
-    }).
-    factory('ShiftRequest', function ($resource) {
-        return $resource('shiftRequests/:id', {id: '@id'});
-    }).
     factory("EditorStatus", function () {
         var editorEnabled = {};
 
@@ -77,10 +32,10 @@ function MainNavigationController($scope, $modal, $http, Status) {
         $scope.manager=false;
         $scope.admin=false;
  
-        $scope.selectedMonth=1;
-	   	$scope.selectedYear=2019;
-	   	$scope.sortField="startDate";
-	   	$scope.selectedWeek=null;
+        if($scope.week==undefined || $scope.week ==null){
+			 $scope.week = new Date();
+		}
+        $scope.employee=null;
 	   	$scope.assignedFilter=false;
 	   	$scope.unassignedFilter= false;
 	   	$scope.clientFilter = false;
@@ -91,8 +46,6 @@ function MainNavigationController($scope, $modal, $http, Status) {
    	 	$scope.selectedClient= false;//Used by clientList.html to select a client for scheduling on scheduling.html
    	 	$scope.selectedEmployee= false;//Used by employeeList.html to select an employee for vacation on vacation.html
    	 	$scope.selectedShift= false;//Used by shiftList.html to select a shift for assignment on shift.html
-   	 	$scope.multiTableEditing=false;//Have I fixed in table editing? No
-   	 	$scope.customFieldDataEditing=true;//TODO factor out this flag
 	 };
 	 
 	 $scope.loggedIn = function loggedIn() {
@@ -110,17 +63,22 @@ function MainNavigationController($scope, $modal, $http, Status) {
 		 $scope.user=false;
 		 $scope.idToken=null;
 		 $scope.profile=null;
-		  console.log("called sign out");
 	    var auth2 = gapi.auth2.getAuthInstance();
 	    auth2.signOut().then(function () {
 	      console.log('User signed out.');
 	    });
 	  }
-//	 window.signOut=signOut;
-	 
+	 $scope.setEmployee = function(employee){
+		 console.log("setting employee:");
+		 console.log(employee)
+		 $scope.employee=employee;
+	 }
 	 $scope.changeSortOrder = function(){
 		 $scope.sortDescending = !$scope.sortDescending;
 	 }
+	 $scope.setWeek = function (isWeek) {
+        $scope.week = isWeek;
+     };
 	 $scope.setIdToken = function (idToken) {
 	        $scope.idToken = idToken;
 	    };
@@ -137,7 +95,6 @@ function MainNavigationController($scope, $modal, $http, Status) {
 	        $scope.admin = isAdmin;
 	    };
     $scope.setPage = function (viewName) {
-    	console.log("Setting page to:"+viewName);
         $scope.page = "templates/page/" + viewName + ".html";
     };
     $scope.setSortField = function(sortField){
