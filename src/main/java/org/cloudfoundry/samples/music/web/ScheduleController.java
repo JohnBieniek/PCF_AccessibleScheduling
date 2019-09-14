@@ -148,17 +148,27 @@ public class ScheduleController {
     	}
     	ArrayList<Shift> shifts = (ArrayList<Shift>) manager.getEmployeeShiftsForWeek(employeeId,month,day,year);
     	ArrayList<Shift> returnValue = new ArrayList<Shift>();
-    	System.out.println("shifts found");
-    	if(!auth.isAdmin() && !auth.isManager()) {
-    		System.out.println("filteringShifts");
-	    	for(Shift shift: shifts) {
-	    		if(shift.getStartMonth()<maxMonth) {
-	    			returnValue.add(shift);
-	    		}
+    	if(null!=shifts && !shifts.isEmpty()) {
+	    	System.out.println("shifts found");
+	    	if(!auth.isAdmin() && !auth.isManager()) {
+	    		System.out.println("filteringShifts");
+		    	for(Shift shift: shifts) {
+		    		System.out.println(shift.toString());
+		    		System.out.println("startMonht:"+shift.getStartMonth());
+		    		System.out.println("maxMonnth:"+maxMonth);
+		    		System.out.println("shift.getStartMonth()<maxMonth:"+(shift.getStartMonth()<=maxMonth));
+		    		if(shift.getStartMonth()<=maxMonth) {
+		    			System.out.println("shift retained");
+		    			returnValue.add(shift);
+		    		}
+		    		else {
+		    			System.out.println("shift removed");
+		    		}
+		    	}
 	    	}
-    	}
-    	else {
-    		returnValue=shifts;
+	    	else {
+	    		returnValue=shifts;
+	    	}
     	}
     	
     	return returnValue;
