@@ -113,7 +113,6 @@ function MobileEmployeeController($scope, $modal, $http, Status) {
     }
 	
 	$scope.setEmployeeToUser = function(){
-		console.log("setting employee to user");
 		$http({
             url: '/employees/'+$scope.profile.employeeId,
             method: 'GET',

@@ -11,7 +11,7 @@
 					<div ng-repeat="employee in employees">
 						<div class = "employeeTab" ng-class="{ active: isEmployeeSet(employee) }">
 					    	<div>
-					       		<p ng-click="setEmployee(employee)">{{employee.first}} {{employee.initial}}</p>
+					       		<p ng-click="setEmployeeAndInfo(employee)">{{employee.first}} {{employee.initial}}</p>
 					    	</div>
 				    	</div>
 			    	</div>
