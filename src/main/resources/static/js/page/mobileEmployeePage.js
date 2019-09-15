@@ -59,26 +59,32 @@ function MobileEmployeeController($scope, $modal, $http, Status) {
 			 $scope.listEmployees();
 		 }
 		 
-		 $scope.setEmployeeToUser();
+		 if($scope.employee==undefined || $scope.employee == null){
+			 $scope.setEmployeeToUser();
+		 }
+		 
 		 $scope.listShifts();
 	}
 
 	$scope.deleteAvailability=function(availability){ 
+		var currentEmployee = $scope.employee;
 		if(confirm("Are you sure you want to delete the selected availability? for "+ $scope.employee.days[availability]+ "?")){
-	        $scope.employee.startTimes.splice(availability,1);    
-	        $scope.employee.days.splice(availability,1);
-	        $scope.employee.endTimes.splice(availability,1); 
+			currentEmployee.startTimes.splice(availability,1);    
+			currentEmployee.days.splice(availability,1);
+			currentEmployee.endTimes.splice(availability,1); 
 	        
+			$scope.setEmployee(employee);
 	        $scope.saveEmployee($scope.employee);
 	    }
     }
 	
 	$scope.addAvailability= function(day){
+		var currentEmployee = $scope.employee;
 		if($scope.employee){
-			$scope.employee.days.push(day);
-			$scope.employee.startTimes.push("08:00");
-			$scope.employee.endTimes.push("16:00");
-			
+			currentEmployee.days.push(day);
+			currentEmployee.startTimes.push("08:00");
+			currentEmployee.endTimes.push("16:00");
+			$scope.setEmployee(currentEmployee);
 	        $scope.saveEmployee($scope.employee);		
 		}
 	}
@@ -107,6 +113,7 @@ function MobileEmployeeController($scope, $modal, $http, Status) {
     }
 	
 	$scope.setEmployeeToUser = function(){
+		console.log("setting employee to user");
 		$http({
             url: '/employees/'+$scope.profile.employeeId,
             method: 'GET',
@@ -118,24 +125,23 @@ function MobileEmployeeController($scope, $modal, $http, Status) {
             }
         })
         .then(function(response) {
-        	$scope.employee=response.data;
-        	
         	if(typeof $scope.employee !== 'undefined' && $scope.employee!=null && $scope.employee.role==null){
-  			  $scope.employee.role="user";
+  			  response.data.role="user";
   		  	}
         	
+        	$scope.setEmployeeAndInfo(response.data);
+        	
         	$scope.employeeModel=clone($scope.employee);
-        	$scope.setEmployee($scope.employee);
         });
 	}
 	
-	$scope.setEmployee = function(newEmployee){		
+	$scope.setEmployeeAndInfo = function(newEmployee){		
 	  $scope.detailsChanged=false;
 	  
 	  if(newEmployee.role==null){
 		  newEmployee.role="user";
 	  }
-      $scope.employee = newEmployee;
+      $scope.setEmployee(newEmployee);
       $scope.employeeModel = clone(newEmployee);
       
       if($scope.employee!=null && $scope.customFields !=null){
@@ -227,7 +233,7 @@ function MobileEmployeeController($scope, $modal, $http, Status) {
            }
        })
        .then(function (response) {//TODO handle error state
-    	   $scope.employee=response.data;
+    	   setEmployee(response.data);
        	   employee.id=response.data.id;
            if(employee.customFields){
 	            var size = employee.customFields.length;
@@ -716,6 +722,7 @@ function MobileEmployeeController($scope, $modal, $http, Status) {
     };
     
      $scope.toggleAvailabilityFor = function toggleAvailabilityFor(day,boolean) {
+    	var existingEmployee = $scope.employee;
     	$scope.detailsChanged=true;	
     	var hoursAvailable=[];
     	
@@ -724,25 +731,25 @@ function MobileEmployeeController($scope, $modal, $http, Status) {
     	}
     	
     	if(day==0){//sunday
-    		$scope.employee.sundaysAvailability=hoursAvailable;
+    		existingEmployee.sundaysAvailability=hoursAvailable;
     	}
     	if(day==1){//monday
-    		$scope.employee.mondaysAvailability=hoursAvailable;
+    		existingEmployee.mondaysAvailability=hoursAvailable;
     	}
     	if(day==2){//tuesday
-    		$scope.employee.tuesdaysAvailability=hoursAvailable;
+    		existingEmployee.tuesdaysAvailability=hoursAvailable;
     	}
     	if(day==3){//wednesday
-    		$scope.employee.wednesdaysAvailability=hoursAvailable;
+    		existingEmployee.wednesdaysAvailability=hoursAvailable;
     	}
     	if(day==4){
-    		$scope.employee.thursdaysAvailability=hoursAvailable;
+    		existingEmployee.thursdaysAvailability=hoursAvailable;
     	}
     	if(day==5){
-    		$scope.employee.fridaysAvailability=hoursAvailable;
+    		existingEmployee.fridaysAvailability=hoursAvailable;
     	}
     	if(day==6){
-    		$scope.employee.saturdaysAvailability=hoursAvailable;
+    		existingEmployee.saturdaysAvailability=hoursAvailable;
     	}
     }
 
@@ -831,7 +838,7 @@ function MobileEmployeeController($scope, $modal, $http, Status) {
         	if(response){
                 Status.success("Employee deleted.");
         		$scope.listEmployees();
-     			$scope.employee =response.data[0];
+     			$scope.setEmployee(response.data[0]);
         		$scope.setEmployeeTab("Schedule");
         	}
         	else{

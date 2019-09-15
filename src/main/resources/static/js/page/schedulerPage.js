@@ -32,15 +32,9 @@ function SchedulingController($scope, $modal, $http, Status) {
 	$scope.generated="Generated";
 	$scope.assigned="Unassigned";
 	
-	//$scope.setScheduleTab($scope.monthTab);
-	
 	$scope.statusList=[];
 	$scope.unscheduled=0;
 	$scope.scheduled=0;
-//	if($scope.year==null ||$scope.year==undefined){
-//		 $scope.year=parseInt($scope.week.getYear())+1900;
-//		 $scope.setMonthTab($scope.month);
-//	}
 	 
 	$scope.setScheduleTab = function(newTab){
 	if($scope.statusList && $scope.statusList[$scope.monthTab-1])$scope.generatedBool = $scope.statusList[$scope.monthTab-1].generated;

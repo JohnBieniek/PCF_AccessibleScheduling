@@ -87,8 +87,6 @@ function MainNavigationController($scope, $modal, $http, Status) {
 	 }
 	 
 	 $scope.setEmployee = function(employee){
-		 console.log("setting employee:");
-		 console.log(employee)
 		 $scope.employee=employee;
 	 }
 	 $scope.changeSortOrder = function(){
