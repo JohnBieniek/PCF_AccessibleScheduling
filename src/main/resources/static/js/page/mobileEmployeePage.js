@@ -195,7 +195,10 @@ function MobileEmployeeController($scope, $modal, $http, Status) {
      }
      
      $scope.incrementWeek = function(){
-    	 if($scope.manager || $scope.admin || $scope.week.getMonth()<$scope.maxMonth){
+    	 var weeksStart = $scope.week.addDays($scope.week.getDay()-1);
+    	 var weeksEnd = weeksStart.addDays(6);
+    	 var nextWeeksStart = weeksEnd.addDays(1);
+    	 if($scope.manager || $scope.admin || nextWeeksStart.getMonth()<$scope.maxMonth){
     		 $scope.setWeek($scope.week.addDays(7));
 	    	 $scope.getDisplayWeek();
 	    	 $scope.listShifts();
