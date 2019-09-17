@@ -93,6 +93,54 @@ function MobileEmployeeController($scope, $modal, $http, Status) {
 		return day==$scope.employee.days[availability];
 	}
 	
+	$scope.getLastShiftUpdate = function (){
+		$http({
+	           url: '/updateInfo/shifts',
+	           method: 'GET',
+	           headers: {
+	               'Authorization': $scope.idToken,
+	               'Content-Type': 'application/x-www-form-urlencoded'
+	           },
+	           params: {
+	           }
+	       })
+	       .then(function (response) {//TODO handle error state
+	    	   $scope.setLastShiftUpdate(response.data);
+	       }
+	}
+	
+	$scope.getLastShiftUpdate = function (){
+		$http({
+	           url: '/updateInfo/clients',
+	           method: 'GET',
+	           headers: {
+	               'Authorization': $scope.idToken,
+	               'Content-Type': 'application/x-www-form-urlencoded'
+	           },
+	           params: {
+	           }
+	       })
+	       .then(function (response) {//TODO handle error state
+	    	   $scope.setLastShiftUpdate(response.data);
+	       }
+	}
+	
+	$scope.getLastEmployeeUpdate = function (){
+		$http({
+	           url: '/updateInfo/employees',
+	           method: 'GET',
+	           headers: {
+	               'Authorization': $scope.idToken,
+	               'Content-Type': 'application/x-www-form-urlencoded'
+	           },
+	           params: {
+	           }
+	       })
+	       .then(function (response) {//TODO handle error state
+	    	   $scope.setLastEmployeeUpdate(response.data);
+	       }
+	}
+	
 	$scope.getEmployeeCustomFieldData = function (employee,customField,index){
      	$http({
             url: '/compatibility/employeeCustomFieldData',

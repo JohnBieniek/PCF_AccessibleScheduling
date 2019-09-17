@@ -47,7 +47,7 @@ public class AccessibleSecurityManager {
 //    			throw new AuthenticationException();
 //    		}
 //    		else 
-    			if(!Constants.TOKEN_ISSUER.equalsIgnoreCase(user.getIssuer())) {
+    			 if(!Constants.TOKEN_ISSUER.equalsIgnoreCase(user.getIssuer())) {
     			System.out.println("invalid id issuer");
     			throw new AuthenticationException();
     		}

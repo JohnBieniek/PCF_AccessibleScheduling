@@ -30,7 +30,10 @@ function MainNavigationController($scope, $modal, $http, Status) {
         $scope.user=false;
         $scope.manager=false;
         $scope.admin=false;
- 
+        $scope.lastShiftUpdate=null;
+        $scope.lastClientUpdate=null;
+        $scope.lastCustomFieldUpdate = null;
+        
         if($scope.week==undefined || $scope.week ==null){
 			 $scope.week = new Date();
 		}
@@ -75,6 +78,16 @@ function MainNavigationController($scope, $modal, $http, Status) {
 		 var auth2 = gapi.auth2.getAuthInstance();
 	     auth2.signOut().then(function () {});
 	  }
+	 
+	 $scope.setLastShiftUpdate = function (time){
+		 $scope.lastShiftUpdate = time;
+	 }
+	 $scope.setLastEmployeeUpdate = function (time){
+		 $scope.lastEmployeeUpdate = time;
+	 }
+	 $scope.setLastClientUpdate = function (time){
+		 $scope.lastClientUpdate = time;
+	 }
 	 $scope.setClient = function (client){
 		 $scope.client = client;
 	 }
