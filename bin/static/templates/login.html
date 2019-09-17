@@ -8,18 +8,15 @@
 	    <link rel="shortcut icon" href="favicon.ico">
 	    <title>Schedule Access</title>
 		<div style="display:inline-block" class="">
-	           	 	<br>
-	           	 	<br>
-	                <p style="display:inline-block; font-size: 50px;  font-weight: bold;"  class="titleText">Accessible Scheduling</p>
-	                <i style="display:inline-block" class="glyphicon glyphicon-calendar micon"></i>
-	                 <!--<ul class="navbar-nav">
-	                   <li></li>
-	                </ul>-->
-	            </div>
+       	 	<br>
+       	 	<br>
+            <p style="display:inline-block; font-size: 50px;  font-weight: bold;"  class="titleText">Accessible Scheduling</p>
+            <i style="display:inline-block" class="glyphicon glyphicon-calendar micon"></i>
+        </div>
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 	    <link rel="stylesheet" type="text/css" href="webjars/bootstrap/3.1.1/css/bootstrap.css">
         <meta name="google-signin-scope" content="profile email">
-	    <meta name="google-signin-client_id" content="728962972693-5uudecgh1ir6if7imo2hb6cv9qa9nrk3.apps.googleusercontent.com">
+	    <meta name="google-signin-client_id" content="728962972693-oh55mmre4ad37b4b2sea632p4s1v8t0l.apps.googleusercontent.com">
 	    <script src="https://apis.google.com/js/platform.js" async defer></script>
 	</head>
 	
@@ -53,7 +50,7 @@
 					        // The ID token you need to pass to your backend:
 					        var id_token = googleUser.getAuthResponse().id_token;
 					        var xhr = new XMLHttpRequest();
-					        xhr.open('POST', 'https://accessiblescheduling-dev.cfapps.io/auth/tokensignin');
+					        xhr.open('POST', 'https://accessiblescheduling.cfapps.io/auth/tokensignin');
 					        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 					        xhr.onload = function() {
 					        };

@@ -42,11 +42,12 @@ public class AccessibleSecurityManager {
     	User user = getUser(idToken);
     	
     	if(null!=user) {
-    		if(!Constants.CLIENT_ID.equalsIgnoreCase(user.getIssuedTo())) {
-    			System.out.println("invalid client id");
-    			throw new AuthenticationException();
-    		}
-    		else if(!Constants.TOKEN_ISSUER.equalsIgnoreCase(user.getIssuer())) {
+//    		if(!Constants.CLIENT_ID.equalsIgnoreCase(user.getIssuedTo())) {
+//    			System.out.println("invalid client id");
+//    			throw new AuthenticationException();
+//    		}
+//    		else 
+    			if(!Constants.TOKEN_ISSUER.equalsIgnoreCase(user.getIssuer())) {
     			System.out.println("invalid id issuer");
     			throw new AuthenticationException();
     		}
