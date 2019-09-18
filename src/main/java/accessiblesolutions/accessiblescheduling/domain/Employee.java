@@ -3,6 +3,7 @@ package accessiblesolutions.accessiblescheduling.domain;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -362,10 +363,6 @@ public class Employee implements Comparable{
 		this.smoker = smoker;
 	}
 
-	public String toString() {
-		return getFirst() + " " + getInitial() + " id:" + getId();
-	}
-
 	public String getUserId() {
 		return userId;
 	}
@@ -404,5 +401,17 @@ public class Employee implements Comparable{
 
 	public void setCompatibile(String compatibile) {
 		this.compatibile = compatibile;
+	}
+
+	@Override
+	public String toString() {
+		return "Employee [id=" + id + ", userId=" + userId + ", manager=" + manager + ", admin=" + admin + ", role="
+				+ role + ", first=" + first + ", initial=" + initial + ", hireDate=" + hireDate + ", gender=" + gender
+				+ ", compatibile=" + compatibile + ", noCats=" + noCats + ", smoker=" + smoker + ", signing=" + signing
+				+ ", medPassCertified=" + medPassCertified + ", inactive=" + inactive + ", offAlternateWeekends="
+				+ offAlternateWeekends + ", requestsExtraShifts=" + requestsExtraShifts + ", fixedSchedule="
+				+ fixedSchedule + ", minHours=" + minHours + ", maxHours=" + maxHours + ", requestedOff="
+				+ Arrays.toString(requestedOff) + ", startTimes=" + Arrays.toString(startTimes) + ", endTimes="
+				+ Arrays.toString(endTimes) + ", days=" + Arrays.toString(days) + "]";
 	}
 }

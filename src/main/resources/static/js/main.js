@@ -90,6 +90,7 @@ function MainNavigationController($scope, $modal, $http, Status) {
 	 }
 	 $scope.setClient = function (client){
 		 $scope.client = client;
+		 $scope.$apply();
 	 }
 	 $scope.setMonthTab = function(monthTab){
 		 $scope.monthTab = monthTab;
@@ -102,6 +103,8 @@ function MainNavigationController($scope, $modal, $http, Status) {
 	 }
 	 
 	 $scope.setEmployee = function(employee){
+		 console.log("updatedEmployee");
+		 console.log(employee);
 		 $scope.employee=employee;
 	 }
 	 $scope.changeSortOrder = function(){

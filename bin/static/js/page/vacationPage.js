@@ -30,21 +30,20 @@ function VacationController($scope, $modal, $http,Status) {
 	 
 	 $scope.addAbsence = function(selectedEmployee,newDate){
 	        selectedEmployee.requestedOff.push(newDate);
-	        saveEmployee(selectedEmployee);
+	        $scope.saveEmployee(selectedEmployee);
     };
 	    
     $scope.removeAbsence=function(selectedEmployee,item){ 
     	 if(confirm("Are you sure you want to delete this request?")){
 	        var index=selectedEmployee.requestedOff.indexOf(item)
 	        selectedEmployee.requestedOff.splice(index,1);     
-	        saveEmployee(selectedEmployee);
+	        $scope.saveEmployee(selectedEmployee);
 	    }
       }
 	    
     $scope.saveEmployee = function saveEmployee(employee) {
      	if(employee.availability){
 	     	for(var index = 0; index<employee.availability.length;index++){
-	     		employee.availabilityStartTimes
 				if(!employee.availabilityStartTimes){
 					employee.availabilityStartTimes=[];
 				}
@@ -67,11 +66,11 @@ function VacationController($scope, $modal, $http,Status) {
                'Content-Type': 'application/x-www-form-urlencoded'
            },
            params: {
-        	   employee: employee
+        	   param: employee
            }
        })
        .then(function (response) {//TODO handle error state
-    	   $scope.employee=response.data;
+    	   $scope.setEmployee(response.data);
        	   employee.id=response.data.id;
            if(employee.customFields){
 	            var size = employee.customFields.length;
@@ -96,7 +95,8 @@ function VacationController($scope, $modal, $http,Status) {
        });
     }
     
-    $scope.listEmployees = function listEmployees() {
+    
+    $scope.listEmployees = function listEmployees() {    	
     	$http({
             url: '/employees/',
             method: 'GET',

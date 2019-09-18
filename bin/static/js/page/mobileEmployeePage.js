@@ -73,8 +73,7 @@ function MobileEmployeeController($scope, $modal, $http, Status) {
 			currentEmployee.days.splice(availability,1);
 			currentEmployee.endTimes.splice(availability,1); 
 	        
-			$scope.setEmployee(employee);
-	        $scope.saveEmployee($scope.employee);
+	        $scope.saveEmployee(currentEmployee);
 	    }
     }
 	
@@ -84,8 +83,8 @@ function MobileEmployeeController($scope, $modal, $http, Status) {
 			currentEmployee.days.push(day);
 			currentEmployee.startTimes.push("08:00");
 			currentEmployee.endTimes.push("16:00");
-			$scope.setEmployee(currentEmployee);
-	        $scope.saveEmployee($scope.employee);		
+			
+	        $scope.saveEmployee(currentEmployee);		
 		}
 	}
 	
@@ -106,10 +105,10 @@ function MobileEmployeeController($scope, $modal, $http, Status) {
 	       })
 	       .then(function (response) {//TODO handle error state
 	    	   $scope.setLastShiftUpdate(response.data);
-	       }
+	       })
 	}
 	
-	$scope.getLastShiftUpdate = function (){
+	$scope.getLastClientUpdate = function (){
 		$http({
 	           url: '/updateInfo/clients',
 	           method: 'GET',
@@ -121,8 +120,8 @@ function MobileEmployeeController($scope, $modal, $http, Status) {
 	           }
 	       })
 	       .then(function (response) {//TODO handle error state
-	    	   $scope.setLastShiftUpdate(response.data);
-	       }
+	    	   $scope.setLastClientUpdate(response.data);
+	       })
 	}
 	
 	$scope.getLastEmployeeUpdate = function (){
@@ -138,7 +137,7 @@ function MobileEmployeeController($scope, $modal, $http, Status) {
 	       })
 	       .then(function (response) {//TODO handle error state
 	    	   $scope.setLastEmployeeUpdate(response.data);
-	       }
+	       })
 	}
 	
 	$scope.getEmployeeCustomFieldData = function (employee,customField,index){
@@ -190,7 +189,6 @@ function MobileEmployeeController($scope, $modal, $http, Status) {
 	  }
       $scope.setEmployee(newEmployee);
       $scope.employeeModel = clone(newEmployee);
-      
       if($scope.employee!=null && $scope.customFields !=null){
 	      for(var index = 0; index<$scope.customFields.length;index++){
 		      $scope.getEmployeeCustomFieldData($scope.employee,$scope.customFields[index],index);
@@ -256,7 +254,6 @@ function MobileEmployeeController($scope, $modal, $http, Status) {
      $scope.saveEmployee = function saveEmployee(employee) {
      	if(employee.availability){
 	     	for(var index = 0; index<employee.availability.length;index++){
-	     		employee.availabilityStartTimes
 				if(!employee.availabilityStartTimes){
 					employee.availabilityStartTimes=[];
 				}
@@ -279,11 +276,11 @@ function MobileEmployeeController($scope, $modal, $http, Status) {
                'Content-Type': 'application/x-www-form-urlencoded'
            },
            params: {
-        	   employee: employee
+        	   param: employee
            }
        })
        .then(function (response) {//TODO handle error state
-    	   setEmployee(response.data);
+    	   $scope.setEmployeeAndInfo(response.data);
        	   employee.id=response.data.id;
            if(employee.customFields){
 	            var size = employee.customFields.length;
@@ -621,7 +618,7 @@ function MobileEmployeeController($scope, $modal, $http, Status) {
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
-            	shift: shift
+            	param: shift
             }
         })
         .then(function(response) {
@@ -888,7 +885,7 @@ function MobileEmployeeController($scope, $modal, $http, Status) {
         	if(response){
                 Status.success("Employee deleted.");
         		$scope.listEmployees();
-     			$scope.setEmployee(response.data[0]);
+     			$scope.setEmployeeAndInfo(response.data[0]);
         		$scope.setEmployeeTab("Schedule");
         	}
         	else{
@@ -912,7 +909,7 @@ function MobileEmployeeController($scope, $modal, $http, Status) {
         .then(function(response) {
         	$scope.detailsChanged=false;
         	if(response.data){
-        		$scope.setEmployee(response.data);
+        		$scope.setEmployeeAndInfo(response.data);
         	}
         });
     };
