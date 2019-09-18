@@ -35,6 +35,7 @@ function SchedulingController($scope, $modal, $http, Status) {
 	$scope.statusList=[];
 	$scope.unscheduled=0;
 	$scope.scheduled=0;
+	$scope.year=2019;
 	 
 	$scope.setScheduleTab = function(newTab){
 	if($scope.statusList && $scope.statusList[$scope.monthTab-1])$scope.generatedBool = $scope.statusList[$scope.monthTab-1].generated;
@@ -252,9 +253,9 @@ function SchedulingController($scope, $modal, $http, Status) {
             }
         })
         .then(function(response) {
-    		$scope.statusList = response.data.sort(function(a, b){return a.month-b.month});
-    		$scope.setMonthTab($scope.monthTab);
     		if($scope.page.includes("scheduler")){
+        		$scope.statusList = response.data.sort(function(a, b){return a.month-b.month});
+        		$scope.setScheduleTab($scope.monthTab);
     			setTimeout(listStatusItems,12500);
     		}
         });
@@ -326,7 +327,7 @@ function SchedulingController($scope, $modal, $http, Status) {
 	        })
 	        .then(function(response) {
 	        	$scope.statusList = response.data.sort(function(a, b){return a.month-b.month});
-	    		$scope.setTab($scope.monthTab);
+	    		$scope.setScheduleTab($scope.monthTab);
 	        });
     	}
     }
@@ -346,8 +347,7 @@ function SchedulingController($scope, $modal, $http, Status) {
         })
         .then(function(response) {
         	$scope.statusList = response.data.sort(function(a, b){return a.month-b.month});
-        	
-    		$scope.setTab($scope.monthTab);
+        	$scope.setScheduleTab($scope.monthTab);
         });
     }
     
@@ -376,7 +376,7 @@ function SchedulingController($scope, $modal, $http, Status) {
         .then(function(response) {
         	$scope.statusList = response.data.sort(function(a, b){return a.month-b.month});
         	
-    		$scope.setTab($scope.monthTab);
+    		$scope.setScheduleTab($scope.monthTab);
         });
     }
     

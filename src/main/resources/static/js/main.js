@@ -90,7 +90,6 @@ function MainNavigationController($scope, $modal, $http, Status) {
 	 }
 	 $scope.setClient = function (client){
 		 $scope.client = client;
-		 $scope.$apply();
 	 }
 	 $scope.setMonthTab = function(monthTab){
 		 $scope.monthTab = monthTab;
