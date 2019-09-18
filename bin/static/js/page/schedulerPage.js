@@ -35,6 +35,8 @@ function SchedulingController($scope, $modal, $http, Status) {
 	$scope.statusList=[];
 	$scope.unscheduled=0;
 	$scope.scheduled=0;
+	$scope.total=0;
+	$scope.year=2019;
 	 
 	$scope.setScheduleTab = function(newTab){
 	if($scope.statusList && $scope.statusList[$scope.monthTab-1])$scope.generatedBool = $scope.statusList[$scope.monthTab-1].generated;
@@ -42,16 +44,17 @@ function SchedulingController($scope, $modal, $http, Status) {
       
       $scope.getUnscheduled(newTab);
       $scope.getScheduled(newTab);
+  	  $scope.total= +$scope.scheduled + +$scope.unscheduled;
       
       if($scope.statusList && $scope.statusList[$scope.monthTab-1] && $scope.statusList[$scope.monthTab-1].generated){
-    	  $scope.generated="Generated";
+    	  $scope.generated="Generated<br />"+$scope.total;
       }
       else{
     	  $scope.generated="Ungenerated";
       }
       
       if($scope.statusList && $scope.statusList[$scope.monthTab-1] && $scope.statusList[$scope.monthTab-1].assigned){
-    	  $scope.assigned="Assigned";
+    	  $scope.assigned="Assigned<br/>" +$scope.scheduled + " of "+$scope.total;
       }
       else {
     	  $scope.assigned="Unassigned";

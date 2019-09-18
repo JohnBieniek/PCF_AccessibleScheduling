@@ -210,6 +210,8 @@
 </div>
 
 <div class="modal-footer">
-    <div style="display:inline-block" ng-if="requestIsValid(shiftRequest)"><button class="btn btn-primary btn-md active" ng-click="ok()" >OK</button></div>
-    <button style="display:inline-block" class="btn btn-warning btn-md active" ng-click="cancel()">Cancel</button>
+	<div style="float:right" class="rightAlign">
+	    <button ng-if="requestIsValid(shiftRequest)" class="rightAlign inline okEmployeeButton" ng-click="ok()" >OK</button>
+	    <button class="rightAlign inline cancelEmployeeButton" style="margin-left:10px" ng-click="cancel()">Cancel</button>
+	</div>
 </div>

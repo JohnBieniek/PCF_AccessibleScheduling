@@ -70,7 +70,7 @@
 	    	</div>
 	    	<div style="overflow-y:auto;" ng-if="isSet('Requests')" ng-init="listRequests(client)">
  	    		<h2 class ="inline" style="font-size:40px;font-weight:bold;margin-left:10px;color:#729fcf!important;"> Existing Requests</h2>
-	    		<button  class="inline rightAlign" style="font-size:30px;float:right; margin-right:20px;margin-top:20px;background-color:#b1f0a1;" ng-click="addRequest(client,employees)"><span class="glyphicon glyphicon-plus"></span>&nbsp;New Request</button>
+	    		<button  class="inline rightAlign" style="font-size:30px;float:right; margin-right:20px;margin-top:20px;background-color:#6EB262;" ng-click="addRequest(client,employees)"><span class="glyphicon glyphicon-plus"></span>&nbsp;New Request</button>
 				<div ng-repeat="request in requests">
 					<div ng-init="setInitialDays(request)" class = "request">
 						<span ng-click="editRequest(request,client,employees)" style="display:inline-block;width:94%" ng-init="getDisplayValue(request)">{{request.displayValue}}</span>

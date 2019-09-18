@@ -115,7 +115,13 @@
 				  <div>
 					  <h2 class ="centered">Days requested off for {{employee.first}} {{employee.initial}}<h2/>
 					  </br>
-					  	<div class="inline">
+				  		<div ng-if="manager" class="inline">
+						  <form ng-submit="addAbsence(newDate)">
+					           <input style="font-size: 30px;width: 250px;" type="date" ng-model="newDate" placeholder="Date" ng-required/>
+					           <button ng-if="manager" class="inline newShiftButton" ng-click="addAbsence(employee,newDate)"><span class="glyphicon glyphicon-plus"></span>&nbsp;New Date</button>
+					      </form>
+					    </div>
+					    <div class="inline rightAllign" style="float: right;">
 						     <ul ng-repeat="requestedDay in employee.requestedOff track by $index">
 						         <li>
 						           <form>
@@ -132,12 +138,6 @@
 						         </li>
 						     </ul>
 					     </div>
-					     <div ng-if="manager" class="inline rightAlign" style="float: right;">
-							  <form ng-submit="addAbsence(newDate)">
-						           <input style="font-size: 25px" type="date" ng-model="newDate" placeholder="Date" ng-required/>
-						           <a href="" style="font-size: 25px" ng-click="addAbsence(employee,newDate)"><span class="glyphicon glyphicon-plus"></span>Add date</a>
-						      </form>
-						  </div>
 					   </div>
 					   
 				    <script type="text/javascript" src="js/page/vacationPage.js"></script>
