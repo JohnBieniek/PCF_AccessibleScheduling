@@ -11,7 +11,7 @@
 					<div ng-repeat="employee in employees">
 						<div class = "employeeTab" ng-class="{ active: isEmployeeSet(employee) }">
 					    	<div>
-					       		<p ng-click="setEmployee(employee)">{{employee.first}} {{employee.initial}}</p>
+					       		<p ng-click="setEmployeeAndInfo(employee)">{{employee.first}} {{employee.initial}}</p>
 					    	</div>
 				    	</div>
 			    	</div>
@@ -31,22 +31,22 @@
 			<div style="width:100%;text-align: center;">
 				<div style="display:inline-block" class = "employeeRecTab" ng-class="{ active: isSet('Schedule') }">
 			    	<div >
-			       		<p ng-click="setTab('Schedule')">Schedule</p>
+			       		<p ng-click="setEmployeeTab('Schedule')">Schedule</p>
 			    	</div>
 		    	</div>
 		    	<div style="display:inline-block;" class = "employeeRecTab" ng-class="{ active: isSet('Availability') }">
 			    	<div >
-			       		<p ng-click="setTab('Availability')">Availability</p>
+			       		<p ng-click="setEmployeeTab('Availability')">Availability</p>
 			    	</div>
 		    	</div>
 		    	<div style="display:inline-block;" class = "employeeRecTab" ng-class="{ active: isSet('Requests') }">
 			    	<div >
-			       		<p ng-click="setTab('Requests')">Requests</p>
+			       		<p ng-click="setEmployeeTab('Requests')">Requests</p>
 			    	</div>
 		    	</div>
 		    	<div ng-if="manager" style="display:inline-block;" class = "employeeRecTab" ng-class="{ active: isSet('Details') }">
 			    	<div >
-			       		<p ng-click="setTab('Details')">Details</p>
+			       		<p ng-click="setEmployeeTab('Details')">Details</p>
 			    	</div>
 		    	</div>
 	    	</div>

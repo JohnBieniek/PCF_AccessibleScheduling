@@ -41,12 +41,12 @@ function LoginController($scope, $modal, $http,Status) {
 	    
 	    var xhr = new XMLHttpRequest();
 	    xhr.open('POST', 'https://accessiblescheduling-dev.cfapps.io/auth/tokensignin');
+//	    xhr.open('POST', 'https://accessiblescheduling.cfapps.io/auth/tokensignin');
 	    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 	    xhr.onload = function() {
 	        console.log('Signed in: ');
 	        console.log( xhr.responseText);
 	        $scope.setProfile(JSON.parse(xhr.responseText));
-	        $scope.$apply();
 	        $scope.setUser($scope.profile.user);
 	        $scope.setManager($scope.profile.manager);
 	        $scope.setAdmin($scope.profile.admin);

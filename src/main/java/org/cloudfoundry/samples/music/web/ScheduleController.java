@@ -141,28 +141,21 @@ public class ScheduleController {
     			throw new AuthenticationException();
     		}
     	}
+    	
     	Date maxMonthDate= new Date();
     	int maxMonth= maxMonthDate.getMonth()+1;
     	if(maxMonth>11) {
     		maxMonth=1;
     	}
+    	
     	ArrayList<Shift> shifts = (ArrayList<Shift>) manager.getEmployeeShiftsForWeek(employeeId,month,day,year);
     	ArrayList<Shift> returnValue = new ArrayList<Shift>();
+    	
     	if(null!=shifts && !shifts.isEmpty()) {
-	    	System.out.println("shifts found");
 	    	if(!auth.isAdmin() && !auth.isManager()) {
-	    		System.out.println("filteringShifts");
 		    	for(Shift shift: shifts) {
-		    		System.out.println(shift.toString());
-		    		System.out.println("startMonht:"+shift.getStartMonth());
-		    		System.out.println("maxMonnth:"+maxMonth);
-		    		System.out.println("shift.getStartMonth()<maxMonth:"+(shift.getStartMonth()<=maxMonth));
 		    		if(shift.getStartMonth()<=maxMonth) {
-		    			System.out.println("shift retained");
 		    			returnValue.add(shift);
-		    		}
-		    		else {
-		    			System.out.println("shift removed");
 		    		}
 		    	}
 	    	}

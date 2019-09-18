@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import accessiblesolutions.accessiblescheduling.constants.Constants;
@@ -69,13 +70,25 @@ public class EmployeeController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public Employee update(@RequestHeader(value="Authorization", required=false) String idToken, @RequestBody @Valid Employee employee) throws AuthenticationException {
+    public Employee update(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam String param) throws AuthenticationException {
     	securityManager.authorize(idToken, Constants.MANAGER);
-        logger.info("Updating employee " + employee.getId());
-        employee.fixInvalidAvailability();
+    	
+    	Employee employee=null;
+
+    	ObjectMapper mapper = new ObjectMapper();
+    	
+    	try {
+			employee= mapper.readValue(param, Employee.class);
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+    	logger.info(employee.toString());
         return repository.save(employee);
     }
-
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public Employee getById(@RequestHeader(value="Authorization", required=false) String idToken, @PathVariable String id) throws AuthenticationException {
     	CallAuth auth = securityManager.authorize(idToken, Constants.USER);

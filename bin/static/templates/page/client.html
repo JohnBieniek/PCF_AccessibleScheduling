@@ -7,11 +7,11 @@
 			       		<p ng-click="newClient()"><span class="glyphicon glyphicon-plus" style="position:static !important"></span>&nbsp;New Client</p>
 			    	</div>
 		    	</div>
-				<div style="overflow-y:auto;height:80vh" class="monthSelector">
-					<div ng-repeat="client in clients" ng-init="setClient(clients[0])">
+				<div style="overflow-y:auto;height:80vh" class="monthSelector" ng-init="init()">
+					<div ng-repeat="client in clients">
 						<div class = "clientTab" ng-class="{ active: isClientSet(client) }">
 					    	<div>
-					       		<p ng-click="setClient(client)">{{client.first}} {{client.initial}}</p>
+					       		<p ng-click="setClientAndInfo(client)">{{client.first}} {{client.initial}}</p>
 					    	</div>
 				    	</div>
 			    	</div>
@@ -22,22 +22,22 @@
 			<div style="width:100%;text-align: center;">
 				<div style="display:inline-block" class = "recTab" ng-class="{ active: isSet('Schedule') }">
 			    	<div >
-			       		<p ng-click="setTab('Schedule')">Schedule</p>
+			       		<p ng-click="setTabAndInfo('Schedule')">Schedule</p>
 			    	</div>
 		    	</div>
 		    	<div style="display:inline-block;" class = "recTab" ng-class="{ active: isSet('Requests') }">
 			    	<div >
-			       		<p ng-click="setTab('Requests')">Requests</p>
+			       		<p ng-click="setTabAndInfo('Requests')">Requests</p>
 			    	</div>
 		    	</div>
 		    	<div style="display:inline-block;" class = "recTab" ng-class="{ active: isSet('Details') }">
 			    	<div >
-			       		<p ng-click="setTab('Details')">Details</p>
+			       		<p ng-click="setTabAndInfo('Details')">Details</p>
 			    	</div>
 		    	</div>
 	    	</div>
 	    	<br>
-	    	<div ng-if="isSet('Schedule')" style="width:100%">
+	    	<div ng-if="isSet('Schedule')" style="width:100%" ng-init="listShifts()">
 	    		<div>
 	    			<div style="width:100%">
 	    				<div class="inline" style="margin-left:32%;width:40%;text-align: center;">
@@ -68,8 +68,7 @@
    					</div>
 	    		</div>
 	    	</div>
-	    	<div style="overflow-y:auto;" ng-if="isSet('Requests')">
-	    		<!-- <p  class="inline" style="font-size:40px;margin-left:10px"> {{client.first}} {{client.initial}}</p>-->
+	    	<div style="overflow-y:auto;" ng-if="isSet('Requests')" ng-init="listRequests(client)">
  	    		<h2 class ="inline" style="font-size:40px;font-weight:bold;margin-left:10px;color:#729fcf!important;"> Existing Requests</h2>
 	    		<button  class="inline rightAlign" style="font-size:30px;float:right; margin-right:20px;margin-top:20px;background-color:#b1f0a1;" ng-click="addRequest(client,employees)"><span class="glyphicon glyphicon-plus"></span>&nbsp;New Request</button>
 				<div ng-repeat="request in requests">

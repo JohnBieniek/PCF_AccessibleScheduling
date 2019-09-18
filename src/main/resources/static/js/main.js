@@ -1,49 +1,4 @@
 angular.module('mainNavigation', ['ngResource', 'ui.bootstrap']).
-    factory('Clients', function ($resource) {
-        return $resource('clients');
-    }).
-    factory('Client', function ($resource) {
-        return $resource('clients/:id', {id: '@id'});
-    }).
-    factory('Events', function ($resource) {
-	    return $resource('events');
-	}).
-	factory('Event', function ($resource) {
-	    return $resource('events/:id', {id: '@id'});
-	}).
-    factory('Employees', function ($resource) {
-        return $resource('employees');
-    }).
-    factory('Employee', function ($resource) {
-        return $resource('employees/:id', {id: '@id'});
-    }).
-    factory('CustomFields', function ($resource) {
-        return $resource('customFields');
-    }).
-    factory('CustomField', function ($resource) {
-        return $resource('customFields/:id', {id: '@id'});
-    }).
-    factory('Shifts', function ($resource) {
-        return $resource('shifts');
-    }).
-    factory('Shift', function ($resource) {
-        return $resource('shifts/:id', {id: '@id'});
-    }).
-    factory('Compatibility', function ($resource) {
-        return $resource('compatibility');
-    }).
-    factory('RecurringShiftNeeds', function ($resource) {
-        return $resource('recurringShiftNeeds');
-    }).
-    factory('RecurringShiftNeed', function ($resource) {
-        return $resource('recurringShiftNeeds/:id', {id: '@id'});
-    }).
-    factory('ShiftRequests', function ($resource) {
-        return $resource('shiftRequests');
-    }).
-    factory('ShiftRequest', function ($resource) {
-        return $resource('shiftRequests/:id', {id: '@id'});
-    }).
     factory("EditorStatus", function () {
         var editorEnabled = {};
 
@@ -70,17 +25,25 @@ function MainNavigationController($scope, $modal, $http, Status) {
 	 $scope.init = function() {
         $scope.setPage("login");
         $scope.sortDescending = false;
-        console.log("nulling profile");
         $scope.profile = null;
         $scope.idToken = null;
         $scope.user=false;
         $scope.manager=false;
         $scope.admin=false;
- 
-        $scope.selectedMonth=1;
-	   	$scope.selectedYear=2019;
-	   	$scope.sortField="startDate";
-	   	$scope.selectedWeek=null;
+        $scope.lastShiftUpdate=null;
+        $scope.lastClientUpdate=null;
+        $scope.lastCustomFieldUpdate = null;
+        
+        if($scope.week==undefined || $scope.week ==null){
+			 $scope.week = new Date();
+		}
+        
+        $scope.monthTab=$scope.week.getMonth()+2;
+
+		$scope.tab="Schedule";
+		$scope.employeeTab="Schedule";
+        $scope.employee=null;
+        $scope.client=null;
 	   	$scope.assignedFilter=false;
 	   	$scope.unassignedFilter= false;
 	   	$scope.clientFilter = false;
@@ -91,8 +54,6 @@ function MainNavigationController($scope, $modal, $http, Status) {
    	 	$scope.selectedClient= false;//Used by clientList.html to select a client for scheduling on scheduling.html
    	 	$scope.selectedEmployee= false;//Used by employeeList.html to select an employee for vacation on vacation.html
    	 	$scope.selectedShift= false;//Used by shiftList.html to select a shift for assignment on shift.html
-   	 	$scope.multiTableEditing=false;//Have I fixed in table editing? No
-   	 	$scope.customFieldDataEditing=true;//TODO factor out this flag
 	 };
 	 
 	 $scope.loggedIn = function loggedIn() {
@@ -110,17 +71,48 @@ function MainNavigationController($scope, $modal, $http, Status) {
 		 $scope.user=false;
 		 $scope.idToken=null;
 		 $scope.profile=null;
-		  console.log("called sign out");
-	    var auth2 = gapi.auth2.getAuthInstance();
-	    auth2.signOut().then(function () {
-	      console.log('User signed out.');
-	    });
+		 $scope.employee=null;
+		 $scope.tab="Schedule";
+		 $scope.employeeTab="Schedule";
+	    
+		 var auth2 = gapi.auth2.getAuthInstance();
+	     auth2.signOut().then(function () {});
 	  }
-//	 window.signOut=signOut;
 	 
+	 $scope.setLastShiftUpdate = function (time){
+		 $scope.lastShiftUpdate = time;
+	 }
+	 $scope.setLastEmployeeUpdate = function (time){
+		 $scope.lastEmployeeUpdate = time;
+	 }
+	 $scope.setLastClientUpdate = function (time){
+		 $scope.lastClientUpdate = time;
+	 }
+	 $scope.setClient = function (client){
+		 $scope.client = client;
+		 $scope.$apply();
+	 }
+	 $scope.setMonthTab = function(monthTab){
+		 $scope.monthTab = monthTab;
+	 }
+	 $scope.setTab = function(newTab){
+	      $scope.tab = newTab;
+	 }
+	 $scope.setEmployeeTab = function(newTab){
+	      $scope.employeeTab = newTab;
+	 }
+	 
+	 $scope.setEmployee = function(employee){
+		 console.log("updatedEmployee");
+		 console.log(employee);
+		 $scope.employee=employee;
+	 }
 	 $scope.changeSortOrder = function(){
 		 $scope.sortDescending = !$scope.sortDescending;
 	 }
+	 $scope.setWeek = function (isWeek) {
+        $scope.week = isWeek;
+     };
 	 $scope.setIdToken = function (idToken) {
 	        $scope.idToken = idToken;
 	    };
@@ -137,7 +129,6 @@ function MainNavigationController($scope, $modal, $http, Status) {
 	        $scope.admin = isAdmin;
 	    };
     $scope.setPage = function (viewName) {
-    	console.log("Setting page to:"+viewName);
         $scope.page = "templates/page/" + viewName + ".html";
     };
     $scope.setSortField = function(sortField){

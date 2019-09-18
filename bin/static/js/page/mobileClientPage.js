@@ -22,8 +22,6 @@ angular.module('client', ['ngResource', 'ui.bootstrap']).
     });
 
 function MobileClientController($scope, $modal, $http, Status) {
-	$scope.multiTableEditing=false;
-	$scope.month=1;
 	$scope.allowOvertime=false;
 	$scope.allowUnavailable=false;
 	$scope.prioritizeSecondShift=false;
@@ -33,25 +31,13 @@ function MobileClientController($scope, $modal, $http, Status) {
 	$scope.generatedBool = false;
 	$scope.generated="Generated";
 	$scope.assigned="Unassigned";
-	$scope.tab="Schedule";
 	$scope.monthName="January";
-	$scope.statusList=[];
 	$scope.customValue=[];
 	$scope.unscheduled=0;
 	$scope.scheduled=0;
 	$scope.selectedInterval="day(s)";
 	$scope.detailsChanged=false;
-	$scope.customFieldDateEditing=true;
 	$scope.days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-	 
-	if($scope.week==undefined || $scope.week ==null){
-		 $scope.week = new Date();
-	}
-
-	
-	$scope.setTab = function(newTab){
-		$scope.tab = newTab;
-	} 
 	
 	$scope.getClientCustomFieldData = function (client,customField,index){
      	$http({
@@ -72,20 +58,26 @@ function MobileClientController($scope, $modal, $http, Status) {
         });
     }
 	
-	$scope.setClient = function(newClient){
+	$scope.setTabAndInfo = function(newTab){
+        $scope.setTab(newTab);
+		$scope.listShifts();
+	}
+	
+	$scope.setClientAndInfo = function(newClient){
 	  $scope.detailsChanged=false;
-	  
-      $scope.client = newClient;
+	  console.log("setting clinet and info");
+      $scope.setClient(newClient);
       
       $scope.listRequests(newClient);
       
       $scope.listShifts();
-      
+
       if($scope.client!=null && $scope.customFields !=null){
 	      for(var index = 0; index<$scope.customFields.length;index++){
 		      $scope.getClientCustomFieldData($scope.client,$scope.customFields[index],index);
 	      }
       }
+      $scope.listClients();
 	}
 	
 	 $scope.listCustomFields = function listCustomFields() {
@@ -124,7 +116,7 @@ function MobileClientController($scope, $modal, $http, Status) {
 	}
      
     $scope.decrementWeek = function(){
-    	 $scope.week = $scope.week.addDays(-7);
+    	$scope.setWeek($scope.week.addDays(-7));
     	 
     	 $scope.getDisplayWeek();
     	 
@@ -132,7 +124,7 @@ function MobileClientController($scope, $modal, $http, Status) {
     }
      
     $scope.incrementWeek = function(){
-    	 $scope.week = $scope.week.addDays(7);
+    	$scope.setWeek($scope.week.addDays(7));
     	 
     	 $scope.getDisplayWeek();
     	 
@@ -271,11 +263,7 @@ function MobileClientController($scope, $modal, $http, Status) {
     function clone (obj) {
     	return JSON.parse(JSON.stringify(obj));
     }
-    
-	 $scope.setMonth = function setMonth(month) {
-		 $scope.month = month;
-	 }
-	 
+ 
 	 $scope.setInitialDays = function setInitialDays(request){
 		 if(request.days==null || request.days==undefined){
 			 request.days=[false,false,false,false,false,false,false];
@@ -419,7 +407,7 @@ function MobileClientController($scope, $modal, $http, Status) {
 	    	$scope.clients=response.data;
 	    	
 	        if($scope.client==null){
-	        	$scope.client = $scope.clients[0];
+	        	$scope.setClientAndInfo($scope.clients[0]);
 	        }
 	        $scope.listEmployees();
 	    });
@@ -934,5 +922,9 @@ function MobileClientController($scope, $modal, $http, Status) {
         		$scope.setClient(response.data);
         	}
         });
+    }
+    
+    $scope.init = function(){
+    	//$scope.listClients();
     }
 }
