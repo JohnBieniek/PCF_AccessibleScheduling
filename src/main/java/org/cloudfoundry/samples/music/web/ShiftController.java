@@ -3,9 +3,11 @@ package org.cloudfoundry.samples.music.web;
 import java.io.IOException;
 import java.util.List;
 
+import javax.security.sasl.AuthenticationException;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.cloudfoundry.samples.music.managers.AccessibleSecurityManager;
 import org.cloudfoundry.samples.music.managers.ScheduleManager;
 import org.cloudfoundry.samples.music.managers.ShiftManager;
 import org.slf4j.Logger;
@@ -17,11 +19,16 @@ import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.databind.Obj
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import accessiblesolutions.accessiblescheduling.constants.Constants;
+import accessiblesolutions.accessiblescheduling.domain.CallAuth;
+import accessiblesolutions.accessiblescheduling.domain.CustomField;
 import accessiblesolutions.accessiblescheduling.domain.Shift;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 
@@ -30,6 +37,9 @@ import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 public class ShiftController {
     private static final Logger logger = LoggerFactory.getLogger(ShiftController.class);
     
+	@Autowired 
+	AccessibleSecurityManager securityManager;
+	
     @Autowired
 	ScheduleManager manager;
     
@@ -44,14 +54,16 @@ public class ShiftController {
     }
     
     @RequestMapping(value = "/set", method = RequestMethod.POST)
-    public List<Shift> set(@RequestBody List<Shift> shifts) {
+    public List<Shift> set(@RequestHeader(value="Authorization", required=false) String idToken,@RequestBody List<Shift> shifts) {
     	repository.save(shifts);
     	
     	return shifts;
     }
     
     @RequestMapping(method = RequestMethod.POST, value= "/validity")
-    public @ResponseBody boolean getValidity(HttpServletRequest request) throws CorruptDataException{
+    public @ResponseBody boolean getValidity(@RequestHeader(value="Authorization", required=false) String idToken, HttpServletRequest request) throws CorruptDataException, AuthenticationException{
+    	securityManager.authorize(idToken, Constants.MANAGER);
+    	
     	Shift shift =null;
 
     	String param= request.getParameter("shift");
@@ -73,7 +85,9 @@ public class ShiftController {
     }
 
     @RequestMapping(method = RequestMethod.POST, value= "/duration")
-    public @ResponseBody float getDuration(HttpServletRequest request) throws CorruptDataException{
+    public @ResponseBody float getDuration(@RequestHeader(value="Authorization", required=false) String idToken,HttpServletRequest request) throws CorruptDataException, AuthenticationException{
+    	securityManager.authorize(idToken, Constants.MANAGER);
+    	
     	Shift shift =null;
 
     	String param= request.getParameter("shift");
@@ -96,13 +110,17 @@ public class ShiftController {
     
     
     @RequestMapping(method = RequestMethod.GET)
-    public Iterable<Shift> shifts() {
+    public Iterable<Shift> shifts(@RequestHeader(value="Authorization", required=false) String idToken) throws AuthenticationException {
+    	securityManager.authorize(idToken, Constants.ADMIN);
+    	
         return repository.findAll();
     }
 
     @RequestMapping(method = RequestMethod.PUT)
-    public Shift add(@RequestBody @Valid Shift shift) {
-        logger.info("Adding shift " + shift.getId());
+    public Shift add(@RequestHeader(value="Authorization", required=false) String idToken,@RequestBody @Valid Shift shift) throws AuthenticationException {
+    	securityManager.authorize(idToken, Constants.MANAGER);
+    	
+    	logger.info("Adding shift " + shift.getId());
         
         if(shift.getStartMonth()==0){
             shift.setStartMonth((int) Integer.parseInt(shift.getStartDate().split("-")[1]));
@@ -116,7 +134,23 @@ public class ShiftController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public Shift update(@RequestBody @Valid Shift shift) {
+    public Shift update(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam String param) throws AuthenticationException {
+    	securityManager.authorize(idToken, Constants.MANAGER);
+    	
+    	Shift shift=null;
+
+    	ObjectMapper mapper = new ObjectMapper();
+    	
+    	try {
+			shift= mapper.readValue(param, Shift.class);
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+    	
         logger.info("Updating shift " + shift.getId());
         
         if(shift.getStartMonth()==0){
@@ -131,13 +165,23 @@ public class ShiftController {
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public Shift getById(@PathVariable String id) {
+    public Shift getById(@RequestHeader(value="Authorization", required=false) String idToken,@PathVariable String id) throws AuthenticationException {
+    	CallAuth auth = securityManager.authorize(idToken, Constants.USER);
+    	
+    	Shift shift = repository.findOne(id);
+    	if(!auth.getEmployeeId().equalsIgnoreCase(shift.getStaffId())) {
+    		if(!auth.isAdmin() && !auth.isManager()) {
+    			throw new AuthenticationException();
+    		}
+    	}
         logger.info("Getting shift " + id);
-        return repository.findOne(id);
+        
+        return shift;
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    public void deleteById(@PathVariable String id) {
+    public void deleteById(@RequestHeader(value="Authorization", required=false) String idToken, @PathVariable String id) throws AuthenticationException {
+    	securityManager.authorize(idToken, Constants.ADMIN);
         logger.info("Deleting shift " + id);
         repository.delete(id);
     }

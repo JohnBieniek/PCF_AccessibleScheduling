@@ -41,6 +41,17 @@ sourceSets {
     }
 }
 dependencies {// https://mvnrepository.com/artifact/javax.persistence/persistence-api
+	// https://mvnrepository.com/artifact/io.springfox/springfox-swagger2
+	compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
+
+ compile 'com.google.api-client:google-api-client:1.30.2'//signin
+ // Dependency for Google Sign-In
+
+    // Dependencies for the REST API example
+    compile 'com.google.api-client:google-api-client:1.22.0'
+    compile 'com.google.api-client:google-api-client-android:1.22.0'
+    compile 'com.google.apis:google-api-services-people:v1-rev139-1.22.0'
+ 
 compile group: 'javax.persistence', name: 'persistence-api', version: '1.0'
 
 compile group: 'org.codehaus.jackson', name: 'jackson-mapper-asl', version: '1.9.13'

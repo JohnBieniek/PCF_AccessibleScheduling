@@ -1,16 +1,21 @@
 package accessiblesolutions.accessiblescheduling.domain;
 
+import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import java.time.DayOfWeek;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
@@ -44,6 +49,20 @@ public class Employee implements Comparable{
 		this.days = days;
 	}
 	
+	public JSONObject userSafeEmployeeData() throws JSONException {
+		JSONObject json = new JSONObject();
+		
+		json.append("id", getId());
+		json.append("first", getFirst());
+		json.append("initial", getInitial());
+		json.append("requestedOff", getRequestedOff());
+		json.append("startTimes", getStartTimes());
+		json.append("endTimes", getEndTimes());
+		json.append("days", getDays());
+		
+		return json;
+	}
+	
 	public Availability getAvailability(int index) {
 		Availability availability = new Availability();
 		System.out.println("get availability for day:"+getDays()[index]);
@@ -62,11 +81,15 @@ public class Employee implements Comparable{
 	@GeneratedValue(generator = "randomId")
 	@GenericGenerator(name = "randomId", strategy = "org.cloudfoundry.samples.music.domain.RandomIdGenerator")
 	private String id;
+	private String userId;
+	private boolean manager;
+	private boolean admin;
+	private String role;
 	private String first;
 	private String initial;
 	private String hireDate;
 	private String gender;
-
+	
 	public String compatibile;// For proccessing only, needs refactored out
 
 	private boolean noCats;
@@ -340,7 +363,55 @@ public class Employee implements Comparable{
 		this.smoker = smoker;
 	}
 
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
+	public boolean isManager() {
+		return manager;
+	}
+
+	public void setManager(boolean manager) {
+		this.manager = manager;
+	}
+
+	public boolean isAdmin() {
+		return admin;
+	}
+
+	public void setAdmin(boolean admin) {
+		this.admin = admin;
+	}
+
+	public String getRole() {
+		return role;
+	}
+
+	public void setRole(String role) {
+		this.role = role;
+	}
+
+	public String getCompatibile() {
+		return compatibile;
+	}
+
+	public void setCompatibile(String compatibile) {
+		this.compatibile = compatibile;
+	}
+
+	@Override
 	public String toString() {
-		return getFirst() + " " + getInitial() + " id:" + getId();
+		return "Employee [id=" + id + ", userId=" + userId + ", manager=" + manager + ", admin=" + admin + ", role="
+				+ role + ", first=" + first + ", initial=" + initial + ", hireDate=" + hireDate + ", gender=" + gender
+				+ ", compatibile=" + compatibile + ", noCats=" + noCats + ", smoker=" + smoker + ", signing=" + signing
+				+ ", medPassCertified=" + medPassCertified + ", inactive=" + inactive + ", offAlternateWeekends="
+				+ offAlternateWeekends + ", requestsExtraShifts=" + requestsExtraShifts + ", fixedSchedule="
+				+ fixedSchedule + ", minHours=" + minHours + ", maxHours=" + maxHours + ", requestedOff="
+				+ Arrays.toString(requestedOff) + ", startTimes=" + Arrays.toString(startTimes) + ", endTimes="
+				+ Arrays.toString(endTimes) + ", days=" + Arrays.toString(days) + "]";
 	}
 }

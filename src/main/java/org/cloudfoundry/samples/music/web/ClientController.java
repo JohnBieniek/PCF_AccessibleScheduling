@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
+import javax.security.sasl.AuthenticationException;
 import javax.validation.Valid;
 
+import org.cloudfoundry.samples.music.managers.AccessibleSecurityManager;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoCustomFieldDataRepository;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoShiftRepository;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoShiftRequestRepository;
@@ -21,10 +23,12 @@ import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.databind.Obj
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import accessiblesolutions.accessiblescheduling.constants.Constants;
 import accessiblesolutions.accessiblescheduling.domain.Client;
 import accessiblesolutions.accessiblescheduling.domain.CustomFieldData;
 import accessiblesolutions.accessiblescheduling.domain.Shift;
@@ -33,10 +37,16 @@ import accessiblesolutions.accessiblescheduling.domain.ShiftRequest;
 @RestController
 @RequestMapping(value = "/clients")
 public class ClientController {
+	@Autowired 
+	AccessibleSecurityManager securityManager;
+	
     private static final Logger logger = LoggerFactory.getLogger(ClientController.class);
     private CrudRepository<Client, String> repository;
+    @Autowired
     private MongoShiftRepository shiftRepository;
+    @Autowired
     private MongoShiftRequestRepository requestRepository;
+    @Autowired
     private MongoCustomFieldDataRepository customDataRepository;
 
     @Autowired
@@ -45,32 +55,38 @@ public class ClientController {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public Iterable<Client> clients() {
+    public Iterable<Client> clients(@RequestHeader(value="Authorization", required=false) String idToken) throws AuthenticationException {
+    	securityManager.authorize(idToken, Constants.MANAGER);
+    	
     	List<Client> clients = (List<Client>) repository.findAll();
         Collections.sort(clients);
 		return clients;
     }
 
     @RequestMapping(method = RequestMethod.PUT)
-    public Client add(@RequestBody @Valid Client client) {
+    public Client add(@RequestHeader(value="Authorization", required=false) String idToken, @RequestBody @Valid Client client) throws AuthenticationException {
+    	securityManager.authorize(idToken, Constants.MANAGER);
         logger.info("Adding client " + client.getId());
         return repository.save(client);
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public Client update(@RequestBody @Valid Client client) {
+    public Client update(@RequestHeader(value="Authorization", required=false) String idToken, @RequestBody @Valid Client client) throws AuthenticationException {
+    	securityManager.authorize(idToken, Constants.MANAGER);
         logger.info("Updating client " + client.getId());
         return repository.save(client);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public Client getById(@PathVariable String id) {
+    public Client getById(@RequestHeader(value="Authorization", required=false) String idToken, @PathVariable String id) throws AuthenticationException {
+    	securityManager.authorize(idToken, Constants.MANAGER);
         logger.info("Getting client " + id);
         return repository.findOne(id);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    public List<Client> deleteById(@PathVariable String id) {
+    public List<Client> deleteById(@RequestHeader(value="Authorization", required=false) String idToken, @PathVariable String id) throws AuthenticationException {
+    	securityManager.authorize(idToken, Constants.MANAGER);
         logger.info("Deleting client " + id);
         repository.delete(id);
     	List<Client> clients = (List<Client>) repository.findAll();
@@ -95,7 +111,8 @@ public class ClientController {
     }
     
     @RequestMapping(value = "/set", method = RequestMethod.POST)
-    public String set(@RequestBody String json) {
+    public String set(@RequestHeader(value="Authorization", required=false) String idToken, @RequestBody String json) throws AuthenticationException {
+    	securityManager.authorize(idToken, Constants.ADMIN);
     	try {
 			JSONArray jsonArray = new JSONArray(json);
 
@@ -119,7 +136,6 @@ public class ClientController {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-    	
     	
     	return json;
     }

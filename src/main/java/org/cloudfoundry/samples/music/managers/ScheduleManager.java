@@ -64,8 +64,15 @@ public class ScheduleManager {
 		
 		Iterable<Shift> firstMonthsShifts = shiftCrud.findByStartMonthAndStaffId(weekStart.getMonthValue(),employeeId);
 		Iterable<Shift> secondMonthsShifts = null;
+		System.out.println("weekStart"+weekStart.getMonthValue());
+		System.out.println("weekEnd:"+weekEnd.getMonthValue());
 		if(weekStart.getMonthValue()!=weekEnd.getMonthValue()) {
-			secondMonthsShifts = shiftCrud.findByStartMonthAndClientId(weekEnd.getMonthValue(),employeeId);
+			System.out.println("getting second months shifts");
+			
+			secondMonthsShifts = shiftCrud.findByStartMonthAndStaffId(weekEnd.getMonthValue(),employeeId);
+			if(null!=secondMonthsShifts) {
+				System.out.println("shifts found for second month:"+secondMonthsShifts.toString());
+			}
 		}
 		
 		System.out.println("getting shifts starting:"+weekStart.toString()+" and ending:"+weekEnd.toString());

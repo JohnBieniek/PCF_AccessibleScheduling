@@ -9,4 +9,5 @@ import accessiblesolutions.accessiblescheduling.domain.Employee;
 @Repository
 @Profile("mongodb")
 public interface MongoEmployeeRepository extends MongoRepository<Employee, String> {
+	Employee findByUserId(String userId);
 }
