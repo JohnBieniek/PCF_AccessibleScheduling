@@ -71,12 +71,13 @@ function MobileClientController($scope, $modal, $http, Status) {
       $scope.listRequests(newClient);
       
       $scope.listShifts();
-      
+
       if($scope.client!=null && $scope.customFields !=null){
 	      for(var index = 0; index<$scope.customFields.length;index++){
 		      $scope.getClientCustomFieldData($scope.client,$scope.customFields[index],index);
 	      }
       }
+      $scope.listClients();
 	}
 	
 	 $scope.listCustomFields = function listCustomFields() {

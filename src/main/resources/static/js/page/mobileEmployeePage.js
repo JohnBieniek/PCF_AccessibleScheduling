@@ -194,7 +194,7 @@ function MobileEmployeeController($scope, $modal, $http, Status) {
 		      $scope.getEmployeeCustomFieldData($scope.employee,$scope.customFields[index],index);
 	      }
       }
-
+      $scope.listEmployees();
       $scope.listShifts();
 	}
 	
@@ -280,6 +280,8 @@ function MobileEmployeeController($scope, $modal, $http, Status) {
            }
        })
        .then(function (response) {//TODO handle error state
+    	   console.log("updated employee and got");
+    	   console.log(response.data);
     	   $scope.setEmployeeAndInfo(response.data);
        	   employee.id=response.data.id;
            if(employee.customFields){
@@ -295,12 +297,12 @@ function MobileEmployeeController($scope, $modal, $http, Status) {
 	                    params: {
 	                        employee: employee,
 	                        customField: employee.customFields[i],
-	                        value:employee.customValue[i],
+	                        value:employee.customValue[i]
 	                    }
 	                });
 	            }
            }
-           
+           $scope.listEmployees();
            Status.success("Employee saved");
        });
     }
