@@ -96,6 +96,9 @@ html,body
 .green{
 	color: #6EB262;
 }
+.greenBackground{
+	background-color: #6EB262;
+}
 .orange{
 	background-color: #9E2F20;
 	border-color: #9E2F20;

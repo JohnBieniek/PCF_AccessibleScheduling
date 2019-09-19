@@ -4,7 +4,7 @@
 			<ul>
 				<div ng-if="admin" class = "newEmployeeTab">
 			    	<div >
-			       		<p ng-click="newEmployee()"><span class="glyphicon glyphicon-plus" style="position:static !important"></span>&nbsp;New Staff</p>
+			       		<p ng-click="newEmployee()"><span class="glyphicon glyphicon-plus"></span>&nbsp;New Staff</p>
 			    	</div>
 		    	</div>
 				<div style="overflow-y:auto;height:90vh" class="monthSelector">
@@ -86,14 +86,17 @@
 	    	<div ng-if="isSet('Availability')" style="width:100%">
 	    		<div>
 	    			<div style="overflow-y:auto;height:80vh;margin-left:25px;">
-					  <h2 class ="centered">{{employee.first}} {{employee.initial}} is available the following times weekly<h2/>
+					  <h2 class ="centered">{{employee.first}} {{employee.initial}} is available the following times weekly.<h2/>
+  					  <h3 ng-if="manager" class ="centered">Times they are available can be added and removed below.
+  					  										Automated scheduling will only assign them work during these times.
+  					  										However, they can be manually assigned shifts during other times if desired.<h3/>
    						<div ng-repeat="day in days">
    							<br>
 				    		<div ng-if="manager" class='availableWeekDay rightAlign'>
-				    			<span ng-click="addAvailability(day)" class="glyphicon glyphicon-plus">{{day}}</span>
+				    			<span ng-click="addAvailability(day)" class="glyphicon glyphicon-plus green"></span><span style="font-weight:700">{{day}}</span>
 				    		</div>
 				    		<div ng-if="!manager" class='availableWeekDay rightAlign'>
-				    			<span>{{day}}</span>
+				    			<span style="font-weight:700">{{day}}</span>
 				    		</div>
 				    		<br>
 				    		<div ng-repeat="availabilitysDay in employee.days track by $index" style="margin-right:20px">
@@ -114,6 +117,10 @@
 	    		<div style="width:90%;margin-left:5%" ng-controller="VacationController"  ng-init="listEmployees()">	  
 				  <div>
 					  <h2 class ="centered">Days requested off for {{employee.first}} {{employee.initial}}<h2/>
+   					  <h3 ng-if="manager" class ="centered">Times they are unavailable can be added and removed below.
+	  										Automated scheduling will not assign them work during these times.
+	  										However, they can be manually assigned shifts during these times if desired.<h3/>
+ 
 					  </br>
 				  		<div ng-if="manager" class="inline">
 						  <form ng-submit="addAbsence(newDate)">
