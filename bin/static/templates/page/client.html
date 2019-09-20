@@ -4,7 +4,7 @@
 			<ul>
 				<div ng-if="admin" class = "newClientTab">
 			    	<div >
-			       		<p ng-click="newClient()"><span class="glyphicon glyphicon-plus"></span>&nbsp;New Client</p>
+			       		<p ng-click="newClient()"><span class="mycon glyphicon-plus"></span>&nbsp;New Client</p>
 			    	</div>
 		    	</div>
 				<div style="overflow-y:auto;height:80vh" class="monthSelector" ng-init="init()">
@@ -69,7 +69,7 @@
 	    		</div>
 	    	</div>
 	    	<div style="overflow-y:auto;" ng-if="isSet('Requests')" ng-init="listRequests(client)">	    		
-			    <h2 class ="centered">Clients need assistance on a regular basis. Times they need help can be added and removed below.
+			    <h2 class ="centered">Times this client needs help can be added and removed below.
 	  										Automated scheduling will generate shifts based on these requests monthly.<h2/>
  	    		<h3 class ="inline" style="font-size:40px;font-weight:bold;margin-left:10px;color:#729fcf!important;"> Existing Requests</h3>
 	    		<button  class="inline rightAlign" style="font-size:30px;float:right; margin-right:20px;margin-top:20px;background-color:#6EB262;" ng-click="addRequest(client,employees)"><span class="glyphicon glyphicon-plus"></span>&nbsp;New Request</button>

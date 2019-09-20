@@ -489,6 +489,16 @@ html,body
     width: 97%;
 }
 
+.mycon{
+   font-family: 'Glyphicons Halflings';
+   font-style:normal;
+    -webkit-font-smoothing: antialiased;
+}
+.newRequestExceptionButton{
+    background-color: #6EB262;
+    font-size: 23px;
+    text-align: center;
+}
 .newShiftButton{
 	background-color:#6EB262;
 	font-size:30px;

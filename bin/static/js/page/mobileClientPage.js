@@ -621,6 +621,8 @@ function MobileClientController($scope, $modal, $http, Status) {
                }
            })
            .then(function(response) {
+
+           		Status.success("Request saved");
         		$scope.requests = response.data;
            });
       	});
@@ -670,6 +672,8 @@ function MobileClientController($scope, $modal, $http, Status) {
                 }
             })
             .then(function(response) {
+
+            	Status.success("Request saved.");
             	$scope.requests = response.data;
             });
        });
@@ -783,6 +787,7 @@ function MobileClientController($scope, $modal, $http, Status) {
                }
            })
            .then(function(response) {
+        	   	Status.success("Request removed.");
            		$scope.requests = response.data;
            });
 	   }

@@ -85,6 +85,7 @@ function MobileEmployeeController($scope, $modal, $http, Status) {
 			currentEmployee.endTimes.push("16:00");
 			
 	        $scope.saveEmployee(currentEmployee);		
+            setTimeout(Status.clear,3000);
 		}
 	}
 	

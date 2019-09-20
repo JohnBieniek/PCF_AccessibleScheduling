@@ -4,11 +4,13 @@ function RequestModalController($scope, $modalInstance, $http, selectedClient, s
     $scope.selectedClient=selectedClient;
     $scope.selectedEmployee=null;
     $scope.employees=employees;
+    $scope.changed=false;
   
     if(action=="add"){
     	if(undefined==shiftRequest || null==shiftRequest){
     		shiftRequest={};
     	}
+        $scope.changed=true;
     	
     	shiftRequest.interval="day(s)";
     	shiftRequest.monthInterval="days";
@@ -142,6 +144,7 @@ function RequestModalController($scope, $modalInstance, $http, selectedClient, s
     $scope.valid=false;
     
     $scope.addException = function(newDate){
+        $scope.changed=true;
     	if(!$scope.shiftRequest.exceptions){
     		$scope.shiftRequest.exceptions=[];
     	}
@@ -152,6 +155,7 @@ function RequestModalController($scope, $modalInstance, $http, selectedClient, s
     };
     
 	$scope.removeException=function(item){ 
+        $scope.changed=true;
 	    var index= $scope.shiftRequest.exceptions.indexOf(item)
 	     $scope.shiftRequest.exceptions.splice(index,1);     
 	}
@@ -159,7 +163,11 @@ function RequestModalController($scope, $modalInstance, $http, selectedClient, s
 	$scope.requestIsValid = function(shiftRequest){
 		var valid = true;
 		
-		if(null==shiftRequest){
+		
+		if(!$scope.changed){
+			valid=false;
+		}
+		else if(null==shiftRequest){
 			valid=false;
 		}
 		else{
@@ -204,21 +212,28 @@ function RequestModalController($scope, $modalInstance, $http, selectedClient, s
 		return valid;
 	}
 	
+	$scope.setChanged = function(){
+		$scope.changed=true;
+	}
 	$scope.setSelectedInterval2=function(selectedInterval2){
+        $scope.changed=true;
 		$scope.selectedInterval2=selectedInterval2
 	}
 	
 	$scope.setSelectedInterval3=function(selectedInterval3){
+        $scope.changed=true;
 		$scope.selectedInterval3=selectedInterval3
 	}
 
 	
 	$scope.setSelectedMonthInterval=function(selectedMonthInterval){
+        $scope.changed=true;
 		$scope.selectedMonthInterval=selectedMonthInterval
 	}
 	
 	
 	$scope.setMonthInterval=function(monthInterval){
+        $scope.changed=true;
 		$scope.monthInterval=monthInterval
 	}
 	
@@ -235,12 +250,9 @@ function RequestModalController($scope, $modalInstance, $http, selectedClient, s
 	}
 
 	 $scope.setInitialDays = function setInitialDays(request){
-		 console.log("days initial");
-		 console.log(request.days);
 		 if(request.days==null || request.days==undefined){
 			 request.days=[false,false,false,false,false,false,false];
 		 }
-		 console.log(request.days);
 	 }
 	 
     if(!$scope.shiftRequest.clientId){
