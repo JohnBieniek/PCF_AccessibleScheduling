@@ -21,21 +21,26 @@ angular.module('vacation', ['ngResource', 'ui.bootstrap']).
         }
     });
 
-function SchedulingController($scope, $modal, $http, Status) {
-	$scope.allowOvertime=false;
-	$scope.allowUnavailable=false;
-	$scope.prioritizeSecondShift=false;
-	$scope.useDailyMax=true;
-	$scope.useWeeklyMax=true;
-	$scope.allowInactive=false;
-	$scope.generatedBool = false;
-	$scope.generated="Generated";
-	$scope.assigned="Unassigned";
-	
-	$scope.statusList=[];
-	$scope.unscheduled=0;
-	$scope.scheduled=0;
-	$scope.year=2019;
+function SchedulingController($scope, $modal, $http) {
+	$scope.init = function(){
+		$scope.allowOvertime=false;
+		$scope.allowUnavailable=false;
+		$scope.prioritizeSecondShift=false;
+		$scope.useDailyMax=true;
+		$scope.useWeeklyMax=true;
+		$scope.allowInactive=false;
+		$scope.generatedBool = false;
+		$scope.generated="Generated";
+		$scope.assigned="Unassigned";
+		
+		$scope.statusList=[];
+		$scope.unscheduled=0;
+		$scope.scheduled=0;
+		$scope.year=2019;
+		$scope.setScheduleTab($scope.monthTab);
+		$scope.listStatusItems();
+	  	$scope.total= +$scope.scheduled + +$scope.unscheduled;
+	}
 	 
 	$scope.setScheduleTab = function(newTab){
 	if($scope.statusList && $scope.statusList[$scope.monthTab-1])$scope.generatedBool = $scope.statusList[$scope.monthTab-1].generated;
@@ -43,19 +48,14 @@ function SchedulingController($scope, $modal, $http, Status) {
       
       $scope.getUnscheduled(newTab);
       $scope.getScheduled(newTab);
+  	  $scope.total= +$scope.scheduled + +$scope.unscheduled;
       
       if($scope.statusList && $scope.statusList[$scope.monthTab-1] && $scope.statusList[$scope.monthTab-1].generated){
     	  $scope.generated="Generated";
       }
-      else{
-    	  $scope.generated="Ungenerated";
-      }
       
       if($scope.statusList && $scope.statusList[$scope.monthTab-1] && $scope.statusList[$scope.monthTab-1].assigned){
     	  $scope.assigned="Assigned";
-      }
-      else {
-    	  $scope.assigned="Unassigned";
       }
       
       if($scope.statusList && $scope.statusList[$scope.monthTab-1] && $scope.statusList[$scope.monthTab-1].assigning){
@@ -275,6 +275,7 @@ function SchedulingController($scope, $modal, $http, Status) {
         })
         .then(function(response) {
         	$scope.scheduled=response.data;
+        	$scope.total= +$scope.scheduled + +$scope.unscheduled;
         });
     }
     
@@ -292,6 +293,7 @@ function SchedulingController($scope, $modal, $http, Status) {
         })
         .then(function(response) {
         	$scope.unscheduled=response.data;
+        	$scope.total= +$scope.scheduled + +$scope.unscheduled;
         });
     }
     

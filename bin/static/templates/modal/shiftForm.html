@@ -51,7 +51,9 @@
     </form>
 </div>
 <div class="modal-footer">
-    <button class="assignButton" ng-class="{ disabledButton: isAssignDisabled(shift) }" ng-click="assign(shift)">Assign</button>
-    <button id="ok" class="btn btn-primary btn-md" ng-show="valid" ng-click="ok()">OK</button>
-    <button class="btn btn-warning btn-md active" ng-click="cancel()">Cancel</button>
+    <button class="okEmployeeButton" ng-class="{ disabledButton: isAssignDisabled(shift) }" ng-click="assign(shift)">Assign</button>
+    <div style="float:right" class="rightAlign">
+	    <button ng-show="valid"  class="rightAlign inline okEmployeeButton" ng-click="ok()" >OK</button>
+	    <button class="rightAlign  inline cancelEmployeeButton" style="margin-left:10px" ng-click="cancel()">Cancel</button>
+	</div>
 </div>

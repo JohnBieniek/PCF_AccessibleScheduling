@@ -1,4 +1,4 @@
-<div ng-if="manager" ng-controller="SchedulingController" ng-init="listStatusItems()">
+<div ng-if="manager" ng-controller="SchedulingController" ng-init="init()">
 	<divstyle="display:inline-block;width:15%">
 	 	<div style="display:inline-block;">
 			<ul>
@@ -78,19 +78,13 @@
 					<label style="font-size:24px">Generate shifts from requests. Assign them to employees.</label>
 				</div>
 				<div style="display:inline-block">
-					<div style="display:inline-block" class = "incomplete" ng-class="{ complete: isGenerated(monthTab) }">
-						<p style="display:inline-block"> <b> {{generated}} </b> </p>
+					<div style="display:inline-block;height:120px" class = "incomplete" ng-class="{ complete: isGenerated(monthTab) }">
+						<p style="font-weight:700">{{generated}}</p>
+						<p style="font-weight:700">{{total}}</p>
 					</div>
-					<div style="display:inline-block;width:120px" class = "completion">
-						<div>
-							<p style="display:inline-block" class="scheduled"> <b> {{scheduled}} </b> </p>
-						</div>
-						<div>
-							<p style="display:inline-block" class="unscheduled"> <b> {{unscheduled}} </b> </p>
-						</div>
-					</div>
-					<div class = "incomplete" style="display:inline-block" ng-class="{ complete: isAssigned(monthTab), working: isAssigning(monthTab) || isStopped(monthTab), errored: isErrored(monthTab) }">
-						<p align="right"   style="display:inline-block"> <b> {{assigned}} </b> </p>
+					<div class = "incomplete" style="display:inline-block;height:120px" ng-class="{ complete: isAssigned(monthTab), working: isAssigning(monthTab) || isStopped(monthTab), errored: isErrored(monthTab) }">
+						<p style="font-weight:700">{{assigned}}</p>
+						<p style="font-weight:700">{{scheduled}} of {{total}}</p>
 					</div>
 				</div>
 					<br>

@@ -21,9 +21,11 @@ angular.module('mainNavigation', ['ngResource', 'ui.bootstrap']).
         }
     });
 
-function MainNavigationController($scope, $modal, $http, Status) {
+function MainNavigationController($scope, $modal, $http) {
 	 $scope.init = function() {
         $scope.setPage("login");
+        $scope.showToast=false;
+        $scope.alertMessage="";
         $scope.sortDescending = false;
         $scope.profile = null;
         $scope.idToken = null;
@@ -79,6 +81,45 @@ function MainNavigationController($scope, $modal, $http, Status) {
 	     auth2.signOut().then(function () {});
 	  }
 	 
+	 $scope.notify = function(message){
+		 $scope.alertMessage=message;
+		 $scope.alertError=false;
+		 $scope.showToast=true;
+		 var d = new Date();
+		 var n = d.getTime();
+		 $scope.lastAlert=n;
+		 setTimeout($scope.autoHideToast,5000);
+	 }
+	 
+	 $scope.warn = function(message){
+		 $scope.alertMessage=message;
+		 $scope.alertError=true;
+		 $scope.showToast=true;
+
+		 var d = new Date();
+		 var n = d.getTime();
+		 $scope.lastAlert=n;
+		 setTimeout($scope.autoHideToast,5000);
+	 }
+	 
+	 $scope.hideToast = function(){
+		 $scope.showToast=false;
+		 $scope.$apply();
+	 }
+	 
+	 $scope.autoHideToast = function(){
+		 var d = new Date();
+		 var n = d.getTime();
+		 var difference = n-$scope.lastAlert;
+		 if(difference>=5000){
+			 $scope.showToast=false;
+			 $scope.$apply();
+		 }
+		 else{
+			 setTimeout($scope.autoHideToast,500);
+		 }
+	 }
+	 
 	 $scope.setLastShiftUpdate = function (time){
 		 $scope.lastShiftUpdate = time;
 	 }
@@ -102,8 +143,6 @@ function MainNavigationController($scope, $modal, $http, Status) {
 	 }
 	 
 	 $scope.setEmployee = function(employee){
-		 console.log("updatedEmployee");
-		 console.log(employee);
 		 $scope.employee=employee;
 	 }
 	 $scope.changeSortOrder = function(){
