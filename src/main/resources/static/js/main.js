@@ -88,7 +88,7 @@ function MainNavigationController($scope, $modal, $http) {
 		 var d = new Date();
 		 var n = d.getTime();
 		 $scope.lastAlert=n;
-		 setTimeout($scope.hideToast,5000);
+		 setTimeout($scope.autoHideToast,5000);
 	 }
 	 
 	 $scope.warn = function(message){
@@ -99,10 +99,15 @@ function MainNavigationController($scope, $modal, $http) {
 		 var d = new Date();
 		 var n = d.getTime();
 		 $scope.lastAlert=n;
-		 setTimeout($scope.hideToast,5000);
+		 setTimeout($scope.autoHideToast,5000);
 	 }
 	 
 	 $scope.hideToast = function(){
+		 $scope.showToast=false;
+		 $scope.$apply();
+	 }
+	 
+	 $scope.autoHideToast = function(){
 		 var d = new Date();
 		 var n = d.getTime();
 		 var difference = n-$scope.lastAlert;
@@ -138,8 +143,6 @@ function MainNavigationController($scope, $modal, $http) {
 	 }
 	 
 	 $scope.setEmployee = function(employee){
-		 console.log("updatedEmployee");
-		 console.log(employee);
 		 $scope.employee=employee;
 	 }
 	 $scope.changeSortOrder = function(){
