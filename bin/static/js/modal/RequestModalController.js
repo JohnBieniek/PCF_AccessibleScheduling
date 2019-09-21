@@ -18,7 +18,6 @@ function RequestModalController($scope, $modalInstance, $http, selectedClient, s
     	shiftRequest.repeatsEvery=1;  
     	shiftRequest.startDate=date.getFullYear()+"-"+((date.getMonth()+1)<10?"0"+(date.getMonth()+1):(date.getMonth()+1))+"-"+date.getDate();
     	shiftRequest.endDate=date.getFullYear()+"-"+((date.getMonth()+1)<10?"0"+(date.getMonth()+1):(date.getMonth()+1))+"-"+date.getDate();
-    	console.log("shiftRequest.startDate"+shiftRequest.startDate);
     	shiftRequest.startTime="12:00";
     	shiftRequest.endTime="20:00";
     }
@@ -34,18 +33,12 @@ function RequestModalController($scope, $modalInstance, $http, selectedClient, s
     $scope.numbers = new Array(52).fill().map((x,i)=>i); 
     $scope.selectedEmployee=$scope.employees[0];
     	if(shiftRequest && shiftRequest.staffId != undefined){
-    		console.log("staffId="+shiftRequest.staffId);
     		for(var index = 0; index<$scope.employees.length;index++){
     			if($scope.employees[index].id==shiftRequest.staffId){
     				$scope.selectedEmployee=$scope.employees[index];
     			}
     		}
     	}
-    		//if()
-        console.log("employees");
-        console.log($scope.employees);
-        console.log("selectedEmployee");
-        console.log($scope.selectedEmployee);
         myCallback(shiftRequest);
     // Will execute myCallback every 5 seconds 
 	var intervalID = setInterval(function(){ myCallback(shiftRequest)}, 500);

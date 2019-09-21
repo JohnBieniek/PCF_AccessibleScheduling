@@ -40,7 +40,7 @@
        	</div>
     </div>
     <div class="row">
-       <div ng-if="showToast" class="alert" ng-class="{'alert-success': !alertError, 'alert-danger': alertError}"">
+       <div  style="margin-bottom:-75px;" ng-if="showToast" ng-click="hideToast()" class="toast centered alert" ng-class="{'alert-success': !alertError, 'alert-danger': alertError}"">
        		<p>{{alertMessage}}</p>
        </div>
     </div>

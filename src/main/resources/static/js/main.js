@@ -85,6 +85,9 @@ function MainNavigationController($scope, $modal, $http) {
 		 $scope.alertMessage=message;
 		 $scope.alertError=false;
 		 $scope.showToast=true;
+		 var d = new Date();
+		 var n = d.getTime();
+		 $scope.lastAlert=n;
 		 setTimeout($scope.hideToast,5000);
 	 }
 	 
@@ -92,13 +95,21 @@ function MainNavigationController($scope, $modal, $http) {
 		 $scope.alertMessage=message;
 		 $scope.alertError=true;
 		 $scope.showToast=true;
+		 $scope.lastAlert=n;
 		 setTimeout($scope.hideToast,5000);
 	 }
 	 
 	 $scope.hideToast = function(){
-		 console.log("set toast:false");
-		 $scope.showToast=false;
-		 $scope.$apply();
+		 var d = new Date();
+		 var n = d.getTime();
+		 var difference = n-$scope.lastAlert;
+		 if(difference>=5000){
+			 $scope.showToast=false;
+			 $scope.$apply();
+		 }
+		 else{
+			 setTimeout($scope.hideToast,500);
+		 }
 	 }
 	 
 	 $scope.setLastShiftUpdate = function (time){

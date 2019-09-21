@@ -41,7 +41,6 @@ function AlertsController($scope, $modal, $http) {
 	            }
 	        })
 	        .then(function(response) {
-	        	console.log(response.data);
 	        	$scope.alerts=response.data;
 	        });
 	    }

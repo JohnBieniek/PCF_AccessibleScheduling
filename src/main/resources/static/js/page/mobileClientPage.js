@@ -65,7 +65,6 @@ function MobileClientController($scope, $modal, $http) {
 	
 	$scope.setClientAndInfo = function(newClient){
 	  $scope.detailsChanged=false;
-	  console.log("setting clinet and info");
       $scope.setClient(newClient);
       
       $scope.listRequests(newClient);

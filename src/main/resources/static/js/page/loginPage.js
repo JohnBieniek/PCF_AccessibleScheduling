@@ -24,35 +24,21 @@ angular.module('login', ['ngResource', 'ui.bootstrap']).
 function LoginController($scope, $modal, $http) {
 	
 	function onSignIn(googleUser) {
-		console.log("$scope.page"+$scope.page);
-	    // Useful data for your client-side scripts:
-//	    console.log("ID: " + profile.getId()); // Don't send this directly to your server!
-//	    console.log('Full Name: ' + profile.getName());
-//	    console.log('Given Name: ' + profile.getGivenName());
-//	    console.log('Family Name: ' + profile.getFamilyName());
-//	    console.log("Image URL: " + profile.getImageUrl());
-//	    console.log("Email: " + profile.getEmail());
-	
 	    // The ID token you need to pass to your backend:
 	    var id_token = googleUser.getAuthResponse().id_token;
 	    $scope.setIdToken(id_token);
 	    $scope.$apply();
-	    //console.log("scope id token: " + $scope.idToken);
 	    
 	    var xhr = new XMLHttpRequest();
 	    xhr.open('POST', 'https://accessiblescheduling-dev.cfapps.io/auth/tokensignin');
 //	    xhr.open('POST', 'https://accessiblescheduling.cfapps.io/auth/tokensignin');
 	    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 	    xhr.onload = function() {
-	        console.log('Signed in: ');
-	        //console.log( xhr.responseText);
 	        $scope.setProfile(JSON.parse(xhr.responseText));
 	        $scope.setUser($scope.profile.user);
 	        $scope.setManager($scope.profile.manager);
 	        $scope.setAdmin($scope.profile.admin);
 		    $scope.$apply();
-		    //console.log("scope.profile.user:"+$scope.profile.user);
-		    //console.log("xhr.responseText.user:"+xhr.responseText.user);
 		    if($scope.profile.user){
 			    $scope.setPage('employee');
 			    $scope.$apply();
@@ -69,8 +55,6 @@ function LoginController($scope, $modal, $http) {
 		            }
 		        })
 		        .then(function(response) {
-		        	console.log("signed up response:");
-		        	//console.log(response);
 		        	if(response.data=="true"){
 		        		$scope.setPage('awaitingAccess');
 		        	}

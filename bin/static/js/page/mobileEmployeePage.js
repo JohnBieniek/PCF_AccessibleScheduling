@@ -73,7 +73,6 @@ function MobileEmployeeController($scope, $modal, $http) {
 			currentEmployee.days.splice(availability,1);
 			currentEmployee.endTimes.splice(availability,1); 
 
-			$scope.setToast(false);
 	        $scope.saveEmployee(currentEmployee);
             //setTimeout($scope.hideToast,3000);
 	    }
@@ -281,8 +280,6 @@ function MobileEmployeeController($scope, $modal, $http) {
            }
        })
        .then(function (response) {//TODO handle error state
-    	   console.log("updated employee and got");
-    	   console.log(response.data);
     	   $scope.setEmployeeAndInfo(response.data);
        	   employee.id=response.data.id;
            if(employee.customFields){
