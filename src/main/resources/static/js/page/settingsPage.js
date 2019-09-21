@@ -21,7 +21,7 @@ angular.module('settings', ['ngResource', 'ui.bootstrap']).
         }
     });
 
-function SettingsController($scope, $modal, $http,Status) {
+function SettingsController($scope, $modal, $http) {
 	 $scope.multiTableEditing=false;
 	 
 	 function clone (obj) {
@@ -41,7 +41,7 @@ function SettingsController($scope, $modal, $http,Status) {
 	           }
 	       })
 	       .then(function (response) {//TODO handle error state
-               Status.success("Custom Field saved");
+               $scope.notify("Custom Field saved");
                
                $scope.listCustomFields();
 	       });
@@ -113,7 +113,7 @@ function SettingsController($scope, $modal, $http,Status) {
             }
         })
         .then(function(response) {
-            Status.success("CustomField deleted");
+            $scope.notify("CustomField deleted");
             
             $scope.listCustomFields();
         });

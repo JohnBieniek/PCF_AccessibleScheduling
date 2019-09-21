@@ -21,7 +21,7 @@ angular.module('login', ['ngResource', 'ui.bootstrap']).
         }
     });
 
-function LoginController($scope, $modal, $http,Status) {
+function LoginController($scope, $modal, $http) {
 	
 	function onSignIn(googleUser) {
 		console.log("$scope.page"+$scope.page);
@@ -45,14 +45,14 @@ function LoginController($scope, $modal, $http,Status) {
 	    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 	    xhr.onload = function() {
 	        console.log('Signed in: ');
-	        console.log( xhr.responseText);
+	        //console.log( xhr.responseText);
 	        $scope.setProfile(JSON.parse(xhr.responseText));
 	        $scope.setUser($scope.profile.user);
 	        $scope.setManager($scope.profile.manager);
 	        $scope.setAdmin($scope.profile.admin);
 		    $scope.$apply();
-		    console.log("scope.profile.user:"+$scope.profile.user);
-		    console.log("xhr.responseText.user:"+xhr.responseText.user);
+		    //console.log("scope.profile.user:"+$scope.profile.user);
+		    //console.log("xhr.responseText.user:"+xhr.responseText.user);
 		    if($scope.profile.user){
 			    $scope.setPage('employee');
 			    $scope.$apply();
@@ -70,7 +70,7 @@ function LoginController($scope, $modal, $http,Status) {
 		        })
 		        .then(function(response) {
 		        	console.log("signed up response:");
-		        	console.log(response);
+		        	//console.log(response);
 		        	if(response.data=="true"){
 		        		$scope.setPage('awaitingAccess');
 		        	}

@@ -40,7 +40,9 @@
        	</div>
     </div>
     <div class="row">
-        <div ng-include src="'templates/util/status.html'"></div>
+       <div ng-if="showToast" class="alert" ng-class="{'alert-success': !alertError, 'alert-danger': alertError}"">
+       		<p>{{alertMessage}}</p>
+       </div>
     </div>
 
     <div class="row multi-columns-row">

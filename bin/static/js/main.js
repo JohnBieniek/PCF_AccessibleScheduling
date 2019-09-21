@@ -21,10 +21,11 @@ angular.module('mainNavigation', ['ngResource', 'ui.bootstrap']).
         }
     });
 
-function MainNavigationController($scope, $modal, $http, Status) {
+function MainNavigationController($scope, $modal, $http) {
 	 $scope.init = function() {
         $scope.setPage("login");
         $scope.showToast=false;
+        $scope.alertMessage="";
         $scope.sortDescending = false;
         $scope.profile = null;
         $scope.idToken = null;
@@ -80,15 +81,24 @@ function MainNavigationController($scope, $modal, $http, Status) {
 	     auth2.signOut().then(function () {});
 	  }
 	 
-	 $scope.setToast = function(boolean){
-		 $scope.showToast=boolean;
-	 }
-	 $scope.showToast = function(){
+	 $scope.notify = function(message){
+		 $scope.alertMessage=message;
+		 $scope.alertError=false;
 		 $scope.showToast=true;
+		 setTimeout($scope.hideToast,5000);
+	 }
+	 
+	 $scope.warn = function(message){
+		 $scope.alertMessage=message;
+		 $scope.alertError=true;
+		 $scope.showToast=true;
+		 setTimeout($scope.hideToast,5000);
 	 }
 	 
 	 $scope.hideToast = function(){
+		 console.log("set toast:false");
 		 $scope.showToast=false;
+		 $scope.$apply();
 	 }
 	 
 	 $scope.setLastShiftUpdate = function (time){

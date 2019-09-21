@@ -21,7 +21,7 @@ angular.module('vacation', ['ngResource', 'ui.bootstrap']).
         }
     });
 
-function SchedulingController($scope, $modal, $http, Status) {
+function SchedulingController($scope, $modal, $http) {
 	$scope.init = function(){
 		$scope.allowOvertime=false;
 		$scope.allowUnavailable=false;
