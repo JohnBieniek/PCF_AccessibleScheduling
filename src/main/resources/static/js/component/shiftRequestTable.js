@@ -30,7 +30,7 @@ angular.module('shiftRequests', ['ngResource', 'ui.bootstrap']).
         }
     });
 
-function ShiftRequestsController($scope, $modal, $http, Requests, Request, Employees, Status) {
+function ShiftRequestsController($scope, $modal, $http, Requests, Request, Employees) {
 	 $scope.multiTableEditing=false;
 	 $scope.sortRequestsField="startDate";
 	 $scope.selectedMonth='02';
@@ -81,11 +81,11 @@ function ShiftRequestsController($scope, $modal, $http, Requests, Request, Emplo
     function saveShiftRequest(shiftRequest) {
         Requests.save(shiftRequest,
             function () {
-                Status.success("Request saved");
+                $scope.notify("Request saved");
                 $scope.listShiftRequests();
             },
             function (result) {
-                Status.error("Error saving shift Request: " + result.status);
+            	$scope.warn("Error saving shift Request: " + result.status);
             }
         );
     }
@@ -127,11 +127,11 @@ function ShiftRequestsController($scope, $modal, $http, Requests, Request, Emplo
     $scope.deleteShiftRequest = function (shiftRequest) {
          Request.delete({id: shiftRequest.id},
              function () {
-                 Status.success("Shift Request deleted");
+        	 	 $scope.notify("Shift Request deleted");
                  $scope.listShiftRequests();
              },
              function (result) {
-                 Status.error("Error deleting shift Request: " + result.status);
+            	 $scope.warn("Error deleting shift Request: " + result.status);
              }
          );
      };

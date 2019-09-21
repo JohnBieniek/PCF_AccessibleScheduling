@@ -116,7 +116,7 @@ function MainNavigationController($scope, $modal, $http) {
 			 $scope.$apply();
 		 }
 		 else{
-			 setTimeout($scope.hideToast,500);
+			 setTimeout($scope.autoHideToast,500);
 		 }
 	 }
 	 
