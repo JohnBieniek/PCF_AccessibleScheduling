@@ -95,6 +95,9 @@ function MainNavigationController($scope, $modal, $http) {
 		 $scope.alertMessage=message;
 		 $scope.alertError=true;
 		 $scope.showToast=true;
+
+		 var d = new Date();
+		 var n = d.getTime();
 		 $scope.lastAlert=n;
 		 setTimeout($scope.hideToast,5000);
 	 }
