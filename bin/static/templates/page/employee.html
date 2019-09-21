@@ -2,12 +2,12 @@
 	<div ng-if="user" style="display:inline-block;width:100%">
 	 	<div ng-if="manager" style="display:inline-block;width:25%">
 			<ul>
-				<div ng-if="admin" class = "newEmployeeTab">
-			    	<div >
+				<div>
+			    	<div ng-if="admin" class = "newEmployeeTab">
 			       		<p ng-click="newEmployee()"><span class="mycon glyphicon-plus"></span>&nbsp;New Staff</p>
 			    	</div>
 		    	</div>
-				<div style="overflow-y:auto;height:90vh" class="monthSelector">
+				<div class="monthSelector">
 					<div ng-repeat="employee in employees">
 						<div class = "employeeTab" ng-class="{ active: isEmployeeSet(employee) }">
 					    	<div>
@@ -68,7 +68,7 @@
 				    		</div>
 			    		</div>
 		    		</div>
-		 			<div style="overflow-y:auto;height:70vh;">
+		 			<div>
    						<div ng-repeat="day in displayDays">
 				    		<h4 class='weekDay rightAlign'>{{day}}</h4>
 				    		<div ng-repeat="shift in shifts">
@@ -85,7 +85,7 @@
 	    	</div>
 	    	<div ng-if="isSet('Availability')" style="width:100%">
 	    		<div>
-	    			<div style="overflow-y:auto;height:80vh;margin-left:25px;">
+	    			<div style="margin-left:25px;">
 					  <h2 class ="centered">{{employee.first}} {{employee.initial}} is available the following times weekly.<h2/>
   					  <h3 ng-if="manager" class ="centered">Times they are available can be added and removed below.
   					  										Automated scheduling will only assign them work during these times.
@@ -113,7 +113,7 @@
 	    		</div>
 	    	</div>
 
-	    	<div overflow-y:auto; ng-if="isSet('Requests')">
+	    	<div ng-if="isSet('Requests')">
 	    		<div style="width:90%;margin-left:5%" ng-controller="VacationController"  ng-init="listEmployees()">	  
 				  <div>
 					  <h2 class ="centered">Days requested off for {{employee.first}} {{employee.initial}}<h2/>
@@ -151,7 +151,7 @@
 				</div>
 	    	</div>
 	    	<div ng-if="isSet('Details')" class = 'rightAlign'>
-	    		<form name="employeeForm" ng-init="listCustomFields()" role="form" style="overflow-y:auto;height:80vh;margin-right:8%">
+	    		<form name="employeeForm" ng-init="listCustomFields()" role="form" style="margin-right:8%">
 			        <div>
 			            <label for="first" class="inline employeeDetails" >First</label>
 			            <input ng-change="setDetailsToChanged()" type="text" class="form-control inline input-large rightAlign nameInput" id="first" name="first" required ng-model="employee.first">

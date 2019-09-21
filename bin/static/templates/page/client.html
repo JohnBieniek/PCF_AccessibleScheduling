@@ -7,7 +7,7 @@
 			       		<p ng-click="newClient()"><span class="mycon glyphicon-plus"></span>&nbsp;New Client</p>
 			    	</div>
 		    	</div>
-				<div style="overflow-y:auto;height:80vh" class="monthSelector" ng-init="init()">
+				<div class="monthSelector" ng-init="init()">
 					<div ng-repeat="client in clients">
 						<div class = "clientTab" ng-class="{ active: isClientSet(client) }">
 					    	<div>
@@ -54,7 +54,7 @@
 			    		</div>
    			    		<button ng-if="manager" class="inline rightAlign newShiftButton" ng-click="addShift(client)"><span class="glyphicon glyphicon-plus"></span>&nbsp;New Shift</button>
 		    		</div>
-		 			<div style="overflow-y:auto;height:70vh;">
+		 			<div>
    						<div ng-repeat="day in displayDays">
 				    		<h4 class='weekDay rightAlign'>{{day}}</h4>
 				    		<div ng-repeat="shift in shifts">
@@ -68,7 +68,7 @@
    					</div>
 	    		</div>
 	    	</div>
-	    	<div style="overflow-y:auto;" ng-if="isSet('Requests')" ng-init="listRequests(client)">	    		
+	    	<div ng-if="isSet('Requests')" ng-init="listRequests(client)">	    		
 			    <h2 class ="centered">Times this client needs help can be added and removed below.
 	  										Automated scheduling will generate shifts based on these requests monthly.<h2/>
  	    		<h3 class ="inline" style="font-size:40px;font-weight:bold;margin-left:10px;color:#729fcf!important;"> Existing Requests</h3>
@@ -81,7 +81,7 @@
 		    	</div>
 	    	</div>
 	    	<div ng-if="isSet('Details')" class = 'rightAlign'>
-	    		<form name="clientForm" ng-init="listCustomFields()" role="form" style="overflow-y:auto;height:80vh;margin-right:3%">
+	    		<form name="clientForm" ng-init="listCustomFields()" role="form" style="margin-right:3%">
 			        <div>
 			            <label for="first" class="inline" style="font-size:38px">First</label>
 			            <input ng-change="setDetailsToChanged()" type="text" class="form-control inline input-large rightAlign nameInput" id="first" name="first" required ng-model="client.first">

@@ -72,8 +72,10 @@ function MobileEmployeeController($scope, $modal, $http, Status) {
 			currentEmployee.startTimes.splice(availability,1);    
 			currentEmployee.days.splice(availability,1);
 			currentEmployee.endTimes.splice(availability,1); 
-	        
+
+			$scope.setToast(true);
 	        $scope.saveEmployee(currentEmployee);
+            setTimeout($scope.hideToast,3000);
 	    }
     }
 	
@@ -83,9 +85,9 @@ function MobileEmployeeController($scope, $modal, $http, Status) {
 			currentEmployee.days.push(day);
 			currentEmployee.startTimes.push("08:00");
 			currentEmployee.endTimes.push("16:00");
-			
+			$scope.showToast();
 	        $scope.saveEmployee(currentEmployee);		
-            setTimeout(Status.clear,3000);
+            setTimeout($scope.hideToast,3000);
 		}
 	}
 	

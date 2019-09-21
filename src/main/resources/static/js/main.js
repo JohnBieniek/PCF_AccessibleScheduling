@@ -24,6 +24,7 @@ angular.module('mainNavigation', ['ngResource', 'ui.bootstrap']).
 function MainNavigationController($scope, $modal, $http, Status) {
 	 $scope.init = function() {
         $scope.setPage("login");
+        $scope.showToast=false;
         $scope.sortDescending = false;
         $scope.profile = null;
         $scope.idToken = null;
@@ -78,6 +79,17 @@ function MainNavigationController($scope, $modal, $http, Status) {
 		 var auth2 = gapi.auth2.getAuthInstance();
 	     auth2.signOut().then(function () {});
 	  }
+	 
+	 $scope.setToast = function(boolean){
+		 $scope.showToast=boolean;
+	 }
+	 $scope.showToast = function(){
+		 $scope.showToast=true;
+	 }
+	 
+	 $scope.hideToast = function(){
+		 $scope.showToast=false;
+	 }
 	 
 	 $scope.setLastShiftUpdate = function (time){
 		 $scope.lastShiftUpdate = time;
