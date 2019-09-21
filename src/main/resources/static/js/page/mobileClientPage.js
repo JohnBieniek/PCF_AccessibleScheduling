@@ -21,7 +21,7 @@ angular.module('client', ['ngResource', 'ui.bootstrap']).
         }
     });
 
-function MobileClientController($scope, $modal, $http, Status) {
+function MobileClientController($scope, $modal, $http) {
 	$scope.allowOvertime=false;
 	$scope.allowUnavailable=false;
 	$scope.prioritizeSecondShift=false;
@@ -65,7 +65,6 @@ function MobileClientController($scope, $modal, $http, Status) {
 	
 	$scope.setClientAndInfo = function(newClient){
 	  $scope.detailsChanged=false;
-	  console.log("setting clinet and info");
       $scope.setClient(newClient);
       
       $scope.listRequests(newClient);
@@ -441,7 +440,7 @@ function MobileClientController($scope, $modal, $http, Status) {
             }
         })
         .then(function(response) {
-        	Status.success("Shift saved");
+        	$scope.notify("Shift saved");
         	
             $scope.listShifts();
         });
@@ -502,7 +501,7 @@ function MobileClientController($scope, $modal, $http, Status) {
             }
         })
         .then(function (response) {//TODO handle error state
-            Status.success("Shift removed.");
+            $scope.notify("Shift removed.");
             
             $scope.listEmployees();
         });
@@ -621,6 +620,8 @@ function MobileClientController($scope, $modal, $http, Status) {
                }
            })
            .then(function(response) {
+
+           		$scope.notify("Request saved");
         		$scope.requests = response.data;
            });
       	});
@@ -670,6 +671,8 @@ function MobileClientController($scope, $modal, $http, Status) {
                 }
             })
             .then(function(response) {
+
+            	$scope.notify("Request saved.");
             	$scope.requests = response.data;
             });
        });
@@ -692,7 +695,7 @@ function MobileClientController($scope, $modal, $http, Status) {
            }
        })
        .then(function (response) {//TODO handle error state
-           Status.success("Request saved.");
+           $scope.notify("Request saved.");
 
            $scope.listShiftRequests();
        });
@@ -783,6 +786,7 @@ function MobileClientController($scope, $modal, $http, Status) {
                }
            })
            .then(function(response) {
+        	   	$scope.notify("Request removed.");
            		$scope.requests = response.data;
            });
 	   }
@@ -801,12 +805,12 @@ function MobileClientController($scope, $modal, $http, Status) {
         })
         .then(function(response) {
         	if(response.data){
-                Status.success("Client created");
+                $scope.notify("Client created");
         		$scope.clients = response.data;
         		$scope.tab="Schedule";
         	}
         	else{
-        		Status.error("Failed to save client info.")
+        		$scope.warn("Failed to save client info.")
         	}
         });
     }
@@ -844,12 +848,12 @@ function MobileClientController($scope, $modal, $http, Status) {
         })
         .then(function(response) {
         	if(response.data){
-                Status.success("Client saved");
+                $scope.notify("Client saved");
                 
             	$scope.detailsChanged=false;
         	}
         	else{
-        		Status.error("Failed to save client info.")
+        		$scope.warn("Failed to save client info.")
         	}
         });
     }
@@ -868,11 +872,11 @@ function MobileClientController($scope, $modal, $http, Status) {
          })
          .then(function(response) {
          	if(response){
-                 Status.success("Shift deleted.");
+                 $scope.notify("Shift deleted.");
                  $scope.listShifts();
          	}
          	else{
-         		Status.error("Failed to delete client info.")
+         		$scope.warn("Failed to delete client info.")
          	}
          });
   	   }
@@ -892,13 +896,13 @@ function MobileClientController($scope, $modal, $http, Status) {
         })
         .then(function(response) {
         	if(response){
-                Status.success("Client deleted.");
+                $scope.notify("Client deleted.");
         		$scope.clients =response.data;
         		$scope.client =response.data[0];
         		$scope.tab="Schedule";
         	}
         	else{
-        		Status.error("Failed to delete client info.")
+        		$scope.warn("Failed to delete client info.")
         	}
         });
  	   }

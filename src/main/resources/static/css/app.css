@@ -83,16 +83,30 @@ html,body
 .trash{
 	margin-top:6px;
 }
+.yellow{
+	color:#E8CF5D;
+}
 .red{
-	color: #cc0000;
+	color: #6a0000;
+}
+.purple{
+	background-color: #794B6B;
+	border-color: #794B6B;
 }
 .green{
-  color:#3d9e03;
+	color: #6EB262;
 }
-
+.greenBackground{
+	background-color: #6EB262;
+}
+.orange{
+	background-color: #9E2F20;
+	border-color: #9E2F20;
+	
+}
 .errored{
-	border-color: #cc0000!important;
-	background-color: #cc0000!important;
+	border-color: #9E2F20!important;
+	background-color: #9E2F20!important;
 	color: white;
 	border-radius: 25px; 
 	font-size: 30px;
@@ -103,8 +117,8 @@ html,body
 }
 
 .deleteButton{
-	border-color: #cc0000!important;
-	background-color: #cc0000!important;
+	border-color: #9E2F20!important;
+	background-color: #9E2F20!important;
 	color: white;
 	text-align: center;
 	font-size:35px;
@@ -119,11 +133,11 @@ html,body
     color: white;
     font-weight: bold;
     text-align: center;
-    background-color: #cc0000;  		
+    background-color: #9E2F20;  		
 }
 
 .assignable{
-    background-color: #4e9a06 !important;  		
+    background-color: #6EB262 !important;  		
 }
 
 .disabledButton {
@@ -131,6 +145,7 @@ html,body
   cursor: not-allowed;
   pointer-events: none;
   text-decoration: none;
+  background-color: #d3d7cf!important;  		
 }
 
 .assignButton{
@@ -139,7 +154,7 @@ html,body
     text-align: center;
     font-size: 14px;
     padding: 6px;
-    background-color: #d3d7cf;  		
+    background-color: #6EB262;  		
 }
 .okClientButton{
 	width: 90px;
@@ -150,7 +165,7 @@ html,body
     color: black;
     font-weight: bold;
     text-align: center;
-    background-color: #3d9e03;  		
+    background-color: #6EB262;  		
 }
 .cancelClientButton{
 	width: 180px;
@@ -161,7 +176,7 @@ html,body
     color: black;
     font-weight: bold;
     text-align: center;
-    background-color: #729fcf;  		
+    background-color: #E8CF5D;  		
 }
 
 .deleteEmployeeButton{
@@ -173,10 +188,9 @@ html,body
     color: white;
     font-weight: bold;
     text-align: center;
-    background-color: #cc0000;      
+    background-color: #9E2F20;      
 }
 .okEmployeeButton{
-  width: 90px;
     margin-right: 0px;
   margin-left:auto;
     font-size: 30px;
@@ -184,7 +198,7 @@ html,body
     color: black;
     font-weight: bold;
     text-align: center;
-    background-color: #3d9e03;      
+    background-color: #6EB262;      
 }
 .cancelEmployeeButton{
   width: 180px;
@@ -195,7 +209,7 @@ html,body
     color: black;
     font-weight: bold;
     text-align: center;
-    background-color: #729fcf;      
+    background-color: #E8CF5D;      
 }
 
 .scheduleOptions{
@@ -211,14 +225,14 @@ html,body
 }
 
 .complete{
-	border-color: #2db93d!important;
-	background-color: #2db93d!important;
+	border-color: #6EB262!important;
+	background-color: #6EB262!important;
 	verticle-allign:baseline;
 }
 
 .incomplete{
-	background-color: #fce94f;
-	border-color: #fce94f;
+	background-color: #E8CF5D;
+	border-color: #E8CF5D;
 	border-radius: 25px; 
 	font-size: 30px;
 	margin-left:20px;
@@ -233,8 +247,8 @@ html,body
 	 height: 50px;
 }
 .scheduled{
-	background-color: #2db93d;
-	border-color: #2db93d;
+	background-color: #6EB262;
+	border-color: #6EB262;
 	border-radius: 25px; 
 	font-size: 25px;
 	 width: 120px;
@@ -266,34 +280,38 @@ html,body
 	background-color: #729fcf!important;
 	 border-color: #729fcf!important;
 }
+.activeSecondary{
+	background-color: #794B6B!important;
+	 border-color: #794B6B!important;
+}
 
 .working{
-	background-color: #fcaf3e!important;
-	 border-color: #fcaf3e!important;
+	background-color: #E8CF5D!important;
+	 border-color: #E8CF5D!important;
  	 border-radius: 25px; 
  	 padding-left:20px;
     padding-right:20px;
 }
 
 .stopping{
-	background-color: #fcaf3e!important;
-	 border-color: #fcaf3e!important;
+	background-color: #9E2F20!important;
+	 border-color: #9E2F20!important;
  	 border-radius: 25px; 
  	 padding-left:20px;
     padding-right:20px;
 }
 
 .generated{
-	background-color: #fce94f!important;
-	 border-color: #fce94f!important;
+	background-color: #E8CF5D!important;
+	 border-color: #E8CF5D!important;
  	 border-radius: 25px; 
  	 padding-left:20px;
     padding-right:20px;
 }
 
 .assigned{
-	background-color: #2db93d!important;
-	 border-color: #2db93d!important;
+	background-color: #6EB262!important;
+	 border-color: #6EB262!important;
  	 border-radius: 25px; 
  	 padding-left:20px;
     padding-right:20px;
@@ -372,8 +390,8 @@ html,body
 }
 
 .newEmployeeTab{
-   background-color: #b1f0a1;
-  border-color: #b1f0a1 ;
+   background-color: #6EB262;
+  border-color: #6EB262;
   color: black;
     margin-bottom: 17px;
     margin-top: 15px;
@@ -385,8 +403,8 @@ html,body
 }
 
 .newClientTab{
-	 background-color: #b1f0a1;
-  border-color: #b1f0a1 ;
+	 background-color: #6EB262;
+  border-color: #6EB262;
   color: black;
     margin-bottom: 17px;
     margin-top: 15px;
@@ -452,7 +470,7 @@ html,body
     float: right;
     color: black;
     text-align: center;
-    background-color: #b1f0a1; 		
+    background-color: #6EB262; 		
     padding:5px;
     width:150px;		
 }
@@ -471,8 +489,18 @@ html,body
     width: 97%;
 }
 
+.mycon{
+   font-family: 'Glyphicons Halflings';
+   font-style:normal;
+    -webkit-font-smoothing: antialiased;
+}
+.newRequestExceptionButton{
+    background-color: #6EB262;
+    font-size: 23px;
+    text-align: center;
+}
 .newShiftButton{
-	background-color:#b1f0a1;
+	background-color:#6EB262;
 	font-size:30px;
 	width: 200px;
 	text-align:center;
@@ -496,7 +524,11 @@ html,body
     padding-right:20px;
     width: 97%;
 }
-
+.toast{
+	color:black;
+	position: relative;
+	z-index:100;	
+}
 .navIcon{
 	margin-left:30px !imporant;
 }

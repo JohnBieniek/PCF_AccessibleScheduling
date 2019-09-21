@@ -21,7 +21,7 @@ angular.module('client', ['ngResource', 'ui.bootstrap']).
         }
     });
 
-function MobileEmployeeController($scope, $modal, $http, Status) {
+function MobileEmployeeController($scope, $modal, $http) {
 	$scope.init = function(){
 		 $scope.allowOvertime=false;
 		 $scope.allowUnavailable=false;
@@ -72,8 +72,9 @@ function MobileEmployeeController($scope, $modal, $http, Status) {
 			currentEmployee.startTimes.splice(availability,1);    
 			currentEmployee.days.splice(availability,1);
 			currentEmployee.endTimes.splice(availability,1); 
-	        
+
 	        $scope.saveEmployee(currentEmployee);
+            //setTimeout($scope.hideToast,3000);
 	    }
     }
 	
@@ -83,7 +84,6 @@ function MobileEmployeeController($scope, $modal, $http, Status) {
 			currentEmployee.days.push(day);
 			currentEmployee.startTimes.push("08:00");
 			currentEmployee.endTimes.push("16:00");
-			
 	        $scope.saveEmployee(currentEmployee);		
 		}
 	}
@@ -280,8 +280,6 @@ function MobileEmployeeController($scope, $modal, $http, Status) {
            }
        })
        .then(function (response) {//TODO handle error state
-    	   console.log("updated employee and got");
-    	   console.log(response.data);
     	   $scope.setEmployeeAndInfo(response.data);
        	   employee.id=response.data.id;
            if(employee.customFields){
@@ -303,7 +301,7 @@ function MobileEmployeeController($scope, $modal, $http, Status) {
 	            }
            }
            $scope.listEmployees();
-           Status.success("Employee saved");
+		   $scope.notify("Employee saved.");
        });
     }
 
@@ -624,7 +622,7 @@ function MobileEmployeeController($scope, $modal, $http, Status) {
             }
         })
         .then(function(response) {
-        	Status.success("Shift saved");
+        	$scope.notify("Shift saved");
         	
             $scope.listShifts();
         });
@@ -701,7 +699,7 @@ function MobileEmployeeController($scope, $modal, $http, Status) {
            }
        })
        .then(function(response) {
-           Status.success("Request saved");
+           $scope.notify("Request saved");
            
            $scope.listShiftRequests();
        });
@@ -758,14 +756,14 @@ function MobileEmployeeController($scope, $modal, $http, Status) {
         })
         .then(function(response) {
         	if(response.data){
-                Status.success("Employee created");
+                $scope.notify("Employee created");
                 
         		$scope.listEmployees();
         		
         		$scope.setEmployeeTab("Schedule");
         	}
         	else{
-        		Status.error("Failed to save employee info.")
+        		$scope.warn("Failed to save employee info.")
         	}
         });
     };
@@ -837,12 +835,12 @@ function MobileEmployeeController($scope, $modal, $http, Status) {
         })
         .then(function(response) {
         	if(response.data){
-                Status.success("Employee saved");
+                $scope.notify("Employee saved");
                 
             	$scope.detailsChanged=false;
         	}
         	else{
-        		Status.error("Failed to save employee info.")
+        		$scope.warn("Failed to save employee info.")
         	}
         });
     };
@@ -861,11 +859,11 @@ function MobileEmployeeController($scope, $modal, $http, Status) {
          })
          .then(function(response) {
          	if(response){
-                 Status.success("Shift deleted.");
+                 $scope.notify("Shift deleted.");
                  $scope.listShifts();
          	}
          	else{
-         		Status.error("Failed to delete employee info.")
+         		$scope.warn("Failed to delete employee info.")
          	}
          });
   	   }
@@ -885,13 +883,13 @@ function MobileEmployeeController($scope, $modal, $http, Status) {
         })
         .then(function(response) {
         	if(response){
-                Status.success("Employee deleted.");
+                $scope.notify("Employee deleted.");
         		$scope.listEmployees();
      			$scope.setEmployeeAndInfo(response.data[0]);
         		$scope.setEmployeeTab("Schedule");
         	}
         	else{
-        		Status.error("Failed to delete employee info.")
+        		$scope.warn("Failed to delete employee info.")
         	}
         });
  	   }

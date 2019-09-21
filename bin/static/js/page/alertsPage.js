@@ -21,7 +21,7 @@ angular.module('employees', ['ngResource', 'ui.bootstrap']).
         }
     });
 
-function AlertsController($scope, $modal, $http, Status) {
+function AlertsController($scope, $modal, $http) {
 	 $scope.multiTableEditing=false;
 	 $scope.customFieldDataEditing=true;
 	 $scope.sortField="first";
@@ -41,7 +41,6 @@ function AlertsController($scope, $modal, $http, Status) {
 	            }
 	        })
 	        .then(function(response) {
-	        	console.log(response.data);
 	        	$scope.alerts=response.data;
 	        });
 	    }
@@ -70,7 +69,7 @@ function AlertsController($scope, $modal, $http, Status) {
 		            }
 		        })
 		        .then(function(response) {
-		        	Status.success("Access granted.");
+		        	$scope.notify("Access granted.");
 		        	$scope.alerts=response.data;
 		        });
 		     }
@@ -132,7 +131,7 @@ function AlertsController($scope, $modal, $http, Status) {
 		            }
 	           }
 	           
-	           Status.success("Employee saved");
+	           $scope.notify("Employee saved");
 	       });
 	    }
 	    
@@ -173,7 +172,7 @@ function AlertsController($scope, $modal, $http, Status) {
                 }
             })
 	        .then(function(response) {
-	        	Status.success("Access denied to "+alertName+".");
+	        	$scope.notify("Access denied to "+alertName+".");
 	        	$scope.alerts=response.data;
 	        });
     	}

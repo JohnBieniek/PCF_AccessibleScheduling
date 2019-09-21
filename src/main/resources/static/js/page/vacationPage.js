@@ -21,7 +21,7 @@ angular.module('vacation', ['ngResource', 'ui.bootstrap']).
         }
     });
 
-function VacationController($scope, $modal, $http,Status) {
+function VacationController($scope, $modal, $http) {
 	 $scope.multiTableEditing=false;
 
 	 function clone (obj) {
@@ -91,7 +91,7 @@ function VacationController($scope, $modal, $http,Status) {
 	            }
            }
            
-           Status.success("Employee saved");
+           $scope.notify("Employee saved");
        });
     }
     

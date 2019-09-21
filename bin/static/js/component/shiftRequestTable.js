@@ -47,7 +47,6 @@ function ShiftRequestsController($scope, $modal, $http, Requests, Request, Emplo
 		 $scope.employees = Employees.query();
 	 }
 	 $scope.addRequest = function (selectedClient,employees) {
-		 console.log("attempting to open requestForm and RequestModalController");
         var addModal = $modal.open({
             templateUrl: 'templates/modal/requestForm.html',
             controller: RequestModalController,

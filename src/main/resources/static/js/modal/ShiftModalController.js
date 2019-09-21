@@ -1,4 +1,4 @@
-function ShiftModalController($scope, $modalInstance, $http, Status, idToken,shift, client,clients,employees,date, action) {
+function ShiftModalController($scope, $modalInstance, $http, idToken,shift, client,clients,employees,date, action) {
 	$scope.idToken = idToken;
     $scope.shiftAction = action;
     $scope.shift = shift;
@@ -30,13 +30,8 @@ function ShiftModalController($scope, $modalInstance, $http, Status, idToken,shi
 			}
 		}
 	}
-    
-//    if($scope.shift.staffId==null || $scope.shift.staffId==undefined){
-//    	$scope.selectedEmployee=$scope.employees[0];
-//    }
    
 	$scope.clearSelectedEmployee = function(){
-		console.log("clearign selected");
 		$scope.showEmployee=false;
 		$scope.showEmployee=true;
 		$scope.selectedEmployee="";
@@ -100,7 +95,6 @@ function ShiftModalController($scope, $modalInstance, $http, Status, idToken,shi
 	   	}
      };
     $scope.assign = function (shift) {
-    	console.log("assigning shift");
     	$http({
             url: '/schedule/staffShift',
             method: 'POST',
@@ -138,10 +132,7 @@ function ShiftModalController($scope, $modalInstance, $http, Status, idToken,shi
         });
     };
     
-    $scope.ok = function () {
-        console.log("oking shift:"+$scope.shift);
-        console.log("oking employee:"+$scope.employee);
-        console.log("oking selectedEmployee:"+$scope.selectedEmployee);           
+    $scope.ok = function () {          
         $modalInstance.close($scope.shift);
     };
 

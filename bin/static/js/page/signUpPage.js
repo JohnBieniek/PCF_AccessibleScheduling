@@ -21,7 +21,7 @@ angular.module('signUp', ['ngResource', 'ui.bootstrap']).
         }
     });
 
-function SignUpController($scope, $modal, $http, Status) {
+function SignUpController($scope, $modal, $http) {
 	$scope.requestSignUp = function requestSignUp() { 
     	$http({
             url: '/auth/signup',
