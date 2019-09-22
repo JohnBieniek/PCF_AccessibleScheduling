@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import accessiblesolutions.accessiblescheduling.domain.CustomFieldData;
-import accessiblesolutions.accessiblescheduling.domain.RecurringShiftNeed;
-import accessiblesolutions.accessiblescheduling.domain.ShiftRequest;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
 import accessiblesolutions.accessiblescheduling.to.AlternateWeekendsOffNotification;
@@ -29,8 +27,10 @@ public class CleaningController {
 	
     @Autowired
     private CustomDataManager customDataManager;
+    
     @Autowired
     private CleaningManager cleaningManager;
+    
     public CleaningController() {
     }
     
@@ -38,14 +38,17 @@ public class CleaningController {
     public String fixShiftNotification(@RequestHeader(value="Authorization", required=false) String idToken, ShiftNotification shiftNotification) throws CorruptDataException, ProccessingException{
         return cleaningManager.fixShiftNotification(shiftNotification);
     }
+    
     @RequestMapping(value = "/alternateWeeekendsNotifications", method = RequestMethod.GET)
     public ArrayList<AlternateWeekendsOffNotification> getAlternateWeekendsOffNotifications(@RequestHeader(value="Authorization", required=false) String idToken) throws CorruptDataException, ProccessingException{
         return cleaningManager.getAlternateWeekendsOffNotifications();
     }
+    
     @RequestMapping(value = "/scheduleNotifications", method = RequestMethod.GET)
     public ArrayList<ScheduleNotification> getScheduleNotifications(@RequestHeader(value="Authorization", required=false) String idToken) throws CorruptDataException, ProccessingException{
         return cleaningManager.getScheduleNotifications();
     }
+    
     @RequestMapping(value = "/dailyMaxNotifications", method = RequestMethod.GET)
     public ArrayList<ShiftNotification> getDailyMaxNotifications(@RequestHeader(value="Authorization", required=false) String idToken) throws CorruptDataException, ProccessingException{
         return cleaningManager.getOverDailyShiftNotifications();
@@ -60,40 +63,24 @@ public class CleaningController {
     public ArrayList<ShiftNotification> getShiftNotifications(@RequestHeader(value="Authorization", required=false) String idToken) throws CorruptDataException, ProccessingException{
         return cleaningManager.getShiftNotifications();
     }
+    
     @RequestMapping(value = "/orphanedCustomFieldData", method = RequestMethod.GET)
     public ArrayList<CustomFieldData> getOrphanedCustomFieldData(@RequestHeader(value="Authorization", required=false) String idToken) {
         return customDataManager.getOrphanedCustomFieldData();
     }
-    @RequestMapping(value = "/orphanedShiftRequests", method = RequestMethod.GET)
-    public ArrayList<ShiftRequest> getOrphanedShiftRequests(@RequestHeader(value="Authorization", required=false) String idToken) {
-        return cleaningManager.getOrphanedShiftRequests();
-    }
-    @RequestMapping(value = "/orphanedRecurringShiftRequests", method = RequestMethod.GET)
-    public ArrayList<RecurringShiftNeed> getOrphanedRecurringShiftRequests(@RequestHeader(value="Authorization", required=false) String idToken) {
-        return cleaningManager.getOrphanedRecurringShiftRequests();
-    }
+
     @RequestMapping(value = "/removeOrphanedCustomFieldData", method = RequestMethod.GET)
     public void removeOrphanedCustomFieldData(@RequestHeader(value="Authorization", required=false) String idToken) {
         customDataManager.removeOrphanedCustomFieldData();
     }
-    @RequestMapping(value = "/removeOrphanedShiftRequests", method = RequestMethod.GET)
-    public void removeOrphanedShiftRequests(@RequestHeader(value="Authorization", required=false) String idToken) {
-        cleaningManager.removeOrphanedSingleShiftRequests();
-    }
+
     @RequestMapping(value = "/removeOrphanedRecurringShiftRequests", method = RequestMethod.GET)
     public void removeOrphanedRecurringShiftRequests(@RequestHeader(value="Authorization", required=false) String idToken) {
        cleaningManager.removeOrphanedRecurringShiftRequests();
     }
+    
     @RequestMapping(value = "/orphanedCustomFieldData", method = RequestMethod.DELETE)
     public void deleteOrphanedCustomFieldData(@RequestHeader(value="Authorization", required=false) String idToken) {
         customDataManager.removeOrphanedCustomFieldData();
-    }
-    @RequestMapping(value = "/orphanedShiftRequests", method = RequestMethod.DELETE)
-    public void deleteOrphanedShiftRequests(@RequestHeader(value="Authorization", required=false) String idToken) {
-        cleaningManager.removeOrphanedSingleShiftRequests();
-    }
-    @RequestMapping(value = "/orphanedRecurringShiftRequests", method = RequestMethod.DELETE)
-    public void deleteOrphanedRecurringShiftRequests(@RequestHeader(value="Authorization", required=false) String idToken) {
-       cleaningManager.removeOrphanedRecurringShiftRequests();
     }
 }

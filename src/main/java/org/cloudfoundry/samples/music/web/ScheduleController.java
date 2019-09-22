@@ -434,13 +434,6 @@ public class ScheduleController {
         return scheduleStatusCrud.findAll();
     }
     
-    @RequestMapping(value = "/generateSingleShifts", method = RequestMethod.GET)
-    public String generateSingleShifts(@RequestHeader(value="Authorization", required=false) String idToken,@RequestParam("month") String month) throws CorruptDataException, AuthenticationException {
-    	securityManager.authorize(idToken, Constants.ADMIN);
-    	
-    	return manager.generateSingleShifts(month);
-    }
-    
     @RequestMapping(value = "/getShiftsForMonth", method = RequestMethod.GET)
     public String getShiftsForOfMonth(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam("month") String month) throws AuthenticationException {
     	securityManager.authorize(idToken, Constants.MANAGER);
