@@ -1,6 +1,7 @@
 package org.cloudfoundry.samples.music.web;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.security.sasl.AuthenticationException;
@@ -29,7 +30,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import accessiblesolutions.accessiblescheduling.constants.Constants;
 import accessiblesolutions.accessiblescheduling.domain.CallAuth;
-import accessiblesolutions.accessiblescheduling.domain.CustomField;
 import accessiblesolutions.accessiblescheduling.domain.Shift;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 
@@ -59,6 +59,10 @@ public class ShiftController {
     
     @RequestMapping(value = "/set", method = RequestMethod.POST)
     public List<Shift> set(@RequestHeader(value="Authorization", required=false) String idToken,@RequestBody List<Shift> shifts) {
+    	for(Shift shift:shifts) {
+        	shift.setLastUpdated(LocalDateTime.now());
+    	}
+    	
     	repository.save(shifts);
     	updateInfoManager.set("shifts");
     	return shifts;
@@ -134,6 +138,7 @@ public class ShiftController {
         	shift.setStartYear((int) Integer.parseInt(shift.getStartDate().split("-")[0]));
         }
     	updateInfoManager.set("shifts");
+    	shift.setLastUpdated(LocalDateTime.now());
         return repository.save(shift);
     }
 
@@ -165,6 +170,7 @@ public class ShiftController {
         	shift.setStartYear((int) Integer.parseInt(shift.getStartDate().split("-")[0]));
         }
     	updateInfoManager.set("shifts");
+    	shift.setLastUpdated(LocalDateTime.now());
         
         return repository.save(shift);
     }

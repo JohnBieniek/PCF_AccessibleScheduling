@@ -79,22 +79,6 @@ function MobileClientController($scope, $modal, $http) {
       $scope.listClients();
 	}
 	
-	 $scope.listCustomFields = function listCustomFields() {
-		$http({
-            url: '/customFields/',
-            method: 'GET',
-            headers: {
-	            'Authorization': $scope.idToken,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            params: {
-            }
-        })
-        .then(function(response) {
-        	$scope.customFields=response.data;
-        });
-     }
-	
 	$scope.setInterval = function(newInterval){
       $scope.interval = newInterval;
 	}

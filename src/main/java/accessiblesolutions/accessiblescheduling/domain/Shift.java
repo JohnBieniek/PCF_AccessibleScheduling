@@ -58,6 +58,8 @@ public class Shift implements Comparable{
     
     private boolean weekend;
     
+    private LocalDateTime lastUpdated;
+    
     public Shift() {
     	assigned=false;
     	recurring=false;
@@ -562,5 +564,13 @@ public class Shift implements Comparable{
 			e.printStackTrace();
 		}
 		return result;
+	}
+
+	public LocalDateTime getLastUpdated() {
+		return lastUpdated;
+	}
+
+	public void setLastUpdated(LocalDateTime lastUpdated) {
+		this.lastUpdated = lastUpdated;
 	}
 }

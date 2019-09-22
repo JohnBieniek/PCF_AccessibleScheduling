@@ -39,6 +39,7 @@ function MainNavigationController($scope, $modal, $http) {
         $scope.admin=false;
         
         $scope.lastShiftUpdate=null;
+        $scope.lastLocalCustomFieldUpdate=null;
         $scope.lastClientUpdate=null;
         $scope.lastLocalClientUpdate=null;
         $scope.lastEmployeeUpdate=null;
@@ -55,6 +56,7 @@ function MainNavigationController($scope, $modal, $http) {
         $scope.employees=null;
         $scope.client=null;
         $scope.clients=null;
+        $scope.customFields=null;
         
    	 	$scope.selectedClient= false;//Used by clientList.html to select a client for scheduling on scheduling.html
    	 	$scope.selectedEmployee= false;//Used by employeeList.html to select an employee for vacation on vacation.html
@@ -136,10 +138,6 @@ function MainNavigationController($scope, $modal, $http) {
 			           }
 		       })
 		       .then(function (response) {//TODO handle error state	    
-		    	   console.log("client update info response:");
-		    	   console.log(response);
-		    	   console.log("$scope.lastLocalClientUpdate");
-		    	   console.log($scope.lastLocalClientUpdate);
 		    	   if($scope.lastLocalClientUpdate==null || response.data==null || response.data.time.nano!=$scope.lastLocalClientUpdate.time.nano){
 		    		   $scope.lastLocalClientUpdate=response.data;
 		    		   
@@ -161,6 +159,37 @@ function MainNavigationController($scope, $modal, $http) {
 	    	}
     }
 	 
+	 $scope.listCustomFields = function listCustomFields() {
+		 $http({
+	           url: '/updateInfo/customFields',
+	           method: 'GET',
+	           headers: {
+	               'Authorization': $scope.idToken,
+	               'Content-Type': 'application/x-www-form-urlencoded'
+	           },
+	           params: {
+	           }
+	     })
+	     .then(function (response) {//TODO handle error state	    	 
+	  	   if($scope.lastLocalCustomFieldUpdate==null || response.data==null || response.data.time.nano!=$scope.lastLocalCustomFieldUpdate.time.nano){
+	  		   $scope.lastLocalCustomFieldUpdate=response.data;
+				 $http({
+		            url: '/customFields/',
+		            method: 'GET',
+		            headers: {
+			            'Authorization': $scope.idToken,
+		                'Content-Type': 'application/x-www-form-urlencoded'
+		            },
+		            params: {
+		            }
+		        })
+		        .then(function(response) {
+		        	$scope.customFields=response.data;
+		        });
+	  	   }
+	     })
+     }
+	 
     $scope.listEmployees = function listEmployees() {
     	if($scope.manager || $scope.admin){
     		$http({
@@ -173,8 +202,7 @@ function MainNavigationController($scope, $modal, $http) {
 		           params: {
 		           }
 	       })
-	       .then(function (response) {//TODO handle error state	    	   
-	    	   console.log(response);
+	       .then(function (response) {//TODO handle error state	    	 
 	    	   if($scope.lastLocalEmployeeUpdate==null || response.data==null || response.data.time.nano!=$scope.lastLocalEmployeeUpdate.time.nano){
 	    		   $scope.lastLocalEmployeeUpdate=response.data;
 	    		   

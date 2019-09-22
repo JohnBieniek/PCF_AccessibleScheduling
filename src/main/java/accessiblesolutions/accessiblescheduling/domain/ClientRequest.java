@@ -39,7 +39,8 @@ public class ClientRequest {
     private String monthInterval;
     private String yearInterval;
     private String[] exceptions;
-
+    private LocalDateTime lastUpdated;
+    
     public ClientRequest() {
     }
 
@@ -380,5 +381,15 @@ public class ClientRequest {
 				+ ", repeats=" + repeats + ", repeatsEvery=" + repeatsEvery + ", days=" + Arrays.toString(days)
 				+ ", interval=" + interval + ", monthInterval=" + monthInterval + ", yearInterval=" + yearInterval
 				+ ", exceptions=" + Arrays.toString(exceptions) + "]";
+	}
+
+
+	public LocalDateTime getLastUpdated() {
+		return lastUpdated;
+	}
+
+
+	public void setLastUpdated(LocalDateTime lastUpdated) {
+		this.lastUpdated = lastUpdated;
 	}
 }

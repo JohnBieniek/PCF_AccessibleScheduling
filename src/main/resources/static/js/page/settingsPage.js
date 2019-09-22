@@ -84,22 +84,7 @@ function SettingsController($scope, $modal, $http) {
              saveCustomField(customField);
          });
      };
-    
-     $scope.listCustomFields = function listCustomFields() {
- 		$http({
-             url: '/customFields/',
-             method: 'GET',
-             headers: {
- 	            'Authorization': $scope.idToken,
-                 'Content-Type': 'application/x-www-form-urlencoded'
-             },
-             params: {
-             }
-         })
-         .then(function(response) {
-         	$scope.customFields=response.data;
-         });
-      }
+
     
     $scope.deleteCustomField = function (customField) {
     	$http({

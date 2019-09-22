@@ -148,22 +148,6 @@ function MobileEmployeeController($scope, $modal, $http) {
       $scope.listEmployeesAndInfo();
       $scope.listShifts();
 	}
-	
-	 $scope.listCustomFields = function listCustomFields() {
-		$http({
-            url: '/customFields/',
-            method: 'GET',
-            headers: {
-	            'Authorization': $scope.idToken,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            params: {
-            }
-        })
-        .then(function(response) {
-        	$scope.customFields=response.data;
-        });
-     }
 	 
 	$scope.setInterval = function(newInterval){
       $scope.interval = newInterval;
