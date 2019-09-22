@@ -421,7 +421,7 @@ public class ScheduleController {
 		status.setAssigning(true);
 		status.setStopped(true);
     	scheduleStatusCrud.save(status);
-    	Thread.sleep(5000);
+    	Thread.sleep(5000);//Can this be deleted?
     	finishAssignment(idToken, month);
         return scheduleStatusCrud.findAll();
     }
