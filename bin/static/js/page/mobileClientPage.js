@@ -486,7 +486,7 @@ function MobileClientController($scope, $modal, $http) {
             }
         })
         .then(function(response) {
-    		$scope.shifts = response.data;
+    		$scope.setShifts(response.data);
     	});
     }
    

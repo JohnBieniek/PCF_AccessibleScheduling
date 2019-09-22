@@ -57,11 +57,16 @@ function MainNavigationController($scope, $modal, $http) {
         $scope.client=null;
         $scope.clients=null;
         $scope.customFields=null;
+        $scope.shifts=null;
         
    	 	$scope.selectedClient= false;//Used by clientList.html to select a client for scheduling on scheduling.html
    	 	$scope.selectedEmployee= false;//Used by employeeList.html to select an employee for vacation on vacation.html
    	 	$scope.selectedShift= false;//Used by shiftList.html to select a shift for assignment on shift.html
 	 };
+	 
+	 $scope.setShifts = function setShifts(shifts){
+		 $scope.shifts=shifts;
+	 }
 	 
 	 $scope.loggedIn = function loggedIn() {
 		 if($scope.idToken!=null){
@@ -158,6 +163,20 @@ function MainNavigationController($scope, $modal, $http) {
 		       })
 	    	}
     }
+	 
+	 $scope.noShiftDay= function(day){
+		var unscheduled =true;
+		
+		if(null!=$scope.shifts){
+			$scope.shifts.forEach(function(shift) {
+			  if(shift.startsLocalDate.dayOfWeek==day.toUpperCase().split(" ")[0]){
+			    unscheduled=false;
+			  }
+			});
+		}
+		
+		return unscheduled;
+	}
 	 
 	 $scope.listCustomFields = function listCustomFields() {
 		 $http({

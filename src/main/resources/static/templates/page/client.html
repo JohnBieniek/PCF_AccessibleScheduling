@@ -56,7 +56,10 @@
 		    		</div>
 		 			<div>
    						<div ng-repeat="day in displayDays">
-				    		<h4 class='weekDay rightAlign'>{{day}}</h4>
+							<h4 style="font-weight:700" class='weekDay rightAlign'>{{day}}</h4>
+				    		<div ng-if="noShiftDay(day)">
+				    			<span style="font-weight:400;margin-bottom: 15px;margin-top: -10px;" class='availableWeekDay rightAlign'>Unscheduled</span>
+				    		</div>
 				    		<div ng-repeat="shift in shifts">
 				    			<div ng-if="isDay(shift,day,displayWeek)" class = "shift">
 				    				<span ng-init="setShiftDisplay(shift)">{{shift.display}}</span>

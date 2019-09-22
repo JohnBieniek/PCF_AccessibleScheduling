@@ -91,6 +91,18 @@ function MobileEmployeeController($scope, $modal, $http) {
 		return day==$scope.employee.days[availability];
 	}
 	
+	$scope.noAvailabilityDay= function(availability,day){
+		var unavailable =true;
+
+		$scope.employee.days.forEach(function(selectedDay) {
+		  if(selectedDay==day){
+		    unavailable=false;
+		  }
+		});
+		
+		return unavailable;
+	}
+	
 	$scope.getEmployeeCustomFieldData = function (employee,customField,index){
      	$http({
             url: '/compatibility/employeeCustomFieldData',
@@ -557,7 +569,7 @@ function MobileEmployeeController($scope, $modal, $http) {
 	            }
 	        })
 	        .then(function(response) {
-	    		$scope.shifts = response.data;
+	    		$scope.setShifts(response.data);
 	    	});
     	}
     }
