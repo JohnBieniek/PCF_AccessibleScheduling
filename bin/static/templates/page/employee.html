@@ -103,7 +103,7 @@
 				    		</div>
 				    		<br>
 				    		<div ng-if="noAvailabilityDay($index,day)">
-				    			<span style="font-weight:400" class='availableWeekDay rightAlign'>Unavailable</span>
+				    			<span style="font-weight:400;margin-top: -5px;" class='availableWeekDay rightAlign'>Unavailable</span>
 				    		</div>
 				    		<div ng-repeat="availabilitysDay in employee.days track by $index" style="margin-right:20px">
 				    			<div ng-if="isAvailabilityDay($index,day)" class="inline availabilityTile">

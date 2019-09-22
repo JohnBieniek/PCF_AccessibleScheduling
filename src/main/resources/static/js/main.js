@@ -40,6 +40,7 @@ function MainNavigationController($scope, $modal, $http) {
         
         $scope.lastShiftUpdate=null;
         $scope.lastLocalCustomFieldUpdate=null;
+        $scope.lastLocalShiftUpdate=null;
         $scope.lastClientUpdate=null;
         $scope.lastLocalClientUpdate=null;
         $scope.lastEmployeeUpdate=null;
@@ -59,77 +60,13 @@ function MainNavigationController($scope, $modal, $http) {
         $scope.customFields=null;
         $scope.shifts=null;
         
+        //TODO factor these out
    	 	$scope.selectedClient= false;//Used by clientList.html to select a client for scheduling on scheduling.html
    	 	$scope.selectedEmployee= false;//Used by employeeList.html to select an employee for vacation on vacation.html
    	 	$scope.selectedShift= false;//Used by shiftList.html to select a shift for assignment on shift.html
 	 };
 	 
-	 $scope.setShifts = function setShifts(shifts){
-		 $scope.shifts=shifts;
-	 }
-	 
-	 $scope.loggedIn = function loggedIn() {
-		 if($scope.idToken!=null){
-			 return true;
-		 }
-		 else{
-			 return false;
-		 }
-
-	  }
-	 $scope.signOut = function signOut() {
-		 $scope.manager=false;
-		 $scope.admin=false;
-		 $scope.user=false;
-		 $scope.idToken=null;
-		 $scope.profile=null;
-		 $scope.employee=null;
-		 $scope.tab="Schedule";
-		 $scope.employeeTab="Schedule";
-	    
-		 var auth2 = gapi.auth2.getAuthInstance();
-	     auth2.signOut().then(function () {});
-	  }
-	 
-	 $scope.notify = function(message){
-		 $scope.alertMessage=message;
-		 $scope.alertError=false;
-		 $scope.showToast=true;
-		 var d = new Date();
-		 var n = d.getTime();
-		 $scope.lastAlert=n;
-		 setTimeout($scope.autoHideToast,5000);
-	 }
-	 
-	 $scope.warn = function(message){
-		 $scope.alertMessage=message;
-		 $scope.alertError=true;
-		 $scope.showToast=true;
-
-		 var d = new Date();
-		 var n = d.getTime();
-		 $scope.lastAlert=n;
-		 setTimeout($scope.autoHideToast,5000);
-	 }
-	 
-	 $scope.hideToast = function(){
-		 $scope.showToast=false;
-		 $scope.$apply();
-	 }
-	 
-	 $scope.autoHideToast = function(){
-		 var d = new Date();
-		 var n = d.getTime();
-		 var difference = n-$scope.lastAlert;
-		 if(difference>=5000){
-			 $scope.showToast=false;
-			 $scope.$apply();
-		 }
-		 else{
-			 setTimeout($scope.autoHideToast,500);
-		 }
-	 }
-	 
+	 //API Access
 	 $scope.listClients = function listClients() {
 	    	if($scope.manager || $scope.admin){
 	    		$http({
@@ -162,21 +99,7 @@ function MainNavigationController($scope, $modal, $http) {
 		    	   }
 		       })
 	    	}
-    }
-	 
-	 $scope.noShiftDay= function(day){
-		var unscheduled =true;
-		
-		if(null!=$scope.shifts){
-			$scope.shifts.forEach(function(shift) {
-			  if(shift.startsLocalDate.dayOfWeek==day.toUpperCase().split(" ")[0]){
-			    unscheduled=false;
-			  }
-			});
-		}
-		
-		return unscheduled;
-	}
+	 }
 	 
 	 $scope.listCustomFields = function listCustomFields() {
 		 $http({
@@ -242,142 +165,174 @@ function MainNavigationController($scope, $modal, $http) {
 	       })
     	}
     }
-	    
-	 $scope.getLastShiftUpdate = function (){
-			$http({
-		           url: '/updateInfo/shifts',
-		           method: 'GET',
-		           headers: {
-		               'Authorization': $scope.idToken,
-		               'Content-Type': 'application/x-www-form-urlencoded'
-		           },
-		           params: {
-		           }
-		       })
-		       .then(function (response) {//TODO handle error state
-		    	   $scope.setLastShiftUpdate(response.data);
-		       })
+    
+    $scope.getLastShiftUpdate = function (){
+		$http({
+	           url: '/updateInfo/shifts',
+	           method: 'GET',
+	           headers: {
+	               'Authorization': $scope.idToken,
+	               'Content-Type': 'application/x-www-form-urlencoded'
+	           },
+	           params: {
+	           }
+	       })
+	       .then(function (response) {//TODO handle error state
+	    	   $scope.setLastShiftUpdate(response.data);
+	       })
+	}
+		
+	$scope.getLastClientUpdate = function (){
+		$http({
+	           url: '/updateInfo/clients',
+	           method: 'GET',
+	           headers: {
+	               'Authorization': $scope.idToken,
+	               'Content-Type': 'application/x-www-form-urlencoded'
+	           },
+	           params: {
+	           }
+	       })
+	       .then(function (response) {//TODO handle error state
+	    	   $scope.setLastClientUpdate(response.data);
+	       })
+	}
+		
+	$scope.getLastEmployeeUpdate = function (){
+		var serverUpdate;
+		
+		$http({
+	           url: '/updateInfo/employees',
+	           method: 'GET',
+	           headers: {
+	               'Authorization': $scope.idToken,
+	               'Content-Type': 'application/x-www-form-urlencoded'
+	           },
+	           params: {
+	           }
+        })
+        .then(function (response) {//TODO handle error state
+    	   $scope.setLastEmployeeUpdate(response.data);
+    	   serverUpdate=response.data;
+        })
+       
+        return serverUpdate;
+	}
+
+	 //View Utils
+	 $scope.getDisplayMonth = function(date){
+    	 var monthName = "January";
+    	 
+		 switch(parseInt(date.getMonth())+1){
+		  	  case 1:
+		  		  monthName="January";
+		  		  break;
+		  	  case 2:
+		  		  monthName="Febuary";
+		  		  break;
+		  	  case 3:
+		  		  monthName="March";
+		  		  break;
+		  	  case 4:
+		  		  monthName="April";
+		  		  break;
+		  	  case 5:
+		  		  monthName="May";
+		  		  break;
+		  	  case 6:
+		  		  monthName="June";
+		  		  break;
+		  	  case 7:
+		  		  monthName="July";
+		  		  break;
+		  	  case 8:
+		  		  monthName="August";
+		  		  break;
+		  	  case 9:
+		  		  monthName="September";
+		  		  break;
+		  	  case 10:
+		  		  monthName="October";
+		  		  break;
+		  	  case 11:
+		  		  monthName="November";
+		  		  break;
+		  	  case 12:
+		  		  monthName="December";
+		  		  break;
+	 	 }
+		 
+		 return monthName;
+     }
+     $scope.getDisplayWeek = function(){
+    	 var date = parseInt($scope.week.getDate());
+    	 var day = parseInt($scope.week.getDay());
+    	 
+    	 var weekStart = $scope.week.addDays(-day);
+    	 var weekEnd = weekStart.addDays(6);
+    	 
+    	 $scope.displayWeek = weekStart.getDate()+ " - " +weekEnd.getDate();
+
+    	 $scope.year = parseInt(weekStart.getYear())+1900;
+    	 $scope.monthName=$scope.getDisplayMonth(weekStart);
+    	 $scope.displayDays=[
+			'Sunday '+$scope.monthName + " "+weekStart.getDate(),
+			'Monday '+$scope.getDisplayMonth(weekStart.addDays(1)) + " "+weekStart.addDays(1).getDate(),
+			'Tuesday '+$scope.getDisplayMonth(weekStart.addDays(2)) + " "+weekStart.addDays(2).getDate(),
+			'Wednesday '+$scope.getDisplayMonth(weekStart.addDays(3)) + " "+weekStart.addDays(3).getDate(),
+			'Thursday '+$scope.getDisplayMonth(weekStart.addDays(4)) + " "+weekStart.addDays(4).getDate(),
+			'Friday '+$scope.getDisplayMonth(weekStart.addDays(5)) + " "+weekStart.addDays(5).getDate(),
+			'Saturday '+$scope.getDisplayMonth(weekStart.addDays(6)) + " "+weekStart.addDays(6).getDate()
+		];
+     }
+     	 
+	 $scope.noShiftDay= function(day){
+		var unscheduled =true;
+		
+		if(null!=$scope.shifts){
+			$scope.shifts.forEach(function(shift) {
+			  if(shift.startsLocalDate.dayOfWeek==day.toUpperCase().split(" ")[0]){
+			    unscheduled=false;
+			  }
+			});
 		}
 		
-		$scope.getLastClientUpdate = function (){
-			$http({
-		           url: '/updateInfo/clients',
-		           method: 'GET',
-		           headers: {
-		               'Authorization': $scope.idToken,
-		               'Content-Type': 'application/x-www-form-urlencoded'
-		           },
-		           params: {
-		           }
-		       })
-		       .then(function (response) {//TODO handle error state
-		    	   $scope.setLastClientUpdate(response.data);
-		       })
-		}
-		
-		$scope.getLastEmployeeUpdate = function (){
-			var serverUpdate;
-			
-			$http({
-		           url: '/updateInfo/employees',
-		           method: 'GET',
-		           headers: {
-		               'Authorization': $scope.idToken,
-		               'Content-Type': 'application/x-www-form-urlencoded'
-		           },
-		           params: {
-		           }
-		       })
-		       .then(function (response) {//TODO handle error state
-		    	   $scope.setLastEmployeeUpdate(response.data);
-		    	   serverUpdate=response.data;
-		       })
-		       
-		       return serverUpdate;
-		}
+		return unscheduled;
+	}
 	 
-	 $scope.setLastShiftUpdate = function (time){
-		 $scope.lastShiftUpdate = time;
-	 }
-	 $scope.setLastEmployeeUpdate = function (time){
-		 $scope.lastEmployeeUpdate = time;
-	 }
-	 $scope.setLastClientUpdate = function (time){
-		 $scope.lastClientUpdate = time;
-	 }
-	 $scope.setClient = function (client){
-		 $scope.client = client;
-	 }
-	 $scope.setClients = function (clients){
-		 $scope.clients = clients;
-	 }
-	 $scope.setMonthTab = function(monthTab){
-		 $scope.monthTab = monthTab;
-	 }
-	 $scope.setTab = function(newTab){
-	      $scope.tab = newTab;
-	 }
-	 $scope.setEmployeeTab = function(newTab){
-	      $scope.employeeTab = newTab;
-	 }
-	 
-	 $scope.setEmployee = function(employee){
+    //View setters
+	$scope.setEmployee = function(employee){
 		 $scope.employee=employee;
-	 }
-	 $scope.setEmployees = function(employees){
+	}
+	$scope.setEmployees = function(employees){
 		 $scope.employees=employees;
-	 }
-	 $scope.changeSortOrder = function(){
-		 $scope.sortDescending = !$scope.sortDescending;
-	 }
-	 $scope.setWeek = function (isWeek) {
-        $scope.week = isWeek;
-     };
-	 $scope.setIdToken = function (idToken) {
-	        $scope.idToken = idToken;
-	    };
-	    $scope.setProfile = function (profile) {
-	        $scope.profile = profile;
-	    };
-	 $scope.setUser = function (isUser) {
-	        $scope.user = isUser;
-	    };
-	    $scope.setManager = function (isManager) {
-	        $scope.manager = isManager;
-	    };
-	    $scope.setAdmin = function (isAdmin) {
-	        $scope.admin = isAdmin;
-	    };
-    $scope.setPage = function (viewName) {
-        $scope.page = "templates/page/" + viewName + ".html";
+	}
+	$scope.setWeek = function (isWeek) {
+       $scope.week = isWeek;
     };
-    $scope.setSortField = function(sortField){
-    	$scope.sortField= sortField;
-    }
-    $scope.setWeekFilter = function(weekFilter){
-    	$scope.weekFilter= weekFilter;
-    }
-    $scope.setClientFilter = function(clientFilter){
-    	$scope.clientFilter= clientFilter;
-    }
-    $scope.setStaffFilter = function(staffFilter){
-    	$scope.staffFilter= staffFilter;
-    }
-    $scope.setAssignedFilter = function(assigned){
-    	$scope.assignedFilter= assigned;
-    }
-    $scope.setUnassignedFilter= function(unassigned){
-    	$scope.unassignedFilter= unassigned;
-    }
-    $scope.setRequestedFilter= function(requested){
-    	$scope.requestedFilter= requested;
-    }
-    $scope.setUnrequestedFilter= function(unrequested){
-    	$scope.unrequestedFilter= unrequested;
-    }
-    $scope.setRecurringFilter= function(recurring){
-    	$scope.recurringFilter= recurring;
-    }
+	$scope.setShifts = function setShifts(shifts){
+		 $scope.shifts=shifts;
+	}
+	$scope.setLastLocalShiftUpdate = function setLastLocalShiftUpdate(time){
+		 $scope.lastLocalShiftUpdate=time;
+	}
+	$scope.setLastShiftUpdate = function (time){
+		 $scope.lastShiftUpdate = time;
+	}
+	$scope.setLastEmployeeUpdate = function (time){
+		 $scope.lastEmployeeUpdate = time;
+	}
+	$scope.setLastClientUpdate = function (time){
+		 $scope.lastClientUpdate = time;
+	}
+	$scope.setClient = function (client){
+		 $scope.client = client;
+	}
+	$scope.setClients = function (clients){
+		 $scope.clients = clients;
+	}
+	
+	//TODO try to remove these
     $scope.setSelectedYear= function(year){
     	$scope.selectedYear= year;
     }
@@ -390,18 +345,106 @@ function MainNavigationController($scope, $modal, $http) {
     $scope.setSelectedEmployee= function(employee){
     	$scope.selectedEmployee= employee;
     }
-    $scope.setStaffFilter=function(boolean){
-    	$scope.staffFilter=boolean;
-    }
-    
     $scope.setSelectedClient= function(client){
     	$scope.selectedClient= client;
     }
-    $scope.setClientFilter=function(boolean){
-    	$scope.clientFilter=boolean;
-    }
-    
+
     $scope.setSelectedShift= function(shift){
     	$scope.selectedShift= shift;
     }
+	 
+	//Navigation
+	$scope.setMonthTab = function(monthTab){
+		 $scope.monthTab = monthTab;
+	}
+	$scope.setTab = function(newTab){//ClientTab
+	      $scope.tab = newTab;
+	}
+	$scope.setEmployeeTab = function(newTab){
+	      $scope.employeeTab = newTab;
+	}
+	$scope.setPage = function (viewName) {
+	        $scope.shifts=null;
+	    	$scope.page = "templates/page/" + viewName + ".html";
+    };
+	
+     
+    //Auth
+	$scope.loggedIn = function loggedIn() {
+		 if($scope.idToken!=null){
+			 return true;
+		 }
+		 else{
+			 return false;
+		 }
+	 }
+	 
+    $scope.signOut = function signOut() {
+		 $scope.manager=false;
+		 $scope.admin=false;
+		 $scope.user=false;
+		 $scope.idToken=null;
+		 $scope.profile=null;
+		 $scope.employee=null;
+		 $scope.tab="Schedule";
+		 $scope.employeeTab="Schedule";
+	    
+		 var auth2 = gapi.auth2.getAuthInstance();
+	     auth2.signOut().then(function () {});
+    }
+    $scope.setIdToken = function (idToken) {
+        $scope.idToken = idToken;
+    };
+    $scope.setProfile = function (profile) {
+        $scope.profile = profile;
+    };
+    $scope.setUser = function (isUser) {
+        $scope.user = isUser;
+    };
+    $scope.setManager = function (isManager) {
+        $scope.manager = isManager;
+    };
+    $scope.setAdmin = function (isAdmin) {
+        $scope.admin = isAdmin;
+    };
+   
+	 //Toast notifications 
+	 $scope.notify = function(message){
+		 $scope.alertMessage=message;
+		 $scope.alertError=false;
+		 $scope.showToast=true;
+		 var d = new Date();
+		 var n = d.getTime();
+		 $scope.lastAlert=n;
+		 setTimeout($scope.autoHideToast,5000);
+	 }
+	 
+	 $scope.warn = function(message){
+		 $scope.alertMessage=message;
+		 $scope.alertError=true;
+		 $scope.showToast=true;
+
+		 var d = new Date();
+		 var n = d.getTime();
+		 $scope.lastAlert=n;
+		 setTimeout($scope.autoHideToast,5000);
+	 }
+	 
+	 $scope.hideToast = function(){
+		 $scope.showToast=false;
+		 $scope.$apply();
+	 }
+	 
+	 $scope.autoHideToast = function(){
+		 var d = new Date();
+		 var n = d.getTime();
+		 var difference = n-$scope.lastAlert;
+		 if(difference>=5000){
+			 $scope.showToast=false;
+			 $scope.$apply();
+		 }
+		 else{
+			 setTimeout($scope.autoHideToast,500);
+		 }
+	 }
 }

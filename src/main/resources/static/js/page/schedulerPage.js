@@ -65,6 +65,7 @@ function SchedulingController($scope, $modal, $http) {
     	  }
       }
       
+      //TODO refactor with getDisplayMonth
       switch(newTab){
     	  case 1:
     		  $scope.monthName="January";

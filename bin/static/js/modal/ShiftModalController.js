@@ -31,6 +31,51 @@ function ShiftModalController($scope, $modalInstance, $http, idToken,shift, clie
 		}
 	}
    
+	$scope.checkForUpdates = function checkForUpdates(){
+    	let id = "-1";
+    	
+    	if(null!=$scope.shift){
+    		id=$scope.shift.id;
+    	}
+    	
+    	$scope.getDisplayWeek();
+    	
+    	if(id!=-1){
+    		$http({
+ 	           url: '/updateInfo/shifts',
+ 	           method: 'GET',
+ 	           headers: {
+ 	               'Authorization': $scope.idToken,
+ 	               'Content-Type': 'application/x-www-form-urlencoded'
+ 	           },
+ 	           params: {
+ 	           }
+ 	       })
+ 	       .then(function (response) {//TODO handle error state
+ 	    	   $scope.setLastShiftUpdate(response.data);
+	    	   $scope.setLastLocalShiftUpdate(response.data);
+
+		    	$http({
+		            url: '/shifts/'+id,
+		            method: 'GET',
+		            headers: {
+		                'Authorization': $scope.idToken,
+		                'Content-Type': 'application/x-www-form-urlencoded'
+		            },
+		            params: {
+		            	employeeId:id,
+		            	month:$scope.week.getMonth()+1,
+		            	day: $scope.week.getDate(),
+		            	year:$scope.week.getFullYear()
+		            }
+		        })
+		        .then(function(response) {
+		    		$scope.setShifts(response.data);
+		    	});
+ 	       })
+    	}
+    }
+	
 	$scope.clearSelectedEmployee = function(){
 		$scope.showEmployee=false;
 		$scope.showEmployee=true;

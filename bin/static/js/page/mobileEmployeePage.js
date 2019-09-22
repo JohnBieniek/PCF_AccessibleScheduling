@@ -252,73 +252,8 @@ function MobileEmployeeController($scope, $modal, $http) {
        });
     }
 
-     $scope.getDisplayMonth = function(date){
-    	 var monthName = "January";
-    	 
-		 switch(parseInt(date.getMonth())+1){
-		  	  case 1:
-		  		  monthName="January";
-		  		  break;
-		  	  case 2:
-		  		  monthName="Febuary";
-		  		  break;
-		  	  case 3:
-		  		  monthName="March";
-		  		  break;
-		  	  case 4:
-		  		  monthName="April";
-		  		  break;
-		  	  case 5:
-		  		  monthName="May";
-		  		  break;
-		  	  case 6:
-		  		  monthName="June";
-		  		  break;
-		  	  case 7:
-		  		  monthName="July";
-		  		  break;
-		  	  case 8:
-		  		  monthName="August";
-		  		  break;
-		  	  case 9:
-		  		  monthName="September";
-		  		  break;
-		  	  case 10:
-		  		  monthName="October";
-		  		  break;
-		  	  case 11:
-		  		  monthName="November";
-		  		  break;
-		  	  case 12:
-		  		  monthName="December";
-		  		  break;
-	 	 }
-		 
-		 return monthName;
-     }
-     
-     $scope.getDisplayWeek = function(){
-    	 var date = parseInt($scope.week.getDate());
-    	 var day = parseInt($scope.week.getDay());
-    	 
-    	 var weekStart = $scope.week.addDays(-day);
-    	 var weekEnd = weekStart.addDays(6);
-    	 
-    	 $scope.displayWeek = weekStart.getDate()+ " - " +weekEnd.getDate();
-
-    	 $scope.year = parseInt(weekStart.getYear())+1900;
-    	 $scope.monthName=$scope.getDisplayMonth(weekStart);
-    	 $scope.displayDays=[
-			'Sunday '+$scope.monthName + " "+weekStart.getDate(),
-			'Monday '+$scope.getDisplayMonth(weekStart.addDays(1)) + " "+weekStart.addDays(1).getDate(),
-			'Tuesday '+$scope.getDisplayMonth(weekStart.addDays(2)) + " "+weekStart.addDays(2).getDate(),
-			'Wednesday '+$scope.getDisplayMonth(weekStart.addDays(3)) + " "+weekStart.addDays(3).getDate(),
-			'Thursday '+$scope.getDisplayMonth(weekStart.addDays(4)) + " "+weekStart.addDays(4).getDate(),
-			'Friday '+$scope.getDisplayMonth(weekStart.addDays(5)) + " "+weekStart.addDays(5).getDate(),
-			'Saturday '+$scope.getDisplayMonth(weekStart.addDays(6)) + " "+weekStart.addDays(6).getDate()
-		];
-     }
-     
+    
+    
      $scope.setShiftDisplay = function(shift){
     	if(shift.startsLocalDateTime==null || shift.startsLocalDateTime==undefined){
 			 return null;
@@ -552,7 +487,9 @@ function MobileEmployeeController($scope, $modal, $http) {
     	if(null!=$scope.employee){
     		id=$scope.employee.id;
     	}
+    	
     	$scope.getDisplayWeek();
+    	
     	if(id!=-1){
 	    	$http({
 	            url: '/schedule/employeeShiftsForWeek',
@@ -573,55 +510,11 @@ function MobileEmployeeController($scope, $modal, $http) {
 	    	});
     	}
     }
-    
-    $scope.listCurrentShifts = function listCurrentShifts(){
-    	let id = "-1";
-    	
-    	if(null!=$scope.employee){
-    		id=$scope.employee.id;
-    	}
-    	
-    	$http({
-            url: '/schedule/currentShifts',
-            method: 'GET',
-            headers: {
-                'Authorization': $scope.idToken,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            params: {
-            	employeeId:id
-            }
-        })
-        .then(function(response) {
-    		$scope.currentShifts = response.data;
-    	});
-    }
-    
-
-  
    
    function clone (obj) {
        return JSON.parse(JSON.stringify(obj));
    }
-   
-   function saveShiftRequest(shiftRequest) {
-	   $http({
-           url: '/clientRequests',
-           method: 'POST',
-           headers: {
-               'Authorization': $scope.idToken,
-               'Content-Type': 'application/x-www-form-urlencoded'
-           },
-           params: {
-           }
-       })
-       .then(function(response) {
-           $scope.notify("Request saved");
-           
-           $scope.listShiftRequests();
-       });
-   }
-   
+
    $scope.editShift = function (shift) {
 	   if($scope.profile && $scope.profile.manager){
 	       var updateModal = $modal.open({
