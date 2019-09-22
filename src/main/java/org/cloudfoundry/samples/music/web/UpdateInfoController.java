@@ -57,7 +57,13 @@ public class UpdateInfoController {
     	logger.info("Getting updateInfo " + id);
     	
     	UpdateInfo updateInfo = repository.findOne(id);
-    	
+    	if(updateInfo!=null) {
+    		logger.info(updateInfo.getTime().toString());
+    	}
+    	else {
+    		manager.set(id);
+    		updateInfo = repository.findOne(id);
+    	}
         return updateInfo;
     }
 

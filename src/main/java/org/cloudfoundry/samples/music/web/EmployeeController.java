@@ -1,6 +1,7 @@
 package org.cloudfoundry.samples.music.web;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.Collections;
 import java.util.List;
 
@@ -75,7 +76,7 @@ public class EmployeeController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public Employee update(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam String param) throws AuthenticationException {
+    public Employee update(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam String param) throws AuthenticationException, ParseException {
     	securityManager.authorize(idToken, Constants.MANAGER);
     	
     	Employee employee=null;
@@ -92,6 +93,7 @@ public class EmployeeController {
 			e.printStackTrace();
 		}
     	logger.info(employee.toString());
+    	employee.sortCallOffs();
     	updateInfoManager.set("employees");
         return repository.save(employee);
     }

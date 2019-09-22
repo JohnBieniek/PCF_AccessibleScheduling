@@ -392,41 +392,14 @@ function MobileClientController($scope, $modal, $http) {
 		 request.displayValue+=".";
 	 }
 
-	 $scope.listClients = function listClients() {
-		$http({
-	        url: '/clients',
-	        method: 'GET',
-	        headers: {
-	            'Authorization': $scope.idToken
-	        },
-	        params: {
-	        }
-	    })
-	    .then(function(response) {
-	    	$scope.clients=response.data;
-	    	
-	        if($scope.client==null){
-	        	$scope.setClientAndInfo($scope.clients[0]);
-	        }
-	        $scope.listEmployees();
-	    });
+	 $scope.listClientsAndInfo = function listClientsAndInfo() {
+		$scope.listClients();
+        if($scope.client==null){
+        	$scope.setClientAndInfo($scope.clients[0]);
+        }
+        $scope.listEmployees();
     }
-    
-    $scope.listEmployees = function listEmployees() {
-  		$http({
-	        url: '/employees',
-	        method: 'GET',
-	        headers: {
-	            'Authorization': $scope.idToken
-	        },
-	        params: {
-	        }
-	    })
-	    .then(function(response) {
-	    	$scope.employees=response.data;
-	    });
-    }
-    
+
     function saveShift(shift) {
     	$http({
             url: '/shifts',
@@ -926,9 +899,5 @@ function MobileClientController($scope, $modal, $http) {
         		$scope.setClient(response.data);
         	}
         });
-    }
-    
-    $scope.init = function(){
-    	//$scope.listClients();
     }
 }

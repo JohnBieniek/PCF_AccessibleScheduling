@@ -24,16 +24,25 @@ angular.module('mainNavigation', ['ngResource', 'ui.bootstrap']).
 function MainNavigationController($scope, $modal, $http) {
 	 $scope.init = function() {
         $scope.setPage("login");
+		$scope.tab="Schedule";
+		$scope.employeeTab="Schedule";
+        
         $scope.showToast=false;
         $scope.alertMessage="";
+        
         $scope.sortDescending = false;
+        
         $scope.profile = null;
         $scope.idToken = null;
         $scope.user=false;
         $scope.manager=false;
         $scope.admin=false;
+        
         $scope.lastShiftUpdate=null;
         $scope.lastClientUpdate=null;
+        $scope.lastLocalClientUpdate=null;
+        $scope.lastEmployeeUpdate=null;
+        $scope.lastLocalEmployeeUpdate=null;
         $scope.lastCustomFieldUpdate = null;
         
         if($scope.week==undefined || $scope.week ==null){
@@ -41,18 +50,12 @@ function MainNavigationController($scope, $modal, $http) {
 		}
         
         $scope.monthTab=$scope.week.getMonth()+2;
-
-		$scope.tab="Schedule";
-		$scope.employeeTab="Schedule";
+		
         $scope.employee=null;
+        $scope.employees=null;
         $scope.client=null;
-	   	$scope.assignedFilter=false;
-	   	$scope.unassignedFilter= false;
-	   	$scope.clientFilter = false;
-	   	$scope.staffFilter = false;
-	   	$scope.requestedFilter= false;
-	   	$scope.unrequestedFilter=false;
-	   	$scope.recurringFilter = false;
+        $scope.clients=null;
+        
    	 	$scope.selectedClient= false;//Used by clientList.html to select a client for scheduling on scheduling.html
    	 	$scope.selectedEmployee= false;//Used by employeeList.html to select an employee for vacation on vacation.html
    	 	$scope.selectedShift= false;//Used by shiftList.html to select a shift for assignment on shift.html
@@ -120,6 +123,132 @@ function MainNavigationController($scope, $modal, $http) {
 		 }
 	 }
 	 
+	 $scope.listClients = function listClients() {
+	    	if($scope.manager || $scope.admin){
+	    		$http({
+			           url: '/updateInfo/clients',
+			           method: 'GET',
+			           headers: {
+			               'Authorization': $scope.idToken,
+			               'Content-Type': 'application/x-www-form-urlencoded'
+			           },
+			           params: {
+			           }
+		       })
+		       .then(function (response) {//TODO handle error state	    
+		    	   console.log("client update info response:");
+		    	   console.log(response);
+		    	   console.log("$scope.lastLocalClientUpdate");
+		    	   console.log($scope.lastLocalClientUpdate);
+		    	   if($scope.lastLocalClientUpdate==null || response.data==null || response.data.time.nano!=$scope.lastLocalClientUpdate.time.nano){
+		    		   $scope.lastLocalClientUpdate=response.data;
+		    		   
+		    		   $http({
+				            url: '/clients/',
+				            method: 'GET',
+				            headers: {
+					            'Authorization': $scope.idToken,
+				                'Content-Type': 'application/x-www-form-urlencoded'
+				            },
+				            params: {
+				            }
+				        })
+				        .then(function(response) {
+				        	$scope.clients =response.data;
+				        });
+		    	   }
+		       })
+	    	}
+    }
+	 
+    $scope.listEmployees = function listEmployees() {
+    	if($scope.manager || $scope.admin){
+    		$http({
+		           url: '/updateInfo/employees',
+		           method: 'GET',
+		           headers: {
+		               'Authorization': $scope.idToken,
+		               'Content-Type': 'application/x-www-form-urlencoded'
+		           },
+		           params: {
+		           }
+	       })
+	       .then(function (response) {//TODO handle error state	    	   
+	    	   console.log(response);
+	    	   if($scope.lastLocalEmployeeUpdate==null || response.data==null || response.data.time.nano!=$scope.lastLocalEmployeeUpdate.time.nano){
+	    		   $scope.lastLocalEmployeeUpdate=response.data;
+	    		   
+	    		   $http({
+			            url: '/employees/',
+			            method: 'GET',
+			            headers: {
+				            'Authorization': $scope.idToken,
+			                'Content-Type': 'application/x-www-form-urlencoded'
+			            },
+			            params: {
+			            }
+			        })
+			        .then(function(response) {
+			        	$scope.employees =response.data;
+			        });
+	    	   }
+	       })
+    	}
+    }
+	    
+	 $scope.getLastShiftUpdate = function (){
+			$http({
+		           url: '/updateInfo/shifts',
+		           method: 'GET',
+		           headers: {
+		               'Authorization': $scope.idToken,
+		               'Content-Type': 'application/x-www-form-urlencoded'
+		           },
+		           params: {
+		           }
+		       })
+		       .then(function (response) {//TODO handle error state
+		    	   $scope.setLastShiftUpdate(response.data);
+		       })
+		}
+		
+		$scope.getLastClientUpdate = function (){
+			$http({
+		           url: '/updateInfo/clients',
+		           method: 'GET',
+		           headers: {
+		               'Authorization': $scope.idToken,
+		               'Content-Type': 'application/x-www-form-urlencoded'
+		           },
+		           params: {
+		           }
+		       })
+		       .then(function (response) {//TODO handle error state
+		    	   $scope.setLastClientUpdate(response.data);
+		       })
+		}
+		
+		$scope.getLastEmployeeUpdate = function (){
+			var serverUpdate;
+			
+			$http({
+		           url: '/updateInfo/employees',
+		           method: 'GET',
+		           headers: {
+		               'Authorization': $scope.idToken,
+		               'Content-Type': 'application/x-www-form-urlencoded'
+		           },
+		           params: {
+		           }
+		       })
+		       .then(function (response) {//TODO handle error state
+		    	   $scope.setLastEmployeeUpdate(response.data);
+		    	   serverUpdate=response.data;
+		       })
+		       
+		       return serverUpdate;
+		}
+	 
 	 $scope.setLastShiftUpdate = function (time){
 		 $scope.lastShiftUpdate = time;
 	 }
@@ -131,6 +260,9 @@ function MainNavigationController($scope, $modal, $http) {
 	 }
 	 $scope.setClient = function (client){
 		 $scope.client = client;
+	 }
+	 $scope.setClients = function (clients){
+		 $scope.clients = clients;
 	 }
 	 $scope.setMonthTab = function(monthTab){
 		 $scope.monthTab = monthTab;
@@ -144,6 +276,9 @@ function MainNavigationController($scope, $modal, $http) {
 	 
 	 $scope.setEmployee = function(employee){
 		 $scope.employee=employee;
+	 }
+	 $scope.setEmployees = function(employees){
+		 $scope.employees=employees;
 	 }
 	 $scope.changeSortOrder = function(){
 		 $scope.sortDescending = !$scope.sortDescending;

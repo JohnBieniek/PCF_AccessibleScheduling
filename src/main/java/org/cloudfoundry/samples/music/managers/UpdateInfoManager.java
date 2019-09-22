@@ -21,7 +21,14 @@ public class UpdateInfoManager {
     
     public UpdateInfo set(String id) {
     	UpdateInfo updateInfo = crud.findOne(id);
+    	
+    	if(null==updateInfo) {
+    		updateInfo= new UpdateInfo();
+    		updateInfo.setId(id);
+    	}
+    	
     	updateInfo.setTime(LocalDateTime.now());
+    	
     	return crud.save(updateInfo);
 	}
 }

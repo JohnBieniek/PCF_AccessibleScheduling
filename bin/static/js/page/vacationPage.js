@@ -94,21 +94,4 @@ function VacationController($scope, $modal, $http) {
            $scope.notify("Employee saved");
        });
     }
-    
-    
-    $scope.listEmployees = function listEmployees() {    	
-    	$http({
-            url: '/employees/',
-            method: 'GET',
-            headers: {
-	            'Authorization': $scope.idToken,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            params: {
-            }
-        })
-        .then(function(response) {
-        	$scope.employees=response.data;
-        });
-    }
 }

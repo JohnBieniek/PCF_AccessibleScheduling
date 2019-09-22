@@ -1,4 +1,4 @@
-<div ng-controller="MobileClientController" ng-init="listClients()">
+<div ng-controller="MobileClientController" ng-init="listClientsAndInfo()">
 	<div ng-if="user" style="display:inline-block;width:100%">
 	 	<div style="display:inline-block;width:25%">
 			<ul>
@@ -7,7 +7,7 @@
 			       		<p ng-click="newClient()"><span class="mycon glyphicon-plus"></span>&nbsp;New Client</p>
 			    	</div>
 		    	</div>
-				<div class="monthSelector" ng-init="init()">
+				<div class="monthSelector">
 					<div ng-repeat="client in clients">
 						<div class = "clientTab" ng-class="{ active: isClientSet(client) }">
 					    	<div>
@@ -126,7 +126,7 @@
 			            <input ng-change="setDetailsToChanged()"  type="checkbox" id="medPass" name="medPass" style="height:20px;width:20px" ng-model="client.medPass">
 			        </div>
 			        
-				    <div ng-if="customFieldDataEditing">
+				    <div ng-if="manager">
 				        <div ng-repeat="customField in customFields">
 			            	<div ng-init="getClientCustomFieldData(client,customField,$index)">
 			            		<label for="customField" style="font-size:38px">{{customField.clientVariable}}</label>

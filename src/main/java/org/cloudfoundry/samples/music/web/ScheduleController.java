@@ -14,6 +14,7 @@ import org.cloudfoundry.samples.music.managers.ScheduleManager;
 import org.cloudfoundry.samples.music.managers.ShiftAssignmentManager;
 import org.cloudfoundry.samples.music.managers.ShiftGenerationManager;
 import org.cloudfoundry.samples.music.managers.ShiftManager;
+import org.cloudfoundry.samples.music.managers.UpdateInfoManager;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoClientRepository;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoClientRequestRepository;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoEmployeeRepository;
@@ -84,6 +85,9 @@ public class ScheduleController {
     
     @Autowired 
     ShiftAssignmentManager shiftAssignmentManager;
+    
+    @Autowired
+    private UpdateInfoManager updateInfoManager;
     
     @Autowired
     public ScheduleController(ScheduleManager manager) {
@@ -179,6 +183,8 @@ public class ScheduleController {
 
         List<Employee> employees = employeeRepository.findAll();
         Collections.sort(employees);
+        
+        updateInfoManager.set("employees");
 		return employees;
     }    
     @RequestMapping(value = "/createClient",method = RequestMethod.POST)
@@ -193,6 +199,7 @@ public class ScheduleController {
 
         List<Client> clients = clientRepository.findAll();
         Collections.sort(clients);
+        updateInfoManager.set("clients");
 		return clients;
     }
 
@@ -226,7 +233,7 @@ public class ScheduleController {
 			e.printStackTrace();
 		}
     	employeeRepository.save(employee);
-        
+    	updateInfoManager.set("employees");
         return employeeRepository.findOne(employee.getId());
     }
     @RequestMapping(value = "/updateClient",method = RequestMethod.POST)
@@ -247,7 +254,7 @@ public class ScheduleController {
 			e.printStackTrace();
 		}
         clientRepository.save(client);
-        
+        updateInfoManager.set("clients");
         return clientRepository.findOne(client.getId());
     }
 

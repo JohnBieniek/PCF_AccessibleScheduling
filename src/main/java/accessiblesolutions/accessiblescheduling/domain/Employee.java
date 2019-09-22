@@ -1,9 +1,13 @@
 package accessiblesolutions.accessiblescheduling.domain;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,8 +18,6 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
@@ -47,6 +49,24 @@ public class Employee implements Comparable{
 
 	public void setDays(String[] days) {
 		this.days = days;
+	}
+	
+	public void sortCallOffs() throws ParseException {
+		ArrayList<Date> callOffs = new ArrayList<Date>();
+		
+		for(String date :requestedOff) {
+			callOffs.add(new SimpleDateFormat("yyyy-MM-dd").parse(date));
+		}
+		
+		Collections.sort(callOffs);
+		
+		String pattern = "yyyy-MM-dd";
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+
+		for(int index = 0; index<callOffs.size();index++) {
+			String date = simpleDateFormat.format(callOffs.get(index));
+			requestedOff[callOffs.size()-1-index]=date;
+		}
 	}
 	
 	public JSONObject userSafeEmployeeData() throws JSONException {

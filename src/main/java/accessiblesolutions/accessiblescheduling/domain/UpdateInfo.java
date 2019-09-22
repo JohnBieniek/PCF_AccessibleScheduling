@@ -17,6 +17,14 @@ public class UpdateInfo {
 	
 	public UpdateInfo() {
 	}
+	
+	public String getId() {
+		return id;
+	}
+	
+	public void setId(String id) {
+		this.id=id;
+	}
 
 	public LocalDateTime getTime() {
 		return time;

@@ -56,7 +56,7 @@ function MobileEmployeeController($scope, $modal, $http) {
 		 $scope.newDate=$scope.week.getFullYear()+"-"+(($scope.week.getMonth()+1)<10?"0"+($scope.week.getMonth()+1):($scope.week.getMonth()+1))+"-"+$scope.week.getDate();
 		 
 		 if($scope.manager){
-			 $scope.listEmployees();
+			 $scope.listEmployeesAndInfo();
 		 }
 		 
 		 if($scope.employee==undefined || $scope.employee == null){
@@ -74,7 +74,6 @@ function MobileEmployeeController($scope, $modal, $http) {
 			currentEmployee.endTimes.splice(availability,1); 
 
 	        $scope.saveEmployee(currentEmployee);
-            //setTimeout($scope.hideToast,3000);
 	    }
     }
 	
@@ -90,54 +89,6 @@ function MobileEmployeeController($scope, $modal, $http) {
 	
 	$scope.isAvailabilityDay= function(availability,day){
 		return day==$scope.employee.days[availability];
-	}
-	
-	$scope.getLastShiftUpdate = function (){
-		$http({
-	           url: '/updateInfo/shifts',
-	           method: 'GET',
-	           headers: {
-	               'Authorization': $scope.idToken,
-	               'Content-Type': 'application/x-www-form-urlencoded'
-	           },
-	           params: {
-	           }
-	       })
-	       .then(function (response) {//TODO handle error state
-	    	   $scope.setLastShiftUpdate(response.data);
-	       })
-	}
-	
-	$scope.getLastClientUpdate = function (){
-		$http({
-	           url: '/updateInfo/clients',
-	           method: 'GET',
-	           headers: {
-	               'Authorization': $scope.idToken,
-	               'Content-Type': 'application/x-www-form-urlencoded'
-	           },
-	           params: {
-	           }
-	       })
-	       .then(function (response) {//TODO handle error state
-	    	   $scope.setLastClientUpdate(response.data);
-	       })
-	}
-	
-	$scope.getLastEmployeeUpdate = function (){
-		$http({
-	           url: '/updateInfo/employees',
-	           method: 'GET',
-	           headers: {
-	               'Authorization': $scope.idToken,
-	               'Content-Type': 'application/x-www-form-urlencoded'
-	           },
-	           params: {
-	           }
-	       })
-	       .then(function (response) {//TODO handle error state
-	    	   $scope.setLastEmployeeUpdate(response.data);
-	       })
 	}
 	
 	$scope.getEmployeeCustomFieldData = function (employee,customField,index){
@@ -194,7 +145,7 @@ function MobileEmployeeController($scope, $modal, $http) {
 		      $scope.getEmployeeCustomFieldData($scope.employee,$scope.customFields[index],index);
 	      }
       }
-      $scope.listEmployees();
+      $scope.listEmployeesAndInfo();
       $scope.listShifts();
 	}
 	
@@ -300,7 +251,7 @@ function MobileEmployeeController($scope, $modal, $http) {
 	                });
 	            }
            }
-           $scope.listEmployees();
+           $scope.listEmployeesAndInfo();
 		   $scope.notify("Employee saved.");
        });
     }
@@ -567,47 +518,17 @@ function MobileEmployeeController($scope, $modal, $http) {
 		 
 		request.displayValue+=".";
 	}
-
-	$scope.listClients = function listClients() {
-		$http({
-            url: '/clients/',
-            method: 'GET',
-            headers: {
-	            'Authorization': $scope.idToken,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            params: {
-            }
-        })
-        .then(function(response) {
-        	$scope.clients=response.data;
-        });
-    }
-    
-    $scope.listEmployees = function listEmployees() {
-    	if($scope.manager || $scope.admin){
-	    	$http({
-	            url: '/employees/',
-	            method: 'GET',
-	            headers: {
-		            'Authorization': $scope.idToken,
-	                'Content-Type': 'application/x-www-form-urlencoded'
-	            },
-	            params: {
-	            }
-	        })
-	        .then(function(response) {
-	        	$scope.employees=response.data;
-	        	
-	        	if($scope.employee==null){
-	                 $scope.setEmployeeToUser();
-	            }
 	
-	            $scope.listClients();
-	    		$scope.getDisplayWeek();
-	        });
-    	}
-    }
+	$scope.listEmployeesAndInfo = function listEmployeesAndInfo(){
+		$scope.listEmployees();
+		
+    	if($scope.employee==null){
+             $scope.setEmployeeToUser();
+        }
+
+        $scope.listClients();
+		$scope.getDisplayWeek();
+	}
     
     function saveShift(shift) {
     	$http({
@@ -758,7 +679,7 @@ function MobileEmployeeController($scope, $modal, $http) {
         	if(response.data){
                 $scope.notify("Employee created");
                 
-        		$scope.listEmployees();
+        		$scope.listEmployeesAndInfo();
         		
         		$scope.setEmployeeTab("Schedule");
         	}
@@ -884,7 +805,7 @@ function MobileEmployeeController($scope, $modal, $http) {
         .then(function(response) {
         	if(response){
                 $scope.notify("Employee deleted.");
-        		$scope.listEmployees();
+        		$scope.listEmployeesAndInfo();
      			$scope.setEmployeeAndInfo(response.data[0]);
         		$scope.setEmployeeTab("Schedule");
         	}
