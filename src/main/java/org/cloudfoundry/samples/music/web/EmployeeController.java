@@ -8,6 +8,7 @@ import javax.security.sasl.AuthenticationException;
 import javax.validation.Valid;
 
 import org.cloudfoundry.samples.music.managers.AccessibleSecurityManager;
+import org.cloudfoundry.samples.music.managers.UpdateInfoManager;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoCustomFieldDataRepository;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoShiftRepository;
 import org.json.JSONArray;
@@ -48,6 +49,9 @@ public class EmployeeController {
     private MongoCustomFieldDataRepository customDataRepository;
 	@Autowired
     private MongoShiftRepository shiftRepository;
+	@Autowired
+    private UpdateInfoManager updateInfoManager;
+
     
     @Autowired
     public EmployeeController(CrudRepository<Employee, String> repository) {
@@ -66,6 +70,7 @@ public class EmployeeController {
     public Employee add(@RequestHeader(value="Authorization", required=false) String idToken,@RequestBody @Valid Employee employee) throws AuthenticationException {
     	securityManager.authorize(idToken, Constants.MANAGER);
     	logger.info("Adding employee " + employee.getId());
+        updateInfoManager.set("employees");
         return repository.save(employee);
     }
 
@@ -87,6 +92,7 @@ public class EmployeeController {
 			e.printStackTrace();
 		}
     	logger.info(employee.toString());
+    	updateInfoManager.set("employees");
         return repository.save(employee);
     }
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
@@ -131,6 +137,10 @@ public class EmployeeController {
         	shift.setRequestedStaffName(null);
         	shiftRepository.save(shift);
         }
+        
+        updateInfoManager.set("employees");
+        updateInfoManager.set("customFieldData");
+        updateInfoManager.set("shifts");
     }
     
     @RequestMapping(value = "/set", method = RequestMethod.POST)
@@ -159,6 +169,8 @@ public class EmployeeController {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+    	
+    	updateInfoManager.set("employees");
     	
     	return json;
     }

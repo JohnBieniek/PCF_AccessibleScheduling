@@ -8,6 +8,7 @@ import javax.security.sasl.AuthenticationException;
 import javax.validation.Valid;
 
 import org.cloudfoundry.samples.music.managers.AccessibleSecurityManager;
+import org.cloudfoundry.samples.music.managers.UpdateInfoManager;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoCustomFieldDataRepository;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoShiftRepository;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoShiftRequestRepository;
@@ -48,6 +49,8 @@ public class ClientController {
     private MongoShiftRequestRepository requestRepository;
     @Autowired
     private MongoCustomFieldDataRepository customDataRepository;
+    @Autowired
+    private UpdateInfoManager updateInfoManager;
 
     @Autowired
     public ClientController(CrudRepository<Client, String> repository) {
@@ -67,6 +70,7 @@ public class ClientController {
     public Client add(@RequestHeader(value="Authorization", required=false) String idToken, @RequestBody @Valid Client client) throws AuthenticationException {
     	securityManager.authorize(idToken, Constants.MANAGER);
         logger.info("Adding client " + client.getId());
+        updateInfoManager.set("clients");
         return repository.save(client);
     }
 
@@ -74,6 +78,7 @@ public class ClientController {
     public Client update(@RequestHeader(value="Authorization", required=false) String idToken, @RequestBody @Valid Client client) throws AuthenticationException {
     	securityManager.authorize(idToken, Constants.MANAGER);
         logger.info("Updating client " + client.getId());
+        updateInfoManager.set("clients");
         return repository.save(client);
     }
 
@@ -107,6 +112,9 @@ public class ClientController {
         	customDataRepository.delete(entry.getId());
         }
         
+        updateInfoManager.set("clients");
+        updateInfoManager.set("customFieldData");
+        
 		return clients;
     }
     
@@ -136,6 +144,8 @@ public class ClientController {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+    	
+        updateInfoManager.set("clients");
     	
     	return json;
     }

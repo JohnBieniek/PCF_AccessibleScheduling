@@ -10,6 +10,7 @@ import javax.validation.Valid;
 import org.cloudfoundry.samples.music.managers.AccessibleSecurityManager;
 import org.cloudfoundry.samples.music.managers.ScheduleManager;
 import org.cloudfoundry.samples.music.managers.ShiftManager;
+import org.cloudfoundry.samples.music.managers.UpdateInfoManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +49,9 @@ public class ShiftController {
     @Autowired
     ShiftManager shiftManager;
     
+	@Autowired
+    private UpdateInfoManager updateInfoManager;
+    
     @Autowired
     public ShiftController(CrudRepository<Shift, String> repository) {
         this.repository = repository;
@@ -56,7 +60,7 @@ public class ShiftController {
     @RequestMapping(value = "/set", method = RequestMethod.POST)
     public List<Shift> set(@RequestHeader(value="Authorization", required=false) String idToken,@RequestBody List<Shift> shifts) {
     	repository.save(shifts);
-    	
+    	updateInfoManager.set("shifts");
     	return shifts;
     }
     
@@ -129,7 +133,7 @@ public class ShiftController {
         if(shift.getStartYear()==0){
         	shift.setStartYear((int) Integer.parseInt(shift.getStartDate().split("-")[0]));
         }
-        
+    	updateInfoManager.set("shifts");
         return repository.save(shift);
     }
 
@@ -160,6 +164,7 @@ public class ShiftController {
         if(shift.getStartYear()==0){
         	shift.setStartYear((int) Integer.parseInt(shift.getStartDate().split("-")[0]));
         }
+    	updateInfoManager.set("shifts");
         
         return repository.save(shift);
     }
@@ -183,6 +188,7 @@ public class ShiftController {
     public void deleteById(@RequestHeader(value="Authorization", required=false) String idToken, @PathVariable String id) throws AuthenticationException {
     	securityManager.authorize(idToken, Constants.ADMIN);
         logger.info("Deleting shift " + id);
+    	updateInfoManager.set("shifts");
         repository.delete(id);
     }
 }
