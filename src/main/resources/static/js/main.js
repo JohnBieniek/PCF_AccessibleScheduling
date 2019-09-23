@@ -26,7 +26,6 @@ function MainNavigationController($scope, $modal, $http) {
         $scope.setPage("login");
 		$scope.tab="Schedule";
 		$scope.employeeTab="Schedule";
-        
         $scope.showToast=false;
         $scope.alertMessage="";
         
@@ -50,9 +49,8 @@ function MainNavigationController($scope, $modal, $http) {
         if($scope.week==undefined || $scope.week ==null){
 			 $scope.week = new Date();
 		}
-        
         $scope.monthTab=$scope.week.getMonth()+2;
-		
+
         $scope.employee=null;
         $scope.employees=null;
         $scope.client=null;
@@ -264,6 +262,14 @@ function MainNavigationController($scope, $modal, $http) {
 		 
 		 return monthName;
      }
+	 
+	 //Allows for date.addDays. It's fucking awesome
+     Date.prototype.addDays = function(days) {
+ 	    var date = new Date(this.valueOf());
+ 	    date.setDate(date.getDate() + days);
+ 	    return date;
+ 	 }
+     
      $scope.getDisplayWeek = function(){
     	 var date = parseInt($scope.week.getDate());
     	 var day = parseInt($scope.week.getDay());

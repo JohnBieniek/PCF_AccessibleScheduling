@@ -30,7 +30,6 @@ function MobileEmployeeController($scope, $modal, $http) {
 		 $scope.useWeeklyMax=true;
 		 $scope.allowInactive=false;
 		 $scope.generatedBool = false;
-		 $scope.monthName="January";
 		 $scope.statusList=[];
 		 $scope.customValue=[];
 		 $scope.unscheduled=0;
@@ -173,12 +172,6 @@ function MobileEmployeeController($scope, $modal, $http) {
     	 return day.toUpperCase().includes(shift.startsLocalDate.dayOfWeek.toUpperCase());
      }
      
-     Date.prototype.addDays = function(days) {
-	    var date = new Date(this.valueOf());
-	    date.setDate(date.getDate() + days);
-	    return date;
-	}
-     
      $scope.decrementWeek = function(){
     	 if($scope.manager || $scope.admin || $scope.week.getMonth()>$scope.minMonth){
 	    	 $scope.setWeek($scope.week.addDays(-7));
@@ -252,8 +245,6 @@ function MobileEmployeeController($scope, $modal, $http) {
        });
     }
 
-    
-    
      $scope.setShiftDisplay = function(shift){
     	if(shift.startsLocalDateTime==null || shift.startsLocalDateTime==undefined){
 			 return null;

@@ -31,7 +31,6 @@ function MobileClientController($scope, $modal, $http) {
 	$scope.generatedBool = false;
 	$scope.generated="Generated";
 	$scope.assigned="Unassigned";
-	$scope.monthName="January";
 	$scope.customValue=[];
 	$scope.unscheduled=0;
 	$scope.scheduled=0;
