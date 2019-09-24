@@ -31,7 +31,7 @@ function SchedulingController($scope, $modal, $http) {
 		$scope.allowInactive=false;
 		$scope.generatedBool = false;
 		$scope.generated="Generated";
-		$scope.assigned="Unassigned";
+		$scope.assigned="Assigned";
 		
 		$scope.statusList=[];
 		$scope.unscheduled=0;
@@ -201,25 +201,6 @@ function SchedulingController($scope, $modal, $http) {
 	$scope.setMonth = function setMonth(month) {
 	        $scope.month = month;
 	}
-	
-	$scope.listClients = function listClients() {
-		$http({
-	        url: '/clients',
-	        method: 'GET',
-	        headers: {
-	            'Authorization': $scope.idToken
-	        },
-	        params: {
-	        }
-	    })
-	    .then(function(response) {
-	    	$scope.clients=response.data;
-	    	
-	        if($scope.client==null){
-	        	$scope.client = $scope.clients[0];
-	        }
-	    });
-    }
     
     $scope.deleteShifts = function(month){
     	if(confirm("Are you sure to delete the shifts for "+$scope.monthName+"?")) {
@@ -382,6 +363,4 @@ function SchedulingController($scope, $modal, $http) {
     		$scope.setScheduleTab($scope.monthTab);
         });
     }
-    
-    $scope.listStatusItems();
 }

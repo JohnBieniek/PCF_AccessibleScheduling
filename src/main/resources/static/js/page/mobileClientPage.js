@@ -22,21 +22,7 @@ angular.module('client', ['ngResource', 'ui.bootstrap']).
     });
 
 function MobileClientController($scope, $modal, $http) {
-	$scope.allowOvertime=false;
-	$scope.allowUnavailable=false;
-	$scope.prioritizeSecondShift=false;
-	$scope.useDailyMax=true;
-	$scope.useWeeklyMax=true;
-	$scope.allowInactive=false;
-	$scope.generatedBool = false;
-	$scope.generated="Generated";
-	$scope.assigned="Unassigned";
-	$scope.customValue=[];
-	$scope.unscheduled=0;
-	$scope.scheduled=0;
-	$scope.selectedInterval="day(s)";
-	$scope.detailsChanged=false;
-	$scope.days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+	$scope.customValue=[];//Holds custom field data in the details tab
 	
 	$scope.getClientCustomFieldData = function (client,customField,index){
      	$http({
@@ -66,7 +52,7 @@ function MobileClientController($scope, $modal, $http) {
 	  $scope.detailsChanged=false;
       $scope.setClient(newClient);
       
-      $scope.listRequests(newClient);
+      $scope.listRequests();
       
       $scope.listShifts();
 
@@ -86,34 +72,6 @@ function MobileClientController($scope, $modal, $http) {
       $scope.detailsChanged=true;;
 	}
 	
-    $scope.isDay = function(shift, day){
-    	 return day.toUpperCase().includes(shift.startsLocalDate.dayOfWeek.toUpperCase());
-    }
-     
-    Date.prototype.addDays = function(days) {
-	    var date = new Date(this.valueOf());
-	    date.setDate(date.getDate() + days);
-	    
-	    return date;
-	}
-     
-    $scope.decrementWeek = function(){
-    	$scope.setWeek($scope.week.addDays(-7));
-    	 
-    	 $scope.getDisplayWeek();
-    	 
-    	 $scope.listShifts();
-    }
-     
-    $scope.incrementWeek = function(){
-    	$scope.setWeek($scope.week.addDays(7));
-    	 
-    	 $scope.getDisplayWeek();
-    	 
-    	 $scope.listShifts();
-    }
-     
-     
      $scope.setShiftDisplay = function(shift){
     	 if(shift.startsLocalDateTime==null || shift.startsLocalDateTime==undefined){
 			 return null;
@@ -176,10 +134,6 @@ function MobileClientController($scope, $modal, $http) {
       return valid;
     }
     
-    function clone (obj) {
-    	return JSON.parse(JSON.stringify(obj));
-    }
- 
 	 $scope.setInitialDays = function setInitialDays(request){
 		 if(request.days==null || request.days==undefined){
 			 request.days=[false,false,false,false,false,false,false];
@@ -342,19 +296,19 @@ function MobileClientController($scope, $modal, $http) {
             controller: ShiftModalController,
             resolve: {
             	idToken: function(){
-         		   return clone($scope.idToken);
+         		   return $scope.clone($scope.idToken);
          	    },
             	shift: function(){
             		return {};
             	},
             	client: function(){
-            		return clone($scope.client);
+            		return $scope.clone($scope.client);
             	},
             	clients: function(){
-            		return clone($scope.clients);
+            		return $scope.clone($scope.clients);
             	},
             	employees:function(){
-            		return clone($scope.employees);
+            		return $scope.clone($scope.employees);
             	},
             	date: function(){
              	   return $scope.week;
@@ -396,79 +350,6 @@ function MobileClientController($scope, $modal, $http) {
             $scope.listEmployees();
         });
     }
-    
-    $scope.listShifts = function listShifts(){
-    	let id = "-1";
-    	
-    	if(null!=$scope.client){
-    		id=$scope.client.id;
-    	}
-    	$scope.getDisplayWeek();
-    	$http({
-            url: '/schedule/clientShiftsForWeek',
-            method: 'GET',
-            headers: {
-	            'Authorization': $scope.idToken,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            params: {
-            	clientId:id,
-            	month:$scope.week.getMonth()+1,
-            	day: $scope.week.getDate(),
-            	year:$scope.week.getFullYear()
-            }
-        })
-        .then(function(response) {
-    		$scope.setShifts(response.data);
-    	});
-    }
-   
-    $scope.listRequests = function listRequests(client){
-    	let id = "-1";
-    	
-    	if(null!=client){
-    		id=client.id;
-    	}
-    	
-    	$http({
-            url: '/schedule/clientsRequests',
-            method: 'GET',
-            headers: {
-	            'Authorization': $scope.idToken,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            params: {
-            	clientId:id
-            }
-        })
-        .then(function(response) {
-    		$scope.requests = response.data;
-    	});
-    }
-    
-    $scope.listCurrentShifts = function listCurrentShifts(){
-    	let id = "-1";
-    	
-    	if(null!=$scope.client){
-    		id=$scope.client.id;
-    	}
-    	
-    	$http({
-            url: '/schedule/currentShifts',
-            method: 'GET',
-            headers: {
-	            'Authorization': $scope.idToken,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            params: {
-            	clientId:id
-            }
-        })
-        .then(function(response) {
-    		$scope.currentShifts = response.data;
-    	});
-    }
-    
  
     $scope.editRequest = function (selectedRequest,selectedClient,employees) {
       var editModal = $modal.open({
@@ -477,10 +358,10 @@ function MobileClientController($scope, $modal, $http) {
           windowClass: 'app-modal-window',
           resolve: {
           	selectedClient: function(){
-          		return clone(selectedClient);
+          		return $scope.clone(selectedClient);
           	},
           	employees: function(){
-          		return clone(employees);
+          		return $scope.clone(employees);
           	},
           	selectedEmployee: function(){
           		return selectedRequest.staffId;
@@ -495,10 +376,10 @@ function MobileClientController($scope, $modal, $http) {
                 return 'edit';
             }
           }
-      });
+    });
 
     editModal.result.then(function (shiftRequest) {
-   		$http({
+   		$http({//TODO refactor to saveClientRequest method
                url: '/clientRequests',
                method: 'POST',
                headers: {
@@ -510,8 +391,8 @@ function MobileClientController($scope, $modal, $http) {
                }
            })
            .then(function(response) {
-
            		$scope.notify("Request saved");
+           		
         		$scope.requests = response.data;
            });
       	});
@@ -524,13 +405,13 @@ function MobileClientController($scope, $modal, $http) {
            windowClass: 'app-modal-window',
            resolve: {
         	client : function(){
-        		return clone(selectedClient);
+        		return $scope.clone(selectedClient);
         	},
            	selectedClient: function(){
-           		return clone(selectedClient);
+           		return $scope.clone(selectedClient);
            	},
            	employees: function(){
-           		return clone(employees);
+           		return $scope.clone(employees);
            	},
            	selectedEmployee: function(){
            		return "";
@@ -568,10 +449,6 @@ function MobileClientController($scope, $modal, $http) {
        });
    }
    
-   function clone (obj) {
-       return JSON.parse(JSON.stringify(obj));
-   }
-   
    function saveShiftRequest(shiftRequest) {
 	   $http({
            url: '/clientRequests',
@@ -597,19 +474,19 @@ function MobileClientController($scope, $modal, $http) {
            controller: ShiftModalController,
            resolve: {
         	   idToken: function(){
-        		   return clone($scope.idToken);
+        		   return $scope.clone($scope.idToken);
         	   },
                shift: function() {
-                   return clone(shift);
+                   return $scope.clone(shift);
                },
                client: function(){
-            	   return clone($scope.selectedClient);
+            	   return $scope.clone($scope.selectedClient);
                },
                clients: function(){
            		return {};
 	           	},
 	           	employees:function(){
-	        		return clone($scope.employees);
+	        		return $scope.clone($scope.employees);
 	        	},
 	           	date: function(){
 	         	   return $scope.week;
@@ -634,17 +511,17 @@ function MobileClientController($scope, $modal, $http) {
            controller: RequestModalController,
            resolve: {
            	selectedClient: function(){
-           		return clone(selectedClient);
+           		return $scope.clone(selectedClient);
            	},
                shiftRequest: function() {
-                   return clone(shiftRequest);
+                   return $scope.clone(shiftRequest);
                },
            	employees: function(){
-           		return clone(employees);
+           		return $scope.clone(employees);
            	},
            	selectedEmployee: function(){
            		if(selectedEmployee!=null && selectedEmployee.length>0){
-           			return clone(selectedEmployee[0]);
+           			return $scope.clone(selectedEmployee[0]);
            		}
            		return "";
            	},

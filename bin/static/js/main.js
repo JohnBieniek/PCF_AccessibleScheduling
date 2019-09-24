@@ -29,8 +29,6 @@ function MainNavigationController($scope, $modal, $http) {
         $scope.showToast=false;
         $scope.alertMessage="";
         
-        $scope.sortDescending = false;
-        
         $scope.profile = null;
         $scope.idToken = null;
         $scope.user=false;
@@ -57,14 +55,158 @@ function MainNavigationController($scope, $modal, $http) {
         $scope.clients=null;
         $scope.customFields=null;
         $scope.shifts=null;
+        $scope.requests=null;
+        $scope.alerts=null;
         
-        //TODO factor these out
-   	 	$scope.selectedClient= false;//Used by clientList.html to select a client for scheduling on scheduling.html
-   	 	$scope.selectedEmployee= false;//Used by employeeList.html to select an employee for vacation on vacation.html
-   	 	$scope.selectedShift= false;//Used by shiftList.html to select a shift for assignment on shift.html
+		$scope.days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+		$scope.maxMonth=$scope.week.getMonth();
+		$scope.minMonth=$scope.maxMonth-1;
+		if($scope.minMonth<0){
+			 $scope.minMonth=11;
+		}
+		$scope.minMonth=$scope.minMonth-1;
+		if($scope.minMonth<0){
+			 $scope.minMonth=11;
+		}
+		$scope.maxMonth=$scope.maxMonth+1;
+		if($scope.maxMonth>11){
+			 $scope.maxMonth=0;
+		}
+		
+		$scope.updateCycle=1;
+		$scope.autoUpdateData();
 	 };
 	 
+	 
+	 $scope.incrementCycle = function(){
+		 $scope.updateCycle=$scope.updateCycle+1;
+		 if($scope.updateCycle=5){
+			 $scope.updateCycle=1;
+		 }
+	 }
+	 
+	 $scope.autoUpdateData = function autoUpdateData(){
+		 if($scope.page!="templates/page/scheduler.html" && $scope.page!="templates/page/alerts.html"){
+			 $scope.listCustomFields();
+			 
+			 if($scope.page=="templates/page/employee.html" || $scope.page=="templates/page/client.html"){
+				 $scope.listClients();
+				 $scope.listEmployees();
+				 $scope.listShifts();//TODO Make this only update when new
+				 
+				 if($scope.page=="templates/page/employee.html"){
+
+				 }
+				 else if($scope.page=="templates/page/client.html"){
+					 $scope.listRequests();//TODO Make this only update when new
+				 }
+			 }
+		 }else if($scope.page=="templates/page/alerts.html"){
+			 $scope.listAlerts();
+		 }
+		 
+		 $scope.incrementCycle();
+		 setTimeout(autoUpdateData,60000);
+	 }
+	 
 	 //API Access
+	 $scope.listAlerts = function (){
+    	if($scope.admin){
+	    	$http({
+	            url: '/alerts/findAll',
+	            method: 'GET',
+	            headers: {
+	                'Authorization': $scope.idToken
+	            },
+	            params: {
+	            }
+	        })
+	        .then(function(response) {
+	        	$scope.alerts=response.data;
+	        });
+    	}
+	 }
+	 
+     $scope.listShifts = function listShifts(){
+    	let id = "-1";
+    	
+       	$scope.getDisplayWeek();
+       	
+		 if($scope.page=="templates/page/employee.html"){
+	    	if(null!=$scope.employee){
+	    		id=$scope.employee.id;
+		    	$http({
+		            url: '/schedule/employeeShiftsForWeek',
+		            method: 'GET',
+		            headers: {
+		                'Authorization': $scope.idToken,
+		                'Content-Type': 'application/x-www-form-urlencoded'
+		            },
+		            params: {
+		            	employeeId:id,
+		            	month:$scope.week.getMonth()+1,
+		            	day: $scope.week.getDate(),
+		            	year:$scope.week.getFullYear()
+		            }
+		        })
+		        .then(function(response) {
+		    		$scope.setShifts(response.data);
+		    	});
+	    	}
+		 }
+		 else if($scope.page=="templates/page/client.html"){
+	    	if(null!=$scope.client){
+		    	if($scope.manager || $scope.admin){
+		    		id=$scope.client.id;
+		    		
+			    	$http({
+			            url: '/schedule/clientShiftsForWeek',
+			            method: 'GET',
+			            headers: {
+				            'Authorization': $scope.idToken,
+			                'Content-Type': 'application/x-www-form-urlencoded'
+			            },
+			            params: {
+			            	clientId:id,
+			            	month:$scope.week.getMonth()+1,
+			            	day: $scope.week.getDate(),
+			            	year:$scope.week.getFullYear()
+			            }
+			        })
+			        .then(function(response) {
+			    		$scope.setShifts(response.data);
+			    	});
+		    	}
+	    	}
+		 }
+     }
+     
+	 $scope.listRequests = function listRequests(){
+    	if($scope.manager || $scope.admin){
+	    	let id = "-1";
+	    	
+	    	if(null!=$scope.client){
+	    		id=$scope.client.id;
+
+	    	
+		    	$http({
+		            url: '/schedule/clientsRequests',
+		            method: 'GET',
+		            headers: {
+			            'Authorization': $scope.idToken,
+		                'Content-Type': 'application/x-www-form-urlencoded'
+		            },
+		            params: {
+		            	clientId:id
+		            }
+		        })
+		        .then(function(response) {
+		    		$scope.requests = response.data;
+		    	});
+	    	}
+    	}
+     }
+	 
 	 $scope.listClients = function listClients() {
 	    	if($scope.manager || $scope.admin){
 	    		$http({
@@ -100,34 +242,36 @@ function MainNavigationController($scope, $modal, $http) {
 	 }
 	 
 	 $scope.listCustomFields = function listCustomFields() {
-		 $http({
-	           url: '/updateInfo/customFields',
-	           method: 'GET',
-	           headers: {
-	               'Authorization': $scope.idToken,
-	               'Content-Type': 'application/x-www-form-urlencoded'
-	           },
-	           params: {
-	           }
-	     })
-	     .then(function (response) {//TODO handle error state	    	 
-	  	   if($scope.lastLocalCustomFieldUpdate==null || response.data==null || response.data.time.nano!=$scope.lastLocalCustomFieldUpdate.time.nano){
-	  		   $scope.lastLocalCustomFieldUpdate=response.data;
-				 $http({
-		            url: '/customFields/',
-		            method: 'GET',
-		            headers: {
-			            'Authorization': $scope.idToken,
-		                'Content-Type': 'application/x-www-form-urlencoded'
-		            },
-		            params: {
-		            }
-		        })
-		        .then(function(response) {
-		        	$scope.customFields=response.data;
-		        });
-	  	   }
-	     })
+		 if($scope.idToken!=null){
+			 $http({
+		           url: '/updateInfo/customFields',
+		           method: 'GET',
+		           headers: {
+		               'Authorization': $scope.idToken,
+		               'Content-Type': 'application/x-www-form-urlencoded'
+		           },
+		           params: {
+		           }
+		     })
+		     .then(function (response) {//TODO handle error state	    	 
+		  	   if($scope.lastLocalCustomFieldUpdate==null || response.data==null || response.data.time.nano!=$scope.lastLocalCustomFieldUpdate.time.nano){
+		  		   $scope.lastLocalCustomFieldUpdate=response.data;
+					 $http({
+			            url: '/customFields/',
+			            method: 'GET',
+			            headers: {
+				            'Authorization': $scope.idToken,
+			                'Content-Type': 'application/x-www-form-urlencoded'
+			            },
+			            params: {
+			            }
+			        })
+			        .then(function(response) {
+			        	$scope.customFields=response.data;
+			        });
+		  	   }
+		     })
+		 }
      }
 	 
     $scope.listEmployees = function listEmployees() {
@@ -263,13 +407,6 @@ function MainNavigationController($scope, $modal, $http) {
 		 return monthName;
      }
 	 
-	 //Allows for date.addDays. It's fucking awesome
-     Date.prototype.addDays = function(days) {
- 	    var date = new Date(this.valueOf());
- 	    date.setDate(date.getDate() + days);
- 	    return date;
- 	 }
-     
      $scope.getDisplayWeek = function(){
     	 var date = parseInt($scope.week.getDate());
     	 var day = parseInt($scope.week.getDay());
@@ -305,6 +442,10 @@ function MainNavigationController($scope, $modal, $http) {
 		
 		return unscheduled;
 	}
+	 
+    $scope.isDay = function(shift, day){
+    	return day.toUpperCase().includes(shift.startsLocalDate.dayOfWeek.toUpperCase());
+    }
 	 
     //View setters
 	$scope.setEmployee = function(employee){
@@ -370,9 +511,27 @@ function MainNavigationController($scope, $modal, $http) {
 	      $scope.employeeTab = newTab;
 	}
 	$scope.setPage = function (viewName) {
+		var newPage = "templates/page/" + viewName + ".html"
+		if(newPage!=$scope.page){
 	        $scope.shifts=null;
 	    	$scope.page = "templates/page/" + viewName + ".html";
+		}
     };
+    
+    $scope.decrementWeek = function(){
+   	 $scope.setWeek($scope.week.addDays(-7));
+   	 
+   	 $scope.getDisplayWeek();
+   	 
+   	 $scope.listShifts();
+    }
+    $scope.incrementWeek = function(){
+    	$scope.setWeek($scope.week.addDays(7));
+   	 
+   	 	$scope.getDisplayWeek();
+   	 
+   	 	$scope.listShifts();
+    }
 	
      
     //Auth
@@ -453,4 +612,17 @@ function MainNavigationController($scope, $modal, $http) {
 			 setTimeout($scope.autoHideToast,500);
 		 }
 	 }
+	 
+	 
+	 //Utils
+	 //Allows for date.addDays. It's fucking awesome
+     Date.prototype.addDays = function(days) {
+ 	    var date = new Date(this.valueOf());
+ 	    date.setDate(date.getDate() + days);
+ 	    return date;
+ 	 }
+     
+     $scope.clone = function clone (obj) {
+         return JSON.parse(JSON.stringify(obj));
+     }
 }
