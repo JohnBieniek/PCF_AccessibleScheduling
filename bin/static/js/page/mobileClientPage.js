@@ -22,27 +22,6 @@ angular.module('client', ['ngResource', 'ui.bootstrap']).
     });
 
 function MobileClientController($scope, $modal, $http) {
-	$scope.customValue=[];//Holds custom field data in the details tab
-	
-	$scope.getClientCustomFieldData = function (client,customField,index){
-     	$http({
-            url: '/compatibility/clientCustomFieldData',
-            method: 'POST',
-            headers: {
-                'Authorization': $scope.idToken,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            params: {
-                client: client,
-                customField: customField,
-                index:index,
-            }
-        })
-        .then(function(response) {
-        	$scope.customValue[response.data.numericResponse] = response.data.booleanResponse;
-        });
-    }
-	
 	$scope.setTabAndInfo = function(newTab){
         $scope.setTab(newTab);
 		$scope.listShifts();
@@ -583,46 +562,66 @@ function MobileClientController($scope, $modal, $http) {
     }
     
     $scope.ok = function () {
-    	$scope.detailsChanged=false;
-
-        var size = $scope.customFields.length;
-        for(var i = 0; i < size ;i++){
-            $http({
-                url: '/compatibility/setClientCustomFieldData',
-                method: 'POST',
-                headers: {
-    	            'Authorization': $scope.idToken,
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                params: {
-                    client: $scope.client,
-                    customField: $scope.customFields[i],
-                    value:$scope.customValue[i],
-                }
-            });
-        }
-        
-    	$http({
-            url: '/schedule/updateClient',
-            method: 'POST',
-            headers: {
-	            'Authorization': $scope.idToken,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            params: {
-                param: $scope.client
-            }
-        })
-        .then(function(response) {
-        	if(response.data){
-                $scope.notify("Client saved");
-                
-            	$scope.detailsChanged=false;
-        	}
-        	else{
-        		$scope.warn("Failed to save client info.")
-        	}
-        });
+    	var originalClient = $scope.clone($scope.unmodifiedClient);
+    	var modifiedClient = $scope.clone($scope.client);
+    	
+    	if(modifiedClient!=$scope.unmodifiedClient){
+	    	$scope.updateClient();
+	    	
+	    	var updateData = false;
+	    	if(originalClient!=$scope.client){
+	    		   if(confirm(modifiedClient.first+" has been modified by another user. Saving your changes will overwrite thier updates. Would you " +
+	    		   				"still like to save your changes?")){
+	    			   updateData=true;
+	    		   }
+	    	}
+	    	else{
+	    		updateData=true;
+	    	}
+	    	
+	    	if(updateDate){
+		  		$scope.detailsChanged=false;
+		  		
+		        var size = $scope.customFields.length;
+		        for(var i = 0; i < size ;i++){
+		            $http({
+		                url: '/compatibility/setClientCustomFieldData',
+		                method: 'POST',
+		                headers: {
+		    	            'Authorization': $scope.idToken,
+		                    'Content-Type': 'application/x-www-form-urlencoded'
+		                },
+		                params: {
+		                    client: $scope.client,
+		                    customField: $scope.customFields[i],
+		                    value:$scope.customValue[i],
+		                }
+		            });
+		        }
+		        
+		    	$http({
+		            url: '/schedule/updateClient',
+		            method: 'POST',
+		            headers: {
+			            'Authorization': $scope.idToken,
+		                'Content-Type': 'application/x-www-form-urlencoded'
+		            },
+		            params: {
+		                param: $scope.client
+		            }
+		        })
+		        .then(function(response) {
+		        	if(response.data){
+		                $scope.notify("Client saved");
+		                
+		            	$scope.detailsChanged=false;
+		        	}
+		        	else{
+		        		$scope.warn("Failed to save client info.")
+		        	}
+		        });
+	    	}
+    	}
     }
     
     $scope.deleteShift = function (shift) {
@@ -675,23 +674,26 @@ function MobileClientController($scope, $modal, $http) {
  	   }
     }
     
-    $scope.cancel = function () {
-    	$http({
+    $scope.updateClient = function () {
+        $http({
             url: '/clients/'+$scope.client.id,
             method: 'GET',
             headers: {
-	            'Authorization': $scope.idToken,
+                'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
             }
         })
         .then(function(response) {
-        	$scope.detailsChanged=false;
-        	
         	if(response.data){
         		$scope.setClient(response.data);
         	}
         });
+    }
+    
+    $scope.cancel = function () {
+    	$scope.detailsChanged=false;
+    	$scope.updateClient();
     }
 }

@@ -23,8 +23,6 @@ angular.module('client', ['ngResource', 'ui.bootstrap']).
 
 function MobileEmployeeController($scope, $modal, $http) {
 	$scope.init = function(){
-		 $scope.customValue=[];//Holds custom field data in the details tab 
-
 		 $scope.newDate=$scope.week.getFullYear()+"-"+(($scope.week.getMonth()+1)<10?"0"+($scope.week.getMonth()+1):($scope.week.getMonth()+1))+"-"+$scope.week.getDate();
 		 
 		 if($scope.manager){

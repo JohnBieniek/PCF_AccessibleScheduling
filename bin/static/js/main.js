@@ -49,9 +49,11 @@ function MainNavigationController($scope, $modal, $http) {
 		}
         $scope.monthTab=$scope.week.getMonth()+2;
 
+    	$scope.customValue=[];//Holds custom field data in the details tab
         $scope.employee=null;
         $scope.employees=null;
         $scope.client=null;
+        $scope.unmodifiedClient=null;
         $scope.clients=null;
         $scope.customFields=null;
         $scope.shifts=null;
@@ -110,6 +112,25 @@ function MainNavigationController($scope, $modal, $http) {
 	 }
 	 
 	 //API Access
+	 $scope.getClientCustomFieldData = function (client,customField,index){
+     	$http({
+            url: '/compatibility/clientCustomFieldData',
+            method: 'POST',
+            headers: {
+                'Authorization': $scope.idToken,
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            params: {
+                client: client,
+                customField: customField,
+                index:index,
+            }
+        })
+        .then(function(response) {
+        	$scope.customValue[response.data.numericResponse] = response.data.booleanResponse;
+        });
+     }
+	 
 	 $scope.listAlerts = function (){
     	if($scope.admin){
 	    	$http({
@@ -474,31 +495,12 @@ function MainNavigationController($scope, $modal, $http) {
 	}
 	$scope.setClient = function (client){
 		 $scope.client = client;
+		 $scope.unmodifiedClient = $scope.clone(client);
 	}
 	$scope.setClients = function (clients){
 		 $scope.clients = clients;
 	}
-	
-	//TODO try to remove these
-    $scope.setSelectedYear= function(year){
-    	$scope.selectedYear= year;
-    }
-    $scope.setSelectedMonth= function(month){
-    	$scope.selectedMonth= month;
-    }
-    $scope.setSelectedWeek= function(week){
-    	$scope.selectedWeek= week;
-    }
-    $scope.setSelectedEmployee= function(employee){
-    	$scope.selectedEmployee= employee;
-    }
-    $scope.setSelectedClient= function(client){
-    	$scope.selectedClient= client;
-    }
 
-    $scope.setSelectedShift= function(shift){
-    	$scope.selectedShift= shift;
-    }
 	 
 	//Navigation
 	$scope.setMonthTab = function(monthTab){
