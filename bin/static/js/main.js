@@ -50,6 +50,7 @@ function MainNavigationController($scope, $modal, $http) {
         $scope.monthTab=$scope.week.getMonth()+2;
 
     	$scope.customValue=[];//Holds custom field data in the details tab
+    	$scope.unmodifiedCustomValue=[];//Holds custom field data in the details tab
         $scope.employee=null;
         $scope.employees=null;
         $scope.client=null;
@@ -108,10 +109,18 @@ function MainNavigationController($scope, $modal, $http) {
 		 }
 		 
 		 $scope.incrementCycle();
-		 setTimeout(autoUpdateData,60000);
+		// setTimeout(autoUpdateData,60000);
 	 }
 	 
 	 //API Access
+	 $scope.getAllClientCustomFieldData = function () {
+	     if($scope.client!=null && $scope.customFields !=null){
+		      for(var index = 0; index<$scope.customFields.length;index++){
+			      $scope.getClientCustomFieldData($scope.client,$scope.customFields[index],index);
+		      }
+	     }
+	 }
+
 	 $scope.getClientCustomFieldData = function (client,customField,index){
      	$http({
             url: '/compatibility/clientCustomFieldData',
@@ -128,6 +137,7 @@ function MainNavigationController($scope, $modal, $http) {
         })
         .then(function(response) {
         	$scope.customValue[response.data.numericResponse] = response.data.booleanResponse;
+        	$scope.unmodifiedCustomValue[response.data.numericResponse] = response.data.booleanResponse;
         });
      }
 	 

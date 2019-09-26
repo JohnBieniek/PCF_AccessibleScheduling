@@ -46,6 +46,7 @@ public class CustomFieldDataController {
     public CustomFieldData add(@RequestHeader(value="Authorization", required=false) String idToken,@RequestBody @Valid CustomFieldData customFieldData) throws AuthenticationException {
     	securityManager.authorize(idToken, Constants.MANAGER);
     	logger.info("Adding customFieldData " + customFieldData.getId());
+    	customFieldData.update();
         return repository.save(customFieldData);
     }
 
@@ -53,6 +54,7 @@ public class CustomFieldDataController {
     public CustomFieldData update(@RequestHeader(value="Authorization", required=false) String idToken, @RequestBody @Valid CustomFieldData customFieldData) throws AuthenticationException {
     	securityManager.authorize(idToken, Constants.MANAGER);
     	logger.info("Updating customFieldData " + customFieldData.getId());
+    	customFieldData.update();
         return repository.save(customFieldData);
     }
 
@@ -82,6 +84,9 @@ public class CustomFieldDataController {
     @RequestMapping(value = "/set", method = RequestMethod.POST)
     public List<CustomFieldData> set(@RequestHeader(value="Authorization", required=false) String idToken, @RequestBody List<CustomFieldData> customFieldDatas) throws AuthenticationException {
     	securityManager.authorize(idToken, Constants.ADMIN);
+    	for(CustomFieldData data: customFieldDatas) {
+        	data.update();
+    	}
     	repository.save(customFieldDatas);
     	
     	return customFieldDatas;

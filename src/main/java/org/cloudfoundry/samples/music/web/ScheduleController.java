@@ -17,6 +17,7 @@ import org.cloudfoundry.samples.music.managers.ShiftManager;
 import org.cloudfoundry.samples.music.managers.UpdateInfoManager;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoClientRepository;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoClientRequestRepository;
+import org.cloudfoundry.samples.music.repositories.mongodb.MongoCustomFieldDataRepository;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoEmployeeRepository;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoShiftRepository;
 import org.cloudfoundry.samples.music.repositories.mongodb.ScheduleStatusRepository;
@@ -35,6 +36,7 @@ import accessiblesolutions.accessiblescheduling.constants.Constants;
 import accessiblesolutions.accessiblescheduling.domain.CallAuth;
 import accessiblesolutions.accessiblescheduling.domain.Client;
 import accessiblesolutions.accessiblescheduling.domain.ClientRequest;
+import accessiblesolutions.accessiblescheduling.domain.CustomFieldData;
 import accessiblesolutions.accessiblescheduling.domain.Employee;
 import accessiblesolutions.accessiblescheduling.domain.ScheduleStatus;
 import accessiblesolutions.accessiblescheduling.domain.Shift;
@@ -90,8 +92,26 @@ public class ScheduleController {
     private UpdateInfoManager updateInfoManager;
     
     @Autowired
+    private MongoCustomFieldDataRepository customFieldDataRepository;
+    
+    @Autowired
     public ScheduleController(ScheduleManager manager) {
         this.manager=manager;
+    }
+    
+    @RequestMapping(value = "/customFieldData",method = RequestMethod.GET)
+    public Iterable<CustomFieldData> customFieldData(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam String param) throws AuthenticationException {
+    	CallAuth auth = securityManager.authorize(idToken, Constants.USER);
+    	
+    	if(!auth.isAdmin() && !auth.isManager()) {
+    		if(param!=auth.getEmployeeId()) {
+    			throw new AuthenticationException();
+    		}
+    	}
+    	
+    	List<CustomFieldData> serverData = customFieldDataRepository.findByOwnerId(param);
+    	System.out.println("customFieldData in ScheduleController gooble snerb fedarkle:"+serverData.size());
+    	return serverData;
     }
     
     @RequestMapping(value = "/staffShift",method = RequestMethod.POST)
