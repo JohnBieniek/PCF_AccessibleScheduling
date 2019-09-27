@@ -331,6 +331,7 @@ public class ScheduleController {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+    	client.setLastUpdatedToNow();
         clientRepository.save(client);
         updateInfoManager.set("clients");
         return clientRepository.findOne(client.getId());

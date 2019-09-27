@@ -99,6 +99,9 @@ public class ShiftAssignmentManager {
 	    	status.setAssigned(true);
 	    	scheduleStatusCrud.save(status);
 	    	System.out.println("Failed to assign everything. "+e.getMessage());
+	    	System.out.println("Failed to assign everything. "+e.getLocalizedMessage());
+	    	System.out.println("Failed to assign everything. "+e.getStackTrace().toString());
+	    	e.printStackTrace();
 		}
     	
     	scheduleStatusRepository.deleteByMonth(options.getMonth());
