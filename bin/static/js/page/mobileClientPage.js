@@ -559,128 +559,83 @@ function MobileClientController($scope, $modal, $http) {
     $scope.ok = function () {
     	var originalClient = $scope.clone($scope.unmodifiedClient);
     	var modifiedClient = $scope.clone($scope.client);
-    	
+    	var lastUpdated = originalClient.lastUpdated;
+    	if(null==lastUpdated || undefined == lastUpdated){
+    		lastUpdated="null";
+    	}
     	if(modifiedClient!=$scope.unmodifiedClient){
 		   $http({
-	            url: '/clients/'+$scope.client.id,
+	            url: '/schedule/clientWasUpdated',
 	            method: 'GET',
 	            headers: {
 	                'Authorization': $scope.idToken,
 	                'Content-Type': 'application/x-www-form-urlencoded'
 	            },
 	            params: {
+	            	lastUpdated:lastUpdated,
+	            	clientId:originalClient.id
 	            }
 	        })
 	        .then(function(response) {
-	        	if(response.data){
-	        		var serverClient = $scope.clone(response.data);
-	        		$http({
-	    	            url: '/schedule/customFieldData',
-	    	            method: 'GET',
-	    	            headers: {
-	    	                'Authorization': $scope.idToken,
-	    	                'Content-Type': 'application/x-www-form-urlencoded'
-	    	            },
-	    	            params: {
-	    	            	param: $scope.client.id
-	    	            }
-	    	        })
-	    	        .then(function(response) {
-	    	        	if(response.data){
-	    	    	    	var updateData = false;
-	    	    	    	var dataChanged = false;
-	    	    	    	
-	    	        		for (i = 0; i < $scope.customFields.length; i++) {
-	    	        			console.log("$scope.customFields[i]");
-	    	        			console.log($scope.customFields[i]);
-	    	        			console.log("$scope.unmodifiedCustomValue[i]");
-	    	        			console.log($scope.unmodifiedCustomValue[i]);
-	    	        			console.log("$scope.customValue[i]");
-	    	        			console.log($scope.customValue[i]);
-	    	        			console.log("response.data[i]");
-	    	        			console.log(response.data[i]);
-	    	        			
-	    	        			if($scope.unmodifiedCustomValue[i]!=response.data[i].booleanData){
-	    	        				console.log($scope.customFields[i].employeeVariable);
-	    	        				dataChanged=true;
-	    	        			}
-	    	        		}
-	    	        		
-	    	        		if(JSON.stringify(originalClient)!=JSON.stringify(serverClient)){
-	    	        			console.log("client changed");
-	    	        			dataChanged=true;
-	    	        		}
-
-	    	    	    	console.log("originalClient");
-	    	    	    	console.log(originalClient);
-	    	    	    	console.log("modifiedClient");
-	    	    	    	console.log(modifiedClient);
-	    	    	    	console.log("serverClient");
-	    	    	    	console.log(serverClient);
-	    	    	    	console.log("originalClient!=response.data");
-	    	    	    	console.log(JSON.stringify(originalClient)!=JSON.stringify(response.data));
-	    	    	    	console.log("JSON.stringify(obj)originalClient!=modifiedClient");
-	    	    	    	console.log(JSON.stringify(originalClient)!=JSON.stringify(modifiedClient));
-
-	    	    	    	if(dataChanged){
-	    	    	    		   if(confirm(modifiedClient.first+" has been modified by another user. Saving your changes will overwrite thier updates. Would you " +
-	    	    	    		   				"still like to save your changes?")){
-	    	    	    			   updateData=true;
-	    	    	    		   }else{
-	    	    	    			   $scope.cancel();
-	    	    	    		   }
-	    	    	    	}
-	    	    	    	else{
-	    	    	    		updateData=true;
-	    	    	    	}
-	    	    	    	
-	    	    	    	if(updateData){
-	    	    		  		$scope.detailsChanged=false;
-	    	    		  		
-	    	    		        var size = $scope.customFields.length;
-	    	    		        for(var i = 0; i < size ;i++){
-	    	    		            $http({
-	    	    		                url: '/compatibility/setClientCustomFieldData',
-	    	    		                method: 'POST',
-	    	    		                headers: {
-	    	    		    	            'Authorization': $scope.idToken,
-	    	    		                    'Content-Type': 'application/x-www-form-urlencoded'
-	    	    		                },
-	    	    		                params: {
-	    	    		                    client: $scope.client,
-	    	    		                    customField: $scope.customFields[i],
-	    	    		                    value:$scope.customValue[i],
-	    	    		                }
-	    	    		            });
-	    	    		        }
-	    	    		        
-	    	    		    	$http({
-	    	    		            url: '/schedule/updateClient',
-	    	    		            method: 'POST',
-	    	    		            headers: {
-	    	    			            'Authorization': $scope.idToken,
-	    	    		                'Content-Type': 'application/x-www-form-urlencoded'
-	    	    		            },
-	    	    		            params: {
-	    	    		                param: $scope.client
-	    	    		            }
-	    	    		        })
-	    	    		        .then(function(response) {
-	    	    		        	if(response.data){
-	    	    		                $scope.notify("Client saved");
-	    	    		                
-	    	    		            	$scope.detailsChanged=false;
-	    	    		            	$scope.updateClient();
-	    	    		            	$scope.getAllClientCustomFieldData();
-	    	    		        	}
-	    	    		        	else{
-	    	    		        		$scope.warn("Failed to save client info.")
-	    	    		        	}
-	    	    		        });
-	    	    	    	}
-	    	        	}
-	    	        });
-	        	}
+	        	var updateData=false;
+	        	console.log("clientWasUpdatedResponse:");
+	        	console.log(response.data);
+    	    	if(response.data=="UPDATED"){
+    	    		   if(confirm(modifiedClient.first+" has just been modified by another user. Saving your changes will overwrite thier updates. Would you " +
+    	    		   				"still like to save your changes?")){
+    	    			   updateData=true;
+    	    		   }else{
+    	    			   $scope.cancel();
+    	    		   }
+    	    	}
+    	    	else{
+    	    		updateData=true;
+    	    	}
+    	    	
+    	    	if(updateData){
+    		  		$scope.detailsChanged=false;
+    		  		
+    		        var size = $scope.customFields.length;
+    		        for(var i = 0; i < size ;i++){
+    		            $http({
+    		                url: '/compatibility/setClientCustomFieldData',
+    		                method: 'POST',
+    		                headers: {
+    		    	            'Authorization': $scope.idToken,
+    		                    'Content-Type': 'application/x-www-form-urlencoded'
+    		                },
+    		                params: {
+    		                    client: $scope.client,
+    		                    customField: $scope.customFields[i],
+    		                    value:$scope.customValue[i],
+    		                }
+    		            });
+    		        }
+    		        
+    		    	$http({
+    		            url: '/schedule/updateClient',
+    		            method: 'POST',
+    		            headers: {
+    			            'Authorization': $scope.idToken,
+    		                'Content-Type': 'application/x-www-form-urlencoded'
+    		            },
+    		            params: {
+    		                param: $scope.client
+    		            }
+    		        })
+    		        .then(function(response) {
+    		        	if(response.data){
+    		                $scope.notify("Client saved");
+    		                
+    		            	$scope.detailsChanged=false;
+    		            	$scope.updateClient();
+    		            	$scope.getAllClientCustomFieldData();
+    		        	}
+    		        	else{
+    		        		$scope.warn("Failed to save client info.")
+    		        	}
+    		        });
+    	    	}
 	        });
     	}
     }

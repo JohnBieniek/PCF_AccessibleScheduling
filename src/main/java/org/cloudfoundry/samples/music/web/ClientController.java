@@ -74,6 +74,7 @@ public class ClientController {
     	securityManager.authorize(idToken, Constants.MANAGER);
         logger.info("Adding client " + client.getId());
         updateInfoManager.set("clients");
+        client.setLastUpdatedToNow();
         return repository.save(client);
     }
 
@@ -82,6 +83,7 @@ public class ClientController {
     	securityManager.authorize(idToken, Constants.MANAGER);
         logger.info("Updating client " + client.getId());
         updateInfoManager.set("clients");
+        client.setLastUpdatedToNow();
         return repository.save(client);
     }
 
@@ -132,6 +134,7 @@ public class ClientController {
 				
 				ObjectMapper objectMapper = new ObjectMapper();
 				Client client = objectMapper.readValue(jsonObject.toString(), Client.class);
+		        client.setLastUpdatedToNow();
 				repository.save(client);
 			}
 		} catch (JSONException e) {

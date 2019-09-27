@@ -33,7 +33,6 @@ public class AccessibleSecurityManager {
     public CallAuth authorize(String idToken, String requiredRole) throws AuthenticationException {
     	CallAuth auth = null;
     	
-    	System.out.println("for role:"+requiredRole+"authorizing:"+idToken);
     	if(null==idToken || idToken.isEmpty()) {
 			System.out.println("invalid id token");
 			throw new AuthenticationException();
@@ -83,7 +82,6 @@ public class AccessibleSecurityManager {
     		auth.setEmployeeId(user.getEmployeeId());
     	}
     	
-    	System.out.println("Call Auth found:"+auth.toString());
     	return auth;
     }
     public boolean signedUp(String idToken) throws AuthenticationException {

@@ -19,7 +19,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import accessiblesolutions.accessiblescheduling.constants.Constants;
 import accessiblesolutions.accessiblescheduling.domain.CallAuth;
+import accessiblesolutions.accessiblescheduling.domain.Client;
 import accessiblesolutions.accessiblescheduling.domain.CustomFieldData;
+import accessiblesolutions.accessiblescheduling.domain.Employee;
 
 @RestController
 @RequestMapping(value = "/customFieldData")
@@ -31,6 +33,12 @@ public class CustomFieldDataController {
 	
     private CrudRepository<CustomFieldData, String> repository;
 
+    @Autowired
+    private CrudRepository<Client, String> clientRepository;
+    
+    @Autowired
+    private CrudRepository<Employee, String> employeeRepository;
+    
     @Autowired
     public CustomFieldDataController(CrudRepository<CustomFieldData, String> repository) {
         this.repository = repository;
@@ -47,6 +55,21 @@ public class CustomFieldDataController {
     	securityManager.authorize(idToken, Constants.MANAGER);
     	logger.info("Adding customFieldData " + customFieldData.getId());
     	customFieldData.update();
+    	
+    	Client client = clientRepository.findOne(customFieldData.getOwnerId());
+    	
+    	if(client!=null) {
+            client.setLastUpdatedToNow();
+    		clientRepository.save(client);    		
+    	}
+    	
+    	Employee employee = employeeRepository.findOne(customFieldData.getOwnerId());
+    	
+    	if(employee!=null) {
+            employee.setLastUpdated();
+    		employeeRepository.save(employee);    		
+    	}
+
         return repository.save(customFieldData);
     }
 
@@ -55,6 +78,21 @@ public class CustomFieldDataController {
     	securityManager.authorize(idToken, Constants.MANAGER);
     	logger.info("Updating customFieldData " + customFieldData.getId());
     	customFieldData.update();
+    	
+    	Client client = clientRepository.findOne(customFieldData.getOwnerId());
+    	
+    	if(client!=null) {
+            client.setLastUpdatedToNow();
+    		clientRepository.save(client);    		
+    	}
+    	
+    	Employee employee = employeeRepository.findOne(customFieldData.getOwnerId());
+    	
+    	if(employee!=null) {
+            employee.setLastUpdated();
+    		employeeRepository.save(employee);    		
+    	}
+    	
         return repository.save(customFieldData);
     }
 
@@ -85,6 +123,20 @@ public class CustomFieldDataController {
     public List<CustomFieldData> set(@RequestHeader(value="Authorization", required=false) String idToken, @RequestBody List<CustomFieldData> customFieldDatas) throws AuthenticationException {
     	securityManager.authorize(idToken, Constants.ADMIN);
     	for(CustomFieldData data: customFieldDatas) {
+        	Client client = clientRepository.findOne(data.getOwnerId());
+        	
+        	if(client!=null) {
+                client.setLastUpdatedToNow();
+        		clientRepository.save(client);    		
+        	}
+        	
+        	Employee employee = employeeRepository.findOne(data.getOwnerId());
+        	
+        	if(employee!=null) {
+                employee.setLastUpdated();
+        		employeeRepository.save(employee);    		
+        	}
+        	
         	data.update();
     	}
     	repository.save(customFieldDatas);

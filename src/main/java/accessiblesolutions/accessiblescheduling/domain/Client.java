@@ -1,5 +1,7 @@
 package accessiblesolutions.accessiblescheduling.domain;
 
+import java.time.LocalDateTime;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -10,7 +12,7 @@ import org.hibernate.annotations.GenericGenerator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @Entity
 @JsonIgnoreProperties
-public class Client implements Comparable{
+public class Client implements Comparable<Client>{
     @Id
     @Column(length=40)
     @GeneratedValue(generator="randomId")
@@ -28,10 +30,15 @@ public class Client implements Comparable{
     private boolean signingOnly;
     private boolean medPass;
     private boolean fixedSchedule;
+    private LocalDateTime lastUpdated;
     
     public Client() {
     }
-
+    
+    public void setLastUpdatedToNow() {
+    	lastUpdated =LocalDateTime.now();
+    }
+    
     @Override
 	public String toString() {
 		return "Client [id=" + id + ", first=" + first + ", initial=" + initial + ", favoriteStaffId=" + favoriteStaffId
@@ -46,9 +53,7 @@ public class Client implements Comparable{
     }
 	
 	@Override
-	public int compareTo(Object arg0) {
-		Client client = (Client)arg0;
-		
+	public int compareTo(Client client) {
 		return getFirst().toLowerCase().compareTo(client.getFirst().toLowerCase());
 	}
 
@@ -146,5 +151,13 @@ public class Client implements Comparable{
 
     public boolean getFixedSchedule() {
         return fixedSchedule;
-    }	
+    }
+
+	public LocalDateTime getLastUpdated() {
+		return lastUpdated;
+	}
+
+	public void setLastUpdated(LocalDateTime lastUpdated) {
+		this.lastUpdated = lastUpdated;
+	}	
 }
