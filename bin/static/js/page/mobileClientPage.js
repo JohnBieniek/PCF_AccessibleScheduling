@@ -24,7 +24,13 @@ angular.module('client', ['ngResource', 'ui.bootstrap']).
 function MobileClientController($scope, $modal, $http) {
 	$scope.setTabAndInfo = function(newTab){
         $scope.setTab(newTab);
-		$scope.listShifts();
+        $scope.updateClient();
+        $scope.getAllClientCustomFieldData();
+        $scope.listRequests();
+        
+        $scope.listShifts();
+
+        $scope.listClients();
 	}
 	
 	$scope.setClientAndInfo = function(newClient){

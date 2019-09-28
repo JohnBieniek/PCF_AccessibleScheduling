@@ -35,7 +35,17 @@ function MobileEmployeeController($scope, $modal, $http) {
 		 
 		 $scope.listShifts();
 	}
-
+	$scope.setEmployeeTabAndInfo=function(tab){
+		$scope.updateEmployee();
+	    if($scope.employee!=null && $scope.customFields !=null){
+		      for(var index = 0; index<$scope.customFields.length;index++){
+			      $scope.getEmployeeCustomFieldData($scope.employee,$scope.customFields[index],index);
+		      }
+	      }
+	    $scope.listEmployeesAndInfo();
+	    $scope.listShifts();
+		$scope.setEmployeeTab(tab);
+	}
 	$scope.deleteAvailability=function(availability){ 
 		var currentEmployee = $scope.employee;
 		if(confirm("Are you sure you want to delete the selected availability? for "+ $scope.employee.days[availability]+ "?")){

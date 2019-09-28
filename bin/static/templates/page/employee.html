@@ -31,22 +31,22 @@
 			<div style="width:100%;text-align: center;">
 				<div style="display:inline-block" class = "employeeRecTab" ng-class="{ active: isSet('Schedule') }">
 			    	<div >
-			       		<p ng-click="setEmployeeTab('Schedule')">Schedule</p>
+			       		<p ng-click="setEmployeeTabAndInfo('Schedule')">Schedule</p>
 			    	</div>
 		    	</div>
 		    	<div style="display:inline-block;" class = "employeeRecTab" ng-class="{ active: isSet('Availability') }">
 			    	<div >
-			       		<p ng-click="setEmployeeTab('Availability')">Availability</p>
+			       		<p ng-click="setEmployeeTabAndInfo('Availability')">Availability</p>
 			    	</div>
 		    	</div>
 		    	<div style="display:inline-block;" class = "employeeRecTab" ng-class="{ active: isSet('Requests') }">
 			    	<div >
-			       		<p ng-click="setEmployeeTab('Requests')">Requests</p>
+			       		<p ng-click="setEmployeeTabAndInfo('Requests')">Requests</p>
 			    	</div>
 		    	</div>
 		    	<div ng-if="manager" style="display:inline-block;" class = "employeeRecTab" ng-class="{ active: isSet('Details') }">
 			    	<div >
-			       		<p ng-click="setEmployeeTab('Details')">Details</p>
+			       		<p ng-click="setEmployeeTabAndInfo('Details')">Details</p>
 			    	</div>
 		    	</div>
 	    	</div>

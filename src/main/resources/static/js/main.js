@@ -639,7 +639,6 @@ function MainNavigationController($scope, $modal, $http) {
 	 
 	 $scope.hideToast = function(){
 		 $scope.showToast=false;
-		 $scope.$apply();
 	 }
 	 
 	 $scope.autoHideToast = function(){
