@@ -54,7 +54,7 @@ public class Employee implements Comparable<Employee>{
 	
 	private String initial;
 
-	private LocalDateTime lastUpdated;
+	private String lastUpdated;
 	private boolean manager;
 	private int maxHours;
 	private boolean medPassCertified;
@@ -197,10 +197,9 @@ public class Employee implements Comparable<Employee>{
 		return initial;
 	}
 
-	public LocalDateTime getLastUpdated() {
+	public String getLastUpdated() {
 		return lastUpdated;
 	}
-
 
 	public int getMaxHours() {
 		return maxHours;
@@ -342,14 +341,16 @@ public class Employee implements Comparable<Employee>{
 		this.initial = initial;
 	}
 
-	public void setLastUpdated() {
-    	lastUpdated =LocalDateTime.now();
+	public void setLastUpdatedToNow() {
+    	setLastUpdated(LocalDateTime.now());
     }
 
 	public void setLastUpdated(LocalDateTime lastUpdated) {
-		this.lastUpdated = lastUpdated;
+		if(lastUpdated!=null) {
+			System.out.println("setting last updated to :"+lastUpdated.toString());
+			this.lastUpdated = lastUpdated.toString();
+		}
 	}
-
 	public void setManager(boolean manager) {
 		this.manager = manager;
 	}

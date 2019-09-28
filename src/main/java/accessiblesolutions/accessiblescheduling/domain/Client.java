@@ -10,6 +10,8 @@ import javax.persistence.Id;
 import org.hibernate.annotations.GenericGenerator;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import accessiblesolutions.accessiblescheduling.util.Util;
 @Entity
 @JsonIgnoreProperties
 public class Client implements Comparable<Client>{
@@ -30,22 +32,14 @@ public class Client implements Comparable<Client>{
     private boolean signingOnly;
     private boolean medPass;
     private boolean fixedSchedule;
-    private LocalDateTime lastUpdated;
+    private String lastUpdated;
     
     public Client() {
     }
     
     public void setLastUpdatedToNow() {
-    	lastUpdated =LocalDateTime.now();
+    	setLastUpdated(LocalDateTime.now().toString());
     }
-    
-    @Override
-	public String toString() {
-		return "Client [id=" + id + ", first=" + first + ", initial=" + initial + ", favoriteStaffId=" + favoriteStaffId
-				+ ", ownsCats=" + ownsCats + ", noSmokers=" + noSmokers + ", noMaleStaff=" + noMaleStaff
-				+ ", noFemaleStaff=" + noFemaleStaff + ", preferSigning=" + preferSigning + ", signingOnly="
-				+ signingOnly + ", medPass=" + medPass + ", fixedSchedule=" + fixedSchedule + "]";
-	}
 
 	public Client(String first, String initial) {
         this.first = first;
@@ -153,11 +147,20 @@ public class Client implements Comparable<Client>{
         return fixedSchedule;
     }
 
-	public LocalDateTime getLastUpdated() {
+	public String getLastUpdated() {
 		return lastUpdated;
 	}
 
-	public void setLastUpdated(LocalDateTime lastUpdated) {
+	public void setLastUpdated(String lastUpdated) {
 		this.lastUpdated = lastUpdated;
+	}
+
+	@Override
+	public String toString() {
+		return "Client [id=" + id + ", first=" + first + ", initial=" + initial + ", favoriteStaffId=" + favoriteStaffId
+				+ ", ownsCats=" + ownsCats + ", noSmokers=" + noSmokers + ", noMaleStaff=" + noMaleStaff
+				+ ", noFemaleStaff=" + noFemaleStaff + ", preferSigning=" + preferSigning + ", signingOnly="
+				+ signingOnly + ", medPass=" + medPass + ", fixedSchedule=" + fixedSchedule + ", lastUpdated="
+				+ lastUpdated + "]";
 	}	
 }

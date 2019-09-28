@@ -44,6 +44,7 @@ import accessiblesolutions.accessiblescheduling.domain.Shift;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
 import accessiblesolutions.accessiblescheduling.to.ScheduleOptions;
+import accessiblesolutions.accessiblescheduling.util.Util;
 
 @RestController
 @RequestMapping(value = "/schedule")
@@ -99,6 +100,35 @@ public class ScheduleController {
     public ScheduleController(ScheduleManager manager) {
         this.manager=manager;
     }
+
+    @RequestMapping(value = "/employeeWasUpdated",method = RequestMethod.GET)
+    public String employeeRequiresUpdate(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam String lastUpdated,@RequestParam String employeeId) throws AuthenticationException {
+    	securityManager.authorize(idToken, Constants.USER);
+    	
+    	String updated ="UNMODIFIED";
+    	LocalDateTime time = null;
+    	//2019-09-22T20:02:26.789Z
+    	if(lastUpdated!=null && lastUpdated!="null") {
+    		time=Util.getLocalDateTimeFromString(lastUpdated);
+    	}
+
+    	Employee employee = employeeRepository.findOne(employeeId);
+    	
+    	if(null!=employee) {
+    		if(time==null && employee.getLastUpdated()!=null){
+    			updated="UPDATED";
+    		}
+    		else {
+        		if(!lastUpdated.equalsIgnoreCase(employee.getLastUpdated())) {
+                	if(time!=null && time.isBefore(Util.getLocalDateTimeFromString(employee.getLastUpdated()))) {
+                		updated="UPDATED";
+                	}
+        		}
+    		}
+    	}
+		
+    	return updated;
+    }
     
     @RequestMapping(value = "/clientWasUpdated",method = RequestMethod.GET)
     public String clientRequiresUpdate(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam String lastUpdated,@RequestParam String clientId) throws AuthenticationException {
@@ -108,52 +138,26 @@ public class ScheduleController {
     	LocalDateTime time = null;
     	//2019-09-22T20:02:26.789Z
     	if(lastUpdated!=null && lastUpdated!="null") {
-        	String[] splitString = lastUpdated.split("-");
-        	String year =splitString[0];
-        	if(splitString.length>2) {
-            	String month = splitString[1];
-            	splitString = splitString[2].split("T");
-            	String day = splitString[0];
-            	if(splitString.length>1) {
-	            	splitString = splitString[1].split(":");
-	            	if(splitString.length>2) {
-		            	String hour = splitString[0];
-		            	String minute = splitString[1];
-		            	splitString = splitString[2].split(".");
-		            	if(splitString.length>1) {
-			            	String second = splitString[0];
-			            	String nanoSecond = splitString[1].substring(0, splitString[1].length()-2);
-			            	System.out.println("nanoSecond found find this:"+nanoSecond + " from "+lastUpdated);			            	
-			            	time = LocalDateTime.of(Integer.parseInt(year),
-			        				Integer.parseInt(month),
-			        				Integer.parseInt(day),
-			        				Integer.parseInt(hour),
-			        				Integer.parseInt(minute),
-			        				Integer.parseInt(second),
-			        				Integer.parseInt(nanoSecond));
-		            	}
-	            	}
-            	}
-        	}
+    		time=Util.getLocalDateTimeFromString(lastUpdated);
     	}
 
     	Client client = clientRepository.findOne(clientId);
     	
-    	if(time!=null) {
-			System.out.println("time:"+time.toString());
-		}
-		else {
-			System.out.println("time:null");
-		}
     	if(null!=client) {
     		System.out.println("client:"+client.toString());
     		
-        	if((time==null && client.getLastUpdated()!=null) || (time!=null && time.isBefore(client.getLastUpdated()))) {
-        		updated="UPDATED";
-        	}
+    		if(time==null && client.getLastUpdated()!=null){
+    			updated="UPDATED";
+    		}
+    		else {
+        		if(!lastUpdated.equalsIgnoreCase(client.getLastUpdated())) {
+                	if(time!=null && time.isBefore(Util.getLocalDateTimeFromString(client.getLastUpdated()))) {
+                		updated="UPDATED";
+                	}
+        		}
+    		}
     	}
-    	System.out.println("updated:"+updated);
-    	
+		
     	return updated;
     }
     

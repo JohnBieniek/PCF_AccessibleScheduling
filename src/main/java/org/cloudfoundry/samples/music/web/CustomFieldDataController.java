@@ -66,7 +66,7 @@ public class CustomFieldDataController {
     	Employee employee = employeeRepository.findOne(customFieldData.getOwnerId());
     	
     	if(employee!=null) {
-            employee.setLastUpdated();
+            employee.setLastUpdatedToNow();
     		employeeRepository.save(employee);    		
     	}
 
@@ -89,7 +89,7 @@ public class CustomFieldDataController {
     	Employee employee = employeeRepository.findOne(customFieldData.getOwnerId());
     	
     	if(employee!=null) {
-            employee.setLastUpdated();
+            employee.setLastUpdatedToNow();
     		employeeRepository.save(employee);    		
     	}
     	
@@ -133,7 +133,7 @@ public class CustomFieldDataController {
         	Employee employee = employeeRepository.findOne(data.getOwnerId());
         	
         	if(employee!=null) {
-                employee.setLastUpdated();
+                employee.setLastUpdatedToNow();
         		employeeRepository.save(employee);    		
         	}
         	
