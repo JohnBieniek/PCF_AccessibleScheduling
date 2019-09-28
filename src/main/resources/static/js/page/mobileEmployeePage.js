@@ -244,11 +244,11 @@ function MobileEmployeeController($scope, $modal, $http) {
     	 var weeksStart = $scope.week.addDays($scope.week.getDay()-1);
     	 var weeksEnd = weeksStart.addDays(6);
     	 var nextWeeksStart = weeksEnd.addDays(1);
-    	 if($scope.manager || $scope.admin || nextWeeksStart.getMonth()<$scope.maxMonth){
+    	 //if($scope.manager || $scope.admin || nextWeeksStart.getMonth()<$scope.maxMonth){
     		 $scope.setWeek($scope.week.addDays(7));
 	    	 $scope.getDisplayWeek();
 	    	 $scope.listShifts();
-    	 }
+    	 //}
      }
      
      $scope.saveEmployee = function saveEmployee(employee) {
