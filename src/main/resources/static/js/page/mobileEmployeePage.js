@@ -480,49 +480,108 @@ function MobileEmployeeController($scope, $modal, $http) {
     };
 
     $scope.ok = function () {
-    	$scope.detailsChanged=false;
+      	var originalEmployee = $scope.clone($scope.unmodifiedEmployee);
+    	var modifiedEmployee = $scope.clone($scope.employee);
+    	var lastUpdated = originalEmployee.lastUpdated;
+    	if(null==lastUpdated || undefined == lastUpdated){
+    		lastUpdated="null";
+    	}
+    	if(modifiedEmployee!=$scope.unmodifiedEmployee){
+		   $http({
+	            url: '/schedule/employeeWasUpdated',
+	            method: 'GET',
+	            headers: {
+	                'Authorization': $scope.idToken,
+	                'Content-Type': 'application/x-www-form-urlencoded'
+	            },
+	            params: {
+	            	lastUpdated:lastUpdated,
+	            	employeeId:originalEmployee.id
+	            }
+	        })
+	        .then(function(response) {
+	        	var updateData=false;
+	        	console.log("employeeWasUpdatedResponse:");
+	        	console.log(response.data);
+    	    	if(response.data=="UPDATED"){
+    	    		   if(confirm(modifiedEmployee.first+" has just been modified by another user. Saving your changes will overwrite thier updates. Would you " +
+    	    		   				"still like to save your changes?")){
+    	    			   updateData=true;
+    	    		   }else{
+    	    			   $scope.cancel();
+    	    		   }
+    	    	}
+    	    	else{
+    	    		updateData=true;
+    	    	}
+    	    	
+    	    	if(updateData){
+    		  		$scope.detailsChanged=false;
     	
-    	if($scope.customFields && $scope.customFields.length>0){
-	        var size = $scope.customFields.length;
-	        for(var i = 0; i < size ;i++){
-	            $http({
-	                url: '/compatibility/setEmployeeCustomFieldData',
-	                method: 'POST',
-	                headers: {
-		                'Authorization': $scope.idToken,
-	                    'Content-Type': 'application/x-www-form-urlencoded'
-	                },
-	                params: {
-	                    employee: $scope.employee,
-	                    customField: $scope.customFields[i],
-	                    value:$scope.customValue[i],
-	                }
-	            });
-	        }
-	    }
-    	
-    	$http({//TODO refactor to saveEmployee method call
-            url: '/schedule/updateEmployee',
-            method: 'POST',
+			    	if($scope.customFields && $scope.customFields.length>0){
+				        var size = $scope.customFields.length;
+				        for(var i = 0; i < size ;i++){
+				            $http({
+				                url: '/compatibility/setEmployeeCustomFieldData',
+				                method: 'POST',
+				                headers: {
+					                'Authorization': $scope.idToken,
+				                    'Content-Type': 'application/x-www-form-urlencoded'
+				                },
+				                params: {
+				                    employee: modifiedEmployee,
+				                    customField: $scope.customFields[i],
+				                    value:$scope.customValue[i],
+				                }
+				            });
+				        }
+				    }
+			    	
+			    	$http({//TODO refactor to saveEmployee method call
+			            url: '/schedule/updateEmployee',
+			            method: 'POST',
+			            headers: {
+			                'Authorization': $scope.idToken,
+			                'Content-Type': 'application/x-www-form-urlencoded'
+			            },
+			            params: {
+			                param: modifiedEmployee
+			            }
+			        })
+			        .then(function(response) {
+			        	if(response.data){
+			        		$scope.notify("Employee saved");
+    		                
+    		            	$scope.detailsChanged=false;
+    		            	$scope.updateEmployee();
+    		            	$scope.getAllEmployeeCustomFieldData();
+			        	}
+			        	else{
+			        		$scope.warn("Failed to save employee info.")
+			        	}
+			        });
+    	    	}
+	        });
+    	}
+    };
+    
+    $scope.updateEmployee = function () {
+        $http({
+            url: '/employees/'+$scope.employee.id,
+            method: 'GET',
             headers: {
                 'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
-                param: $scope.employee
             }
         })
         .then(function(response) {
         	if(response.data){
-                $scope.notify("Employee saved");
-                
-            	$scope.detailsChanged=false;
-        	}
-        	else{
-        		$scope.warn("Failed to save employee info.")
+        		$scope.setEmployee(response.data);
         	}
         });
-    };
+    }
     
     $scope.deleteShift = function (shift) {
   	   if(confirm("Are you sure you want to delete the following shift? "+shift.display)){

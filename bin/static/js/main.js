@@ -52,6 +52,7 @@ function MainNavigationController($scope, $modal, $http) {
     	$scope.customValue=[];//Holds custom field data in the details tab
     	$scope.unmodifiedCustomValue=[];//Holds custom field data in the details tab
         $scope.employee=null;
+        $scope.unmodifiedEmployee=null;
         $scope.employees=null;
         $scope.client=null;
         $scope.unmodifiedClient=null;
@@ -113,6 +114,34 @@ function MainNavigationController($scope, $modal, $http) {
 	 }
 	 
 	 //API Access
+	 $scope.getAllEmployeeCustomFieldData = function () {
+	     if($scope.employee!=null && $scope.customFields !=null){
+		      for(var index = 0; index<$scope.customFields.length;index++){
+			      $scope.getEmployeeCustomFieldData($scope.employee,$scope.customFields[index],index);
+		      }
+	     }
+	 }
+
+	 $scope.getEmployeeCustomFieldData = function (employee,customField,index){
+     	$http({
+            url: '/compatibility/employeeCustomFieldData',
+            method: 'POST',
+            headers: {
+                'Authorization': $scope.idToken,
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            params: {
+                employee: employee,
+                customField: customField,
+                index:index,
+            }
+        })
+        .then(function(response) {
+        	$scope.customValue[response.data.numericResponse] = response.data.booleanResponse;
+        	$scope.unmodifiedCustomValue[response.data.numericResponse] = response.data.booleanResponse;
+        });
+     }
+	 
 	 $scope.getAllClientCustomFieldData = function () {
 	     if($scope.client!=null && $scope.customFields !=null){
 		      for(var index = 0; index<$scope.customFields.length;index++){
@@ -481,6 +510,7 @@ function MainNavigationController($scope, $modal, $http) {
     //View setters
 	$scope.setEmployee = function(employee){
 		 $scope.employee=employee;
+		 $scope.unmodifiedEmployee = $scope.clone(employee);
 	}
 	$scope.setEmployees = function(employees){
 		 $scope.employees=employees;

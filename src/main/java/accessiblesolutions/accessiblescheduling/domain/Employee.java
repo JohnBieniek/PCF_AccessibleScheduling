@@ -342,14 +342,11 @@ public class Employee implements Comparable<Employee>{
 	}
 
 	public void setLastUpdatedToNow() {
-    	setLastUpdated(LocalDateTime.now());
+    	setLastUpdated(LocalDateTime.now().toString());
     }
 
-	public void setLastUpdated(LocalDateTime lastUpdated) {
-		if(lastUpdated!=null) {
-			System.out.println("setting last updated to :"+lastUpdated.toString());
-			this.lastUpdated = lastUpdated.toString();
-		}
+	public void setLastUpdated(String lastUpdated) {
+		this.lastUpdated = lastUpdated;
 	}
 	public void setManager(boolean manager) {
 		this.manager = manager;

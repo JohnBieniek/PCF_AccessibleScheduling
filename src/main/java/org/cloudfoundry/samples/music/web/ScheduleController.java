@@ -314,6 +314,7 @@ public class ScheduleController {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+    	employee.setLastUpdatedToNow();
     	employeeRepository.save(employee);
     	updateInfoManager.set("employees");
         return employeeRepository.findOne(employee.getId());
