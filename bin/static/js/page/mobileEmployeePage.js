@@ -602,8 +602,8 @@ function MobileEmployeeController($scope, $modal, $http) {
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
-            	lastUpdated:($scope.shift.lastUpdated!=null?$scope.shift.lastUpdated:"null"),
-            	shiftId:id
+            	lastUpdated:(shift.lastUpdated!=null?shift.lastUpdated:"null"),
+            	shiftId:shift.id
             }
         })
         .then(function(response) {
@@ -611,7 +611,7 @@ function MobileEmployeeController($scope, $modal, $http) {
         	
         	if(response.data=="UPDATED"){
     		   if(confirm("This shift has just been modified by another user. Deleteing this shift will overwrite thier updates. Would you " +
-    		   				"still like to delete the following shift?"+shift.display)){
+    		   				"still like to delete this shift?")){
     			   deleteShift=true;
     		   }
     		   else{
