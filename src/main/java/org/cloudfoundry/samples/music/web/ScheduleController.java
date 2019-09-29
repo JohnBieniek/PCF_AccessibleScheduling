@@ -126,6 +126,9 @@ public class ScheduleController {
         		}
     		}
     	}
+    	else {
+    		updated="DELETED";
+    	}
 		
     	return updated;
     }

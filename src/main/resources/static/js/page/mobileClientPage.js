@@ -449,40 +449,64 @@ function MobileClientController($scope, $modal, $http) {
    }
    
    $scope.editShift = function (shift) {
-       var updateModal = $modal.open({
-           templateUrl: 'templates/modal/shiftForm.html',
-           controller: ShiftModalController,
-           resolve: {
-        	    idToken: function(){
-        	    	return $scope.clone($scope.idToken);
-        	    },
-                shift: function() {
-                	return $scope.clone(shift);
-                },
-                client: function(){
-                	return $scope.clone($scope.selectedClient);
-                },
-                clients: function(){
-                	return {};
-	            },
-	            employees:function(){
-	        		return $scope.clone($scope.employees);
-	            },
-	           	date: function(){
-	           		return $scope.week;
-	            },
-                action: function() {
-                	return 'update';
-                }
-           }
-       });
+	   var lastUpdated = (shift.lastUpdated!=null?shift.lastUpdated:"null");
+	   $http({
+            url: '/schedule/shiftWasUpdated',
+            method: 'GET',
+            headers: {
+                'Authorization': $scope.idToken,
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            params: {
+            	lastUpdated:lastUpdated,
+            	shiftId:shift.id
+            }
+        })
+        .then(function(response) {
+        	var updateData=true;
 
-       updateModal.result.then(function (shift) {
-		   saveShift(shift);
-           $scope.listShifts();
-       }, function () {
-           $scope.listShifts();
-       });
+        	if(response.data=="DELETED"){
+        	   updateDate=false;
+	    	   $scope.warn("This shift has just been deleted by another user. If you still wish to make edits please make a new shift.");
+   	    	}
+   	    	
+   	    	if(updateData){
+		       var updateModal = $modal.open({
+		           templateUrl: 'templates/modal/shiftForm.html',
+		           controller: ShiftModalController,
+		           resolve: {
+		        	    idToken: function(){
+		        	    	return $scope.clone($scope.idToken);
+		        	    },
+		                shift: function() {
+		                	return $scope.clone(shift);
+		                },
+		                client: function(){
+		                	return $scope.clone($scope.selectedClient);
+		                },
+		                clients: function(){
+		                	return {};
+			            },
+			            employees:function(){
+			        		return $scope.clone($scope.employees);
+			            },
+			           	date: function(){
+			           		return $scope.week;
+			            },
+		                action: function() {
+		                	return 'update';
+		                }
+		           }
+		       });
+		
+		       updateModal.result.then(function (shift) {
+				   saveShift(shift);
+		           $scope.listShifts();
+		       }, function () {
+		           $scope.listShifts();
+		       });
+   	    	}
+        });
    }
    
    $scope.updateShiftRequest = function (selectedClient, shiftRequest,employees) {
@@ -648,8 +672,6 @@ function MobileClientController($scope, $modal, $http) {
     }
     
     $scope.deleteShift = function (shift) {
-    	console.log("deleteing shift");
-    	console.log(shift);
     	var lastUpdated = (shift.lastUpdated!=null?shift.lastUpdated:"null");
     	$http({
             url: '/schedule/shiftWasUpdated',
@@ -675,7 +697,7 @@ function MobileClientController($scope, $modal, $http) {
     			   $scope.listShifts();
     		   }
         	}
-    		else if(confirm("Are you sure you want to delete the following shift? "+shift.display)){
+    		else if(confirm("Are you sure you want to delete this shift?")){
     			deleteShift=true;
     		}
         	

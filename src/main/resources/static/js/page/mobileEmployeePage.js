@@ -426,42 +426,69 @@ function MobileEmployeeController($scope, $modal, $http) {
         });
     }
 
+    /**
+     * When you click on a shift see if it's around. If it is bring them to an edit modal. When accepting changes in the modal we check
+     * to ensure we aren't overwriting any changes that just happened while we were editing. If changes occurred check if the user wants to
+     * view the changes or overwrite with their edits. Accept their input then refresh the list of shifts to reflect any changes.
+     */
     $scope.editShift = function (shift) {
+       //Only managers and above can currently edit shifts
 	   if($scope.profile && $scope.profile.manager){
-	       var updateModal = $modal.open({
-	           templateUrl: 'templates/modal/shiftForm.html',
-	           controller: ShiftModalController,
-	           resolve: {
-	        	   idToken: function(){
-	        		   return $scope.clone($scope.idToken);
-	        	   },
-	               shift: function() {
-	                   return $scope.clone(shift);
-	               },
-	               client: function(){
-	            	   return {};
-	               },
-	               clients: function(){
-	           		return {};
-		           	},
-		           	employees:function(){
-		        		return $scope.clone($scope.employees);
-		        	},
-		           	date: function(){
-		         	   return $scope.week;
-		            },
-	               action: function() {
-	                   return 'update';
-	               }
-	           }
-	       });
-	
-	       updateModal.result.then(function (shift) {
-    		   saveShift(shift);
-	           $scope.listShifts();
-	       }, function () {
-	           $scope.listShifts();
-	       });
+		   var lastUpdated = (shift.lastUpdated!=null?shift.lastUpdated:"null");//Account for old data having no lastUpdated info
+		   $http({//Ensure this shift hasn't been deleted out from under us before we start editing
+	            url: '/schedule/shiftWasUpdated',
+	            method: 'GET',
+	            headers: {
+	                'Authorization': $scope.idToken,
+	                'Content-Type': 'application/x-www-form-urlencoded'
+	            },
+	            params: {
+	            	lastUpdated:lastUpdated,
+	            	shiftId:shift.id//If it can be deleted it already exists and has an id, unlike new shifts
+	            }
+	        })
+	        .then(function(response) {
+	        	if(response.data=="DELETED"){//If this was delted out from under us let the user know and refresh our dated shift list
+	        	   $scope.warn("This shift has just been deleted by another user. If you still wish to make edits please make a new shift.");
+	        	   $scope.listShifts();
+	   	    	}
+	        	else{//If, as usual, this shift is around, edit it
+			       var updateModal = $modal.open({
+			           templateUrl: 'templates/modal/shiftForm.html',
+			           controller: ShiftModalController,
+			           resolve: {
+			        	   idToken: function(){
+			        		   return $scope.clone($scope.idToken);
+			        	   },
+			               shift: function() {
+			                   return $scope.clone(shift);
+			               },
+			               client: function(){
+			            	   return {};
+			               },
+			               clients: function(){
+			           		return {};
+				           	},
+				           	employees:function(){
+				        		return $scope.clone($scope.employees);
+				        	},
+				           	date: function(){
+				         	   return $scope.week;
+				            },
+			               action: function() {
+			                   return 'update';
+			               }
+			           }
+			       });
+			
+			       updateModal.result.then(function (shift) {
+		    		   saveShift(shift);//Update this shift on the server if ok was pressed
+			           $scope.listShifts();//Refresh our list to show the update and any others that may have occurred while editing
+			       }, function () {
+			           $scope.listShifts();//If we canceled we still want to make sure we come back to the latest shift data
+			       });
+	        	}
+	        });
 	   }
    };
 
@@ -575,6 +602,9 @@ function MobileEmployeeController($scope, $modal, $http) {
     	}
     };
     
+    /**
+     * Updates $scope.employee and $scope.unmodifiedEmployee to be the most recent copy of this employee from the server
+     */
     $scope.updateEmployee = function () {
         $http({
             url: '/employees/'+$scope.employee.id,
@@ -592,59 +622,6 @@ function MobileEmployeeController($scope, $modal, $http) {
         	}
         });
     }
-    
-    $scope.deleteShift = function (shift) {
-    	$http({
-            url: '/schedule/shiftWasUpdated',
-            method: 'GET',
-            headers: {
-                'Authorization': $scope.idToken,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            params: {
-            	lastUpdated:(shift.lastUpdated!=null?shift.lastUpdated:"null"),
-            	shiftId:shift.id
-            }
-        })
-        .then(function(response) {
-        	var deleteShift=false;
-        	
-        	if(response.data=="UPDATED"){
-    		   if(confirm("This shift has just been modified by another user. Deleteing this shift will overwrite thier updates. Would you " +
-    		   				"still like to delete this shift?")){
-    			   deleteShift=true;
-    		   }
-    		   else{
-    			   $scope.listShifts();
-    		   }
-        	}
-    		else if(confirm("Are you sure you want to delete the following shift? "+shift.display)){
-    			deleteShift=true;
-    		}
-        	
-        	if(deleteShift){
-             	$http({
-                    url: '/shifts/'+shift.id,
-                    method: 'DELETE',
-                    headers: {
-                       'Authorization': $scope.idToken,
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    params: {
-                    }
-                })
-                .then(function(response) {
-                	if(response){
-                        $scope.notify("Shift deleted.");
-                        $scope.listShifts();
-                	}
-                	else{
-                		$scope.warn("Failed to delete shift info.")
-                	}
-                });
-        	}
-    	});
-     };
      
     $scope.delete = function () {
  	   if(confirm("Are you sure you want to delete info for "+$scope.employee.first + " "+$scope.employee.initial+"?")){
