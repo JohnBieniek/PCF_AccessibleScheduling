@@ -104,9 +104,10 @@ public class ClientRequestController {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+    	clientRequest.setLastUpdatedToNow();
         repository.save(clientRequest);
         updateInfoManager.set("clientRequests");
-    	clientRequest.setLastUpdatedToNow();
+
         return mongoRepository.findByClientId(clientRequest.getClientId());
     }
 

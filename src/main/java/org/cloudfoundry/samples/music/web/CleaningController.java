@@ -74,11 +74,6 @@ public class CleaningController {
         customDataManager.removeOrphanedCustomFieldData();
     }
 
-    @RequestMapping(value = "/removeOrphanedRecurringShiftRequests", method = RequestMethod.GET)
-    public void removeOrphanedRecurringShiftRequests(@RequestHeader(value="Authorization", required=false) String idToken) {
-       cleaningManager.removeOrphanedRecurringShiftRequests();
-    }
-    
     @RequestMapping(value = "/orphanedCustomFieldData", method = RequestMethod.DELETE)
     public void deleteOrphanedCustomFieldData(@RequestHeader(value="Authorization", required=false) String idToken) {
         customDataManager.removeOrphanedCustomFieldData();

@@ -8,7 +8,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import accessiblesolutions.accessiblescheduling.util.Util;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -392,6 +391,8 @@ public class ClientRequest {
 				+ startDate + ", startTime=" + startTime + ", endDate=" + endDate + ", endTime=" + endTime
 				+ ", repeats=" + repeats + ", repeatsEvery=" + repeatsEvery + ", days=" + Arrays.toString(days)
 				+ ", interval=" + interval + ", monthInterval=" + monthInterval + ", yearInterval=" + yearInterval
-				+ ", exceptions=" + Arrays.toString(exceptions) + "]";
+				+ ", exceptions=" + Arrays.toString(exceptions) + ", lastUpdated=" + lastUpdated + "]";
 	}
+
+
 }

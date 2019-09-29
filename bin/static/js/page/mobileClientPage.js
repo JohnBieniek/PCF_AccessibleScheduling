@@ -331,71 +331,24 @@ function MobileClientController($scope, $modal, $http) {
         });
     }
  
-    $scope.editRequest = function (selectedRequest,selectedClient,employees) {
-      var editModal = $modal.open({
-          templateUrl: 'templates/modal/requestForm.html',
-          controller: RequestModalController,
-          windowClass: 'app-modal-window',
-          resolve: {
-          	selectedClient: function(){
-          		return $scope.clone(selectedClient);
-          	},
-          	employees: function(){
-          		return $scope.clone(employees);
-          	},
-          	selectedEmployee: function(){
-          		return selectedRequest.staffId;
-          	},
-            shiftRequest: function () {
-            	return selectedRequest;
-            },
-            date:function(){
-            	return "";
-            },
-            action: function() {
-                return 'edit';
-            }
-          }
-    });
-
-    editModal.result.then(function (shiftRequest) {
-   		$http({//TODO refactor to saveClientRequest method
-               url: '/clientRequests',
-               method: 'POST',
-               headers: {
-            	   'Authorization': $scope.idToken,
-                   'Content-Type': 'application/x-www-form-urlencoded'
-               },
-               params: {
-                   param: shiftRequest
-               }
-           })
-           .then(function(response) {
-           		$scope.notify("Request saved");
-           		
-        		$scope.requests = response.data;
-           });
-      	});
-	}
-  
     $scope.addRequest = function (selectedClient,employees) {
        var addModal = $modal.open({
            templateUrl: 'templates/modal/requestForm.html',
            controller: RequestModalController,
            windowClass: 'app-modal-window',
            resolve: {
-        	client : function(){
-        		return $scope.clone(selectedClient);
-        	},
-           	selectedClient: function(){
-           		return $scope.clone(selectedClient);
-           	},
-           	employees: function(){
-           		return $scope.clone(employees);
-           	},
-           	selectedEmployee: function(){
-           		return "";
-           	},
+	        	client : function(){
+	        		return $scope.clone(selectedClient);
+	        	},
+	           	selectedClient: function(){
+	           		return $scope.clone(selectedClient);
+	           	},
+	           	employees: function(){
+	           		return $scope.clone(employees);
+	           	},
+	           	selectedEmployee: function(){
+	           		return "";
+	           	},
                shiftRequest: function () {
                    return {};
                },
@@ -404,7 +357,10 @@ function MobileClientController($scope, $modal, $http) {
                },
                action: function() {
                    return 'add';
-               }
+               },
+				idToken: function(){
+        	    	return $scope.clone($scope.idToken);
+        	    }
            }
        });
 
@@ -422,9 +378,8 @@ function MobileClientController($scope, $modal, $http) {
                 }
             })
             .then(function(response) {
-
             	$scope.notify("Request saved.");
-            	$scope.requests = response.data;
+            	$scope.setRequests(response.data);
             });
        });
    }
@@ -444,7 +399,7 @@ function MobileClientController($scope, $modal, $http) {
        .then(function (response) {//TODO handle error state
            $scope.notify("Request saved.");
 
-           $scope.listShiftRequests();
+           $scope.listRequests();
        });
    }
    
@@ -510,7 +465,13 @@ function MobileClientController($scope, $modal, $http) {
    }
    
    $scope.updateShiftRequest = function (selectedClient, shiftRequest,employees) {
-	   var lastUpdated = (request.lastUpdated!=null?request.lastUpdated:"null");
+	   console.log("selectedClient");
+	   console.log(selectedClient);
+	   console.log("shiftRequest");
+	   console.log(shiftRequest);
+	   console.log("employees");
+	   console.log(employees);
+	   var lastUpdated = (shiftRequest.lastUpdated!=null?shiftRequest.lastUpdated:"null");
 	   $http({
             url: '/schedule/requestWasUpdated',
             method: 'GET',
@@ -520,21 +481,19 @@ function MobileClientController($scope, $modal, $http) {
             },
             params: {
             	lastUpdated:lastUpdated,
-            	requestId:request.id
+            	requestId:shiftRequest.id
             }
         })
         .then(function(response) {
-        	var updateData=true;
-
         	if(response.data=="DELETED"){
-        	   updateDate=false;
 	    	   $scope.warn("This request has just been deleted by another user. If you still wish to make edits please make a new shift.");
+	    	   $scope.listRequests();
    	    	}
-   	    	
-   	    	if(updateData){
+        	else{
 	   	  	    var selectedEmployee = employees.filter(function( employee ) {
 	   	  	    	return employee.id == shiftRequest.staffId;
 				});
+	   	  	    console.log("updating request:"+$scope.idToken);
 				var updateModal = $modal.open({
 					templateUrl: 'templates/modal/requestForm.html',
 					controller: RequestModalController,
@@ -559,13 +518,19 @@ function MobileClientController($scope, $modal, $http) {
 						},
 						action: function() {
 							return 'update';
-						}
+						},
+						idToken: function(){
+		        	    	return $scope.clone($scope.idToken);
+		        	    }
 					}
 				});
 						
 				updateModal.result.then(function (shiftRequest) {
 					saveShiftRequest(shiftRequest);
-				});
+    			    $scope.listRequests();
+				}, function () {
+			        $scope.listRequests();
+		        });
    	    	}
         });
 
@@ -582,7 +547,7 @@ function MobileClientController($scope, $modal, $http) {
             },
             params: {
             	lastUpdated:lastUpdated,
-            	requestId:request.id
+            	requestId:shiftRequest.id
             }
         })
         .then(function(response) {
@@ -591,17 +556,17 @@ function MobileClientController($scope, $modal, $http) {
         	if(response.data=="UPDATED"){
     		   if(confirm("This request has just been modified by another user. Deleteing this request will overwrite thier updates. Would you " +
     		   				"still like to delete this request?")){
-    			   deleteShift=true;
+    			   deleteRequest=true;
     		   }
     		   else{
-    			   $scope.listShifts();
+    			   $scope.listRequests();
     		   }
         	}
     		else if(confirm("Are you sure you want to delete this request?")){
-    			deleteShift=true;
+    			deleteRequest=true;
     		}
         	
-        	if(deleteShift){
+        	if(deleteRequest){
 			   $http({
 	               url: '/schedule/deleteRequest',
 	               method: 'GET',
@@ -615,7 +580,7 @@ function MobileClientController($scope, $modal, $http) {
 	           })
 	           .then(function(response) {
 	        	   	$scope.notify("Request removed.");
-	           		$scope.requests = response.data;
+	    			   $scope.listRequests();
 	           });
         	}
 	   });

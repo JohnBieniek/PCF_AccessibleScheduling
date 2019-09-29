@@ -541,6 +541,9 @@ function MainNavigationController($scope, $modal, $http) {
 	$scope.setClients = function (clients){
 		 $scope.clients = clients;
 	}
+	$scope.setRequests = function(requests){
+		$scope.requests=requests;
+	}
 
 	 
 	//Navigation

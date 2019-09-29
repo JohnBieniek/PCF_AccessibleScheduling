@@ -18,7 +18,6 @@ import accessiblesolutions.accessiblescheduling.domain.CustomFieldData;
 import accessiblesolutions.accessiblescheduling.domain.Employee;
 import accessiblesolutions.accessiblescheduling.domain.EmployeeShiftCompatibilities;
 import accessiblesolutions.accessiblescheduling.domain.EmployeeShiftCompatibility;
-import accessiblesolutions.accessiblescheduling.domain.RecurringShiftNeed;
 import accessiblesolutions.accessiblescheduling.domain.Shift;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
@@ -42,8 +41,6 @@ public class CleaningManager {
 	
 	@Autowired
 	private CrudRepository<Employee,String> employeeCrud;
-	@Autowired
-	private CrudRepository<RecurringShiftNeed,String> recurringShiftNeedCrud;
 
 	@Autowired
 	private CrudRepository<Client,String> clientCrud;
@@ -60,34 +57,6 @@ public class CleaningManager {
     }
     
 
-    
-    public ArrayList<RecurringShiftNeed> getOrphanedRecurringShiftRequests() {
-    	ArrayList<RecurringShiftNeed> orphans = new ArrayList<RecurringShiftNeed>();
-    	Iterable<RecurringShiftNeed> table = recurringShiftNeedCrud.findAll();
-    	Iterable<Client> clients =clientCrud.findAll();
-    	ArrayList<String> clientIds = new ArrayList<String>();
-    	
-    	
-    	for(Client client: clients){
-    		clientIds.add(client.getId());
-    	}
-
-    	for(RecurringShiftNeed request:table){
-    			if(!clientIds.contains(request.getClientId())){
-    				orphans.add(request);
-    			}
-    	}
-    	
-    	return orphans;
-	}
-    
-    public void removeOrphanedRecurringShiftRequests() {
-    	ArrayList<RecurringShiftNeed> orphanedShiftRequests = getOrphanedRecurringShiftRequests();
-    	for(RecurringShiftNeed request:orphanedShiftRequests){
-    		recurringShiftNeedCrud.delete(request);
-    	}
-	}
-    
     public ArrayList<ShiftIssueTO> getAlternateWeekendOffIssues() throws ProccessingException, CorruptDataException{
     	ArrayList<ShiftIssueTO> issues = new ArrayList<ShiftIssueTO>();
     	

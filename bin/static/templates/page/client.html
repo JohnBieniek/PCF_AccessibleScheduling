@@ -73,13 +73,15 @@
 	    	</div>
 	    	<div ng-if="isSet('Requests')">	    		
 			    <h2 class ="centered">Times this client needs help can be added and removed below.
-	  										Automated scheduling will generate shifts based on these requests monthly.</h2>
+	  										Automated scheduling will generate shifts based on these requests monthly.
+				</h2>
+				<br>
 	    		<button  class="inline rightAlign" style="font-size:30px;float:right; margin-right:20px;background-color:#6EB262;" ng-click="addRequest(client,employees)"><span class="glyphicon glyphicon-plus"></span>&nbsp;New Request</button>
 	    		<br>
 	    		<br>
 				<div ng-repeat="request in requests">
 					<div ng-init="setInitialDays(request)" class = "request">
-						<span ng-click="editRequest(request,client,employees)" style="display:inline-block;width:94%" ng-init="getDisplayValue(request)">{{request.displayValue}}</span>
+						<span ng-click="updateShiftRequest(client,request,employees)" style="display:inline-block;width:94%" ng-init="getDisplayValue(request)">{{request.displayValue}}</span>
 						<span ng-click="deleteShiftRequest(request)" style="display:inline-block;float:right" class="glyphicon inline red trash glyphicon-trash"></span>
 			    	</div>
 		    	</div>

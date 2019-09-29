@@ -1,5 +1,6 @@
-function RequestModalController($scope, $modalInstance, $http, selectedClient, selectedEmployee, employees,shiftRequest, date, action) {
-    $scope.valid=false;
+function RequestModalController($scope, $modalInstance, $http, selectedClient, selectedEmployee, employees,shiftRequest, date, action,idToken) {
+	$scope.idToken = idToken;
+	$scope.valid=false;
 	$scope.shiftRequestAction = action;
     $scope.selectedClient=selectedClient;
     $scope.selectedEmployee=null;
