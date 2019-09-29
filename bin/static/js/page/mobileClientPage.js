@@ -453,32 +453,35 @@ function MobileClientController($scope, $modal, $http) {
            templateUrl: 'templates/modal/shiftForm.html',
            controller: ShiftModalController,
            resolve: {
-        	   idToken: function(){
-        		   return $scope.clone($scope.idToken);
-        	   },
-               shift: function() {
-                   return $scope.clone(shift);
-               },
-               client: function(){
-            	   return $scope.clone($scope.selectedClient);
-               },
-               clients: function(){
-           		return {};
-	           	},
-	           	employees:function(){
-	        		return $scope.clone($scope.employees);
-	        	},
-	           	date: function(){
-	         	   return $scope.week;
+        	    idToken: function(){
+        	    	return $scope.clone($scope.idToken);
+        	    },
+                shift: function() {
+                	return $scope.clone(shift);
+                },
+                client: function(){
+                	return $scope.clone($scope.selectedClient);
+                },
+                clients: function(){
+                	return {};
 	            },
-               action: function() {
-                   return 'update';
-               }
+	            employees:function(){
+	        		return $scope.clone($scope.employees);
+	            },
+	           	date: function(){
+	           		return $scope.week;
+	            },
+                action: function() {
+                	return 'update';
+                }
            }
        });
 
        updateModal.result.then(function (shift) {
-           saveShift(shift);
+		   saveShift(shift);
+           $scope.listShifts();
+       }, function () {
+           $scope.listShifts();
        });
    }
    
@@ -584,8 +587,6 @@ function MobileClientController($scope, $modal, $http) {
 	        })
 	        .then(function(response) {
 	        	var updateData=false;
-	        	console.log("clientWasUpdatedResponse:");
-	        	console.log(response.data);
     	    	if(response.data=="UPDATED"){
     	    		   if(confirm(modifiedClient.first+" has just been modified by another user. Saving your changes will overwrite thier updates. Would you " +
     	    		   				"still like to save your changes?")){
@@ -647,28 +648,57 @@ function MobileClientController($scope, $modal, $http) {
     }
     
     $scope.deleteShift = function (shift) {
-  	   if(confirm("Are you sure you want to delete the following shift? "+shift.display)){
-     	$http({
-             url: '/shifts/'+shift.id,
-             method: 'DELETE',
-             headers: {
- 	            'Authorization': $scope.idToken,
-                 'Content-Type': 'application/x-www-form-urlencoded'
-             },
-             params: {
-             }
-         })
-         .then(function(response) {
-         	if(response){
-                 $scope.notify("Shift deleted.");
-                 $scope.listShifts();
-         	}
-         	else{
-         		$scope.warn("Failed to delete client info.")
-         	}
-         });
-  	   }
-     }
+    	$http({
+            url: '/schedule/shiftWasUpdated',
+            method: 'GET',
+            headers: {
+                'Authorization': $scope.idToken,
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            params: {
+            	lastUpdated:($scope.shift.lastUpdated!=null?$scope.shift.lastUpdated:"null"),
+            	shiftId:id
+            }
+        })
+        .then(function(response) {
+        	var deleteShift=false;
+        	
+        	if(response.data=="UPDATED"){
+    		   if(confirm("This shift has just been modified by another user. Deleteing this shift will overwrite thier updates. Would you " +
+    		   				"still like to delete the following shift?"+shift.display)){
+    			   deleteShift=true;
+    		   }
+    		   else{
+    			   $scope.listShifts();
+    		   }
+        	}
+    		else if(confirm("Are you sure you want to delete the following shift? "+shift.display)){
+    			deleteShift=true;
+    		}
+        	
+        	if(deleteShift){
+             	$http({
+                    url: '/shifts/'+shift.id,
+                    method: 'DELETE',
+                    headers: {
+                       'Authorization': $scope.idToken,
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    params: {
+                    }
+                })
+                .then(function(response) {
+                	if(response){
+                        $scope.notify("Shift deleted.");
+                        $scope.listShifts();
+                	}
+                	else{
+                		$scope.warn("Failed to delete shift info.")
+                	}
+                });
+        	}
+    	});
+     };
      
     $scope.delete = function () {
  	   if(confirm("Are you sure you want to delete info for "+$scope.client.first + " "+$scope.client.initial+"?")){

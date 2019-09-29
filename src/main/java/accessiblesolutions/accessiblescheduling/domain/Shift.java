@@ -58,7 +58,7 @@ public class Shift implements Comparable{
     
     private boolean weekend;
     
-    private LocalDateTime lastUpdated;
+	private String lastUpdated;
     
     public Shift() {
     	assigned=false;
@@ -566,11 +566,15 @@ public class Shift implements Comparable{
 		return result;
 	}
 
-	public LocalDateTime getLastUpdated() {
+	public String getLastUpdated() {
 		return lastUpdated;
 	}
 
-	public void setLastUpdated(LocalDateTime lastUpdated) {
+	public void setLastUpdatedToNow() {
+    	setLastUpdated(LocalDateTime.now().toString());
+    }
+
+	public void setLastUpdated(String lastUpdated) {
 		this.lastUpdated = lastUpdated;
 	}
 }

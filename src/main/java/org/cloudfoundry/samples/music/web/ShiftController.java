@@ -60,7 +60,7 @@ public class ShiftController {
     @RequestMapping(value = "/set", method = RequestMethod.POST)
     public List<Shift> set(@RequestHeader(value="Authorization", required=false) String idToken,@RequestBody List<Shift> shifts) {
     	for(Shift shift:shifts) {
-        	shift.setLastUpdated(LocalDateTime.now());
+        	shift.setLastUpdatedToNow();
     	}
     	
     	repository.save(shifts);
@@ -138,7 +138,7 @@ public class ShiftController {
         	shift.setStartYear((int) Integer.parseInt(shift.getStartDate().split("-")[0]));
         }
     	updateInfoManager.set("shifts");
-    	shift.setLastUpdated(LocalDateTime.now());
+    	shift.setLastUpdatedToNow();
         return repository.save(shift);
     }
 
@@ -170,7 +170,7 @@ public class ShiftController {
         	shift.setStartYear((int) Integer.parseInt(shift.getStartDate().split("-")[0]));
         }
     	updateInfoManager.set("shifts");
-    	shift.setLastUpdated(LocalDateTime.now());
+    	shift.setLastUpdatedToNow();
         
         return repository.save(shift);
     }

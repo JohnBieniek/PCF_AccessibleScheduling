@@ -101,6 +101,35 @@ public class ScheduleController {
         this.manager=manager;
     }
 
+    @RequestMapping(value = "/shiftWasUpdated",method = RequestMethod.GET)
+    public String shiftRequiresUpdate(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam String lastUpdated,@RequestParam String shiftId) throws AuthenticationException {
+    	securityManager.authorize(idToken, Constants.USER);
+    	
+    	String updated ="UNMODIFIED";
+    	LocalDateTime time = null;
+    	//2019-09-22T20:02:26.789Z
+    	if(lastUpdated!=null && lastUpdated!="null") {
+    		time=Util.getLocalDateTimeFromString(lastUpdated);
+    	}
+
+    	Shift shift = shiftRepository.findOne(shiftId);
+    	
+    	if(null!=shift) {
+    		if(time==null && shift.getLastUpdated()!=null){
+    			updated="UPDATED";
+    		}
+    		else {
+        		if(!lastUpdated.equalsIgnoreCase(shift.getLastUpdated())) {
+                	if(time!=null && time.isBefore(Util.getLocalDateTimeFromString(shift.getLastUpdated()))) {
+                		updated="UPDATED";
+                	}
+        		}
+    		}
+    	}
+		
+    	return updated;
+    }
+    
     @RequestMapping(value = "/employeeWasUpdated",method = RequestMethod.GET)
     public String employeeRequiresUpdate(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam String lastUpdated,@RequestParam String employeeId) throws AuthenticationException {
     	securityManager.authorize(idToken, Constants.USER);

@@ -187,11 +187,13 @@ function MainNavigationController($scope, $modal, $http) {
     	}
 	 }
 	 
+	 
      $scope.listShifts = function listShifts(){
     	let id = "-1";
     	
        	$scope.getDisplayWeek();
-       	
+       	console.log("called list Shifts on page:");
+       	console.log($scope.page);
 		 if($scope.page=="templates/page/employee.html"){
 	    	if(null!=$scope.employee){
 	    		id=$scope.employee.id;
@@ -656,7 +658,7 @@ function MainNavigationController($scope, $modal, $http) {
 	 
 	 
 	 //Utils
-	 //Allows for date.addDays. It's fucking awesome
+	 //Allows for date.addDays. It's fucking(sic) awesome
      Date.prototype.addDays = function(days) {
  	    var date = new Date(this.valueOf());
  	    date.setDate(date.getDate() + days);
@@ -664,6 +666,11 @@ function MainNavigationController($scope, $modal, $http) {
  	 }
      
      $scope.clone = function clone (obj) {
-         return JSON.parse(JSON.stringify(obj));
+    	 if(undefined!=obj){
+             return JSON.parse(JSON.stringify(obj));
+    	 }
+    	 else{
+    		 return null;
+    	 }
      }
 }
