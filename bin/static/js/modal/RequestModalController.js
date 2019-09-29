@@ -1,5 +1,5 @@
 function RequestModalController($scope, $modalInstance, $http, selectedClient, selectedEmployee, employees,shiftRequest, date, action) {
-
+    $scope.valid=false;
 	$scope.shiftRequestAction = action;
     $scope.selectedClient=selectedClient;
     $scope.selectedEmployee=null;
@@ -28,20 +28,19 @@ function RequestModalController($scope, $modalInstance, $http, selectedClient, s
     $scope.dayOfMonth=-1;
     $scope.dayOfWeek="Fakeday";
     $scope.weekOfMonth=-1;
-    
 
     $scope.numbers = new Array(52).fill().map((x,i)=>i); 
     $scope.selectedEmployee=$scope.employees[0];
-    	if(shiftRequest && shiftRequest.staffId != undefined){
-    		for(var index = 0; index<$scope.employees.length;index++){
-    			if($scope.employees[index].id==shiftRequest.staffId){
-    				$scope.selectedEmployee=$scope.employees[index];
-    			}
-    		}
-    	}
-        myCallback(shiftRequest);
+	if(shiftRequest && shiftRequest.staffId != undefined){
+		for(var index = 0; index<$scope.employees.length;index++){
+			if($scope.employees[index].id==shiftRequest.staffId){
+				$scope.selectedEmployee=$scope.employees[index];
+			}
+		}
+	}
+    myCallback(shiftRequest);
     // Will execute myCallback every 5 seconds 
-	var intervalID = setInterval(function(){ myCallback(shiftRequest)}, 500);
+	$scope.intervalID = setInterval(function(){ myCallback(shiftRequest)}, 500);
 	
 	function myCallback(shiftRequest) {
 		var date = new Date($scope.shiftRequest.startDate);
@@ -134,8 +133,7 @@ function RequestModalController($scope, $modalInstance, $http, selectedClient, s
 		
 		$scope.weekOfMonth= week;
 	}
-    $scope.valid=false;
-    
+	
     $scope.addException = function(newDate){
         $scope.changed=true;
     	if(!$scope.shiftRequest.exceptions){
@@ -150,7 +148,7 @@ function RequestModalController($scope, $modalInstance, $http, selectedClient, s
 	$scope.removeException=function(item){ 
         $scope.changed=true;
 	    var index= $scope.shiftRequest.exceptions.indexOf(item)
-	     $scope.shiftRequest.exceptions.splice(index,1);     
+	    $scope.shiftRequest.exceptions.splice(index,1);     
 	}
 
 	$scope.requestIsValid = function(shiftRequest){
@@ -255,13 +253,56 @@ function RequestModalController($scope, $modalInstance, $http, selectedClient, s
     	$scope.shiftRequest.clientName=selectedClient.first;
     }
 
-    $scope.ok = function () {
-    	clearInterval(intervalID);
-        $modalInstance.close($scope.shiftRequest);
-    };
+	$scope.ok = function (){
+    	let id = "-1";
+    	
+    	if(null!=$scope.shiftRequest){
+    		id=$scope.shiftRequest.id;
+    	}
+    	
+    	if(action!="add" && id!=-1 && id!=null){
+ 		   $http({
+	            url: '/schedule/requestWasUpdated',
+	            method: 'GET',
+	            headers: {
+	                'Authorization': $scope.idToken,
+	                'Content-Type': 'application/x-www-form-urlencoded'
+	            },
+	            params: {
+	            	lastUpdated:($scope.shiftRequest.lastUpdated!=null?$scope.shiftRequest.lastUpdated:"null"),
+	            	requestId:id
+	            }
+	        })
+	        .then(function(response) {
+	        	var updateData=false;
+	        	console.log("requestWasUpdatedResponse:");
+	        	console.log(response.data);
+	        	if(response.data=="UPDATED"){
+    	    		   if(confirm("This request has just been modified by another user. Saving your changes will overwrite thier updates. Would you " +
+    	    		   				"still like to save your changes?")){
+    	    			   updateData=true;
+    	    		   }else{
+    	    			   $scope.cancel();
+    	    		   }
+    	    	}
+    	    	else{
+    	    		updateData=true;
+    	    	}
+    	    	
+    	    	if(updateData){
+    	        	clearInterval($scope.intervalID);
+    	            $modalInstance.close($scope.shiftRequest);
+    	    	}
+ 	       })
+    	}
+    	else if(action=="add"){
+        	clearInterval($scope.intervalID);
+            $modalInstance.close($scope.shiftRequest);
+    	}
+    }
 
     $scope.cancel = function () {
-    	clearInterval(intervalID);
+    	clearInterval($scope.intervalID);
         $modalInstance.dismiss('cancel');
     };
 };

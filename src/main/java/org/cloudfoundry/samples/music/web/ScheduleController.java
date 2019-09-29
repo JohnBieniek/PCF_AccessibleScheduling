@@ -76,7 +76,7 @@ public class ScheduleController {
     private ScheduleStatusRepository scheduleStatusRepository;   
 
     @Autowired
-    private MongoClientRequestRepository mongoRepository;
+    private MongoClientRequestRepository requestRepository;
  
     @Autowired
     private MongoClientRepository clientRepository;
@@ -101,6 +101,38 @@ public class ScheduleController {
         this.manager=manager;
     }
 
+    @RequestMapping(value = "/requestWasUpdated",method = RequestMethod.GET)
+    public String requestRequiresUpdate(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam String lastUpdated,@RequestParam String requestId) throws AuthenticationException {
+    	securityManager.authorize(idToken, Constants.USER);
+    	
+    	String updated ="UNMODIFIED";
+    	LocalDateTime time = null;
+    	//2019-09-22T20:02:26.789Z
+    	if(lastUpdated!=null && lastUpdated!="null") {
+    		time=Util.getLocalDateTimeFromString(lastUpdated);
+    	}
+
+    	ClientRequest request = requestRepository.findOne(requestId);
+    	
+    	if(null!=request) {
+    		if(time==null && request.getLastUpdated()!=null){
+    			updated="UPDATED";
+    		}
+    		else {
+        		if(!lastUpdated.equalsIgnoreCase(request.getLastUpdated())) {
+                	if(time!=null && time.isBefore(Util.getLocalDateTimeFromString(request.getLastUpdated()))) {
+                		updated="UPDATED";
+                	}
+        		}
+    		}
+    	}
+    	else {
+    		updated="DELETED";
+    	}
+		
+    	return updated;
+    }
+    
     @RequestMapping(value = "/shiftWasUpdated",method = RequestMethod.GET)
     public String shiftRequiresUpdate(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam String lastUpdated,@RequestParam String shiftId) throws AuthenticationException {
     	securityManager.authorize(idToken, Constants.USER);
@@ -378,11 +410,11 @@ public class ScheduleController {
     public List<ClientRequest> deleteById(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam String id) throws AuthenticationException {
     	securityManager.authorize(idToken, Constants.MANAGER);
     	
-    	ClientRequest request = mongoRepository.findOne(id);
+    	ClientRequest request = requestRepository.findOne(id);
     	String clientId=request.getClientId();
-    	mongoRepository.delete(id);
+    	requestRepository.delete(id);
         
-        return mongoRepository.findByClientId(clientId);
+        return requestRepository.findByClientId(clientId);
     }
     
     @RequestMapping(value = "/clientsRequests", method = RequestMethod.GET)
@@ -390,7 +422,7 @@ public class ScheduleController {
     	securityManager.authorize(idToken, Constants.MANAGER);
     	
     	
-    	return mongoRepository.findByClientId(clientId);
+    	return requestRepository.findByClientId(clientId);
     }
 
     @RequestMapping(value = "/byMonth", method = RequestMethod.DELETE)

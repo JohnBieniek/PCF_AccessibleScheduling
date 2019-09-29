@@ -39,12 +39,24 @@ public class ClientRequest {
     private String monthInterval;
     private String yearInterval;
     private String[] exceptions;
-    private LocalDateTime lastUpdated;
+    private String lastUpdated;
     
     public ClientRequest() {
     }
 
-    
+
+	public String getLastUpdated() {
+		return lastUpdated;
+	}
+
+	public void setLastUpdatedToNow() {
+    	setLastUpdated(LocalDateTime.now().toString());
+    }
+
+	public void setLastUpdated(String lastUpdated) {
+		this.lastUpdated = lastUpdated;
+	}
+	
     public boolean isValid(){
     	boolean valid = true;
     	float duration = 0;
@@ -381,15 +393,5 @@ public class ClientRequest {
 				+ ", repeats=" + repeats + ", repeatsEvery=" + repeatsEvery + ", days=" + Arrays.toString(days)
 				+ ", interval=" + interval + ", monthInterval=" + monthInterval + ", yearInterval=" + yearInterval
 				+ ", exceptions=" + Arrays.toString(exceptions) + "]";
-	}
-
-
-	public LocalDateTime getLastUpdated() {
-		return lastUpdated;
-	}
-
-
-	public void setLastUpdated(LocalDateTime lastUpdated) {
-		this.lastUpdated = lastUpdated;
 	}
 }

@@ -84,7 +84,7 @@ public class ClientRequestController {
     public ClientRequest add(@RequestHeader(value="Authorization", required=false) String idToken, @RequestBody @Valid ClientRequest clientRequest) throws AuthenticationException {
     	securityManager.authorize(idToken, Constants.MANAGER);
     	logger.info("Adding clientRequest " + clientRequest.getId());
-    	clientRequest.setLastUpdated(LocalDateTime.now());
+    	clientRequest.setLastUpdatedToNow();
         return repository.save(clientRequest);
     }
 
@@ -106,7 +106,7 @@ public class ClientRequestController {
 		}
         repository.save(clientRequest);
         updateInfoManager.set("clientRequests");
-    	clientRequest.setLastUpdated(LocalDateTime.now());
+    	clientRequest.setLastUpdatedToNow();
         return mongoRepository.findByClientId(clientRequest.getClientId());
     }
 
@@ -122,7 +122,7 @@ public class ClientRequestController {
     	securityManager.authorize(idToken, Constants.ADMIN);
     	
     	for(ClientRequest request:requests) {
-    		request.setLastUpdated(LocalDateTime.now());
+    		request.setLastUpdatedToNow();
     	}
     	
     	repository.save(requests);

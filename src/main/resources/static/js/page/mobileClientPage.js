@@ -510,60 +510,115 @@ function MobileClientController($scope, $modal, $http) {
    }
    
    $scope.updateShiftRequest = function (selectedClient, shiftRequest,employees) {
-	   var selectedEmployee = employees.filter(function( employee ) {
-			   										return employee.id == shiftRequest.staffId;
-			   									});
-       var updateModal = $modal.open({
-           templateUrl: 'templates/modal/requestForm.html',
-           controller: RequestModalController,
-           resolve: {
-           	selectedClient: function(){
-           		return $scope.clone(selectedClient);
-           	},
-               shiftRequest: function() {
-                   return $scope.clone(shiftRequest);
-               },
-           	employees: function(){
-           		return $scope.clone(employees);
-           	},
-           	selectedEmployee: function(){
-           		if(selectedEmployee!=null && selectedEmployee.length>0){
-           			return $scope.clone(selectedEmployee[0]);
-           		}
-           		return "";
-           	},
-           	date: function(){
-           		return "";
-           	},
-               action: function() {
-                   return 'update';
-               }
-           }
-       });
+	   var lastUpdated = (request.lastUpdated!=null?request.lastUpdated:"null");
+	   $http({
+            url: '/schedule/requestWasUpdated',
+            method: 'GET',
+            headers: {
+                'Authorization': $scope.idToken,
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            params: {
+            	lastUpdated:lastUpdated,
+            	requestId:request.id
+            }
+        })
+        .then(function(response) {
+        	var updateData=true;
 
-       updateModal.result.then(function (shiftRequest) {
-           saveShiftRequest(shiftRequest);
-       });
+        	if(response.data=="DELETED"){
+        	   updateDate=false;
+	    	   $scope.warn("This request has just been deleted by another user. If you still wish to make edits please make a new shift.");
+   	    	}
+   	    	
+   	    	if(updateData){
+	   	  	    var selectedEmployee = employees.filter(function( employee ) {
+	   	  	    	return employee.id == shiftRequest.staffId;
+				});
+				var updateModal = $modal.open({
+					templateUrl: 'templates/modal/requestForm.html',
+					controller: RequestModalController,
+					resolve: {
+						selectedClient: function(){
+							return $scope.clone(selectedClient);
+						},
+						shiftRequest: function() {
+							return $scope.clone(shiftRequest);
+						},
+						employees: function(){
+							return $scope.clone(employees);
+						},
+						selectedEmployee: function(){
+							if(selectedEmployee!=null && selectedEmployee.length>0){
+								return $scope.clone(selectedEmployee[0]);
+							}
+							return "";
+						},
+						date: function(){
+							return "";
+						},
+						action: function() {
+							return 'update';
+						}
+					}
+				});
+						
+				updateModal.result.then(function (shiftRequest) {
+					saveShiftRequest(shiftRequest);
+				});
+   	    	}
+        });
+
    }
    
    $scope.deleteShiftRequest = function (shiftRequest) {
-	   if(confirm("Are you sure to delete info for the following request?"+shiftRequest.displayValue)){
-		   $http({
-               url: '/schedule/deleteRequest',
-               method: 'GET',
-               headers: {
-            	   'Authorization': $scope.idToken,
-                   'Content-Type': 'application/x-www-form-urlencoded'
-               },
-               params: {
-                   id: shiftRequest.id
-               }
-           })
-           .then(function(response) {
-        	   	$scope.notify("Request removed.");
-           		$scope.requests = response.data;
-           });
-	   }
+	   	var lastUpdated = (shiftRequest.lastUpdated!=null?shiftRequest.lastUpdated:"null");
+    	$http({
+            url: '/schedule/requestWasUpdated',
+            method: 'GET',
+            headers: {
+                'Authorization': $scope.idToken,
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            params: {
+            	lastUpdated:lastUpdated,
+            	requestId:request.id
+            }
+        })
+        .then(function(response) {
+        	var deleteRequest=false;
+        	
+        	if(response.data=="UPDATED"){
+    		   if(confirm("This request has just been modified by another user. Deleteing this request will overwrite thier updates. Would you " +
+    		   				"still like to delete this request?")){
+    			   deleteShift=true;
+    		   }
+    		   else{
+    			   $scope.listShifts();
+    		   }
+        	}
+    		else if(confirm("Are you sure you want to delete this request?")){
+    			deleteShift=true;
+    		}
+        	
+        	if(deleteShift){
+			   $http({
+	               url: '/schedule/deleteRequest',
+	               method: 'GET',
+	               headers: {
+	            	   'Authorization': $scope.idToken,
+	                   'Content-Type': 'application/x-www-form-urlencoded'
+	               },
+	               params: {
+	                   id: shiftRequest.id
+	               }
+	           })
+	           .then(function(response) {
+	        	   	$scope.notify("Request removed.");
+	           		$scope.requests = response.data;
+	           });
+        	}
+	   });
     }
     
     $scope.newClient = function () {

@@ -36,6 +36,7 @@ function MainNavigationController($scope, $modal, $http) {
         $scope.admin=false;
         
         $scope.lastShiftUpdate=null;
+        $scope.lastRequestUpdate=null;
         $scope.lastLocalCustomFieldUpdate=null;
         $scope.lastLocalShiftUpdate=null;
         $scope.lastClientUpdate=null;
@@ -192,8 +193,6 @@ function MainNavigationController($scope, $modal, $http) {
     	let id = "-1";
     	
        	$scope.getDisplayWeek();
-       	console.log("called list Shifts on page:");
-       	console.log($scope.page);
 		 if($scope.page=="templates/page/employee.html"){
 	    	if(null!=$scope.employee){
 	    		id=$scope.employee.id;
@@ -625,7 +624,7 @@ function MainNavigationController($scope, $modal, $http) {
 		 var d = new Date();
 		 var n = d.getTime();
 		 $scope.lastAlert=n;
-		 setTimeout($scope.autoHideToast,5000);
+		 setTimeout($scope.autoHideToast,4000);
 	 }
 	 
 	 $scope.warn = function(message){
@@ -636,7 +635,7 @@ function MainNavigationController($scope, $modal, $http) {
 		 var d = new Date();
 		 var n = d.getTime();
 		 $scope.lastAlert=n;
-		 setTimeout($scope.autoHideToast,5000);
+		 setTimeout($scope.autoHideToast,8000);
 	 }
 	 
 	 $scope.hideToast = function(){
@@ -647,7 +646,7 @@ function MainNavigationController($scope, $modal, $http) {
 		 var d = new Date();
 		 var n = d.getTime();
 		 var difference = n-$scope.lastAlert;
-		 if(difference>=5000){
+		 if(difference>=4000){
 			 $scope.showToast=false;
 			 $scope.$apply();
 		 }
