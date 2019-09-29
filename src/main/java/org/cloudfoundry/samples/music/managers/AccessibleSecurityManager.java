@@ -140,20 +140,22 @@ public class AccessibleSecurityManager {
     	return user;
     }
 
-    public ArrayList<AccessRequest> deny(String userId) {
+    public String deny(String userId) {
     	if(null!=userId) {
     	   	AccessRequest request = accessCrud.findOne(userId);
     	   	
     	   	if(request!=null) {
-        	   	System.out.println("deleteing request for "+request.getName());
         		accessCrud.delete(request);    	   		
+    	   	}
+    	   	else {
+    	   		return "DELETED";
     	   	}
     	};
     	
-    	return (ArrayList<AccessRequest>) accessCrud.findAll();
+    	return "DENIED";
 	}
     
-	public ArrayList<AccessRequest> approve(String userId, String employeeId) {
+	public String approve(String userId, String employeeId) {
     	if(null!=userId) {
     	   	Employee employee = employeeCrud.findOne(employeeId);
     	   	
@@ -161,12 +163,14 @@ public class AccessibleSecurityManager {
     	   	employeeCrud.save(employee);
     	   	AccessRequest request = accessCrud.findOne(userId);
     	   	if(request!=null) {
-        	   	System.out.println("deleteing request for "+request.getName());
         		accessCrud.delete(request);    	   		
+    	   	}
+    	   	else {
+    	   		return "DELETED";
     	   	}
     	};
     	
-    	return (ArrayList<AccessRequest>) accessCrud.findAll();
+    	return "APPROVED";
 	}
 	
 	public User getUser(String idToken) throws AuthenticationException{

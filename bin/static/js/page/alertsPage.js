@@ -47,8 +47,13 @@ function AlertsController($scope, $modal, $http) {
 		            }
 		        })
 		        .then(function(response) {
-		        	$scope.notify("Access granted.");
-		        	$scope.alerts=response.data;
+		        	if(response.data=="APPROVED"){
+			        	$scope.notify("Access granted.");
+			        	$scope.listAlerts();
+		        	}else if(response.data=="DELETED"){
+			        	$scope.warn("Your update has not been applied as someone else just answered this request.");
+			        	$scope.listAlerts();
+		        	}
 		        });
 		     }
 		  }
@@ -72,9 +77,13 @@ function AlertsController($scope, $modal, $http) {
                 }
             })
 	        .then(function(response) {
-	        	$scope.notify("Access denied to "+alertName+".");
-	        	
-	        	$scope.alerts=response.data;
+	        	if(response.data=="DENIED"){
+		        	$scope.notify("Access denied to "+alertName+".");
+		        	$scope.listAlerts();
+	        	}else if(response.data=="DELETED"){
+		        	$scope.warn("Your update has not been applied as someone else just answered this request.");
+		        	$scope.listAlerts();
+	        	}
 	        });
     	}
     };
