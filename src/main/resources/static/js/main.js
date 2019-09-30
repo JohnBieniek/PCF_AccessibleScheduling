@@ -135,10 +135,10 @@ function MainNavigationController($scope, $modal, $http) {
 			 setTimeout(autoUpdateData,120000);
 		 }
 		 else if(timeSinceInteraction>30){
-			 setTimeout(autoUpdateData,6000);
+			 setTimeout(autoUpdateData,60000);
 		 }
 		 else if(timeSinceInteraction>=5){
-			 setTimeout(autoUpdateData,3000);
+			 setTimeout(autoUpdateData,30000);
 		 }
 		 else if(timeSinceInteraction<5){
 			 setTimeout(autoUpdateData,15000);
