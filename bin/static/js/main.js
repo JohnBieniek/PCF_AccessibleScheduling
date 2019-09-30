@@ -122,24 +122,25 @@ function MainNavigationController($scope, $modal, $http) {
 		 }else if($scope.page=="templates/page/alerts.html"){
 			 $scope.listAlerts();
 		 }
-		 else if($scope.page!="templates/page/scheduler.html"){
+		 else if($scope.page=="templates/page/scheduler.html"){
 			 $scope.listStatusItems();
 		 }
 		 
 		 $scope.incrementCycle();
-		 if($scope.getMinutesSinceLastInteraction>120){
+		 var timeSinceInteraction = $scope.getMinutesSinceLastInteraction();
+		 if(timeSinceInteraction>120){
 			 setTimeout(autoUpdateData,12000000);
 		 }
-		 else if($scope.getMinutesSinceLastInteraction>60){
+		 else if(timeSinceInteraction>60){
 			 setTimeout(autoUpdateData,120000);
 		 }
-		 else if($scope.getMinutesSinceLastInteraction>30){
+		 else if(timeSinceInteraction>30){
 			 setTimeout(autoUpdateData,6000);
 		 }
-		 else if($scope.getMinutesSinceLastInteraction>=5){
+		 else if(timeSinceInteraction>=5){
 			 setTimeout(autoUpdateData,3000);
 		 }
-		 else if($scope.getMinutesSinceLastInteraction<5){
+		 else if(timeSinceInteraction<5){
 			 setTimeout(autoUpdateData,15000);
 		 }
 	 }
