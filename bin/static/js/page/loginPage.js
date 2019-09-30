@@ -26,7 +26,7 @@ function LoginController($scope, $modal, $http) {
 	    // The ID token you need to pass to your backend:
 	    var idToken = googleUser.getAuthResponse().id_token;
 	    $scope.setIdToken(idToken);
-	    
+		$scope.updateLastInteractionTime();
     	$http({
             url: '/auth/tokensignin',
             method: 'GET',

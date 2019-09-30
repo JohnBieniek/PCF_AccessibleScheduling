@@ -29,11 +29,13 @@ function VacationController($scope, $modal, $http) {
      }
 	 
 	 $scope.addAbsence = function(selectedEmployee,newDate){
+		 $scope.updateLastInteractionTime();
 	        selectedEmployee.requestedOff.push(newDate);
 	        $scope.saveEmployee(selectedEmployee);
     };
 	    
     $scope.removeAbsence=function(selectedEmployee,item){ 
+    	$scope.updateLastInteractionTime();
     	 if(confirm("Are you sure you want to delete this request?")){
 	        var index=selectedEmployee.requestedOff.indexOf(item)
 	        selectedEmployee.requestedOff.splice(index,1);     

@@ -22,6 +22,10 @@ angular.module('client', ['ngResource', 'ui.bootstrap']).
     });
 
 function MobileClientController($scope, $modal, $http) {
+	
+	/**
+	 * Interaction notification is done in setTab
+	 */
 	$scope.setTabAndInfo = function(newTab){
         $scope.setTab(newTab);
         $scope.updateClient();
@@ -33,6 +37,9 @@ function MobileClientController($scope, $modal, $http) {
         $scope.listClients();
 	}
 	
+	/**
+	 * Interaction notification is done in setClient
+	 */
 	$scope.setClientAndInfo = function(newClient){
 	  $scope.detailsChanged=false;
       $scope.setClient(newClient);
@@ -49,6 +56,7 @@ function MobileClientController($scope, $modal, $http) {
 	}
 	
 	$scope.setDetailsToChanged = function(){
+	  $scope.updateLastInteractionTime();
       $scope.detailsChanged=true;;
 	}
 	
@@ -271,6 +279,7 @@ function MobileClientController($scope, $modal, $http) {
     }
     
     $scope.addShift = function () {
+    	$scope.updateLastInteractionTime();
         var addModal = $modal.open({
             templateUrl: 'templates/modal/shiftForm.html',
             controller: ShiftModalController,
@@ -307,31 +316,13 @@ function MobileClientController($scope, $modal, $http) {
         	if(shift.startMonth==0 || shift.startMonth == undefined || shift.startMonth==null){
         		shift.startMonth=shift.startDate.split("-")[1];
         	}
-        	
+        	$scope.updateLastInteractionTime();
             saveShift(shift);
-        });
-    }
-    
-    
-    $scope.deleteShift = function (shift) {
-    	$http({
-            url: '/shifts/'+shift.id,
-            method: 'DELETE',
-            headers: {
-                'Authorization': $scope.idToken,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            params: {
-            }
-        })
-        .then(function (response) {//TODO handle error state
-            $scope.notify("Shift removed.");
-            
-            $scope.listEmployees();
         });
     }
  
     $scope.addRequest = function (selectedClient,employees) {
+       $scope.updateLastInteractionTime();
        var addModal = $modal.open({
            templateUrl: 'templates/modal/requestForm.html',
            controller: RequestModalController,
@@ -378,6 +369,7 @@ function MobileClientController($scope, $modal, $http) {
                 }
             })
             .then(function(response) {
+            	$scope.updateLastInteractionTime();
             	$scope.notify("Request saved.");
             	$scope.setRequests(response.data);
             });
@@ -404,6 +396,7 @@ function MobileClientController($scope, $modal, $http) {
    }
    
    $scope.editShift = function (shift) {
+	   $scope.updateLastInteractionTime();
 	   var lastUpdated = (shift.lastUpdated!=null?shift.lastUpdated:"null");
 	   $http({
             url: '/schedule/shiftWasUpdated',
@@ -457,20 +450,17 @@ function MobileClientController($scope, $modal, $http) {
 		       updateModal.result.then(function (shift) {
 				   saveShift(shift);
 		           $scope.listShifts();
+		           $scope.updateLastInteractionTime();
 		       }, function () {
 		           $scope.listShifts();
+		           $scope.updateLastInteractionTime();
 		       });
    	    	}
         });
    }
    
    $scope.updateShiftRequest = function (selectedClient, shiftRequest,employees) {
-	   console.log("selectedClient");
-	   console.log(selectedClient);
-	   console.log("shiftRequest");
-	   console.log(shiftRequest);
-	   console.log("employees");
-	   console.log(employees);
+	   $scope.updateLastInteractionTime();
 	   var lastUpdated = (shiftRequest.lastUpdated!=null?shiftRequest.lastUpdated:"null");
 	   $http({
             url: '/schedule/requestWasUpdated',
@@ -493,7 +483,6 @@ function MobileClientController($scope, $modal, $http) {
 	   	  	    var selectedEmployee = employees.filter(function( employee ) {
 	   	  	    	return employee.id == shiftRequest.staffId;
 				});
-	   	  	    console.log("updating request:"+$scope.idToken);
 				var updateModal = $modal.open({
 					templateUrl: 'templates/modal/requestForm.html',
 					controller: RequestModalController,
@@ -528,7 +517,9 @@ function MobileClientController($scope, $modal, $http) {
 				updateModal.result.then(function (shiftRequest) {
 					saveShiftRequest(shiftRequest);
     			    $scope.listRequests();
+    			    $scope.updateLastInteractionTime();
 				}, function () {
+					$scope.updateLastInteractionTime();
 			        $scope.listRequests();
 		        });
    	    	}
@@ -537,6 +528,7 @@ function MobileClientController($scope, $modal, $http) {
    }
    
    $scope.deleteShiftRequest = function (shiftRequest) {
+	    $scope.updateLastInteractionTime();
 	   	var lastUpdated = (shiftRequest.lastUpdated!=null?shiftRequest.lastUpdated:"null");
     	$http({
             url: '/schedule/requestWasUpdated',
@@ -579,14 +571,16 @@ function MobileClientController($scope, $modal, $http) {
 	               }
 	           })
 	           .then(function(response) {
-	        	   	$scope.notify("Request removed.");
-	    			   $scope.listRequests();
+	        	   $scope.notify("Request removed.");
+    			   $scope.listRequests();
+    			   $scope.updateLastInteractionTime();
 	           });
         	}
 	   });
     }
     
     $scope.newClient = function () {
+    	$scope.updateLastInteractionTime();
     	$http({
             url: '/schedule/createClient',
             method: 'POST',
@@ -610,6 +604,7 @@ function MobileClientController($scope, $modal, $http) {
     }
     
     $scope.ok = function () {
+    	$scope.updateLastInteractionTime();
     	var originalClient = $scope.clone($scope.unmodifiedClient);
     	var modifiedClient = $scope.clone($scope.client);
     	var lastUpdated = originalClient.lastUpdated;
@@ -635,7 +630,9 @@ function MobileClientController($scope, $modal, $http) {
     	    		   if(confirm(modifiedClient.first+" has just been modified by another user. Saving your changes will overwrite thier updates. Would you " +
     	    		   				"still like to save your changes?")){
     	    			   updateData=true;
+    	    			   $scope.updateLastInteractionTime();
     	    		   }else{
+    	    			   $scope.updateLastInteractionTime();
     	    			   $scope.cancel();
     	    		   }
     	    	}
@@ -692,6 +689,7 @@ function MobileClientController($scope, $modal, $http) {
     }
     
     $scope.deleteShift = function (shift) {
+    	$scope.updateLastInteractionTime();
     	var lastUpdated = (shift.lastUpdated!=null?shift.lastUpdated:"null");
     	$http({
             url: '/schedule/shiftWasUpdated',
@@ -746,6 +744,7 @@ function MobileClientController($scope, $modal, $http) {
      };
      
     $scope.delete = function () {
+    	$scope.updateLastInteractionTime();
  	   if(confirm("Are you sure you want to delete info for "+$scope.client.first + " "+$scope.client.initial+"?")){
     	$http({
             url: '/clients/'+$scope.client.id,
@@ -790,6 +789,7 @@ function MobileClientController($scope, $modal, $http) {
     }
     
     $scope.cancel = function () {
+    	$scope.updateLastInteractionTime();
     	$scope.detailsChanged=false;
     	$scope.updateClient();
     	$scope.getAllClientCustomFieldData();

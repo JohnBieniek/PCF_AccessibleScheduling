@@ -35,6 +35,10 @@ function MobileEmployeeController($scope, $modal, $http) {
 		 
 		 $scope.listShifts();
 	}
+	
+	/**
+	 * $scope.updateLastInteractionTime() is called from the setEmployeeTab function
+	 */
 	$scope.setEmployeeTabAndInfo=function(tab){
 		$scope.updateEmployee();
 	    if($scope.employee!=null && $scope.customFields !=null){
@@ -46,7 +50,9 @@ function MobileEmployeeController($scope, $modal, $http) {
 	    $scope.listShifts();
 		$scope.setEmployeeTab(tab);
 	}
+	
 	$scope.deleteAvailability=function(availability){ 
+		$scope.updateLastInteractionTime();
 		var currentEmployee = $scope.employee;
 		if(confirm("Are you sure you want to delete the selected availability? for "+ $scope.employee.days[availability]+ "?")){
 			currentEmployee.startTimes.splice(availability,1);    
@@ -58,6 +64,7 @@ function MobileEmployeeController($scope, $modal, $http) {
     }
 	
 	$scope.addAvailability= function(day){
+		$scope.updateLastInteractionTime();
 		var currentEmployee = $scope.employee;
 		if($scope.employee){
 			currentEmployee.days.push(day);
@@ -146,6 +153,7 @@ function MobileEmployeeController($scope, $modal, $http) {
 	}
 	
 	$scope.setDetailsToChanged = function(){
+	  $scope.updateLastInteractionTime();
       $scope.detailsChanged=true;;
 	}
 	
@@ -395,7 +403,7 @@ function MobileEmployeeController($scope, $modal, $http) {
 		 
 		request.displayValue+=".";
 	}
-	
+
 	$scope.listEmployeesAndInfo = function listEmployeesAndInfo(){
 		$scope.listEmployees();
 		
@@ -432,6 +440,7 @@ function MobileEmployeeController($scope, $modal, $http) {
      * view the changes or overwrite with their edits. Accept their input then refresh the list of shifts to reflect any changes.
      */
     $scope.editShift = function (shift) {
+       $scope.updateLastInteractionTime();
        //Only managers and above can currently edit shifts
 	   if($scope.profile && $scope.profile.manager){
 		   var lastUpdated = (shift.lastUpdated!=null?shift.lastUpdated:"null");//Account for old data having no lastUpdated info
@@ -494,6 +503,7 @@ function MobileEmployeeController($scope, $modal, $http) {
 
 
     $scope.newEmployee = function () {
+    	$scope.updateLastInteractionTime();
     	$http({
             url: '/schedule/createEmployee',
             method: 'POST',
@@ -519,6 +529,7 @@ function MobileEmployeeController($scope, $modal, $http) {
     };
 
     $scope.ok = function () {
+    	$scope.updateLastInteractionTime();
       	var originalEmployee = $scope.clone($scope.unmodifiedEmployee);
     	var modifiedEmployee = $scope.clone($scope.employee);
     	var lastUpdated = originalEmployee.lastUpdated;
@@ -624,6 +635,7 @@ function MobileEmployeeController($scope, $modal, $http) {
     }
      
     $scope.delete = function () {
+    	$scope.updateLastInteractionTime();
  	   if(confirm("Are you sure you want to delete info for "+$scope.employee.first + " "+$scope.employee.initial+"?")){
     	$http({
             url: '/employees/'+$scope.employee.id,
@@ -650,6 +662,7 @@ function MobileEmployeeController($scope, $modal, $http) {
     };
     
     $scope.cancel = function () {
+    	$scope.updateLastInteractionTime();
 	  	$http({
             url: '/employees/'+$scope.employee.id,
             method: 'GET',

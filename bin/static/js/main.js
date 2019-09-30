@@ -23,6 +23,7 @@ angular.module('mainNavigation', ['ngResource', 'ui.bootstrap']).
 
 function MainNavigationController($scope, $modal, $http) {
 	 $scope.init = function() {
+		$scope.lastInteraction=new Date();
         $scope.setPage("login");
 		$scope.tab="Schedule";
 		$scope.employeeTab="Schedule";
@@ -35,6 +36,7 @@ function MainNavigationController($scope, $modal, $http) {
         $scope.manager=false;
         $scope.admin=false;
         
+        $scope.lastScheduleStatusUpdate=null;
         $scope.lastShiftUpdate=null;
         $scope.lastRequestUpdate=null;
         $scope.lastLocalCustomFieldUpdate=null;
@@ -50,6 +52,7 @@ function MainNavigationController($scope, $modal, $http) {
 		}
         $scope.monthTab=$scope.week.getMonth()+2;
 
+		$scope.statusList=[];//Holds the info to color the month tabs of the scheduler
     	$scope.customValue=[];//Holds custom field data in the details tab
     	$scope.unmodifiedCustomValue=[];//Holds custom field data in the details tab
         $scope.employee=null;
@@ -82,6 +85,16 @@ function MainNavigationController($scope, $modal, $http) {
 		$scope.autoUpdateData();
 	 };
 	 
+	 $scope.getMinutesSinceLastInteraction = function(){
+		 var now = new Date();
+		 var diffMs = (now-$scope.lastInteraction); // milliseconds between now & last interaction
+		 var diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000); // minutes
+		 return diffMins;
+	 }
+
+	 $scope.updateLastInteractionTime = function(){
+		$scope.lastInteraction = new Date();
+	 }
 	 
 	 $scope.incrementCycle = function(){
 		 $scope.updateCycle=$scope.updateCycle+1;
@@ -109,12 +122,72 @@ function MainNavigationController($scope, $modal, $http) {
 		 }else if($scope.page=="templates/page/alerts.html"){
 			 $scope.listAlerts();
 		 }
+		 else if($scope.page!="templates/page/scheduler.html"){
+			 $scope.listStatusItems();
+		 }
 		 
 		 $scope.incrementCycle();
-		// setTimeout(autoUpdateData,60000);
+		 if($scope.getMinutesSinceLastInteraction>120){
+			 setTimeout(autoUpdateData,12000000);
+		 }
+		 else if($scope.getMinutesSinceLastInteraction>60){
+			 setTimeout(autoUpdateData,120000);
+		 }
+		 else if($scope.getMinutesSinceLastInteraction>30){
+			 setTimeout(autoUpdateData,6000);
+		 }
+		 else if($scope.getMinutesSinceLastInteraction>=5){
+			 setTimeout(autoUpdateData,3000);
+		 }
+		 else if($scope.getMinutesSinceLastInteraction<5){
+			 setTimeout(autoUpdateData,15000);
+		 }
 	 }
 	 
 	 //API Access
+     $scope.listStatusItems = function listStatusItems(){
+		 if($scope.idToken!=null){
+			 $http({
+		           url: '/updateInfo/scheduleStatus',
+		           method: 'GET',
+		           headers: {
+		               'Authorization': $scope.idToken,
+		               'Content-Type': 'application/x-www-form-urlencoded'
+		           },
+		           params: {
+		           }
+		     })
+		     .then(function (response) {//TODO handle error state	    	 
+		       console.log('listStatusItems-response.data');
+		       console.log(response.data);
+		       console.log('$scope.lastScheduleStatusUpdate');
+		       console.log($scope.lastScheduleStatusUpdate);
+
+		  	   if($scope.lastScheduleStatusUpdate==null || response.data==null || response.data.time.nano!=$scope.lastScheduleStatusUpdate.time.nano){
+			       if(response.data.time!=null && $scope.lastScheduleStatusUpdate !=null){
+			    	   console.log("response.data.time.nano!=$scope.lastScheduleStatusUpdate.time.nano)");
+				       console.log(response.data.time.nano!=$scope.lastScheduleStatusUpdate.time.nano);
+			       }
+
+		  		    $scope.lastScheduleStatusUpdate=response.data;
+			    	$http({
+			            url: '/schedule/statusList',
+			            method: 'GET',
+			            headers: {
+			                'Authorization': $scope.idToken,
+			                'Content-Type': 'application/x-www-form-urlencoded'
+			            },
+			            params: {
+			            }
+			        })
+			        .then(function(response) {
+			    		$scope.statusList = response.data.sort(function(a, b){return a.month-b.month});
+			        });
+		  	   }
+		     });
+		 }
+     }
+	    
 	 $scope.getAllEmployeeCustomFieldData = function () {
 	     if($scope.employee!=null && $scope.customFields !=null){
 		      for(var index = 0; index<$scope.customFields.length;index++){
@@ -547,16 +620,20 @@ function MainNavigationController($scope, $modal, $http) {
 
 	 
 	//Navigation
-	$scope.setMonthTab = function(monthTab){
+	$scope.setMonthTab = function(monthTab){//Scheduler
+		 $scope.updateLastInteractionTime();
 		 $scope.monthTab = monthTab;
 	}
 	$scope.setTab = function(newTab){//ClientTab
-	      $scope.tab = newTab;
+		 $scope.updateLastInteractionTime();
+	     $scope.tab = newTab;
 	}
 	$scope.setEmployeeTab = function(newTab){
-	      $scope.employeeTab = newTab;
+		 $scope.updateLastInteractionTime();
+	     $scope.employeeTab = newTab;
 	}
 	$scope.setPage = function (viewName) {
+	    $scope.updateLastInteractionTime();
 		var newPage = "templates/page/" + viewName + ".html"
 		if(newPage!=$scope.page){
 	        $scope.shifts=null;
@@ -565,6 +642,7 @@ function MainNavigationController($scope, $modal, $http) {
     };
     
     $scope.decrementWeek = function(){
+   	 $scope.updateLastInteractionTime();
    	 $scope.setWeek($scope.week.addDays(-7));
    	 
    	 $scope.getDisplayWeek();
@@ -572,6 +650,7 @@ function MainNavigationController($scope, $modal, $http) {
    	 $scope.listShifts();
     }
     $scope.incrementWeek = function(){
+   	 	$scope.updateLastInteractionTime();
     	$scope.setWeek($scope.week.addDays(7));
    	 
    	 	$scope.getDisplayWeek();
@@ -591,6 +670,7 @@ function MainNavigationController($scope, $modal, $http) {
 	 }
 	 
     $scope.signOut = function signOut() {
+   	 	 $scope.updateLastInteractionTime();
 		 $scope.manager=false;
 		 $scope.admin=false;
 		 $scope.user=false;
@@ -642,6 +722,7 @@ function MainNavigationController($scope, $modal, $http) {
 	 }
 	 
 	 $scope.hideToast = function(){
+		 $scope.updateLastInteractionTime();
 		 $scope.showToast=false;
 	 }
 	 

@@ -48,6 +48,7 @@ function SettingsController($scope, $modal, $http) {
      }
      
      $scope.addCustomField = function () {
+    	 $scope.updateLastInteractionTime();
          var addModal = $modal.open({
              templateUrl: 'templates/modal/customFieldForm.html',
              controller: CustomFieldModalController,
@@ -81,12 +82,14 @@ function SettingsController($scope, $modal, $http) {
          });
 
          updateModal.result.then(function (customField) {
+        	 $scope.updateLastInteractionTime();
              saveCustomField(customField);
          });
      };
 
     
     $scope.deleteCustomField = function (customField) {
+    	$scope.updateLastInteractionTime();
     	$http({
             url: '/customFields/'+customField.id,
             method: 'DELETE',

@@ -32,6 +32,7 @@ function AlertsController($scope, $modal, $http) {
 	  }
 	
 	  $scope.assignSelectedEmployee = function(alert,employee){
+		  $scope.updateLastInteractionTime();
 		  if(typeof employee !== 'undefined' && employee !=null && employee != undefined && employee !=false){
 			  if(confirm("Are you sure you want to give "+alert.name +" access to the profile of " +employee.first+"?")){
 		    	$http({
@@ -63,6 +64,7 @@ function AlertsController($scope, $modal, $http) {
 	}
 	
     $scope.deleteAlert = function (alert) {
+    	$scope.updateLastInteractionTime();
     	let alertName = alert.name;
     	if(confirm("Are you sure you want to deny access for "+alertName+"?")){
         	$http({

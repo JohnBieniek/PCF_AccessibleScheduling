@@ -448,16 +448,6 @@ public class ScheduleController {
     	return shiftManager.getDurationOfShiftsStartingWeekOfMonth(Integer.parseInt(week),Integer.parseInt(month),Integer.parseInt(year));
     }
     
-    @RequestMapping(value = "/staffPreassignedShifts", method = RequestMethod.GET)
-    public String staffPreassignedShifts(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam("month") String month,@RequestParam("year") String year) throws CorruptDataException, ProccessingException, AuthenticationException {
-    	securityManager.authorize(idToken, Constants.ADMIN);
-    	
-    	ScheduleOptions options = new ScheduleOptions();
-    	options.setMonth(month);
-    	options.setYear(year);
-    	return assignmentManager.staffPreassignedShifts(options);
-    }
-    
     @RequestMapping(value = "/staffShiftsSafely", method = RequestMethod.GET)
     public Iterable<ScheduleStatus> staffShiftsSafely(@RequestHeader(value="Authorization", required=false) String idToken,
     													@RequestParam("month") String month
@@ -478,10 +468,12 @@ public class ScheduleController {
     		status= new ScheduleStatus();
     		status.setMonth(month);
     	}
-    	
+    
     	if(status.isGenerated()) {
     		status.setAssigning(true);
+    		status.setLastUpdatedToNow();
         	scheduleStatusCrud.save(status);
+            updateInfoManager.set("scheduleStatus");
     	}
     	
     	ScheduleOptions options = new ScheduleOptions(month, year, allowOvertime, allowInactive,allowUnavailable, 
@@ -526,6 +518,7 @@ public class ScheduleController {
     	securityManager.authorize(idToken, Constants.ADMIN);
     	
     	scheduleManager.generateStatusList();
+        updateInfoManager.set("scheduleStatus");
         return scheduleStatusCrud.findAll();
     }
     
@@ -546,8 +539,10 @@ public class ScheduleController {
     	}
     	if(status.isGenerated()) {
     		status.setAssigned(true);
+    		status.setLastUpdatedToNow();
     		scheduleStatusRepository.deleteByMonth(month);
         	scheduleStatusCrud.save(status);
+            updateInfoManager.set("scheduleStatus");
     	}
     	
         return scheduleStatusCrud.findAll();
@@ -568,7 +563,9 @@ public class ScheduleController {
     	status.setGenerated(true);
 		status.setAssigning(true);
 		status.setStopped(true);
+		status.setLastUpdatedToNow();
     	scheduleStatusCrud.save(status);
+        updateInfoManager.set("scheduleStatus");
     	Thread.sleep(5000);//Can this be deleted?
     	finishAssignment(idToken, month);
         return scheduleStatusCrud.findAll();
@@ -577,7 +574,7 @@ public class ScheduleController {
     @RequestMapping(value = "/generateShifts", method = RequestMethod.GET)
     public Iterable<ScheduleStatus> generateShifts(@RequestHeader(value="Authorization", required=false) String idToken,@RequestParam("month") String month,@RequestParam("year") String year) throws CorruptDataException, AuthenticationException {
     	securityManager.authorize(idToken, Constants.ADMIN);
-    	
+        updateInfoManager.set("scheduleStatus");
     	generationManager.generateShifts(month,year);
         return scheduleStatusCrud.findAll();
     }

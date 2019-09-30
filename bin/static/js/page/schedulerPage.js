@@ -32,8 +32,6 @@ function SchedulingController($scope, $modal, $http) {
 		$scope.generatedBool = false;
 		$scope.generated="Generated";
 		$scope.assigned="Assigned";
-		
-		$scope.statusList=[];
 		$scope.unscheduled=0;
 		$scope.scheduled=0;
 		$scope.year=2019;
@@ -43,87 +41,94 @@ function SchedulingController($scope, $modal, $http) {
 	}
 	 
 	$scope.setScheduleTab = function(newTab){
-	if($scope.statusList && $scope.statusList[$scope.monthTab-1])$scope.generatedBool = $scope.statusList[$scope.monthTab-1].generated;
-      $scope.setMonthTab(newTab);
-      
-      $scope.getUnscheduled(newTab);
-      $scope.getScheduled(newTab);
-  	  $scope.total= +$scope.scheduled + +$scope.unscheduled;
-      
-      if($scope.statusList && $scope.statusList[$scope.monthTab-1] && $scope.statusList[$scope.monthTab-1].generated){
-    	  $scope.generated="Generated";
-      }
-      
-      if($scope.statusList && $scope.statusList[$scope.monthTab-1] && $scope.statusList[$scope.monthTab-1].assigned){
-    	  $scope.assigned="Assigned";
-      }
-      
-      if($scope.statusList && $scope.statusList[$scope.monthTab-1] && $scope.statusList[$scope.monthTab-1].assigning){
-    	  $scope.assigned="Assigning";
-    	  if($scope.statusList && $scope.statusList[$scope.monthTab-1] && $scope.statusList[$scope.monthTab-1].stopped){
-    		  $scope.assigned="Stopping";
-    	  }
-      }
-      
-      //TODO refactor with getDisplayMonth
-      switch(newTab){
-    	  case 1:
-    		  $scope.monthName="January";
-    		  break;
-    	  case 2:
-    		  $scope.monthName="Febuary";
-    		  break;
-    	  case 3:
-    		  $scope.monthName="March";
-    		  break;
-    	  case 4:
-    		  $scope.monthName="April";
-    		  break;
-    	  case 5:
-    		  $scope.monthName="May";
-    		  break;
-    	  case 6:
-    		  $scope.monthName="June";
-    		  break;
-    	  case 7:
-    		  $scope.monthName="July";
-    		  break;
-    	  case 8:
-    		  $scope.monthName="August";
-    		  break;
-    	  case 9:
-    		  $scope.monthName="September";
-    		  break;
-    	  case 10:
-    		  $scope.monthName="October";
-    		  break;
-    	  case 11:
-    		  $scope.monthName="November";
-    		  break;
-    	  case 12:
-    		  $scope.monthName="December";
-    		  break;
-      }
+		$scope.updateLastInteractionTime();
+		if($scope.statusList && $scope.statusList[$scope.monthTab-1])$scope.generatedBool = $scope.statusList[$scope.monthTab-1].generated;
+	      $scope.setMonthTab(newTab);
+	      
+	      $scope.getUnscheduled(newTab);
+	      $scope.getScheduled(newTab);
+	  	  $scope.total= +$scope.scheduled + +$scope.unscheduled;
+	      
+	      if($scope.statusList && $scope.statusList[$scope.monthTab-1] && $scope.statusList[$scope.monthTab-1].generated){
+	    	  $scope.generated="Generated";
+	      }
+	      
+	      if($scope.statusList && $scope.statusList[$scope.monthTab-1] && $scope.statusList[$scope.monthTab-1].assigned){
+	    	  $scope.assigned="Assigned";
+	      }
+	      
+	      if($scope.statusList && $scope.statusList[$scope.monthTab-1] && $scope.statusList[$scope.monthTab-1].assigning){
+	    	  $scope.assigned="Assigning";
+	    	  if($scope.statusList && $scope.statusList[$scope.monthTab-1] && $scope.statusList[$scope.monthTab-1].stopped){
+	    		  $scope.assigned="Stopping";
+	    	  }
+	      }
+	      
+	      //TODO refactor with getDisplayMonth
+	      switch(newTab){
+	    	  case 1:
+	    		  $scope.monthName="January";
+	    		  break;
+	    	  case 2:
+	    		  $scope.monthName="Febuary";
+	    		  break;
+	    	  case 3:
+	    		  $scope.monthName="March";
+	    		  break;
+	    	  case 4:
+	    		  $scope.monthName="April";
+	    		  break;
+	    	  case 5:
+	    		  $scope.monthName="May";
+	    		  break;
+	    	  case 6:
+	    		  $scope.monthName="June";
+	    		  break;
+	    	  case 7:
+	    		  $scope.monthName="July";
+	    		  break;
+	    	  case 8:
+	    		  $scope.monthName="August";
+	    		  break;
+	    	  case 9:
+	    		  $scope.monthName="September";
+	    		  break;
+	    	  case 10:
+	    		  $scope.monthName="October";
+	    		  break;
+	    	  case 11:
+	    		  $scope.monthName="November";
+	    		  break;
+	    	  case 12:
+	    		  $scope.monthName="December";
+	    		  break;
+	      }
     };
     
     
     $scope.toggleInactive = function(){
+   	 	$scope.updateLastInteractionTime();
     	$scope.allowInactive = !$scope.allowInactive;
     }
     
     $scope.toggleUnavailable = function(){
+   	 	$scope.updateLastInteractionTime();
     	$scope.allowUnavailable = !$scope.allowUnavailable;
     }
     $scope.toggleOvertime = function(){
+   	 	$scope.updateLastInteractionTime();
     	$scope.allowOvertime = !$scope.allowOvertime;
     }
     $scope.toggleDailyMax = function(){
+   	 	$scope.updateLastInteractionTime();
     	$scope.useDailyMax = !$scope.useDailyMax;
     }
     $scope.toggleWeeklyMax = function(){
+   	 	$scope.updateLastInteractionTime();
     	$scope.useWeeklyMax = !$scope.useWeeklyMax;
     }
     $scope.togglePrioritizationHistory = function(){
+   	 	$scope.updateLastInteractionTime();
     	$scope.prioritizeSecondShift = !$scope.prioritizeSecondShift;
     }
     
@@ -202,47 +207,6 @@ function SchedulingController($scope, $modal, $http) {
 	        $scope.month = month;
 	}
     
-    $scope.deleteShifts = function(month){
-    	if(confirm("Are you sure to delete the shifts for "+$scope.monthName+"?")) {
-	    	$http({
-	            url: '/schedule/byMonth',
-	            method: 'DELETE',
-	            headers: {
-	                'Authorization': $scope.idToken,
-	                'Content-Type': 'application/x-www-form-urlencoded'
-	            },
-	            params: {
-	            	month: month
-	            }
-	        })
-	        .then(function(response) {
-	        	$scope.statusList = response.data.sort(function(a, b){return a.month-b.month});
-	        	$scope.getUnscheduled(month);
-	            $scope.getScheduled(month);
-	        });
-    	}
-    }
-    
-    $scope.listStatusItems = function listStatusItems(){
-    	$http({
-            url: '/schedule/statusList',
-            method: 'GET',
-            headers: {
-                'Authorization': $scope.idToken,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            params: {
-            }
-        })
-        .then(function(response) {
-    		if($scope.page.includes("scheduler")){
-        		$scope.statusList = response.data.sort(function(a, b){return a.month-b.month});
-        		$scope.setScheduleTab($scope.monthTab);
-    			setTimeout(listStatusItems,12500);
-    		}
-        });
-    }
-    
     $scope.getScheduled = function getScheduled(month){
     	$http({
             url: '/schedule/scheduled',
@@ -297,6 +261,7 @@ function SchedulingController($scope, $modal, $http) {
     }
 
     $scope.stopAssignment = function(month){
+   	 	$scope.updateLastInteractionTime();
     	if(confirm("Are you sure you want to stop assigning shifts for "+$scope.monthName+"?")){
 	    	$http({
 	            url: '/schedule/stopAssignment',
@@ -317,6 +282,7 @@ function SchedulingController($scope, $modal, $http) {
     }
     
     $scope.generateShifts = function(month){
+   	 	$scope.updateLastInteractionTime();
     	$http({
             url: '/schedule/generateShifts',
             method: 'GET',
@@ -336,6 +302,7 @@ function SchedulingController($scope, $modal, $http) {
     }
     
     $scope.assignShifts = function(month, allowOvertime,allowInactive,allowUnavailable,prioritizeSecondShift,dailyMax,weeklyMax){
+   	 	$scope.updateLastInteractionTime();
     	$scope.statusList[month-1].assigning=true;
     	$scope.assigned="Assigning";
     	

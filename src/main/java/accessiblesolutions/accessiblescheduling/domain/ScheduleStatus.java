@@ -1,5 +1,7 @@
 package accessiblesolutions.accessiblescheduling.domain;
 
+import java.time.LocalDateTime;
+
 import javax.persistence.Column;
 import javax.persistence.Id;
 
@@ -14,6 +16,19 @@ public class ScheduleStatus {
 	private boolean stopped;
 	private int scheduled;
 	private int unscheduled;
+	private String lastUpdated;
+	
+	public String getLastUpdated() {
+		return lastUpdated;
+	}
+
+	public void setLastUpdatedToNow() {
+    	setLastUpdated(LocalDateTime.now().toString());
+    }
+
+	public void setLastUpdated(String lastUpdated) {
+		this.lastUpdated = lastUpdated;
+	}
 	
 	public String getMonth() {
 		return month;
@@ -52,9 +67,11 @@ public class ScheduleStatus {
 	public void setStopped(boolean stopped) {
 		this.stopped = stopped;
 	}
+
 	@Override
 	public String toString() {
 		return "ScheduleStatus [month=" + month + ", generated=" + generated + ", assigned=" + assigned + ", assigning="
-				+ assigning + ", errored=" + errored + ", stopped=" + stopped + "]";
+				+ assigning + ", errored=" + errored + ", stopped=" + stopped + ", scheduled=" + scheduled
+				+ ", unscheduled=" + unscheduled + ", lastUpdated=" + lastUpdated + "]";
 	}
 }
