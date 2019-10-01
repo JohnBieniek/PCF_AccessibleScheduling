@@ -38,29 +38,29 @@ public class ShiftGenerationManager {
     public String generateShifts(String selectedMonth,String selectedYear) throws NumberFormatException{
     	String response = "Generated ";
     	int shiftsGenerated = 0;
-    	Iterable<ClientRequest> requests = requestRepository.findAll();
-    	System.out.println("generating shifts for "+selectedMonth);
-    	for(ClientRequest request: requests) {
-    		try {
-				shiftsGenerated+=generateShiftsForRequest(request,selectedMonth,Integer.parseInt(selectedYear));
-			} catch (CorruptDataException e) {
-				e.printStackTrace();
-			} catch (ProccessingException e) {
-				e.printStackTrace();
-			}
-    	}
-    	System.out.println(response+shiftsGenerated);
-    	
     	ScheduleStatus status = scheduleStatusCrud.findOne(selectedMonth);
-    	
     	if(null==status) {
     		status= new ScheduleStatus();
     		status.setMonth(selectedMonth);
     	}
     	
-    	scheduleStatusRepository.deleteByMonth(selectedMonth);
-    	status.setGenerated(true);
-    	scheduleStatusCrud.save(status);
+    	if(!status.isGenerated() && !status.isAssigning() && !status.isAssigned() && !status.isStopped() && !status.isErrored()) {
+	    	scheduleStatusRepository.deleteByMonth(selectedMonth);
+	    	status.setGenerated(true);
+	    	scheduleStatusCrud.save(status);
+	    	Iterable<ClientRequest> requests = requestRepository.findAll();
+	    	System.out.println("generating shifts for "+selectedMonth);
+	    	for(ClientRequest request: requests) {
+	    		try {
+					shiftsGenerated+=generateShiftsForRequest(request,selectedMonth,Integer.parseInt(selectedYear));
+				} catch (CorruptDataException e) {
+					e.printStackTrace();
+				} catch (ProccessingException e) {
+					e.printStackTrace();
+				}
+	    	}
+	    	System.out.println(response+shiftsGenerated);
+    	}
     	
     	return response+shiftsGenerated;
     }

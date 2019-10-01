@@ -50,8 +50,16 @@ function MainNavigationController($scope, $modal, $http) {
         if($scope.week==undefined || $scope.week ==null){
 			 $scope.week = new Date();
 		}
-        $scope.monthTab=$scope.week.getMonth()+2;
+        $scope.monthTab=null;//Scheduler tab
+        $scope.year = $scope.week.getYear()+1900;
 
+        $scope.shiftsForMonth=null;
+        $scope.lastGeneratedStatus=false;
+        $scope.lastAssignedStatus=false;
+		$scope.unscheduled=0;//Number of shifts for the selected month in the scheduler page
+		$scope.scheduled=0;//Number of shifts for the selected month in the scheduler page
+	  	$scope.total= +$scope.scheduled + +$scope.unscheduled;//Number of shifts for the selected month in the scheduler page
+	  	
 		$scope.statusList=[];//Holds the info to color the month tabs of the scheduler
     	$scope.customValue=[];//Holds custom field data in the details tab
     	$scope.unmodifiedCustomValue=[];//Holds custom field data in the details tab
@@ -65,6 +73,18 @@ function MainNavigationController($scope, $modal, $http) {
         $scope.shifts=null;
         $scope.requests=null;
         $scope.alerts=null;
+        
+        //Scheduler options
+		$scope.allowOvertime=false;
+		$scope.allowUnavailable=false;
+		$scope.prioritizeSecondShift=false;
+		$scope.useDailyMax=true;
+		$scope.useWeeklyMax=true;
+		$scope.allowInactive=false;
+		
+		//Scheduler messages
+		$scope.generated="Generated";
+		$scope.assigned="Assigned";
         
 		$scope.days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 		$scope.maxMonth=$scope.week.getMonth();
@@ -128,7 +148,11 @@ function MainNavigationController($scope, $modal, $http) {
 		 
 		 $scope.incrementCycle();
 		 var timeSinceInteraction = $scope.getMinutesSinceLastInteraction();
-		 if(timeSinceInteraction>120){
+ 		 if($scope.statusList !=undefined && $scope.statusList[$scope.monthTab-1] !=undefined &&
+ 		    $scope.statusList[$scope.monthTab-1].assigning && $scope.page=="templates/page/scheduler.html"){
+			 setTimeout(autoUpdateData,5000);
+ 		 }
+ 		 else if(timeSinceInteraction>120){
 			 setTimeout(autoUpdateData,12000000);
 		 }
 		 else if(timeSinceInteraction>60){
@@ -146,7 +170,52 @@ function MainNavigationController($scope, $modal, $http) {
 	 }
 	 
 	 //API Access
+	 $scope.getScheduled = function getScheduled(month){
+    	if(month!=null && month!=undefined){
+			$scope.shiftsForMonth=month;
+	    	$http({
+	            url: '/schedule/scheduled',
+	            method: 'GET',
+	            headers: {
+	                'Authorization': $scope.idToken,
+	                'Content-Type': 'application/x-www-form-urlencoded'
+	            },
+	            params: {
+	            	month: month
+	            }
+	        })
+	        .then(function(response) {
+	        	$scope.scheduled=response.data;
+	        	$scope.total= +$scope.scheduled + +$scope.unscheduled;
+	        });
+    	}
+     }
+    
+     $scope.getUnscheduled = function getUnscheduled(month){
+    	if(month!=null && month!=undefined){
+			$scope.shiftsForMonth=month;
+			$http({
+		        url: '/schedule/unscheduled',
+		        method: 'GET',
+		        headers: {
+		            'Authorization': $scope.idToken,
+		            'Content-Type': 'application/x-www-form-urlencoded'
+		        },
+		        params: {
+		        	month: month
+		        }
+		    })
+		    .then(function(response) {
+		    	$scope.unscheduled=response.data;
+		    	$scope.total= +$scope.scheduled + +$scope.unscheduled;
+		    });
+    	}
+
+     }
+     
      $scope.listStatusItems = function listStatusItems(){
+    	 var shiftNumbersUpdated = false;
+    	 var month = $scope.monthTab;
 		 if($scope.idToken!=null){
 			 $http({
 		           url: '/updateInfo/scheduleStatus',
@@ -159,18 +228,13 @@ function MainNavigationController($scope, $modal, $http) {
 		           }
 		     })
 		     .then(function (response) {//TODO handle error state	    	 
-		       console.log('listStatusItems-response.data');
-		       console.log(response.data);
-		       console.log('$scope.lastScheduleStatusUpdate');
-		       console.log($scope.lastScheduleStatusUpdate);
-
 		  	   if($scope.lastScheduleStatusUpdate==null || response.data==null || response.data.time.nano!=$scope.lastScheduleStatusUpdate.time.nano){
-			       if(response.data.time!=null && $scope.lastScheduleStatusUpdate !=null){
-			    	   console.log("response.data.time.nano!=$scope.lastScheduleStatusUpdate.time.nano)");
-				       console.log(response.data.time.nano!=$scope.lastScheduleStatusUpdate.time.nano);
-			       }
-
-		  		    $scope.lastScheduleStatusUpdate=response.data;
+		  		   
+		  		   	$scope.lastScheduleStatusUpdate=response.data;
+			
+		  		    $scope.getUnscheduled(month);
+		  		    $scope.getScheduled(month);
+		  		   	
 			    	$http({
 			            url: '/schedule/statusList',
 			            method: 'GET',
@@ -183,7 +247,50 @@ function MainNavigationController($scope, $modal, $http) {
 			        })
 			        .then(function(response) {
 			    		$scope.statusList = response.data.sort(function(a, b){return a.month-b.month});
+			    	    if($scope.statusList!=undefined && $scope.statusList[month-1]!=undefined && $scope.statusList[month-1].generated){
+			  	    	  $scope.setGenerated("Generated");
+				  	    }
+				  	      
+				  	    if($scope.statusList!=undefined && $scope.statusList[month-1]!=undefined && $scope.statusList[month-1].assigned){
+				  	    	  $scope.setAssigned("Assigned");
+				  	    }
+				  	      
+				  	    if($scope.statusList!=undefined && $scope.statusList[month-1]!=undefined && $scope.statusList[month-1].assigning){
+				      	  $scope.setAssigned("Assigning");
+				      	  if($scope.statusList!=undefined && $scope.statusList[month-1]!=undefined && $scope.statusList[month-1].stopped){
+				      		  $scope.setAssigned("Stopping");
+				      	  }
+				  	    }
+				        if($scope.statusList[month-1]!=undefined){
+				    	   $scope.lastGeneratedStatus=$scope.statusList[month-1].generated;
+					       $scope.lastAssignedStatus=$scope.statusList[month-1].assigned;
+				        }
 			        });
+		  	   }
+		  	   else{
+		  		    if($scope.shiftsForMonth==null || $scope.shiftsForMonth!=month ||  
+		 				$scope.statusList==undefined || $scope.statusList[month-1] == undefined ||
+		 			    $scope.lastGeneratedStatus!=$scope.statusList[month-1].generated || 
+		 			    $scope.lastAssignedStatus!=$scope.statusList[month-1].assigned||
+		 			    $scope.statusList[month-1].assigning){
+		 		  		   $scope.getUnscheduled(month);
+		 		  		   $scope.getScheduled(month);
+		 		  		   shiftNumbersUpdated=true;
+		 	    	}
+		  		    if($scope.statusList!=undefined && $scope.statusList[month-1]!=undefined && $scope.statusList[month-1].generated){
+		  	    	  $scope.setGenerated("Generated");
+			  	    }
+			  	      
+			  	    if($scope.statusList!=undefined && $scope.statusList[month-1]!=undefined && $scope.statusList[month-1].assigned){
+			  	    	  $scope.setAssigned("Assigned");
+			  	    }
+			  	      
+			  	    if($scope.statusList!=undefined && $scope.statusList[month-1]!=undefined && $scope.statusList[month-1].assigning){
+			      	  $scope.setAssigned("Assigning");
+			      	  if($scope.statusList!=undefined && $scope.statusList[month-1]!=undefined && $scope.statusList[month-1].stopped){
+			      		  $scope.setAssigned("Stopping");
+			      	  }
+			  	    }
 		  	   }
 		     });
 		 }
@@ -498,49 +605,52 @@ function MainNavigationController($scope, $modal, $http) {
 
 	 //View Utils
 	 $scope.getDisplayMonth = function(date){
-    	 var monthName = "January";
-    	 
-		 switch(parseInt(date.getMonth())+1){
-		  	  case 1:
-		  		  monthName="January";
-		  		  break;
-		  	  case 2:
-		  		  monthName="Febuary";
-		  		  break;
-		  	  case 3:
-		  		  monthName="March";
-		  		  break;
-		  	  case 4:
-		  		  monthName="April";
-		  		  break;
-		  	  case 5:
-		  		  monthName="May";
-		  		  break;
-		  	  case 6:
-		  		  monthName="June";
-		  		  break;
-		  	  case 7:
-		  		  monthName="July";
-		  		  break;
-		  	  case 8:
-		  		  monthName="August";
-		  		  break;
-		  	  case 9:
-		  		  monthName="September";
-		  		  break;
-		  	  case 10:
-		  		  monthName="October";
-		  		  break;
-		  	  case 11:
-		  		  monthName="November";
-		  		  break;
-		  	  case 12:
-		  		  monthName="December";
-		  		  break;
-	 	 }
-		 
-		 return monthName;
+		 return $scope.getDisplayMonthFromInt(parseInt(date.getMonth())+1);
      }
+	 
+	 $scope.getDisplayMonthFromInt= function(month){
+		 var monthName= "";
+		 
+		 switch(month){
+	  	  case 1:
+	  		  monthName="January";
+	  		  break;
+	  	  case 2:
+	  		  monthName="Febuary";
+	  		  break;
+	  	  case 3:
+	  		  monthName="March";
+	  		  break;
+	  	  case 4:
+	  		  monthName="April";
+	  		  break;
+	  	  case 5:
+	  		  monthName="May";
+	  		  break;
+	  	  case 6:
+	  		  monthName="June";
+	  		  break;
+	  	  case 7:
+	  		  monthName="July";
+	  		  break;
+	  	  case 8:
+	  		  monthName="August";
+	  		  break;
+	  	  case 9:
+	  		  monthName="September";
+	  		  break;
+	  	  case 10:
+	  		  monthName="October";
+	  		  break;
+	  	  case 11:
+	  		  monthName="November";
+	  		  break;
+	  	  case 12:
+	  		  monthName="December";
+	  		  break;
+		 }
+		 return monthName;
+	 }
 	 
      $scope.getDisplayWeek = function(){
     	 var date = parseInt($scope.week.getDate());
@@ -583,6 +693,15 @@ function MainNavigationController($scope, $modal, $http) {
     }
 	 
     //View setters
+    $scope.setScheduled=function(scheduled){
+    	$scope.scheduled=scheduled;
+    }
+    $scope.setUnscheduled=function(unscheduled){
+    	$scope.unscheduled=unscheduled;
+    }
+    $scope.setTotal=function(total){
+    	$scope.total=total;
+    }
 	$scope.setEmployee = function(employee){
 		 $scope.employee=employee;
 		 $scope.unmodifiedEmployee = $scope.clone(employee);
@@ -590,6 +709,12 @@ function MainNavigationController($scope, $modal, $http) {
 	$scope.setEmployees = function(employees){
 		 $scope.employees=employees;
 	}
+	$scope.setGenerated = function (generated) {
+		$scope.generated = generated;
+    };
+	$scope.setAssigned = function (assigned) {
+		$scope.assigned = assigned;
+    };
 	$scope.setWeek = function (isWeek) {
        $scope.week = isWeek;
     };
@@ -621,10 +746,6 @@ function MainNavigationController($scope, $modal, $http) {
 
 	 
 	//Navigation
-	$scope.setMonthTab = function(monthTab){//Scheduler
-		 $scope.updateLastInteractionTime();
-		 $scope.monthTab = monthTab;
-	}
 	$scope.setTab = function(newTab){//ClientTab
 		 $scope.updateLastInteractionTime();
 	     $scope.tab = newTab;
@@ -633,11 +754,32 @@ function MainNavigationController($scope, $modal, $http) {
 		 $scope.updateLastInteractionTime();
 	     $scope.employeeTab = newTab;
 	}
+	$scope.setScheduleTab = function(newTab){
+		if($scope.monthTab!=newTab){
+			$scope.updateLastInteractionTime();
+			$scope.unscheduled="0";//Clear to ease visual transition
+			$scope.scheduled="0";//Clear to ease visual transition
+			$scope.total="0";//Clear to ease visual transition
+		    $scope.monthName=$scope.getDisplayMonthFromInt(newTab);
+	        $scope.monthTab=newTab;
+	        
+	        $scope.listStatusItems();
+		}
+    };
 	$scope.setPage = function (viewName) {
 	    $scope.updateLastInteractionTime();
 		var newPage = "templates/page/" + viewName + ".html"
 		if(newPage!=$scope.page){
-	        $scope.shifts=null;
+	        $scope.shifts=null;//Clear to ease visual transition
+	        $scope.requests=null;//Clear to ease visual transition
+	        
+	        if(newPage=="templates/page/scheduler.html"){
+	        	var month = $scope.monthTab;
+	        	if(month ==null){
+	        		month = $scope.week.getMonth()+1;
+	        	}
+	    		$scope.setScheduleTab(month);//Update early to ease visual transition
+	        }
 	    	$scope.page = "templates/page/" + viewName + ".html";
 		}
     };
