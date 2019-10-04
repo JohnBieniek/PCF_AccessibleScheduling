@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.security.sasl.AuthenticationException;
@@ -16,12 +17,15 @@ import org.cloudfoundry.samples.music.managers.ShiftAssignmentManager;
 import org.cloudfoundry.samples.music.managers.ShiftGenerationManager;
 import org.cloudfoundry.samples.music.managers.ShiftManager;
 import org.cloudfoundry.samples.music.managers.UpdateInfoManager;
+import org.cloudfoundry.samples.music.repositories.mongodb.MongoAccessRequestRepository;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoClientRepository;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoClientRequestRepository;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoCustomFieldDataRepository;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoEmployeeRepository;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoShiftRepository;
 import org.cloudfoundry.samples.music.repositories.mongodb.ScheduleStatusRepository;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.core.JsonParseException;
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.databind.JsonMappingException;
@@ -41,6 +45,7 @@ import accessiblesolutions.accessiblescheduling.domain.CustomFieldData;
 import accessiblesolutions.accessiblescheduling.domain.Employee;
 import accessiblesolutions.accessiblescheduling.domain.ScheduleStatus;
 import accessiblesolutions.accessiblescheduling.domain.Shift;
+import accessiblesolutions.accessiblescheduling.domain.UpdateInfo;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
 import accessiblesolutions.accessiblescheduling.to.ScheduleOptions;
@@ -79,6 +84,9 @@ public class ScheduleController {
     private MongoClientRequestRepository requestRepository;
  
     @Autowired
+    private MongoAccessRequestRepository accessRequestRepository;
+    
+    @Autowired
     private MongoClientRepository clientRepository;
     
     @Autowired
@@ -93,6 +101,9 @@ public class ScheduleController {
     @Autowired
     private UpdateInfoManager updateInfoManager;
     
+	@Autowired
+    private CrudRepository<UpdateInfo, String> updateInfoRepository;
+    
     @Autowired
     private MongoCustomFieldDataRepository customFieldDataRepository;
     
@@ -100,7 +111,120 @@ public class ScheduleController {
     public ScheduleController(ScheduleManager manager) {
         this.manager=manager;
     }
+    
+    @RequestMapping(value = "/allUpdates",method = RequestMethod.GET)
+    public String getAllUpdates(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam String json) throws AuthenticationException, JSONException {
+    	securityManager.authorize(idToken, Constants.USER);
+    	System.out.println("called get allUpdates with json:"+json);
+    	JSONObject jsonObject = new JSONObject(json);
+    	System.out.println("called get allUpdates with jsonObject:"+jsonObject.toString());
+    	JSONObject result = new JSONObject();
+    	
+    	Iterator keys = jsonObject.keys();
 
+    	while(keys.hasNext()) {
+    		try {
+			    String id = null;
+			    String date = null;
+			    String day = null;
+			    String month = null;
+			    String year = null;
+			    Employee employee = null;
+			    Client client = null;
+			    LocalDateTime tableLastUpdated = null;
+	    	    String key = (String) keys.next();
+	    	    
+	    	    if (jsonObject.get(key) instanceof JSONObject) {
+	    			JSONObject updateRequest = (JSONObject)jsonObject.get(key);
+					
+				    UpdateInfo updateInfo = updateInfoRepository.findOne(key);
+				    String tableString = updateRequest.getString("tableLastUpdated");
+
+				    if(null!=tableString && !"null".equalsIgnoreCase(tableString)) {
+				    	tableLastUpdated = Util.getLocalDateTimeFromString(tableString);
+				    }
+			
+				    if(updateRequest.has("id")) {
+				    	id=updateRequest.getString("id");
+				    	
+					    employee =employeeRepository.findOne(id);
+					    if(null==employee) {
+					    	client = clientRepository.findOne(id);
+					    }
+				    }
+				    
+				    if(updateRequest.has("date")) {
+				    	date = updateRequest.getString("date");
+				    	String[] splitDate = date.split("-");
+				    	if(splitDate.length>2) {
+					    	day = splitDate[1];
+					    	month = splitDate[0];
+					    	year = splitDate[2];			    		
+				    	}
+				    }
+				    
+			    	if(updateInfo==null) {
+			    		updateInfoManager.set(key);
+			    		updateInfo = updateInfoRepository.findOne(key);
+			    	}
+				    if(null!=tableLastUpdated)System.out.println("tableLastUpdated"+tableLastUpdated.toString());
+				    if(null!=updateInfo)System.out.println("updateInfo:"+updateInfo.toString());
+				    if(tableLastUpdated == null || updateInfo.getTime().isAfter(tableLastUpdated)) {
+						switch(key)
+						{
+						   case Constants.EMPLOYEES :
+							  result.put(Constants.EMPLOYEES, employeeRepository.findAll());
+						      break;
+						   case Constants.CLIENTS :
+							  result.put(Constants.CLIENTS, clientRepository.findAll());
+						      break; 
+						   case Constants.SHIFTS :
+							  Iterable<Shift> shifts = null;
+							  
+							  if(null!=employee) {
+								  shifts = manager.getEmployeeShiftsForWeek(id,day,month,year);
+							  }
+							  else if(null!=client) {
+								  shifts = manager.getClientShiftsForWeek(id, month, day, year);
+							  }
+							  
+							  result.put(Constants.SHIFTS,  shifts);
+							  break;
+						   case Constants.REQUESTS :
+							  result.put(Constants.SHIFTS,requestRepository.findByClientId(id));
+							  break; 
+						   case Constants.ALERTS :
+							  result.put(Constants.ALERTS, accessRequestRepository.findAll());
+							  break; 
+						   case Constants.CUSTOM_FIELDS :
+							  result.put(Constants.CUSTOM_FIELDS, accessRequestRepository.findAll());
+						      break; 
+						   case Constants.EMPLOYEE :
+							  result.put(Constants.EMPLOYEE, employee);
+							  result.put("customFieldData", customFieldDataRepository.findByOwnerId(id));
+							  break;
+						   case Constants.CLIENT :
+							  result.put(Constants.CLIENT, client);
+							  result.put("customFieldData", customFieldDataRepository.findByOwnerId(id));
+							  break;
+						   case Constants.SHIFT :
+							  result.put(Constants.SHIFT, shiftRepository.findOne(id));
+							  break;
+						   case Constants.REQUEST :
+							  result.put(Constants.REQUEST, requestRepository.findOne(id));
+							  break;
+						   default : 
+						}
+				    }
+	    	    }
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+    	}
+    	
+    	return result.toString();
+    }
+    
     @RequestMapping(value = "/requestWasUpdated",method = RequestMethod.GET)
     public String requestRequiresUpdate(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam String lastUpdated,@RequestParam String requestId) throws AuthenticationException {
     	securityManager.authorize(idToken, Constants.USER);

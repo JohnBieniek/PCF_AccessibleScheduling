@@ -1,5 +1,7 @@
 package accessiblesolutions.accessiblescheduling.domain;
 
+import java.time.LocalDateTime;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -24,6 +26,9 @@ public class CustomField {
     
     private boolean overrideable;
     
+    private String lastUpdated;
+    
+    
     public CustomField() {
     	clientVariable="";
     	employeeVariable="";
@@ -31,6 +36,18 @@ public class CustomField {
     	employeeRequirement=false;
     	overrideable=true;
     }
+    
+	public String getLastUpdated() {
+		return lastUpdated;
+	}
+
+	public void setLastUpdatedToNow() {
+    	setLastUpdated(LocalDateTime.now().toString());
+    }
+
+	public void setLastUpdated(String lastUpdated) {
+		this.lastUpdated = lastUpdated;
+	}
     
     public boolean getOverrideable(){
     	return overrideable;
@@ -82,6 +99,7 @@ public class CustomField {
 	public String toString() {
 		return "CustomField [id=" + id + ", clientVariable=" + clientVariable + ", employeeVariable=" + employeeVariable
 				+ ", clientRequirement=" + clientRequirement + ", employeeRequirement=" + employeeRequirement
-				+ ", overrideable=" + overrideable + "]";
+				+ ", overrideable=" + overrideable + ", lastUpdated=" + lastUpdated + "]";
 	}
+
 }

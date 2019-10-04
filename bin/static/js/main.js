@@ -41,12 +41,16 @@ function MainNavigationController($scope, $modal, $http) {
         $scope.lastRequestUpdate=null;
         $scope.lastLocalCustomFieldUpdate=null;
         $scope.lastLocalShiftUpdate=null;
+        $scope.lastClientsUpdate=null;
         $scope.lastClientUpdate=null;
         $scope.lastLocalClientUpdate=null;
         $scope.lastEmployeeUpdate=null;
+        $scope.lastEmployeesUpdate=null;
         $scope.lastLocalEmployeeUpdate=null;
         $scope.lastCustomFieldUpdate = null;
-        
+        $scope.lastAlertTableUpdate = null;
+        $scope.lastStatusTableUpdate = null;
+        $scope.lastShiftTableUpdate = null;
         if($scope.week==undefined || $scope.week ==null){
 			 $scope.week = new Date();
 		}
@@ -124,27 +128,65 @@ function MainNavigationController($scope, $modal, $http) {
 	 }
 	 
 	 $scope.autoUpdateData = function autoUpdateData(){
+		 var payload = {};
 		 if($scope.page!="templates/page/scheduler.html" && $scope.page!="templates/page/alerts.html"){
+			 var customFieldsInfo = {}; 
+			 customFieldsInfo["tableLastUpdated"]=$scope.lastCustomFieldUpdate;
+			 payload["customFields"] = customFieldsInfo;
 			 $scope.listCustomFields();
 			 
 			 if($scope.page=="templates/page/employee.html" || $scope.page=="templates/page/client.html"){
+				 var clientsInfo = {}; 
+				 clientsInfo["tableLastUpdated"]=$scope.lastClientsUpdate;
+				 payload["clients"] = clientsInfo;
+				 
 				 $scope.listClients();
+				 
+				 var employeesInfo = {}; 
+				 employeesInfo["tableLastUpdated"]=$scope.lastEmployeesUpdate;
+				 payload["employees"] = employeesInfo;
+				 
 				 $scope.listEmployees();
 				 $scope.listShifts();//TODO Make this only update when new
 				 
 				 if($scope.page=="templates/page/employee.html"){
-
+					 var shiftsInfo = {}; 
+					 shiftsInfo["tableLastUpdated"]=$scope.lastShiftTableUpdate;
+					 shiftsInfo["lastUpdated"]=$scope.lastShiftUpdate;
+					 shiftsInfo["id"] = $scope.employee.id;
+					 payload["shifts"] = shiftsInfo;
 				 }
 				 else if($scope.page=="templates/page/client.html"){
+					 var shiftsInfo = {}; 
+					 shiftsInfo["tableLastUpdated"]=$scope.lastShiftTableUpdate;
+					 shiftsInfo["lastUpdated"]=$scope.lastShiftUpdate;
+					 shiftsInfo["id"] = $scope.client.id;
+					 payload["shifts"] = shiftsInfo;
+					 
+					 var requestsInfo = {}; 
+					 requestsInfo["tableLastUpdated"]=$scope.lastRequestTableUpdate;
+					 requestsInfo["lastUpdated"]=$scope.lastRequestUpdate;
+					 requestsInfo["id"] = $scope.client.id;
+					 payload["requests"] = requestsInfo;
+
 					 $scope.listRequests();//TODO Make this only update when new
 				 }
 			 }
 		 }else if($scope.page=="templates/page/alerts.html"){
+			 var alertsInfo = {}; 
+			 alertsInfo["tableLastUpdated"]=$scope.lastAlertTableUpdate;
+			 payload["alerts"] = alertsInfo;
 			 $scope.listAlerts();
 		 }
 		 else if($scope.page=="templates/page/scheduler.html"){
+			 var statusInfo = {}; 
+			 alertsInfo["tableLastUpdated"]=$scope.lastStatusTableUpdate;
+			 payload["status"] = statusInfo;
+
 			 $scope.listStatusItems();
 		 }
+		 
+		 $scope.getAllUpdates(payload);
 		 
 		 $scope.incrementCycle();
 		 var timeSinceInteraction = $scope.getMinutesSinceLastInteraction();
@@ -155,7 +197,10 @@ function MainNavigationController($scope, $modal, $http) {
  		 else if(timeSinceInteraction>120){
 			 setTimeout(autoUpdateData,12000000);
 		 }
-		 else if(timeSinceInteraction>60){
+ 		 else if(!$scope.manager && !$scope.admin){
+ 			setTimeout(autoUpdateData,300000);
+ 		 }
+		 else if(timeSinceInteraction>60)){
 			 setTimeout(autoUpdateData,120000);
 		 }
 		 else if(timeSinceInteraction>30){
@@ -170,6 +215,27 @@ function MainNavigationController($scope, $modal, $http) {
 	 }
 	 
 	 //API Access
+	 $scope.getAllUpdates = function getAllUpdates(json){
+		 console.log("calling getAllUpdates- json:");
+		 console.log(json);
+		 
+    	$http({
+            url: '/schedule/allUpdates',
+            method: 'GET',
+            headers: {
+                'Authorization': $scope.idToken,
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            params: {
+            	json: json
+            }
+        })
+        .then(function(response) {
+        	console.log("get all updates response");
+        	console.log(response.data);
+        });
+	 }
+	 
 	 $scope.getScheduled = function getScheduled(month){
     	if(month!=null && month!=undefined){
 			$scope.shiftsForMonth=month;
