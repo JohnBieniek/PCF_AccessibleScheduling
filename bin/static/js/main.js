@@ -127,6 +127,10 @@ function MainNavigationController($scope, $modal, $http) {
 		 }
 	 }
 	 
+	 $scope.getDateString = function getDateString(date){
+		return  date.getFullYear() +"-" +(date.getMonth()+1)+"-"+date.getDate();
+	 }
+	 
 	 $scope.autoUpdateData = function autoUpdateData(){
 		 var payload = {};
 		 if($scope.page!="templates/page/scheduler.html" && $scope.page!="templates/page/alerts.html"){
@@ -153,6 +157,7 @@ function MainNavigationController($scope, $modal, $http) {
 					 var shiftsInfo = {}; 
 					 shiftsInfo["tableLastUpdated"]=$scope.lastShiftTableUpdate;
 					 shiftsInfo["lastUpdated"]=$scope.lastShiftUpdate;
+					 shiftsInfo["date"]=$scope.getDateString($scope.week);
 					 shiftsInfo["id"] = $scope.employee.id;
 					 payload["shifts"] = shiftsInfo;
 				 }
@@ -160,6 +165,7 @@ function MainNavigationController($scope, $modal, $http) {
 					 var shiftsInfo = {}; 
 					 shiftsInfo["tableLastUpdated"]=$scope.lastShiftTableUpdate;
 					 shiftsInfo["lastUpdated"]=$scope.lastShiftUpdate;
+					 shiftsInfo["date"]=$scope.getDateString($scope.week);
 					 shiftsInfo["id"] = $scope.client.id;
 					 payload["shifts"] = shiftsInfo;
 					 
@@ -185,9 +191,7 @@ function MainNavigationController($scope, $modal, $http) {
 
 			 $scope.listStatusItems();
 		 }
-		 
-		 $scope.getAllUpdates(payload);
-		 
+
 		 $scope.incrementCycle();
 		 var timeSinceInteraction = $scope.getMinutesSinceLastInteraction();
  		 if($scope.statusList !=undefined && $scope.statusList[$scope.monthTab-1] !=undefined &&
@@ -198,9 +202,9 @@ function MainNavigationController($scope, $modal, $http) {
 			 setTimeout(autoUpdateData,12000000);
 		 }
  		 else if(!$scope.manager && !$scope.admin){
- 			setTimeout(autoUpdateData,300000);
+ 			setTimeout(autoUpdateData,30000);
  		 }
-		 else if(timeSinceInteraction>60)){
+		 else if(timeSinceInteraction>60){
 			 setTimeout(autoUpdateData,120000);
 		 }
 		 else if(timeSinceInteraction>30){
@@ -212,28 +216,29 @@ function MainNavigationController($scope, $modal, $http) {
 		 else if(timeSinceInteraction<5){
 			 setTimeout(autoUpdateData,15000);
 		 }
+
+ 		 $scope.getAllUpdates(payload);
 	 }
 	 
 	 //API Access
 	 $scope.getAllUpdates = function getAllUpdates(json){
-		 console.log("calling getAllUpdates- json:");
-		 console.log(json);
-		 
-    	$http({
-            url: '/schedule/allUpdates',
-            method: 'GET',
-            headers: {
-                'Authorization': $scope.idToken,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            params: {
-            	json: json
-            }
-        })
-        .then(function(response) {
-        	console.log("get all updates response");
-        	console.log(response.data);
-        });
+		 if($scope.idToken!=null){
+	    	$http({
+	            url: '/schedule/allUpdates',
+	            method: 'GET',
+	            headers: {
+	                'Authorization': $scope.idToken,
+	                'Content-Type': 'application/x-www-form-urlencoded'
+	            },
+	            params: {
+	            	json: json
+	            }
+	        })
+	        .then(function(response) {
+	        	console.log("get all updates response");
+	        	console.log(response.data);
+	        });
+		 }
 	 }
 	 
 	 $scope.getScheduled = function getScheduled(month){

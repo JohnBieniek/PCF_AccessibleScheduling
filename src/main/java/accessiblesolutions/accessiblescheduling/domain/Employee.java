@@ -42,6 +42,7 @@ public class Employee implements Comparable<Employee>{
 	private String[] startTimes;
 	private String[] endTimes;
 
+	private String name;
 	private String first;
 
 	private boolean fixedSchedule;
@@ -95,6 +96,31 @@ public class Employee implements Comparable<Employee>{
 		this.first = first;
 		this.initial = initial;
 	}
+	public String getName() {
+		String employeeName = "";
+		if(name!=null && name!="") {
+			employeeName=name;
+		}
+		else {
+			employeeName =  this.first + " "+ this.initial;
+		}
+		
+		return employeeName;
+	}
+	public JSONObject getNameInfo() throws JSONException {
+		JSONObject json = new JSONObject();
+		
+		if(name!=null && name!="") {
+			json.put("name", this.name);
+		}
+		else {
+			json.put("name", this.first + " "+ this.initial);
+		}
+		json.put("id", id);
+		
+		return json;
+	}
+	
 	public int cleanDuplicateVacationDays() {
 		int daysRemoved = 0;
 		//System.out.println("clean in:"+requestedOff.toString());

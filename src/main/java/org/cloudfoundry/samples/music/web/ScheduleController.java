@@ -157,9 +157,9 @@ public class ScheduleController {
 				    	date = updateRequest.getString("date");
 				    	String[] splitDate = date.split("-");
 				    	if(splitDate.length>2) {
-					    	day = splitDate[1];
-					    	month = splitDate[0];
-					    	year = splitDate[2];			    		
+					    	day = splitDate[2];
+					    	month = splitDate[1];
+					    	year = splitDate[0];			    		
 				    	}
 				    }
 				    
@@ -173,10 +173,20 @@ public class ScheduleController {
 						switch(key)
 						{
 						   case Constants.EMPLOYEES :
-							  result.put(Constants.EMPLOYEES, employeeRepository.findAll());
+							  List<Employee> employeeList = employeeRepository.findAll();
+							  JSONObject employeeJson = new JSONObject();
+							  for(Employee selectedEmployee : employeeList) {
+								  employeeJson.put(selectedEmployee.getId(), selectedEmployee.getName());
+							  }
+							  result.put(Constants.EMPLOYEES, employeeJson);
 						      break;
 						   case Constants.CLIENTS :
-							  result.put(Constants.CLIENTS, clientRepository.findAll());
+							  List<Client> clientList = clientRepository.findAll();
+							  JSONObject clientJson = new JSONObject();
+							  for(Client selectedClient : clientList) {
+								  clientJson.put(selectedClient.getId(), selectedClient.getName());
+							  }
+							  result.put(Constants.CLIENTS, clientJson);
 						      break; 
 						   case Constants.SHIFTS :
 							  Iterable<Shift> shifts = null;

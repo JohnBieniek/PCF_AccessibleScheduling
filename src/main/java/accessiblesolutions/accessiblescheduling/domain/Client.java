@@ -7,11 +7,11 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 import org.hibernate.annotations.GenericGenerator;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-import accessiblesolutions.accessiblescheduling.util.Util;
 @Entity
 @JsonIgnoreProperties
 public class Client implements Comparable<Client>{
@@ -21,8 +21,9 @@ public class Client implements Comparable<Client>{
     @GenericGenerator(name="randomId", strategy="org.cloudfoundry.samples.music.domain.RandomIdGenerator")
     private String id;
 
-    private String first;
-    private String initial;
+    private String name;
+    private String first;//Deprecated
+    private String initial;//Deprecated
     private String favoriteStaffId;
     private boolean ownsCats;
     private boolean noSmokers;
@@ -46,11 +47,36 @@ public class Client implements Comparable<Client>{
         this.initial = initial;
     }
 	
+	public JSONObject getNameInfo() throws JSONException {
+		JSONObject json = new JSONObject();
+		
+		if(name!=null && name!="") {
+			json.put("name", this.name);
+		}
+		else {
+			json.put("name", this.first + " "+ this.initial);
+		}
+		json.put("id", id);
+		
+		return json;
+	}
+	
 	@Override
 	public int compareTo(Client client) {
 		return getFirst().toLowerCase().compareTo(client.getFirst().toLowerCase());
 	}
 
+	public String getName() {
+		String employeeName = "";
+		if(name!=null && name!="") {
+			employeeName=name;
+		}
+		else {
+			employeeName =  this.first + " "+ this.initial;
+		}
+		
+		return employeeName;
+	}
     public String getId() {
         return id;
     }
