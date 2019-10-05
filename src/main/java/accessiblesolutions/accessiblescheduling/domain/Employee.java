@@ -104,7 +104,13 @@ public class Employee implements Comparable<Employee>{
 			employeeName=name;
 		}
 		else {
-			employeeName =  this.first + " "+ this.initial;
+			if(this.first!=null) {
+				employeeName =  this.first;
+			}
+			
+			if(this.initial!=null) {
+				employeeName+= " "+ this.initial;
+			}
 		}
 		
 		return employeeName;

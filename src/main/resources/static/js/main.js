@@ -261,22 +261,22 @@ function MainNavigationController($scope, $modal, $http) {
 	        			$scope.lastEmployeeTableUpdate = response.data.employees.tableLastUpdated;
 	        		}
 	        		
-	        		if(response.shifts){
+	        		if(response.data.shifts){
 	        			$scope.shifts = response.data.shifts.info;
 	        			$scope.lastShiftTableUpdate = response.data.shifts.tableLastUpdated;
 	        		}
 	        		
-	        		if(response.alerts){
+	        		if(response.data.alerts){
 	        			$scope.alerts = response.data.alerts.info;
 	        			$scope.lastAlertTableUpdate = response.data.alerts.tableLastUpdated;
 	        		}
 	        		
-	        		if(response.customFields){
+	        		if(response.data.customFields){
 	        			$scope.customFields = response.data.customFields.info;
 	        			$scope.lastCustomFieldTableUpdate = response.data.customFieldData.tableLastUpdated;
 	        		}
 	        		
-	        		if(response.requests){
+	        		if(response.data.requests){
 	        			$scope.requests = response.data.requests.info;
 	        			$scope.lastRequestTableUpdate = response.data.requests.tableLastUpdated;
 	        		}
@@ -931,7 +931,7 @@ function MainNavigationController($scope, $modal, $http) {
 	 $scope.noShiftDay= function(day){
 		var unscheduled =true;
 		
-		if(null!=$scope.shifts){
+		if(null!=$scope.shifts && $scope.shifts.length>0){
 			$scope.shifts.forEach(function(shift) {
 			  if(shift.startsLocalDate.dayOfWeek==day.toUpperCase().split(" ")[0]){
 			    unscheduled=false;

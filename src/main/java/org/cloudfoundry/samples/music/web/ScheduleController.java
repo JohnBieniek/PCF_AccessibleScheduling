@@ -145,11 +145,11 @@ public class ScheduleController {
 	    int index = 0;
 	    List<Client> clientList = clientRepository.findAll();
         Collections.sort(clientList);
-	  JSONObject clientJson = new JSONObject();
-	  JSONObject clientInfoJson = new JSONObject();
-	  JSONObject clientsInfoJson = new JSONObject();
-	  index = 0;
-	  for(Client selectedClient : clientList) {
+		  JSONObject clientJson = new JSONObject();
+		  JSONObject clientInfoJson = new JSONObject();
+		  JSONObject clientsInfoJson = new JSONObject();
+		  index = 0;
+		  for(Client selectedClient : clientList) {
 		  clientJson = new JSONObject();
 		  clientJson.put("name", selectedClient.getName());
 		  clientJson.put("id", selectedClient.getId());
@@ -265,6 +265,7 @@ public class ScheduleController {
 							  result.put(Constants.CLIENTS, clientsInfoJson);
 						      break; 
 						   case Constants.SHIFTS :
+							  JSONObject shiftJson = new JSONObject();
 							  Iterable<Shift> shifts = null;
 							  
 							  if(null!=employee) {
@@ -273,8 +274,10 @@ public class ScheduleController {
 							  else if(null!=client) {
 								  shifts = manager.getClientShiftsForWeek(id, month, day, year);
 							  }
-							  
-							  result.put(Constants.SHIFTS,  shifts);
+							  shiftJson.put("info", shifts);
+							  shiftJson.put("tableLastUpdated", updateInfo.getTime());
+
+							  result.put(Constants.SHIFTS,  shiftJson);
 							  break;
 						   case Constants.REQUESTS :
 							  result.put(Constants.REQUESTS,requestRepository.findByClientId(id));
