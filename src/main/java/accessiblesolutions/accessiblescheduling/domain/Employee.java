@@ -20,6 +20,8 @@ import org.codehaus.jettison.json.JSONObject;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
 import accessiblesolutions.accessiblescheduling.to.Availability;
@@ -107,6 +109,8 @@ public class Employee implements Comparable<Employee>{
 		
 		return employeeName;
 	}
+	
+	@JsonIgnore
 	public JSONObject getNameInfo() throws JSONException {
 		JSONObject json = new JSONObject();
 		

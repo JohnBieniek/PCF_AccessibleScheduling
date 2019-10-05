@@ -111,6 +111,56 @@ public class ScheduleController {
     public ScheduleController(ScheduleManager manager) {
         this.manager=manager;
     }
+
+    @RequestMapping(value = "/employeeNames", method = RequestMethod.GET)
+    public String employeeNames(@RequestHeader(value="Authorization", required=false) String idToken) throws AuthenticationException, JSONException {
+    	securityManager.authorize(idToken, Constants.MANAGER);
+	    UpdateInfo updateInfo = updateInfoRepository.findOne("employees");
+		  List<Employee> employeeList = employeeRepository.findAll();
+          Collections.sort(employeeList);
+          int index = 0;
+		  JSONObject employeeJson = new JSONObject();
+		  JSONObject employeeInfoJson = new JSONObject();
+		  JSONObject employeesInfoJson = new JSONObject();
+		  index = 0;
+		  for(Employee selectedEmployee : employeeList) {
+			  employeeJson = new JSONObject();
+			  employeeJson.put("name", selectedEmployee.getName());
+			  employeeJson.put("id", selectedEmployee.getId());
+			  employeeInfoJson.put(""+index,employeeJson);
+			  index++;
+		  }
+		  
+		  employeesInfoJson.put("names", employeeInfoJson);
+		  employeesInfoJson.put("tableLastUpdated", updateInfo.getTime());
+		  
+    	return employeeInfoJson.toString();
+    }
+    
+    @RequestMapping(value = "/clientNames", method = RequestMethod.GET)
+    public String clientNames(@RequestHeader(value="Authorization", required=false) String idToken) throws AuthenticationException, JSONException {
+    	securityManager.authorize(idToken, Constants.MANAGER);
+
+	    UpdateInfo updateInfo = updateInfoRepository.findOne("clients");
+	    int index = 0;
+	    List<Client> clientList = clientRepository.findAll();
+        Collections.sort(clientList);
+	  JSONObject clientJson = new JSONObject();
+	  JSONObject clientInfoJson = new JSONObject();
+	  JSONObject clientsInfoJson = new JSONObject();
+	  index = 0;
+	  for(Client selectedClient : clientList) {
+		  clientJson = new JSONObject();
+		  clientJson.put("name", selectedClient.getName());
+		  clientJson.put("id", selectedClient.getId());
+		  clientInfoJson.put(""+index,clientJson);
+		  index++;
+	  }
+	  
+	  clientsInfoJson.put("names", clientInfoJson);
+	  clientsInfoJson.put("tableLastUpdated", updateInfo.getTime());
+    	return clientInfoJson.toString();
+    }
     
     @RequestMapping(value = "/allUpdates",method = RequestMethod.GET)
     public String getAllUpdates(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam String json) throws AuthenticationException, JSONException {
@@ -124,6 +174,7 @@ public class ScheduleController {
 
     	while(keys.hasNext()) {
     		try {
+    			int index;
 			    String id = null;
 			    String date = null;
 			    String day = null;
@@ -170,23 +221,48 @@ public class ScheduleController {
 				    if(null!=tableLastUpdated)System.out.println("tableLastUpdated"+tableLastUpdated.toString());
 				    if(null!=updateInfo)System.out.println("updateInfo:"+updateInfo.toString());
 				    if(tableLastUpdated == null || updateInfo.getTime().isAfter(tableLastUpdated)) {
+				    	
 						switch(key)
 						{
 						   case Constants.EMPLOYEES :
 							  List<Employee> employeeList = employeeRepository.findAll();
+					          Collections.sort(employeeList);
 							  JSONObject employeeJson = new JSONObject();
+							  JSONObject employeeInfoJson = new JSONObject();
+							  JSONObject employeesInfoJson = new JSONObject();
+							  index = 0;
 							  for(Employee selectedEmployee : employeeList) {
-								  employeeJson.put(selectedEmployee.getId(), selectedEmployee.getName());
+								  employeeJson = new JSONObject();
+								  employeeJson.put("name", selectedEmployee.getName());
+								  employeeJson.put("id", selectedEmployee.getId());
+								  employeeInfoJson.put(""+index,employeeJson);
+								  index++;
 							  }
-							  result.put(Constants.EMPLOYEES, employeeJson);
+							  
+							  employeesInfoJson.put("names", employeeInfoJson);
+							  employeesInfoJson.put("tableLastUpdated", updateInfo.getTime());
+							  
+							  result.put(Constants.EMPLOYEES, employeesInfoJson);
 						      break;
 						   case Constants.CLIENTS :
 							  List<Client> clientList = clientRepository.findAll();
+					          Collections.sort(clientList);
 							  JSONObject clientJson = new JSONObject();
+							  JSONObject clientInfoJson = new JSONObject();
+							  JSONObject clientsInfoJson = new JSONObject();
+							  index = 0;
 							  for(Client selectedClient : clientList) {
-								  clientJson.put(selectedClient.getId(), selectedClient.getName());
+								  clientJson = new JSONObject();
+								  clientJson.put("name", selectedClient.getName());
+								  clientJson.put("id", selectedClient.getId());
+								  clientInfoJson.put(""+index,clientJson);
+								  index++;
 							  }
-							  result.put(Constants.CLIENTS, clientJson);
+							  
+							  clientsInfoJson.put("names", clientInfoJson);
+							  clientsInfoJson.put("tableLastUpdated", updateInfo.getTime());
+							  
+							  result.put(Constants.CLIENTS, clientsInfoJson);
 						      break; 
 						   case Constants.SHIFTS :
 							  Iterable<Shift> shifts = null;
@@ -201,7 +277,7 @@ public class ScheduleController {
 							  result.put(Constants.SHIFTS,  shifts);
 							  break;
 						   case Constants.REQUESTS :
-							  result.put(Constants.SHIFTS,requestRepository.findByClientId(id));
+							  result.put(Constants.REQUESTS,requestRepository.findByClientId(id));
 							  break; 
 						   case Constants.ALERTS :
 							  result.put(Constants.ALERTS, accessRequestRepository.findAll());

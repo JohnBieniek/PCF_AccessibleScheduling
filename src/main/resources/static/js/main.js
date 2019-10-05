@@ -30,6 +30,7 @@ function MainNavigationController($scope, $modal, $http) {
         $scope.showToast=false;
         $scope.alertMessage="";
         
+        //Security data set on login
         $scope.profile = null;
         $scope.idToken = null;
         $scope.user=false;
@@ -47,10 +48,12 @@ function MainNavigationController($scope, $modal, $http) {
         $scope.lastEmployeeUpdate=null;
         $scope.lastEmployeesUpdate=null;
         $scope.lastLocalEmployeeUpdate=null;
-        $scope.lastCustomFieldUpdate = null;
+        $scope.lastCustomFieldTableUpdate = null;
         $scope.lastAlertTableUpdate = null;
         $scope.lastStatusTableUpdate = null;
         $scope.lastShiftTableUpdate = null;
+        $scope.lastClientTableUpdate=null;
+        $scope.lastEmployeeTableUpdate=null;
         if($scope.week==undefined || $scope.week ==null){
 			 $scope.week = new Date();
 		}
@@ -68,9 +71,11 @@ function MainNavigationController($scope, $modal, $http) {
     	$scope.customValue=[];//Holds custom field data in the details tab
     	$scope.unmodifiedCustomValue=[];//Holds custom field data in the details tab
         $scope.employee=null;
+        $scope.selectedEmployee=null;
         $scope.unmodifiedEmployee=null;
         $scope.employees=null;
         $scope.client=null;
+        $scope.selectedClient = null;
         $scope.unmodifiedClient=null;
         $scope.clients=null;
         $scope.customFields=null;
@@ -131,27 +136,27 @@ function MainNavigationController($scope, $modal, $http) {
 		return  date.getFullYear() +"-" +(date.getMonth()+1)+"-"+date.getDate();
 	 }
 	 
-	 $scope.autoUpdateData = function autoUpdateData(){
+	 $scope.updateData = function updateData(){
 		 var payload = {};
 		 if($scope.page!="templates/page/scheduler.html" && $scope.page!="templates/page/alerts.html"){
 			 var customFieldsInfo = {}; 
 			 customFieldsInfo["tableLastUpdated"]=$scope.lastCustomFieldUpdate;
 			 payload["customFields"] = customFieldsInfo;
-			 $scope.listCustomFields();
+			 //$scope.listCustomFields();
 			 
 			 if($scope.page=="templates/page/employee.html" || $scope.page=="templates/page/client.html"){
 				 var clientsInfo = {}; 
-				 clientsInfo["tableLastUpdated"]=$scope.lastClientsUpdate;
+				 clientsInfo["tableLastUpdated"]=$scope.lastClientTableUpdate;
 				 payload["clients"] = clientsInfo;
 				 
-				 $scope.listClients();
+				 //$scope.listClients();//deprecated
 				 
 				 var employeesInfo = {}; 
-				 employeesInfo["tableLastUpdated"]=$scope.lastEmployeesUpdate;
+				 employeesInfo["tableLastUpdated"]=$scope.lastEmployeeTableUpdate;
 				 payload["employees"] = employeesInfo;
 				 
-				 $scope.listEmployees();
-				 $scope.listShifts();//TODO Make this only update when new
+				 //$scope.listEmployees();//deprecated
+				 //$scope.listShifts();//TODO Make this only update when new
 				 
 				 if($scope.page=="templates/page/employee.html"){
 					 var shiftsInfo = {}; 
@@ -162,20 +167,21 @@ function MainNavigationController($scope, $modal, $http) {
 					 payload["shifts"] = shiftsInfo;
 				 }
 				 else if($scope.page=="templates/page/client.html"){
-					 var shiftsInfo = {}; 
-					 shiftsInfo["tableLastUpdated"]=$scope.lastShiftTableUpdate;
-					 shiftsInfo["lastUpdated"]=$scope.lastShiftUpdate;
-					 shiftsInfo["date"]=$scope.getDateString($scope.week);
-					 shiftsInfo["id"] = $scope.client.id;
-					 payload["shifts"] = shiftsInfo;
-					 
-					 var requestsInfo = {}; 
-					 requestsInfo["tableLastUpdated"]=$scope.lastRequestTableUpdate;
-					 requestsInfo["lastUpdated"]=$scope.lastRequestUpdate;
-					 requestsInfo["id"] = $scope.client.id;
-					 payload["requests"] = requestsInfo;
-
-					 $scope.listRequests();//TODO Make this only update when new
+        			 if($scope.selectedClient!=null){
+						 var shiftsInfo = {}; 
+						 shiftsInfo["tableLastUpdated"]=$scope.lastShiftTableUpdate;
+						 shiftsInfo["lastUpdated"]=$scope.lastShiftUpdate;
+						 shiftsInfo["date"]=$scope.getDateString($scope.week);
+						 shiftsInfo["id"] = $scope.selectedClient.id;
+						 payload["shifts"] = shiftsInfo;
+						 
+						 var requestsInfo = {}; 
+						 requestsInfo["tableLastUpdated"]=$scope.lastRequestTableUpdate;
+						 requestsInfo["lastUpdated"]=$scope.lastRequestUpdate;
+						 requestsInfo["id"] = $scope.selectedClient.id;
+						 payload["requests"] = requestsInfo;
+        			 }
+//						 $scope.listRequests();//TODO Make this only update when new
 				 }
 			 }
 		 }else if($scope.page=="templates/page/alerts.html"){
@@ -193,6 +199,11 @@ function MainNavigationController($scope, $modal, $http) {
 		 }
 
 		 $scope.incrementCycle();
+ 		 $scope.getAllUpdates(payload);
+	 }
+	 
+	 $scope.autoUpdateData = function autoUpdateData(){
+		 $scope.updateData();
 		 var timeSinceInteraction = $scope.getMinutesSinceLastInteraction();
  		 if($scope.statusList !=undefined && $scope.statusList[$scope.monthTab-1] !=undefined &&
  		    $scope.statusList[$scope.monthTab-1].assigning && $scope.page=="templates/page/scheduler.html"){
@@ -216,8 +227,6 @@ function MainNavigationController($scope, $modal, $http) {
 		 else if(timeSinceInteraction<5){
 			 setTimeout(autoUpdateData,15000);
 		 }
-
- 		 $scope.getAllUpdates(payload);
 	 }
 	 
 	 //API Access
@@ -235,8 +244,180 @@ function MainNavigationController($scope, $modal, $http) {
 	            }
 	        })
 	        .then(function(response) {
-	        	console.log("get all updates response");
+	        	if(response.data){
+		        	console.log("get all updates response");
+		        	console.log(response.data);
+
+	        		if(response.data.clients){
+	        			$scope.clients = response.data.clients.names;
+	        			if($scope.selectedClient==null){
+	        				$scope.selectedClient = $scope.clients[0];
+	        			}
+	        			$scope.lastClientTableUpdate = response.data.clients.tableLastUpdated;
+	        		}
+	        		
+	        		if(response.data.employees){
+	        			$scope.employees = response.data.employees.names;
+	        			$scope.lastEmployeeTableUpdate = response.data.employees.tableLastUpdated;
+	        		}
+	        		
+	        		if(response.shifts){
+	        			$scope.shifts = response.data.shifts.info;
+	        			$scope.lastShiftTableUpdate = response.data.shifts.tableLastUpdated;
+	        		}
+	        		
+	        		if(response.alerts){
+	        			$scope.alerts = response.data.alerts.info;
+	        			$scope.lastAlertTableUpdate = response.data.alerts.tableLastUpdated;
+	        		}
+	        		
+	        		if(response.customFields){
+	        			$scope.customFields = response.data.customFields.info;
+	        			$scope.lastCustomFieldTableUpdate = response.data.customFieldData.tableLastUpdated;
+	        		}
+	        		
+	        		if(response.requests){
+	        			$scope.requests = response.data.requests.info;
+	        			$scope.lastRequestTableUpdate = response.data.requests.tableLastUpdated;
+	        		}
+	        	}
+	        	else{
+	        		if(response.status==404){
+	        			$scope.warn("Failed to update schedule data. If connection trouble persits contact your representative.");
+	        		}
+	        		else{
+	        			$scope.warn("Failed to update schedule data");
+	        		}
+	        	}
+	        });
+		 }
+	 }
+	
+	 $scope.getClient = function getClient(clientInfo){
+		 console.log("getting client");
+		 console.log(clientInfo);
+
+		 if($scope.idToken!=null){
+	    	$http({
+	            url: '/clients/'+clientInfo,
+	            method: 'GET',
+	            headers: {
+	                'Authorization': $scope.idToken,
+	                'Content-Type': 'application/x-www-form-urlencoded'
+	            },
+	            params: {
+	            }
+	        })
+	        .then(function(response) {
+	        	if(response.data){
+        			$scope.client = response.data;
+	        	}
+	        	else{
+	        		if(response.status==404){
+	        			$scope.warn("Failed to update client data. If connection trouble persits contact your representative.");
+	        		}
+	        		else{
+	        			$scope.warn("Failed to update client data.");
+	        		}
+	        	}
+	        });
+		 }
+	 }
+
+	 $scope.getEmployee = function getEmployee(){
+		 console.log("getting employee");
+		 console.log($scope.selectedEmployee.id);
+		 
+		 if($scope.idToken!=null){
+	    	$http({
+	            url: '/employees/'+$scope.selectedEmployee.id,
+	            method: 'GET',
+	            headers: {
+	                'Authorization': $scope.idToken,
+	                'Content-Type': 'application/x-www-form-urlencoded'
+	            },
+	            params: {
+	            }
+	        })
+	        .then(function(response) {
+	        	if(response.data){
+        			$scope.employee = response.data;
+	        	}
+	        	else{
+	        		if(response.status==404){
+	        			$scope.warn("Failed to update employee data. If connection trouble persits contact your representative.");
+	        		}
+	        		else{
+	        			$scope.warn("Failed to update employee data.");
+	        		}
+	        	}
+	        });
+		 }
+	 }
+	 $scope.getEmployeeNames = function getEmployeeNames(){
+		 if($scope.idToken!=null){
+	    	$http({
+	            url: '/schedule/employeeNames',
+	            method: 'GET',
+	            headers: {
+	                'Authorization': $scope.idToken,
+	                'Content-Type': 'application/x-www-form-urlencoded'
+	            },
+	            params: {
+	            	tableLastUpdated: $scope.lastEmployeeTableUpdate
+	            }
+	        })
+	        .then(function(response) {
+	        	console.log("get employee names");
 	        	console.log(response.data);
+	        	if(response.data){
+        			$scope.employees = response.data;
+        			if($scope.employee==null){
+	        			$scope.employee = $scope.employees[0];
+        			}
+        			$scope.lastEmployeeTableUpdate = response.data.tableLastUpdated;
+	        	}
+	        	else{
+	        		if(response.status==404){
+	        			$scope.warn("Failed to update employee data. If connection trouble persits contact your representative.");
+	        		}
+	        		else{
+	        			$scope.warn("Failed to update employee data.");
+	        		}
+	        	}
+	        });
+		 }
+	 }
+	 
+	 $scope.getClientNames = function getClientNames(){
+		 if($scope.idToken!=null){
+	    	$http({
+	            url: '/schedule/clientNames',
+	            method: 'GET',
+	            headers: {
+	                'Authorization': $scope.idToken,
+	                'Content-Type': 'application/x-www-form-urlencoded'
+	            },
+	            params: {
+	            	tableLastUpdated: $scope.lastClientTableUpdate
+	            }
+	        })
+	        .then(function(response) {
+	        	if(response.data){
+        			$scope.clients = response.data;
+        			if($scope.selectedClient==null){
+	        			$scope.selectedClient = $scope.clients[0];
+        			}
+        			$scope.lastClientTableUpdate = response.data.tableLastUpdated;
+	        	}
+	        	else{
+	        		if(response.status==404){
+	        			$scope.warn("Failed to update client data. If connection trouble persits contact your representative.");
+	        		}
+	        		else{
+	        			$scope.warn("Failed to update client data.");
+	        		}
+	        	}
 	        });
 		 }
 	 }
@@ -520,6 +701,7 @@ function MainNavigationController($scope, $modal, $http) {
     	}
      }
 	 
+	 //Deprecated
 	 $scope.listClients = function listClients() {
 	    	if($scope.manager || $scope.admin){
 	    		$http({
@@ -587,6 +769,7 @@ function MainNavigationController($scope, $modal, $http) {
 		 }
      }
 	 
+	 //Deprecated
     $scope.listEmployees = function listEmployees() {
     	if($scope.manager || $scope.admin){
     		$http({
@@ -775,7 +958,10 @@ function MainNavigationController($scope, $modal, $http) {
     }
 	$scope.setEmployee = function(employee){
 		 $scope.employee=employee;
-		 $scope.unmodifiedEmployee = $scope.clone(employee);
+	}
+	$scope.setSelectedEmployee = function(employee){
+		 $scope.selectedEmployee=employee;
+		 $scope.getEmployee();
 	}
 	$scope.setEmployees = function(employees){
 		 $scope.employees=employees;
@@ -806,7 +992,10 @@ function MainNavigationController($scope, $modal, $http) {
 	}
 	$scope.setClient = function (client){
 		 $scope.client = client;
-		 $scope.unmodifiedClient = $scope.clone(client);
+	}
+	$scope.setSelectedClient = function(client){
+		 $scope.selectedClient=client;
+		 $scope.getClient();
 	}
 	$scope.setClients = function (clients){
 		 $scope.clients = clients;
@@ -824,6 +1013,7 @@ function MainNavigationController($scope, $modal, $http) {
 	$scope.setEmployeeTab = function(newTab){
 		 $scope.updateLastInteractionTime();
 	     $scope.employeeTab = newTab;
+	     
 	}
 	$scope.setScheduleTab = function(newTab){
 		if($scope.monthTab!=newTab){
@@ -899,6 +1089,7 @@ function MainNavigationController($scope, $modal, $http) {
     }
     $scope.setIdToken = function (idToken) {
         $scope.idToken = idToken;
+        $scope.updateData();
     };
     $scope.setProfile = function (profile) {
         $scope.profile = profile;

@@ -11,7 +11,7 @@
 					<div ng-repeat="employee in employees">
 						<div class = "employeeTab" ng-class="{ active: isEmployeeSet(employee) }">
 					    	<div>
-					       		<p ng-click="setEmployeeAndInfo(employee)">{{employee.first}} {{employee.initial}}</p>
+					       		<p ng-click="setEmployeeAndInfo(employee)">{{employee.name}}</p>
 					    	</div>
 				    	</div>
 			    	</div>
@@ -22,7 +22,7 @@
 	   		<ul>
 			   	<div class = "employeeTab">
 			    	<div>
-			       		<p>{{employee.first}} {{employee.initial}}</p>
+			       		<p>{{employee.name}}</p>
 			    	</div>
 			   	</div>
 			</ul>
@@ -57,7 +57,7 @@
 	    				<div class="inline" style="margin-left:32%;width:40%;text-align: center;">
 		    				<div class = 'inline centered'>
 					    		<div>
-					    			<h1 class = 'centered'>Schedule for {{employee.first}}</h1>
+					    			<h1 class = 'centered'>Schedule for {{employee.name}}</h1>
 						    		<h2 class = 'centered'>{{monthName}}  {{year}}</h2>
 					    		</div>
 					    		<div>
@@ -89,7 +89,7 @@
 	    	<div ng-if="isSet('Availability')" style="width:100%">
 	    		<div>
 	    			<div style="margin-left:25px;">
-					  <h2 class ="centered">{{employee.first}} {{employee.initial}} is available the following times weekly.<h2/>
+					  <h2 class ="centered">{{employee.name}} is available the following times weekly.<h2/>
   					  <h3 ng-if="manager" class ="centered">Times they are available can be added and removed below.
   					  										Automated scheduling will only assign them work during these times.
   					  										However, they can be manually assigned shifts during other times if desired.<h3/>
@@ -120,9 +120,9 @@
 	    	</div>
 
 	    	<div ng-if="isSet('Requests')">
-	    		<div style="width:90%;margin-left:5%" ng-controller="VacationController"  ng-init="listEmployeesAndInfo()">	  
+	    		<div style="width:90%;margin-left:5%" ng-controller="VacationController">	  
 				  <div>
-					  <h2 class ="centered">Days requested off for {{employee.first}} {{employee.initial}}<h2/>
+					  <h2 class ="centered">Days requested off for {{employee.name}}<h2/>
    					  <h3 ng-if="manager" class ="centered">Times they are unavailable can be added and removed below.
 	  										Automated scheduling will not assign them work during these times.
 	  										However, they can be manually assigned shifts during these times if desired.<h3/>

@@ -43,7 +43,8 @@ function LoginController($scope, $modal, $http) {
 	        $scope.setManager($scope.profile.manager);
 	        $scope.setAdmin($scope.profile.admin);
 		    if($scope.profile.user){
-			    $scope.setPage('employee');
+			    $scope.getEmployeeNames();
+		    	$scope.setPage('employee');
 		    }
 		    else{
 		    	$http({

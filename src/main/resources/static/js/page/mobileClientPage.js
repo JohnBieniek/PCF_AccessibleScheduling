@@ -24,6 +24,7 @@ angular.module('client', ['ngResource', 'ui.bootstrap']).
 function MobileClientController($scope, $modal, $http) {
 	
 	/**
+	 * Changes what client info we are looking at and gets all info for that new client
 	 * Interaction notification is done in setTab
 	 */
 	$scope.setTabAndInfo = function(newTab){
@@ -60,6 +61,10 @@ function MobileClientController($scope, $modal, $http) {
       $scope.detailsChanged=true;;
 	}
 	
+    /**
+     * Updates the provided object with .displayValue containing a human readable string of what this shift is for.
+     * Differs from the client version in its description of who this is for.
+     */
      $scope.setShiftDisplay = function(shift){
     	 if(shift.startsLocalDateTime==null || shift.startsLocalDateTime==undefined){
 			 return null;
@@ -101,14 +106,23 @@ function MobileClientController($scope, $modal, $http) {
 		shift.displayValue+= ".";
      }
      
+     /**
+      * Determines if the given tab should have the selected style applied
+      */
 	$scope.isSet = function(tabNum){
       return $scope.tab === tabNum;
     }
     
+    /**
+     * Determines if the given tab should have the selected style applied
+     */
     $scope.isClientSet = function(client){
         return client !==null && $scope.client !==null && client !==undefined && $scope.client !==undefined && $scope.client.id === client.id;
     }
-      
+  
+    /**
+     * Determines if the ok button can pop up in client details
+     */
     $scope.isClientChangeValid = function(client){
       let valid = true;
       
@@ -128,6 +142,9 @@ function MobileClientController($scope, $modal, $http) {
 		 }
 	 }
 	 
+    /**
+     * Updates the provided object with .displayValue containing a human readable string of what this request is for.
+     */
 	 $scope.getDisplayValue = function getDisplayValue(request) {
 		 if(request.startsLocalDateTime==null || request.startsLocalDateTime==undefined){
 			 return null;
@@ -252,13 +269,14 @@ function MobileClientController($scope, $modal, $http) {
 	 }
 
 	 $scope.listClientsAndInfo = function listClientsAndInfo() {
-		$scope.listClients();
-        if($scope.client==null){
-        	$scope.setClientAndInfo($scope.clients[0]);
-        }
-        $scope.listEmployees();
+		$scope.getClientNames();
+        $scope.getEmployeeNames();
     }
 
+		/**
+		 * Enters or updates the provided shift in the database.
+		 * Requires a unique version per page due to the differences in how shifts are listed afterward.
+		 */
     function saveShift(shift) {
     	$http({
             url: '/shifts',
@@ -579,6 +597,9 @@ function MobileClientController($scope, $modal, $http) {
 	   });
     }
     
+   /**
+    * Creates a new client with name A Client and refreshes the client list to contain the change
+    */
     $scope.newClient = function () {
     	$scope.updateLastInteractionTime();
     	$http({
@@ -603,6 +624,11 @@ function MobileClientController($scope, $modal, $http) {
         });
     }
     
+    /**
+     * Checks to see if we have the latest info in this client.
+     * If we don't we ask if they want to overwrite what's on the server or see what the changes are.
+     * If the choose to proceed or if we had the latest data we save the client and custom field data.
+     */
     $scope.ok = function () {
     	$scope.updateLastInteractionTime();
     	var originalClient = $scope.clone($scope.unmodifiedClient);
@@ -688,6 +714,11 @@ function MobileClientController($scope, $modal, $http) {
     	}
     }
     
+    /**
+     * Checks to see if we have the latest info in this shift.
+     * If we don't we ask if they want to delete anyways or see what the changes are.
+     * If the choose to proceed or if we had the latest data we delete the shift.
+     */
     $scope.deleteShift = function (shift) {
     	$scope.updateLastInteractionTime();
     	var lastUpdated = (shift.lastUpdated!=null?shift.lastUpdated:"null");

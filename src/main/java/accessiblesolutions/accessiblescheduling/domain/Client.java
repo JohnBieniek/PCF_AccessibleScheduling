@@ -11,6 +11,7 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.hibernate.annotations.GenericGenerator;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @Entity
 @JsonIgnoreProperties
@@ -46,7 +47,7 @@ public class Client implements Comparable<Client>{
         this.first = first;
         this.initial = initial;
     }
-	
+	@JsonIgnore
 	public JSONObject getNameInfo() throws JSONException {
 		JSONObject json = new JSONObject();
 		
