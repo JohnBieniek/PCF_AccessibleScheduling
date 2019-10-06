@@ -21,6 +21,7 @@ import org.cloudfoundry.samples.music.repositories.mongodb.MongoAccessRequestRep
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoClientRepository;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoClientRequestRepository;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoCustomFieldDataRepository;
+import org.cloudfoundry.samples.music.repositories.mongodb.MongoCustomFieldRepository;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoEmployeeRepository;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoShiftRepository;
 import org.cloudfoundry.samples.music.repositories.mongodb.ScheduleStatusRepository;
@@ -106,6 +107,8 @@ public class ScheduleController {
     
     @Autowired
     private MongoCustomFieldDataRepository customFieldDataRepository;
+    @Autowired
+    private MongoCustomFieldRepository customFieldRepository;
     
     @Autowired
     public ScheduleController(ScheduleManager manager) {
@@ -189,10 +192,14 @@ public class ScheduleController {
 	    			JSONObject updateRequest = (JSONObject)jsonObject.get(key);
 					
 				    UpdateInfo updateInfo = updateInfoRepository.findOne(key);
-				    String tableString = updateRequest.getString("tableLastUpdated");
-
-				    if(null!=tableString && !"null".equalsIgnoreCase(tableString)) {
-				    	tableLastUpdated = Util.getLocalDateTimeFromString(tableString);
+				    String tableString = null;
+				    
+				    if(updateRequest.has("tableLastUpdated")){
+				    	tableString = updateRequest.getString("tableLastUpdated");
+				    	
+					    if(null!=tableString && !"null".equalsIgnoreCase(tableString)) {
+					    	tableLastUpdated = Util.getLocalDateTimeFromString(tableString);
+					    }
 				    }
 			
 				    if(updateRequest.has("id")) {
@@ -214,7 +221,7 @@ public class ScheduleController {
 				    	}
 				    }
 				    
-			    	if(updateInfo==null) {
+			    	if(updateInfo==null || updateInfo.getTime()==null) {
 			    		updateInfoManager.set(key);
 			    		updateInfo = updateInfoRepository.findOne(key);
 			    	}
@@ -286,7 +293,11 @@ public class ScheduleController {
 							  result.put(Constants.ALERTS, accessRequestRepository.findAll());
 							  break; 
 						   case Constants.CUSTOM_FIELDS :
-							  result.put(Constants.CUSTOM_FIELDS, accessRequestRepository.findAll());
+							  JSONObject customFieldsJson = new JSONObject();
+							  customFieldsJson.put("info", customFieldRepository.findAll());
+							  customFieldsJson.put("tableLastUpdated", updateInfo.getTime());
+
+							  result.put(Constants.CUSTOM_FIELDS, customFieldsJson);
 						      break; 
 						   case Constants.EMPLOYEE :
 							  result.put(Constants.EMPLOYEE, employee);

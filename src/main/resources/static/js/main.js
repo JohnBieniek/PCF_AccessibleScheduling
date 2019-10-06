@@ -25,7 +25,7 @@ function MainNavigationController($scope, $modal, $http) {
 	 $scope.init = function() {
 		$scope.lastInteraction=new Date();
         $scope.setPage("login");
-		$scope.tab="Schedule";
+		$scope.tab="Schedule";//client tab
 		$scope.employeeTab="Schedule";
         $scope.showToast=false;
         $scope.alertMessage="";
@@ -140,7 +140,7 @@ function MainNavigationController($scope, $modal, $http) {
 		 var payload = {};
 		 if($scope.page!="templates/page/scheduler.html" && $scope.page!="templates/page/alerts.html"){
 			 var customFieldsInfo = {}; 
-			 customFieldsInfo["tableLastUpdated"]=$scope.lastCustomFieldUpdate;
+			 customFieldsInfo["tableLastUpdated"]=$scope.lastCustomFieldTableUpdate;
 			 payload["customFields"] = customFieldsInfo;
 			 //$scope.listCustomFields();
 			 
@@ -158,7 +158,7 @@ function MainNavigationController($scope, $modal, $http) {
 				 //$scope.listEmployees();//deprecated
 				 //$scope.listShifts();//TODO Make this only update when new
 				 
-				 if($scope.page=="templates/page/employee.html"){
+				 if($scope.page=="templates/page/employee.html" && $scope.employeeTab == "Schedule"){
 					 var shiftsInfo = {}; 
 					 shiftsInfo["tableLastUpdated"]=$scope.lastShiftTableUpdate;
 					 shiftsInfo["lastUpdated"]=$scope.lastShiftUpdate;
@@ -168,18 +168,21 @@ function MainNavigationController($scope, $modal, $http) {
 				 }
 				 else if($scope.page=="templates/page/client.html"){
         			 if($scope.selectedClient!=null){
-						 var shiftsInfo = {}; 
-						 shiftsInfo["tableLastUpdated"]=$scope.lastShiftTableUpdate;
-						 shiftsInfo["lastUpdated"]=$scope.lastShiftUpdate;
-						 shiftsInfo["date"]=$scope.getDateString($scope.week);
-						 shiftsInfo["id"] = $scope.selectedClient.id;
-						 payload["shifts"] = shiftsInfo;
-						 
-						 var requestsInfo = {}; 
-						 requestsInfo["tableLastUpdated"]=$scope.lastRequestTableUpdate;
-						 requestsInfo["lastUpdated"]=$scope.lastRequestUpdate;
-						 requestsInfo["id"] = $scope.selectedClient.id;
-						 payload["requests"] = requestsInfo;
+        				 if($scope.tab == "Schedule"){
+							 var shiftsInfo = {}; 
+							 shiftsInfo["tableLastUpdated"]=$scope.lastShiftTableUpdate;
+							 shiftsInfo["lastUpdated"]=$scope.lastShiftUpdate;
+							 shiftsInfo["date"]=$scope.getDateString($scope.week);
+							 shiftsInfo["id"] = $scope.selectedClient.id;
+							 payload["shifts"] = shiftsInfo;
+        				 }
+        				 else if($scope.tab=="Requests"){
+							 var requestsInfo = {}; 
+							 requestsInfo["tableLastUpdated"]=$scope.lastRequestTableUpdate;
+							 requestsInfo["lastUpdated"]=$scope.lastRequestUpdate;
+							 requestsInfo["id"] = $scope.selectedClient.id;
+							 payload["requests"] = requestsInfo;
+        				 }
         			 }
 //						 $scope.listRequests();//TODO Make this only update when new
 				 }
@@ -232,6 +235,7 @@ function MainNavigationController($scope, $modal, $http) {
 	 //API Access
 	 $scope.getAllUpdates = function getAllUpdates(json){
 		 if($scope.idToken!=null){
+			 console.log("getting all updates");
 	    	$http({
 	            url: '/schedule/allUpdates',
 	            method: 'GET',
@@ -262,7 +266,11 @@ function MainNavigationController($scope, $modal, $http) {
 	        		}
 	        		
 	        		if(response.data.shifts){
-	        			$scope.shifts = response.data.shifts.info;
+	        			if(response.data.shifts.info && response.data.shifts.info.length>0 && response.data.shifts.info !="[]"){
+	        				console.log("response.data.shifts.info.length",response.data.shifts.info.length);
+	        				$scope.shifts = response.data.shifts.info;
+	        				console.log("Updated shifts",$scope.shifts);
+	        			}
 	        			$scope.lastShiftTableUpdate = response.data.shifts.tableLastUpdated;
 	        		}
 	        		
@@ -273,7 +281,7 @@ function MainNavigationController($scope, $modal, $http) {
 	        		
 	        		if(response.data.customFields){
 	        			$scope.customFields = response.data.customFields.info;
-	        			$scope.lastCustomFieldTableUpdate = response.data.customFieldData.tableLastUpdated;
+	        			$scope.lastCustomFieldTableUpdate = response.data.customFields.tableLastUpdated;
 	        		}
 	        		
 	        		if(response.data.requests){
@@ -281,15 +289,16 @@ function MainNavigationController($scope, $modal, $http) {
 	        			$scope.lastRequestTableUpdate = response.data.requests.tableLastUpdated;
 	        		}
 	        	}
-	        	else{
-	        		if(response.status==404){
-	        			$scope.warn("Failed to update schedule data. If connection trouble persits contact your representative.");
-	        		}
-	        		else{
-	        			$scope.warn("Failed to update schedule data");
-	        		}
-	        	}
-	        });
+	        })
+            .catch(function(data, status) {
+            	console.error('Gists error', data,status);
+	    		if(data.status==404){
+	    			$scope.warn("Failed to update schedule data. If connection trouble persits contact your representative.");
+	    		}
+	    		else{
+	    			$scope.warn("Failed to update schedule data");
+	    		}
+            });
 		 }
 	 }
 	
@@ -342,6 +351,7 @@ function MainNavigationController($scope, $modal, $http) {
 	        .then(function(response) {
 	        	if(response.data){
         			$scope.employee = response.data;
+        			$scope.unmodifiedEmployee=response.data;
 	        	}
 	        	else{
 	        		if(response.status==404){

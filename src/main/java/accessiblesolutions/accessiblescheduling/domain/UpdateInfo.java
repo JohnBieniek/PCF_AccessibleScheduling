@@ -33,4 +33,9 @@ public class UpdateInfo {
 	public void setTime(LocalDateTime time) {
 		this.time = time;
 	}
+
+	@Override
+	public String toString() {
+		return "UpdateInfo [id=" + id + ", time=" + time + "]";
+	}
 }

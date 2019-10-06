@@ -47,7 +47,7 @@ public abstract class Util {
 	        				Integer.parseInt(hour),
 	        				Integer.parseInt(minute),
 	        				Integer.parseInt(second),
-	        				Integer.parseInt(nanoSecond));
+	        				Integer.parseInt(nanoSecond)*1000000);
             	}
         	}
     	}
