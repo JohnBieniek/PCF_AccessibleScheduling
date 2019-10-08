@@ -37,6 +37,7 @@ function MainNavigationController($scope, $modal, $http) {
         $scope.manager=false;
         $scope.admin=false;
         
+        //Last updated info used to tell if we need to pull fresh data in autoUpdateData
         $scope.lastScheduleStatusUpdate=null;
         $scope.lastShiftUpdate=null;
         $scope.lastRequestUpdate=null;
@@ -54,6 +55,7 @@ function MainNavigationController($scope, $modal, $http) {
         $scope.lastShiftTableUpdate = null;
         $scope.lastClientTableUpdate=null;
         $scope.lastEmployeeTableUpdate=null;
+        
         if($scope.week==undefined || $scope.week ==null){
 			 $scope.week = new Date();
 		}
@@ -70,8 +72,8 @@ function MainNavigationController($scope, $modal, $http) {
 		$scope.statusList=[];//Holds the info to color the month tabs of the scheduler
     	$scope.customValue=[];//Holds custom field data in the details tab
     	$scope.unmodifiedCustomValue=[];//Holds custom field data in the details tab
-        $scope.employee=null;
-        $scope.selectedEmployee=null;
+        $scope.employee=null;//The full employee info for who we are looking at
+        $scope.selectedEmployee=null;//The name and id of the employee we are looking at
         $scope.unmodifiedEmployee=null;
         $scope.employees=null;
         $scope.client=null;
@@ -95,7 +97,7 @@ function MainNavigationController($scope, $modal, $http) {
 		$scope.generated="Generated";
 		$scope.assigned="Assigned";
         
-		$scope.days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+		$scope.days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];//Display strings for each day
 		$scope.maxMonth=$scope.week.getMonth();
 		$scope.minMonth=$scope.maxMonth-1;
 		if($scope.minMonth<0){
@@ -111,6 +113,7 @@ function MainNavigationController($scope, $modal, $http) {
 		}
 		
 		$scope.updateCycle=1;
+
 		$scope.autoUpdateData();
 	 };
 	 
@@ -364,6 +367,7 @@ function MainNavigationController($scope, $modal, $http) {
 	        });
 		 }
 	 }
+	 
 	 $scope.getEmployeeNames = function getEmployeeNames(){
 		 if($scope.idToken!=null){
 	    	$http({
@@ -382,9 +386,6 @@ function MainNavigationController($scope, $modal, $http) {
 	        	console.log(response.data);
 	        	if(response.data){
         			$scope.employees = response.data;
-        			if($scope.employee==null){
-	        			$scope.employee = $scope.employees[0];
-        			}
         			$scope.lastEmployeeTableUpdate = response.data.tableLastUpdated;
 	        	}
 	        	else{
@@ -559,7 +560,7 @@ function MainNavigationController($scope, $modal, $http) {
      }
 	    
 	 $scope.getAllEmployeeCustomFieldData = function () {
-	     if($scope.employee!=null && $scope.customFields !=null){
+	     if($scope.selectedEmployee!=null && $scope.customFields !=null){
 		      for(var index = 0; index<$scope.customFields.length;index++){
 			      $scope.getEmployeeCustomFieldData($scope.employee,$scope.customFields[index],index);
 		      }
@@ -567,23 +568,25 @@ function MainNavigationController($scope, $modal, $http) {
 	 }
 
 	 $scope.getEmployeeCustomFieldData = function (employee,customField,index){
-     	$http({
-            url: '/compatibility/employeeCustomFieldData',
-            method: 'POST',
-            headers: {
-                'Authorization': $scope.idToken,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            params: {
-                employee: selectedEmployee,
-                customField: customField,
-                index:index,
-            }
-        })
-        .then(function(response) {
-        	$scope.customValue[response.data.numericResponse] = response.data.booleanResponse;
-        	$scope.unmodifiedCustomValue[response.data.numericResponse] = response.data.booleanResponse;
-        });
+		if(null!=employee){
+	     	$http({
+	            url: '/compatibility/employeeCustomFieldData',
+	            method: 'POST',
+	            headers: {
+	                'Authorization': $scope.idToken,
+	                'Content-Type': 'application/x-www-form-urlencoded'
+	            },
+	            params: {
+	                employee: employee,
+	                customField: customField,
+	                index:index,
+	            }
+	        })
+	        .then(function(response) {
+	        	$scope.customValue[response.data.numericResponse] = response.data.booleanResponse;
+	        	$scope.unmodifiedCustomValue[response.data.numericResponse] = response.data.booleanResponse;
+	        });
+		}
      }
 	 
 	 $scope.getAllClientCustomFieldData = function () {
@@ -773,6 +776,13 @@ function MainNavigationController($scope, $modal, $http) {
 			        })
 			        .then(function(response) {
 			        	$scope.customFields=response.data;
+			        	
+			        	if($scope.page=="templates/page/employee.html"){
+			        		$scope.getAllEmployeeCustomFieldData();
+			        	}
+			        	else if($scope.page=="templates/page/client.html"){
+			        		$scope.getAllClientCustomFieldData();
+			        	}
 			        });
 		  	   }
 		     })
@@ -968,6 +978,9 @@ function MainNavigationController($scope, $modal, $http) {
     }
 	$scope.setEmployee = function(employee){
 		 $scope.employee=employee;
+	}
+	$scope.setSelectedEmployeeWithoutGetEmployee = function(employee){
+		 $scope.selectedEmployee=employee;
 	}
 	$scope.setSelectedEmployee = function(employee){
 		 $scope.selectedEmployee=employee;

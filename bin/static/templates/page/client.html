@@ -11,7 +11,7 @@
 					<div ng-repeat="client in clients">
 						<div class = "clientTab" ng-class="{ active: isClientSet(client) }">
 					    	<div>
-					       		<p ng-click="setClientAndInfo(client)">{{client}}</p>
+					       		<p ng-click="setClientAndInfo(client)">{{client.name}}</p>
 					    	</div>
 				    	</div>
 			    	</div>
@@ -87,7 +87,7 @@
 		    	</div>
 	    	</div>
 	    	<div ng-if="isSet('Details')" class = 'rightAlign'>
-	    		<form name="clientForm" ng-init="listCustomFields()" role="form" style="margin-right:3%">
+	    		<form name="clientForm" role="form" style="margin-right:3%">
 			        <div>
 			            <label for="first" class="inline" style="font-size:38px">First</label>
 			            <input ng-change="setDetailsToChanged()" type="text" class="form-control inline input-large rightAlign nameInput" id="first" name="first" required ng-model="client.first">

@@ -26,26 +26,27 @@ function MobileEmployeeController($scope, $modal, $http) {
 		 $scope.newDate=$scope.week.getFullYear()+"-"+(($scope.week.getMonth()+1)<10?"0"+($scope.week.getMonth()+1):($scope.week.getMonth()+1))+"-"+$scope.week.getDate();
 		 
 		 if($scope.manager){
-			 $scope.listEmployeesAndInfo();
+	    	 $scope.getClientNames();
 		 }
 		 
-		 if($scope.employee==undefined || $scope.employee == null){
-			 $scope.setEmployeeToUser();
-		 }
+		 $scope.listCustomFields();
 		 
+		 if($scope.selectedEmployee==undefined || $scope.selectedEmployee == null){
+            $scope.setEmployeeToUser();
+		 }
+
+		 $scope.getDisplayWeek();
+
 		 $scope.listShifts();
 	}
 	
 	/**
-	 * $scope.updateLastInteractionTime() is called from the setEmployeeTab function
+	 * $scope.updateLastInteractionTime() is called from the setEmployeeTab
+	 * function
 	 */
 	$scope.setEmployeeTabAndInfo=function(tab){
 		$scope.updateEmployee();
-	    if($scope.employee!=null && $scope.customFields !=null){
-		      for(var index = 0; index<$scope.customFields.length;index++){
-			      $scope.getEmployeeCustomFieldData($scope.employee,$scope.customFields[index],index);
-		      }
-	      }
+		$scope.getAllEmployeeCustomFieldData();
 	    $scope.listShifts();
 		$scope.setEmployeeTab(tab);
 	}
@@ -91,25 +92,6 @@ function MobileEmployeeController($scope, $modal, $http) {
 		return unavailable;
 	}
 	
-	$scope.getEmployeeCustomFieldData = function (employee,customField,index){
-     	$http({
-            url: '/compatibility/employeeCustomFieldData',
-            method: 'POST',
-            headers: {
-                'Authorization': $scope.idToken,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            params: {
-                employee: employee,
-                customField: customField,
-                index:index,
-            }
-        })
-        .then(function(response) {
-        	$scope.customValue[response.data.numericResponse] = response.data.booleanResponse;
-        });
-    }
-	
 	$scope.setEmployeeToUser = function(){
 		$http({
             url: '/employees/'+$scope.profile.employeeId,
@@ -125,8 +107,9 @@ function MobileEmployeeController($scope, $modal, $http) {
         	if(typeof $scope.employee !== 'undefined' && $scope.employee!=null && $scope.employee.role==null){
   			  response.data.role="user";
   		  	}
-        	
-        	$scope.setEmployeeAndInfo(response.data);
+
+        	$scope.setEmployee(response.data);
+        	$scope.setSelectedEmployeeWithoutGetEmployee(response.data);
         });
 	}
 	
@@ -140,12 +123,7 @@ function MobileEmployeeController($scope, $modal, $http) {
 		  newEmployee.role="user";
 	  }
       $scope.setSelectedEmployee(newEmployee);
-
-      if($scope.employee!=null && $scope.customFields !=null){
-	      for(var index = 0; index<$scope.customFields.length;index++){
-		      $scope.getEmployeeCustomFieldData($scope.employee,$scope.customFields[index],index);
-	      }
-      }
+      $scope.getAllEmployeeCustomFieldData();
       $scope.listShifts();
 	}
 	 
@@ -154,8 +132,8 @@ function MobileEmployeeController($scope, $modal, $http) {
 	}
 	
 	/**
-	 * Toggled whenever a user changes something in the details section.
-	 * Used to determine if the ok and cancel buttons should show.
+	 * Toggled whenever a user changes something in the details section. Used to
+	 * determine if the ok and cancel buttons should show.
 	 */
 	$scope.setDetailsToChanged = function(){
 	  $scope.updateLastInteractionTime();
@@ -164,8 +142,8 @@ function MobileEmployeeController($scope, $modal, $http) {
 	
      
 	/**
-	 * Updates the employee and its custom field data.
-	 * Checks for updates to the employee names list afterwards and updates if needbe
+	 * Updates the employee and its custom field data. Checks for updates to the
+	 * employee names list afterwards and updates if needbe
 	 */
      $scope.saveEmployee = function saveEmployee(employee) {
      	if(employee.availability){
@@ -195,7 +173,7 @@ function MobileEmployeeController($scope, $modal, $http) {
         	   param: employee
            }
        })
-       .then(function (response) {//TODO handle error state
+       .then(function (response) {// TODO handle error state
     	   if(response.data){
 	    	   $scope.setEmployeeAndInfo(response.data);
 	       	   employee.id=response.data.id;
@@ -227,9 +205,10 @@ function MobileEmployeeController($scope, $modal, $http) {
     }
      
      /**
-      * Updates the provided object with .displayValue containing a human readable string of what this shift is for.
-      * Differs from the client version in its description of who this is for.
-      */
+		 * Updates the provided object with .displayValue containing a human
+		 * readable string of what this shift is for. Differs from the client
+		 * version in its description of who this is for.
+		 */
      $scope.setShiftDisplay = function(shift){
     	if(shift.startsLocalDateTime==null || shift.startsLocalDateTime==undefined){
 			 return null;
@@ -399,7 +378,7 @@ function MobileEmployeeController($scope, $modal, $http) {
 			 request.displayValue+=" on "+ request.startDate;
 		}
 
-		//Add exceptions
+		// Add exceptions
 		if(request.exceptions !=undefined && request.exceptions!=null && request.exceptions.length>0){
 			 request.displayValue+=" except ";
 			 
@@ -424,17 +403,14 @@ function MobileEmployeeController($scope, $modal, $http) {
 
 	$scope.listEmployeesAndInfo = function listEmployeesAndInfo(){
 		$scope.getEmployeeNames();
-    	if($scope.employee==null){
-             $scope.setEmployeeToUser();
-        }
-
     	$scope.getClientNames();
 		$scope.getDisplayWeek();
 	}
     
 	/**
-	 * Enters or updates the provided shift in the database.
-	 * Requires a unique version per page due to the differences in how shifts are listed afterward.
+	 * Enters or updates the provided shift in the database. Requires a unique
+	 * version per page due to the differences in how shifts are listed
+	 * afterward.
 	 */
     function saveShift(shift) {
     	$http({
@@ -456,16 +432,27 @@ function MobileEmployeeController($scope, $modal, $http) {
     }
 
     /**
-     * When you click on a shift see if it's around. If it is bring them to an edit modal. When accepting changes in the modal we check
-     * to ensure we aren't overwriting any changes that just happened while we were editing. If changes occurred check if the user wants to
-     * view the changes or overwrite with their edits. Accept their input then refresh the list of shifts to reflect any changes.
-     */
+	 * When you click on a shift see if it's around. If it is bring them to an
+	 * edit modal. When accepting changes in the modal we check to ensure we
+	 * aren't overwriting any changes that just happened while we were editing.
+	 * If changes occurred check if the user wants to view the changes or
+	 * overwrite with their edits. Accept their input then refresh the list of
+	 * shifts to reflect any changes.
+	 */
     $scope.editShift = function (shift) {
        $scope.updateLastInteractionTime();
-       //Only managers and above can currently edit shifts
+       // Only managers and above can currently edit shifts
 	   if($scope.profile && $scope.profile.manager){
-		   var lastUpdated = (shift.lastUpdated!=null?shift.lastUpdated:"null");//Account for old data having no lastUpdated info
-		   $http({//Ensure this shift hasn't been deleted out from under us before we start editing
+		   var lastUpdated = (shift.lastUpdated!=null?shift.lastUpdated:"null");// Account
+																				// for
+																				// old
+																				// data
+																				// having
+																				// no
+																				// lastUpdated
+																				// info
+		   $http({// Ensure this shift hasn't been deleted out from under us
+					// before we start editing
 	            url: '/schedule/shiftWasUpdated',
 	            method: 'GET',
 	            headers: {
@@ -474,15 +461,19 @@ function MobileEmployeeController($scope, $modal, $http) {
 	            },
 	            params: {
 	            	lastUpdated:lastUpdated,
-	            	shiftId:shift.id//If it can be deleted it already exists and has an id, unlike new shifts
+	            	shiftId:shift.id// If it can be deleted it already exists
+									// and has an id, unlike new shifts
 	            }
 	        })
 	        .then(function(response) {
-	        	if(response.data=="DELETED"){//If this was delted out from under us let the user know and refresh our dated shift list
+	        	if(response.data=="DELETED"){// If this was delted out from
+												// under us let the user know
+												// and refresh our dated shift
+												// list
 	        	   $scope.warn("This shift has just been deleted by another user. If you still wish to make edits please make a new shift.");
 	        	   $scope.listShifts();
 	   	    	}
-	        	else{//If, as usual, this shift is around, edit it
+	        	else{// If, as usual, this shift is around, edit it
 			       var updateModal = $modal.open({
 			           templateUrl: 'templates/modal/shiftForm.html',
 			           controller: ShiftModalController,
@@ -512,10 +503,15 @@ function MobileEmployeeController($scope, $modal, $http) {
 			       });
 			
 			       updateModal.result.then(function (shift) {
-		    		   saveShift(shift);//Update this shift on the server if ok was pressed
-			           $scope.listShifts();//Refresh our list to show the update and any others that may have occurred while editing
+		    		   saveShift(shift);// Update this shift on the server if ok
+										// was pressed
+			           $scope.listShifts();// Refresh our list to show the
+											// update and any others that may
+											// have occurred while editing
 			       }, function () {
-			           $scope.listShifts();//If we canceled we still want to make sure we come back to the latest shift data
+			           $scope.listShifts();// If we canceled we still want to
+											// make sure we come back to the
+											// latest shift data
 			       });
 	        	}
 	        });
@@ -524,8 +520,9 @@ function MobileEmployeeController($scope, $modal, $http) {
 
 
    /**
-    * Creates a new employee with name An Employee and refreshes the employee list to contain the change
-    */
+	 * Creates a new employee with name An Employee and refreshes the employee
+	 * list to contain the change
+	 */
     $scope.newEmployee = function () {
     	$scope.updateLastInteractionTime();
     	$http({
@@ -542,7 +539,8 @@ function MobileEmployeeController($scope, $modal, $http) {
         	if(response.data){
                 $scope.notify("Employee created");
                 
-        		$scope.listEmployeesAndInfo();//TODO refactor to ensure the new employee is selected
+        		$scope.listEmployeesAndInfo();// TODO refactor to ensure the
+												// new employee is selected
         		
         		$scope.setEmployeeTab("Schedule");
         	}
@@ -553,10 +551,11 @@ function MobileEmployeeController($scope, $modal, $http) {
     };
 
     /**
-     * Checks to see if we have the latest info in this employee.
-     * If we don't we ask if they want to overwrite what's on the server or see what the changes are.
-     * If the choose to proceed or if we had the latest data we save the employee and custom field data.
-     */
+	 * Checks to see if we have the latest info in this employee. If we don't we
+	 * ask if they want to overwrite what's on the server or see what the
+	 * changes are. If the choose to proceed or if we had the latest data we
+	 * save the employee and custom field data.
+	 */
     $scope.ok = function () {
     	$scope.updateLastInteractionTime();
       	var originalEmployee = $scope.clone($scope.unmodifiedEmployee);
@@ -614,7 +613,7 @@ function MobileEmployeeController($scope, $modal, $http) {
 				        }
 				    }
 			    	
-			    	$http({//TODO refactor to saveEmployee method call
+			    	$http({// TODO refactor to saveEmployee method call
 			            url: '/schedule/updateEmployee',
 			            method: 'POST',
 			            headers: {
@@ -643,8 +642,9 @@ function MobileEmployeeController($scope, $modal, $http) {
     };
     
     /**
-     * Updates $scope.employee and $scope.unmodifiedEmployee to be the most recent copy of this employee from the server
-     */
+	 * Updates $scope.employee and $scope.unmodifiedEmployee to be the most
+	 * recent copy of this employee from the server
+	 */
     $scope.updateEmployee = function () {
         $http({
             url: '/employees/'+$scope.employee.id,
@@ -658,7 +658,7 @@ function MobileEmployeeController($scope, $modal, $http) {
         })
         .then(function(response) {
         	if(response.data){
-        		$scope.setEmployee(response.data);
+        		$scope.setSelectedEmployee(response.data);
         	}
         });
     }

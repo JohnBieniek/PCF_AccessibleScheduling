@@ -72,7 +72,7 @@ function VacationController($scope, $modal, $http) {
            }
        })
        .then(function (response) {//TODO handle error state
-    	   $scope.setEmployee(response.data);
+    	   $scope.setSelectedEmployee(response.data);
        	   employee.id=response.data.id;
            if(employee.customFields){
 	            var size = employee.customFields.length;
