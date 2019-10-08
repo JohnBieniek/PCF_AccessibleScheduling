@@ -575,7 +575,7 @@ function MainNavigationController($scope, $modal, $http) {
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
-                employee: employee,
+                employee: selectedEmployee,
                 customField: customField,
                 index:index,
             }

@@ -6,9 +6,11 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import org.hibernate.annotations.GenericGenerator;
 
+import org.hibernate.annotations.GenericGenerator;
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CustomField {
@@ -35,12 +37,14 @@ public class CustomField {
     	clientRequirement=false;
     	employeeRequirement=false;
     	overrideable=true;
+    	lastUpdated=null;
     }
     
 	public String getLastUpdated() {
 		return lastUpdated;
 	}
 
+	@JsonIgnore
 	public void setLastUpdatedToNow() {
     	setLastUpdated(LocalDateTime.now().toString());
     }
