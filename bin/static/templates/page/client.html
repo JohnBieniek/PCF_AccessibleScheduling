@@ -8,7 +8,7 @@
 			    	</div>
 		    	</div>
 				<div class="monthSelector">
-					<div ng-repeat="client in clients">
+					<div ng-repeat="client in clients | orderby: name">
 						<div class = "clientTab" ng-class="{ active: isClientSet(client) }">
 					    	<div>
 					       		<p ng-click="setClientAndInfo(client)">{{client.name}}</p>

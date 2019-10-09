@@ -51,6 +51,7 @@ function MobileEmployeeController($scope, $modal, $http) {
 		$scope.setEmployeeTab(tab);
 	}
 	
+	//TODO validate these are up to date first
 	$scope.deleteAvailability=function(availability){ 
 		$scope.updateLastInteractionTime();
 		var currentEmployee = $scope.employee;

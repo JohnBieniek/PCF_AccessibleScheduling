@@ -323,6 +323,7 @@ function MainNavigationController($scope, $modal, $http) {
 	        .then(function(response) {
 	        	if(response.data){
         			$scope.client = response.data;
+        			$scope.unmodifiedClient=$scope.clone(response.data);
 	        	}
 	        	else{
 	        		if(response.status==404){

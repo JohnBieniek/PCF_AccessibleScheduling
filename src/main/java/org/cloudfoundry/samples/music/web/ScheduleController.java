@@ -25,6 +25,7 @@ import org.cloudfoundry.samples.music.repositories.mongodb.MongoCustomFieldRepos
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoEmployeeRepository;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoShiftRepository;
 import org.cloudfoundry.samples.music.repositories.mongodb.ScheduleStatusRepository;
+import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -121,17 +122,14 @@ public class ScheduleController {
 	    UpdateInfo updateInfo = updateInfoRepository.findOne("employees");
 		  List<Employee> employeeList = employeeRepository.findAll();
           Collections.sort(employeeList);
-          int index = 0;
 		  JSONObject employeeJson = new JSONObject();
-		  JSONObject employeeInfoJson = new JSONObject();
+		  JSONArray employeeInfoJson = new JSONArray();
 		  JSONObject employeesInfoJson = new JSONObject();
-		  index = 0;
 		  for(Employee selectedEmployee : employeeList) {
 			  employeeJson = new JSONObject();
 			  employeeJson.put("name", selectedEmployee.getName());
 			  employeeJson.put("id", selectedEmployee.getId());
-			  employeeInfoJson.put(""+index,employeeJson);
-			  index++;
+			  employeeInfoJson.put(employeeJson);
 		  }
 		  
 		  employeesInfoJson.put("names", employeeInfoJson);
@@ -145,23 +143,20 @@ public class ScheduleController {
     	securityManager.authorize(idToken, Constants.MANAGER);
 
 	    UpdateInfo updateInfo = updateInfoRepository.findOne("clients");
-	    int index = 0;
 	    List<Client> clientList = clientRepository.findAll();
         Collections.sort(clientList);
-		  JSONObject clientJson = new JSONObject();
-		  JSONObject clientInfoJson = new JSONObject();
-		  JSONObject clientsInfoJson = new JSONObject();
-		  index = 0;
-		  for(Client selectedClient : clientList) {
+		JSONObject clientJson = new JSONObject();
+		JSONArray clientInfoJson = new JSONArray();
+		JSONObject clientsInfoJson = new JSONObject();
+		for(Client selectedClient : clientList) {
 		  clientJson = new JSONObject();
 		  clientJson.put("name", selectedClient.getName());
 		  clientJson.put("id", selectedClient.getId());
-		  clientInfoJson.put(""+index,clientJson);
-		  index++;
-	  }
+		  clientInfoJson.put(clientJson);
+		}
 	  
-	  clientsInfoJson.put("names", clientInfoJson);
-	  clientsInfoJson.put("tableLastUpdated", updateInfo.getTime());
+	    clientsInfoJson.put("names", clientInfoJson);
+	    clientsInfoJson.put("tableLastUpdated", updateInfo.getTime());
     	return clientInfoJson.toString();
     }
     
@@ -235,15 +230,13 @@ public class ScheduleController {
 							  List<Employee> employeeList = employeeRepository.findAll();
 					          Collections.sort(employeeList);
 							  JSONObject employeeJson = new JSONObject();
-							  JSONObject employeeInfoJson = new JSONObject();
+							  JSONArray employeeInfoJson = new JSONArray();
 							  JSONObject employeesInfoJson = new JSONObject();
-							  index = 0;
 							  for(Employee selectedEmployee : employeeList) {
 								  employeeJson = new JSONObject();
 								  employeeJson.put("name", selectedEmployee.getName());
 								  employeeJson.put("id", selectedEmployee.getId());
-								  employeeInfoJson.put(""+index,employeeJson);
-								  index++;
+								  employeeInfoJson.put(employeeJson);
 							  }
 							  
 							  employeesInfoJson.put("names", employeeInfoJson);
@@ -255,15 +248,13 @@ public class ScheduleController {
 							  List<Client> clientList = clientRepository.findAll();
 					          Collections.sort(clientList);
 							  JSONObject clientJson = new JSONObject();
-							  JSONObject clientInfoJson = new JSONObject();
+							  JSONArray clientInfoJson = new JSONArray();
 							  JSONObject clientsInfoJson = new JSONObject();
-							  index = 0;
 							  for(Client selectedClient : clientList) {
 								  clientJson = new JSONObject();
 								  clientJson.put("name", selectedClient.getName());
 								  clientJson.put("id", selectedClient.getId());
-								  clientInfoJson.put(""+index,clientJson);
-								  index++;
+								  clientInfoJson.put(clientJson);
 							  }
 							  
 							  clientsInfoJson.put("names", clientInfoJson);
