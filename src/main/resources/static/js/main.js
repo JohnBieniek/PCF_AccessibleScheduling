@@ -170,20 +170,20 @@ function MainNavigationController($scope, $modal, $http) {
 					 payload["shifts"] = shiftsInfo;
 				 }
 				 else if($scope.page=="templates/page/client.html"){
-        			 if($scope.selectedClient!=null){
+        			 if($scope.client!=null){
         				 if($scope.tab == "Schedule"){
 							 var shiftsInfo = {}; 
 							 shiftsInfo["tableLastUpdated"]=$scope.lastShiftTableUpdate;
 							 shiftsInfo["lastUpdated"]=$scope.lastShiftUpdate;
 							 shiftsInfo["date"]=$scope.getDateString($scope.week);
-							 shiftsInfo["id"] = $scope.selectedClient.id;
+							 shiftsInfo["id"] = $scope.client.id;
 							 payload["shifts"] = shiftsInfo;
         				 }
         				 else if($scope.tab=="Requests"){
 							 var requestsInfo = {}; 
 							 requestsInfo["tableLastUpdated"]=$scope.lastRequestTableUpdate;
 							 requestsInfo["lastUpdated"]=$scope.lastRequestUpdate;
-							 requestsInfo["id"] = $scope.selectedClient.id;
+							 requestsInfo["id"] = $scope.client.id;
 							 payload["requests"] = requestsInfo;
         				 }
         			 }

@@ -23,17 +23,15 @@
                     style="font-size:23px"
                     ng-change="isValid(shift)"
                     ng-init = "selectedEmployee"
-                    ng-options="employee.first for employee in employees | orderBy:'first' track by employee.id"
+                    ng-options="employee.name for employee in employees | orderBy:'name' track by employee.id"
                     ng-model="selectedEmployee"
-                    ng-value="{{employee.first}}">
-                {{employee.first}}
+                    ng-value="{{employee.name}}">
+                {{employee.name}}
             </select>
             <span ng-click="clearSelectedEmployee()" style="font-size:23px" class="inline red glyphicon glyphicon-ban-circle"></span>                   
             <input type="text" ng-hide="true" id="staffId" name="staffId" ng-model="shift.staffId" ng-value="shift.staffId=selectedEmployee.id">
-            <input type="text" ng-hide="true" id="staffName" name="staffName" ng-model="shift.staffName" ng-value="shift.staffName=selectedEmployee.first">
+            <input type="text" ng-hide="true" id="staffName" name="staffName" ng-model="shift.staffName" ng-value="shift.staffName=selectedEmployee.name">
         </div>
-        
-
         
         <div ng-if="shift.clientId|| shiftAction==='update'">
 	        <div>

@@ -287,7 +287,17 @@ public class ScheduleController {
 							  result.put(Constants.SHIFTS,  shiftJson);
 							  break;
 						   case Constants.REQUESTS :
-							  result.put(Constants.REQUESTS,requestRepository.findByClientId(id));
+							  JSONObject requestJson = new JSONObject();
+							  Iterable<ClientRequest> requests = null;
+							  
+							  if(null!=client) {
+								  requests = requestRepository.findByClientId(id);
+								  
+								  requestJson.put("info", requests);
+								  requestJson.put("tableLastUpdated", updateInfo.getTime());
+
+								  result.put(Constants.REQUESTS,  requestJson);
+							  }
 							  break; 
 						   case Constants.ALERTS :
 							  result.put(Constants.ALERTS, accessRequestRepository.findAll());
