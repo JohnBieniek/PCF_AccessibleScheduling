@@ -30,6 +30,7 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.core.JsonParseException;
+import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.databind.JsonMappingException;
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.repository.CrudRepository;
@@ -161,7 +162,7 @@ public class ScheduleController {
     }
     
     @RequestMapping(value = "/allUpdates",method = RequestMethod.GET)
-    public String getAllUpdates(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam String json) throws AuthenticationException, JSONException {
+    public String getAllUpdates(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam String json) throws AuthenticationException, JSONException, JsonProcessingException {
     	securityManager.authorize(idToken, Constants.USER);
     	System.out.println("called get allUpdates with json:"+json);
     	JSONObject jsonObject = new JSONObject(json);
@@ -283,8 +284,13 @@ public class ScheduleController {
 							  
 							  if(null!=client) {
 								  requests = requestRepository.findByClientId(id);
-								  
-								  requestJson.put("info", requests);
+								  ObjectMapper mapper = new ObjectMapper();
+
+								  JSONArray requestInfoJson = new JSONArray();
+								  for(ClientRequest selectedClientRequest : requests) {
+									  requestInfoJson.put(new JSONObject(mapper.writeValueAsString(selectedClientRequest)));
+								  }
+								  requestJson.put("info", requestInfoJson);
 								  requestJson.put("tableLastUpdated", updateInfo.getTime());
 
 								  result.put(Constants.REQUESTS,  requestJson);

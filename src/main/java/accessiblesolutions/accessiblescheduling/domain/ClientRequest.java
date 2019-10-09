@@ -67,6 +67,9 @@ public class ClientRequest {
     	
     	try{
     		duration = getDuration();
+    		if(duration==0) {
+    			valid=false;
+    		}
     	}
     	catch(CorruptDataException e){
     		valid=false;

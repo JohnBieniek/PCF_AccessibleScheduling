@@ -145,20 +145,16 @@ function MainNavigationController($scope, $modal, $http) {
 			 var customFieldsInfo = {}; 
 			 customFieldsInfo["tableLastUpdated"]=$scope.lastCustomFieldTableUpdate;
 			 payload["customFields"] = customFieldsInfo;
-			 //$scope.listCustomFields();
 			 
 			 if($scope.page=="templates/page/employee.html" || $scope.page=="templates/page/client.html"){
 				 var clientsInfo = {}; 
 				 clientsInfo["tableLastUpdated"]=$scope.lastClientTableUpdate;
 				 payload["clients"] = clientsInfo;
 				 
-				 //$scope.listClients();//deprecated
-				 
 				 var employeesInfo = {}; 
 				 employeesInfo["tableLastUpdated"]=$scope.lastEmployeeTableUpdate;
 				 payload["employees"] = employeesInfo;
 				 
-				 //$scope.listEmployees();//deprecated
 				 //$scope.listShifts();//TODO Make this only update when new
 				 
 				 if($scope.page=="templates/page/employee.html" && $scope.employeeTab == "Schedule"){
@@ -198,7 +194,7 @@ function MainNavigationController($scope, $modal, $http) {
 		 }
 		 else if($scope.page=="templates/page/scheduler.html"){
 			 var statusInfo = {}; 
-			 alertsInfo["tableLastUpdated"]=$scope.lastStatusTableUpdate;
+			 statusInfo["tableLastUpdated"]=$scope.lastStatusTableUpdate;
 			 payload["status"] = statusInfo;
 
 			 $scope.listStatusItems();
@@ -208,6 +204,13 @@ function MainNavigationController($scope, $modal, $http) {
  		 $scope.getAllUpdates(payload);
 	 }
 	 
+	 /**
+	  * Infinite recursive loop used to ensure fresh data is always shown
+	  * Calls UpdateData
+	  * Uses the time since the last time the user interacted with the UI to determine how often to refresh
+	  * The longer the user has been inactive the longer it is okay to wait to refresh data. 15sec-10min
+	  * Users get slower base update speeds than managers and admins
+	  */
 	 $scope.autoUpdateData = function autoUpdateData(){
 		 $scope.updateData();
 		 var timeSinceInteraction = $scope.getMinutesSinceLastInteraction();
@@ -216,7 +219,7 @@ function MainNavigationController($scope, $modal, $http) {
 			 setTimeout(autoUpdateData,5000);
  		 }
  		 else if(timeSinceInteraction>120){
-			 setTimeout(autoUpdateData,12000000);
+			 setTimeout(autoUpdateData,600000);
 		 }
  		 else if(!$scope.manager && !$scope.admin){
  			setTimeout(autoUpdateData,30000);
@@ -236,6 +239,11 @@ function MainNavigationController($scope, $modal, $http) {
 	 }
 	 
 	 //API Access
+	 /**
+	  * Takes in a payload of all updates that are needed and when that area last got its data
+	  * Calls the allUpdates endpoint on the server to get all shifts, clients, etc that have changed.
+	  * Only changed info comes back. When it does it overwrites existing info for that area.
+	  */
 	 $scope.getAllUpdates = function getAllUpdates(json){
 		 if($scope.idToken!=null){
 			 console.log("getting all updates");
@@ -289,6 +297,10 @@ function MainNavigationController($scope, $modal, $http) {
 	        		
 	        		if(response.data.requests){
 	        			$scope.requests = response.data.requests.info;
+	        			console.log("got requests 1",$scope.requests);
+	        			for(var index = 0; index< $scope.requests.length;index++){
+	        				$scope.getDisplayValue($scope.requests[index]);
+	        			}
 	        			$scope.lastRequestTableUpdate = response.data.requests.tableLastUpdated;
 	        		}
 	        	}
@@ -305,6 +317,10 @@ function MainNavigationController($scope, $modal, $http) {
 		 }
 	 }
 	
+	 /**
+	  * Gets the full client model from the server for the selected client.
+	  * Saves it in $scope.client and $scope.unmodifiedClient
+	  */
 	 $scope.getClient = function getClient(clientInfo){
 		 console.log("getting client");
 		 console.log(clientInfo);
@@ -337,6 +353,10 @@ function MainNavigationController($scope, $modal, $http) {
 		 }
 	 }
 
+	 /**
+	  * Gets the full employee model from the server for the $scope.selectedEmployee.
+	  * Saves it in $scope.employee and $scope.unmodifiedEmployee
+	  */
 	 $scope.getEmployee = function getEmployee(){
 		 console.log("getting employee");
 		 console.log($scope.selectedEmployee.id);
@@ -369,6 +389,10 @@ function MainNavigationController($scope, $modal, $http) {
 		 }
 	 }
 	 
+	 /**
+	  * Gets the employee list and save it in $scope.employees
+	  * The list comes back sorted alphabeticly with each object containing employee.id and employee.name
+	  */
 	 $scope.getEmployeeNames = function getEmployeeNames(){
 		 if($scope.idToken!=null){
 	    	$http({
@@ -401,6 +425,12 @@ function MainNavigationController($scope, $modal, $http) {
 		 }
 	 }
 	 
+	 /**
+	  * Gets the client list and save it in $scope.clients
+	  * The list comes back sorted alphabeticly with each object containing client.id and client.name
+	  * If no client is currently selected the first one in the list is chosen and its data is pulled
+	  * Updates $scope.lastClientTableUpdate to response.data.tableLastUpdated
+	  */
 	 $scope.getClientNames = function getClientNames(){
 		 if($scope.idToken!=null){
 	    	$http({
@@ -642,7 +672,7 @@ function MainNavigationController($scope, $modal, $http) {
      $scope.listShifts = function listShifts(){
     	let id = "-1";
     	
-       	$scope.getDisplayWeek();
+       	$scope.getDisplayWeek();//TODO refactor this out
 		 if($scope.page=="templates/page/employee.html"){
 	    	if(null!=$scope.employee){
 	    		id=$scope.employee.id;
@@ -713,6 +743,10 @@ function MainNavigationController($scope, $modal, $http) {
 		        })
 		        .then(function(response) {
 		    		$scope.requests = response.data;
+        			for(var index = 0; index< $scope.requests.length;index++){
+        				$scope.getDisplayValue($scope.requests[index]);
+        			}
+        			console.log("got requests",$scope.requests);
 		    	});
 	    	}
     	}
@@ -930,6 +964,132 @@ function MainNavigationController($scope, $modal, $http) {
 		 return monthName;
 	 }
 	 
+	 /**
+	     * Updates the provided object with .displayValue containing a human readable string of what this request is for.
+	     */
+		 $scope.getDisplayValue = function getDisplayValue(request) {
+			 if(request.startsLocalDateTime==null || request.startsLocalDateTime==undefined){
+				 return null;
+			 }
+			 
+			let startHour = parseInt(request.startsLocalDateTime.hour);
+		 	let endHour= parseInt(request.endsLocalDateTime.hour);
+		 	
+		 	let startMinute = parseInt(request.startsLocalDateTime.minute);
+		 	let endMinute= parseInt(request.endsLocalDateTime.minute);
+		 	
+		 	let startModifier = "AM";
+		 	let endModifier = "AM";
+		 	
+		 	if(startHour>11){
+		 		startHour-=12;
+		 		startModifier="PM"
+		 	}
+		 	
+		 	if(endHour>11){
+		 		endHour-=12;
+		 		endModifier="PM"
+		 	}
+		 	
+		 	if(startMinute<10){
+		 		startMinute="0"+startMinute
+		 	}
+		 	
+		 	if(endMinute<10){
+		 		endMinute="0"+endMinute
+		 	}
+	        request.displayValue = (startHour!=0?startHour:"12")+":"+startMinute+startModifier+"-";
+	        request.displayValue += (endHour!=0?endHour:"12")+":"+endMinute+endModifier;
+			 
+			 if(request.requestEmployee){
+				 request.displayValue+=" with "+request.staffName;
+			 }
+			 if(request.repeats){
+				 request.displayValue+= " every "+request.repeatsEvery + " " +request.interval; 
+			 }
+			 if(request.days && request.interval=="week(s)"){
+				 request.displayValue+=" [";
+				 if(request.days[0]){
+					 request.displayValue+="Su";
+				 }
+				 if(request.days[1]){
+					 request.displayValue+="M";
+				 }
+				 if(request.days[2]){
+					 request.displayValue+="Tu";
+				 }
+				 if(request.days[3]){
+					 request.displayValue+="W";
+				 }
+				 if(request.days[4]){
+					 request.displayValue+="Th";
+				 }
+				 if(request.days[5]){
+					 request.displayValue+="F";
+				 }
+				 if(request.days[6]){
+					 request.displayValue+="Sa";
+				 }
+				 request.displayValue+="]";
+			 }
+			 var weekOfMonth = 0;
+			 var dateCursor = request.startsLocalDate.dayOfMonth;
+			 
+			 for(var i =0; i<8;i++){
+				 if(dateCursor>0){
+					 dateCursor-=7;
+					 weekOfMonth+=1;
+				 }
+			 }
+			 
+			 if(request.interval=="month(s)"){
+				 if(request.monthInterval=="days"){
+					 request.displayValue+=" on day "+request.startsLocalDate.dayOfMonth;
+				 }
+				 else{
+					 request.displayValue+=" on "+request.startsLocalDate.dayOfWeek + " of week "+weekOfMonth;
+				 }
+			 }
+			 if(request.interval=="year(s)"){
+				 request.displayValue+= " in " +request.startsLocalDate.month;
+				 if(request.yearInterval=="days"){
+					 request.displayValue+=" on day "+request.startsLocalDate.dayOfMonth;
+				 }
+				 else{
+					 request.displayValue+=" on "+request.startsLocalDate.dayOfWeek + " of week "+weekOfMonth;
+				 }
+			 }
+			 
+			 if(request.repeats){
+				 request.displayValue+= " starting "+request.startDate; 
+			 }
+			 else{
+				 request.displayValue+=" on "+ request.startDate;
+			 }
+
+			 //Add exceptions
+			 if(request.exceptions !=undefined && request.exceptions!=null && request.exceptions.length>0){
+				 request.displayValue+=" except ";
+				 
+				 if(request.exceptions.length<4){
+					 for(var index = 0; index <request.exceptions.length;index++){
+						 if(index==request.exceptions.length-1 && request.exceptions.length>1){
+							 request.displayValue+=" and " 
+						 }
+						 else if(index>0){
+							 request.displayValue+=" ,"
+						 }
+						 request.displayValue+=request.exceptions[index];
+					 }
+				 }
+				 else{
+					 request.displayValue+=" as noted";
+				 }
+			 }
+			 
+			 request.displayValue+=".";
+		 } 
+		 
      $scope.getDisplayWeek = function(){
     	 var date = parseInt($scope.week.getDate());
     	 var day = parseInt($scope.week.getDay());
