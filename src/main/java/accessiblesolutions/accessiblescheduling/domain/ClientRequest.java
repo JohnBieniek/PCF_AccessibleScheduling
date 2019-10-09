@@ -12,7 +12,10 @@ import javax.persistence.Id;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
+import accessiblesolutions.accessiblescheduling.util.Util;
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ClientRequest {
@@ -48,9 +51,15 @@ public class ClientRequest {
 		return lastUpdated;
 	}
 
+	@JsonIgnore
 	public void setLastUpdatedToNow() {
     	setLastUpdated(LocalDateTime.now().toString());
     }
+	
+	@JsonIgnore
+	public LocalDateTime getLastUpdatedTime() {
+		return Util.getLocalDateTimeFromString(getLastUpdated());
+	}
 
 	public void setLastUpdated(String lastUpdated) {
 		this.lastUpdated = lastUpdated;

@@ -182,6 +182,7 @@ public class ScheduleController {
 			    Employee employee = null;
 			    Client client = null;
 			    LocalDateTime tableLastUpdated = null;
+			    LocalDateTime lastUpdated = null;
 	    	    String key = (String) keys.next();
 	    	    
 	    	    if (jsonObject.get(key) instanceof JSONObject) {
@@ -197,13 +198,21 @@ public class ScheduleController {
 					    	tableLastUpdated = Util.getLocalDateTimeFromString(tableString);
 					    }
 				    }
-			
+				    
 				    if(updateRequest.has("id")) {
 				    	id=updateRequest.getString("id");
 				    	
 					    employee =employeeRepository.findOne(id);
 					    if(null==employee) {
 					    	client = clientRepository.findOne(id);
+					    }
+					    
+					    if(updateRequest.has("lastUpdated")){
+					    	String updateString = updateRequest.getString("lastUpdated");
+					    	
+						    if(null!=updateString && !"null".equalsIgnoreCase(updateString)) {
+						    	lastUpdated = Util.getLocalDateTimeFromString(updateString);
+						    }
 					    }
 				    }
 				    
@@ -280,21 +289,27 @@ public class ScheduleController {
 							  break;
 						   case Constants.REQUESTS :
 							  JSONObject requestJson = new JSONObject();
-							  Iterable<ClientRequest> requests = null;
-							  
-							  if(null!=client) {
-								  requests = requestRepository.findByClientId(id);
-								  ObjectMapper mapper = new ObjectMapper();
-
-								  JSONArray requestInfoJson = new JSONArray();
-								  for(ClientRequest selectedClientRequest : requests) {
-									  requestInfoJson.put(new JSONObject(mapper.writeValueAsString(selectedClientRequest)));
-								  }
-								  requestJson.put("info", requestInfoJson);
-								  requestJson.put("tableLastUpdated", updateInfo.getTime());
-
-								  result.put(Constants.REQUESTS,  requestJson);
-							  }
+							    
+						      Iterable<ClientRequest> requests = requestRepository.findByClientId(id);
+						      ObjectMapper mapper = new ObjectMapper();
+						      JSONArray requestInfoJson = new JSONArray();
+						      LocalDateTime currentUpdateTime = null;
+						    	    
+						      for(ClientRequest selectedClientRequest : requests) {
+						          if(null == currentUpdateTime || selectedClientRequest.getLastUpdatedTime().isAfter(currentUpdateTime)) {
+						        	  currentUpdateTime=selectedClientRequest.getLastUpdatedTime();
+						          }
+						    	      
+						    	  requestInfoJson.put(new JSONObject(mapper.writeValueAsString(selectedClientRequest)));
+						      }
+						    	    
+						      requestJson.put("lastUpdated", currentUpdateTime);
+						    	    
+						      if(currentUpdateTime==null || lastUpdated == null ||currentUpdateTime.isAfter(lastUpdated)) {
+						      	    requestJson.put("info", requestInfoJson);
+						      }
+							  requestJson.put("tableLastUpdated", updateInfo.getTime());
+							  result.put(Constants.REQUESTS,  requestJson);
 							  break; 
 						   case Constants.ALERTS :
 							  result.put(Constants.ALERTS, accessRequestRepository.findAll());
@@ -649,11 +664,40 @@ public class ScheduleController {
     }
     
     @RequestMapping(value = "/clientsRequests", method = RequestMethod.GET)
-    public Iterable<ClientRequest> clientsRequests(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam String clientId) throws AuthenticationException {
+    public String clientsRequests(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam String clientId, @RequestParam String tableLastUpdated, @RequestParam String lastUpdated) throws AuthenticationException, JSONException, JsonProcessingException {
     	securityManager.authorize(idToken, Constants.MANAGER);
     	
-    	
-    	return requestRepository.findByClientId(clientId);
+	    JSONObject requestJson = new JSONObject();
+	    
+	    UpdateInfo updateInfo = updateInfoRepository.findOne(Constants.REQUESTS);
+
+	    	
+    	LocalDateTime tableLastUpdatedTime = Util.getLocalDateTimeFromString(tableLastUpdated);
+    	LocalDateTime lastUpdatedTime = Util.getLocalDateTimeFromString(lastUpdated);
+    	if(tableLastUpdated == null || updateInfo.getTime().isAfter(tableLastUpdatedTime)) {
+            Iterable<ClientRequest> requests = requestRepository.findByClientId(clientId);
+    	    ObjectMapper mapper = new ObjectMapper();
+    	    JSONArray requestInfoJson = new JSONArray();
+    	    LocalDateTime currentUpdateTime = null;
+    	    
+    	    for(ClientRequest selectedClientRequest : requests) {
+    	      if(null == currentUpdateTime || selectedClientRequest.getLastUpdatedTime().isAfter(currentUpdateTime)) {
+    	    	  currentUpdateTime=selectedClientRequest.getLastUpdatedTime();
+    	      }
+    	      
+    		  requestInfoJson.put(new JSONObject(mapper.writeValueAsString(selectedClientRequest)));
+    	    }
+    	    
+    	    requestJson.put("lastUpdated", currentUpdateTime);
+    	    
+    	    if(currentUpdateTime.isAfter(lastUpdatedTime)) {
+        	    requestJson.put("info", requestInfoJson);
+    	    }
+    	}
+	    requestJson.put("tableLastUpdated", updateInfo.getTime());
+
+
+    	return requestJson.toString();
     }
 
     @RequestMapping(value = "/byMonth", method = RequestMethod.DELETE)

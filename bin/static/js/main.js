@@ -38,9 +38,10 @@ function MainNavigationController($scope, $modal, $http) {
         $scope.admin=false;
         
         //Last updated info used to tell if we need to pull fresh data in autoUpdateData
+        $scope.lastRequestUpdate=null;
+        
         $scope.lastScheduleStatusUpdate=null;
         $scope.lastShiftUpdate=null;
-        $scope.lastRequestUpdate=null;
         $scope.lastLocalCustomFieldUpdate=null;
         $scope.lastLocalShiftUpdate=null;
         $scope.lastClientsUpdate=null;
@@ -49,6 +50,8 @@ function MainNavigationController($scope, $modal, $http) {
         $scope.lastEmployeeUpdate=null;
         $scope.lastEmployeesUpdate=null;
         $scope.lastLocalEmployeeUpdate=null;
+        
+        //Table update info
         $scope.lastCustomFieldTableUpdate = null;
         $scope.lastAlertTableUpdate = null;
         $scope.lastStatusTableUpdate = null;
@@ -302,6 +305,7 @@ function MainNavigationController($scope, $modal, $http) {
 	        				$scope.getDisplayValue($scope.requests[index]);
 	        			}
 	        			$scope.lastRequestTableUpdate = response.data.requests.tableLastUpdated;
+	        			$scope.lastRequestUpdate = response.data.requests.lastUpdated;
 	        		}
 	        	}
 	        })
@@ -738,15 +742,21 @@ function MainNavigationController($scope, $modal, $http) {
 		                'Content-Type': 'application/x-www-form-urlencoded'
 		            },
 		            params: {
-		            	clientId:id
+		            	clientId:id,
+		            	tableLastUpdated:$scope.lastRequestTableUpdate,
+		            	lastUpdated:$scope.lastUpdated
 		            }
 		        })
 		        .then(function(response) {
-		    		$scope.requests = response.data;
-        			for(var index = 0; index< $scope.requests.length;index++){
-        				$scope.getDisplayValue($scope.requests[index]);
-        			}
-        			console.log("got requests",$scope.requests);
+		        	if(response.data){
+			    		$scope.requests = response.data.info;
+	        			for(var index = 0; index< $scope.requests.length;index++){
+	        				$scope.getDisplayValue($scope.requests[index]);
+	        			}
+	        			console.log("got requests",$scope.requests);
+	        			$scope.lastRequestTableUpdate = response.data.tableLastUpdated;
+	        			$scope.lastRequestUpdate = response.data.lastUpdated;
+		        	}
 		    	});
 	    	}
     	}
