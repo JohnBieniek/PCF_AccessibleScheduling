@@ -22,7 +22,6 @@ angular.module('client', ['ngResource', 'ui.bootstrap']).
     });
 
 function MobileClientController($scope, $modal, $http) {
-	
 	/**
 	 * Changes what client info we are looking at and gets all info for that new client
 	 * Interaction notification is done in setTab
@@ -35,7 +34,7 @@ function MobileClientController($scope, $modal, $http) {
         
         $scope.listShifts();
 
-        $scope.listClients();
+        $scope.listClients();//Consider removing and all auto update to do this
 	}
 	
 	/**
@@ -49,13 +48,17 @@ function MobileClientController($scope, $modal, $http) {
       
       $scope.listShifts();
 
-      $scope.listClients();
+      $scope.listClients();//Consider removing and all auto update to do this
 	}
 	
 	$scope.setInterval = function(newInterval){
       $scope.interval = newInterval;
 	}
 	
+	/**
+	 * Called whenever something in the client object is changed.
+	 * Used to show the okay and cancel buttons at the bottom of the screen to save the changes
+	 */
 	$scope.setDetailsToChanged = function(){
 	  $scope.updateLastInteractionTime();
       $scope.detailsChanged=true;;
@@ -267,11 +270,6 @@ function MobileClientController($scope, $modal, $http) {
 		 
 		 request.displayValue+=".";
 	 }
-
-	 $scope.listClientsAndInfo = function listClientsAndInfo() {
-		$scope.getClientNames();
-        $scope.getEmployeeNames();
-    }
 
 		/**
 		 * Enters or updates the provided shift in the database.

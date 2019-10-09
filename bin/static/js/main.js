@@ -76,8 +76,8 @@ function MainNavigationController($scope, $modal, $http) {
         $scope.selectedEmployee=null;//The name and id of the employee we are looking at
         $scope.unmodifiedEmployee=null;
         $scope.employees=null;
-        $scope.client=null;
-        $scope.selectedClient = null;
+        $scope.client=null;//The full client info for who we are looking at
+        $scope.selectedClient = null;//The name and id of the client we are looking at
         $scope.unmodifiedClient=null;
         $scope.clients=null;
         $scope.customFields=null;
@@ -415,9 +415,12 @@ function MainNavigationController($scope, $modal, $http) {
 	        })
 	        .then(function(response) {
 	        	if(response.data){
+	        		console.log("got client names with selected client:",$scope.selectedClient);
         			$scope.clients = response.data;
-        			if($scope.selectedClient==null){
+        			if($scope.selectedClient==null ){
 	        			$scope.selectedClient = $scope.clients[0];
+		        		console.log("updated selected client to the first of the clients returned:",$scope.selectedClient);
+		        		$scope.getClient($scope.selectedClient.id);
         			}
         			$scope.lastClientTableUpdate = response.data.tableLastUpdated;
 	        	}
@@ -1018,7 +1021,7 @@ function MainNavigationController($scope, $modal, $http) {
 	}
 	$scope.setSelectedClient = function(client){
 		 $scope.selectedClient=client;
-		 $scope.getClient();
+		 $scope.getClient(client.id);
 	}
 	$scope.setClients = function (clients){
 		 $scope.clients = clients;
@@ -1050,9 +1053,18 @@ function MainNavigationController($scope, $modal, $http) {
 	        $scope.listStatusItems();
 		}
     };
+    
+    /**
+     * Updates the page to the selected page from the templates folder.
+     * Removes any shifts and requests from the user to ensure one users data doesn't appear with another name for a moment
+     * Pulls data for the given months schedule when moving to the scheduler before changing pages to be present when they arrive
+     * Notes interaction as every other click
+     */
 	$scope.setPage = function (viewName) {
 	    $scope.updateLastInteractionTime();
+	    
 		var newPage = "templates/page/" + viewName + ".html"
+		
 		if(newPage!=$scope.page){
 	        $scope.shifts=null;//Clear to ease visual transition
 	        $scope.requests=null;//Clear to ease visual transition
@@ -1064,7 +1076,7 @@ function MainNavigationController($scope, $modal, $http) {
 	        	}
 	    		$scope.setScheduleTab(month);//Update early to ease visual transition
 	        }
-	    	$scope.page = "templates/page/" + viewName + ".html";
+	    	$scope.page = newPage;
 		}
     };
     
