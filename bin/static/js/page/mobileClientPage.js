@@ -43,14 +43,19 @@ function MobileClientController($scope, $modal, $http) {
 	$scope.setClientAndInfo = function(newClient){
 	  $scope.detailsChanged=false;
       $scope.setClient(newClient);
-      $scope.getAllClientCustomFieldData();
-      $scope.listRequests();
+      $scope.getAllClientCustomFieldData();//Done now for visual crispness
       
-      $scope.listShifts();
+	  if($scope.tab=="Requests"){		 
+		  $scope.listRequests();
+	  }
+	  else if($scope.tab == "Schedule"){
+		  $scope.listShifts();
+	  }
 
       $scope.listClients();//Consider removing and all auto update to do this
 	}
 	
+	//May be used in checking if a shift or request is valid, TODO factor out
 	$scope.setInterval = function(newInterval){
       $scope.interval = newInterval;
 	}

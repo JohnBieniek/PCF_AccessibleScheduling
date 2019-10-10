@@ -58,6 +58,8 @@ function MainNavigationController($scope, $modal, $http) {
         $scope.lastShiftTableUpdate = null;
         $scope.lastClientTableUpdate=null;
         $scope.lastEmployeeTableUpdate=null;
+        $scope.lastRequestTableUpdate=null;
+        
         
         if($scope.week==undefined || $scope.week ==null){
 			 $scope.week = new Date();
@@ -80,7 +82,7 @@ function MainNavigationController($scope, $modal, $http) {
         $scope.unmodifiedEmployee=null;
         $scope.employees=null;
         $scope.client=null;//The full client info for who we are looking at
-        $scope.selectedClient = null;//The name and id of the client we are looking at
+        $scope.selectedClient = null;//The name and id of the client we are looking at TODO check to see if this is still used
         $scope.unmodifiedClient=null;
         $scope.clients=null;
         $scope.customFields=null;
@@ -1157,6 +1159,8 @@ function MainNavigationController($scope, $modal, $http) {
 		 $scope.selectedEmployee=employee;
 	}
 	$scope.setSelectedEmployee = function(employee){
+		 $scope.lastShiftUpdate=null;
+		 $scope.lastShiftTableUpdate=null;
 		 $scope.selectedEmployee=employee;
 		 $scope.getEmployee();
 	}
@@ -1188,6 +1192,12 @@ function MainNavigationController($scope, $modal, $http) {
 		 $scope.lastClientUpdate = time;
 	}
 	$scope.setClient = function (client){
+		 $scope.lastRequestUpdate=null;
+		 $scope.lastShiftUpdate=null;
+		 $scope.lastShiftTableUpdate=null;
+		 console.log("Nulled $scope.lastShiftTableUpdate to:",$scope.lastShiftTableUpdate);
+		 $scope.lastRequestTableUpdate=null;
+
 		 $scope.client = client;
 	}
 	$scope.setSelectedClient = function(client){

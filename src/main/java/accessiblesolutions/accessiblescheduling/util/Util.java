@@ -28,29 +28,32 @@ public abstract class Util {
 	
 	public static LocalDateTime getLocalDateTimeFromString(String time) {
 		LocalDateTime dateTime = null;
-		String[] splitString = time.split("-");
-    	String year =splitString[0];
-    	if(splitString.length>2) {
-        	String month = splitString[1];
-        	splitString = splitString[2].split("T");
-        	String day = splitString[0];
-        	if(splitString.length>1) {
-            	splitString = splitString[1].split(":");
-            	if(splitString.length>2) {
-	            	String hour = splitString[0];
-	            	String minute = splitString[1];
-	            	String second = splitString[2].substring(0, 2);
-	            	String nanoSecond =splitString[2].substring(3);
-	            	dateTime = LocalDateTime.of(Integer.parseInt(year),
-	        				Integer.parseInt(month),
-	        				Integer.parseInt(day),
-	        				Integer.parseInt(hour),
-	        				Integer.parseInt(minute),
-	        				Integer.parseInt(second),
-	        				Integer.parseInt(nanoSecond)*1000000);
-            	}
-        	}
-    	}
+		
+		if(time!=null) {
+			String[] splitString = time.split("-");
+	    	String year =splitString[0];
+	    	if(splitString.length>2) {
+	        	String month = splitString[1];
+	        	splitString = splitString[2].split("T");
+	        	String day = splitString[0];
+	        	if(splitString.length>1) {
+	            	splitString = splitString[1].split(":");
+	            	if(splitString.length>2) {
+		            	String hour = splitString[0];
+		            	String minute = splitString[1];
+		            	String second = splitString[2].substring(0, 2);
+		            	String nanoSecond =splitString[2].substring(3);
+		            	dateTime = LocalDateTime.of(Integer.parseInt(year),
+		        				Integer.parseInt(month),
+		        				Integer.parseInt(day),
+		        				Integer.parseInt(hour),
+		        				Integer.parseInt(minute),
+		        				Integer.parseInt(second),
+		        				Integer.parseInt(nanoSecond)*1000000);
+	            	}
+	        	}
+	    	}
+		}
 		
 		return dateTime;
 	}

@@ -168,7 +168,7 @@ public class ScheduleController {
     	JSONObject jsonObject = new JSONObject(json);
     	System.out.println("called get allUpdates with jsonObject:"+jsonObject.toString());
     	JSONObject result = new JSONObject();
-    	
+	      ObjectMapper mapper = new ObjectMapper();
     	Iterator keys = jsonObject.keys();
 
     	while(keys.hasNext()) {
@@ -183,6 +183,7 @@ public class ScheduleController {
 			    Client client = null;
 			    LocalDateTime tableLastUpdated = null;
 			    LocalDateTime lastUpdated = null;
+			    LocalDateTime currentUpdateTime = null;
 	    	    String key = (String) keys.next();
 	    	    
 	    	    if (jsonObject.get(key) instanceof JSONObject) {
@@ -274,6 +275,7 @@ public class ScheduleController {
 						      break; 
 						   case Constants.SHIFTS :
 							  JSONObject shiftJson = new JSONObject();
+						      JSONArray shiftInfoJson = new JSONArray();
 							  Iterable<Shift> shifts = null;
 							  
 							  if(null!=employee) {
@@ -282,7 +284,21 @@ public class ScheduleController {
 							  else if(null!=client) {
 								  shifts = manager.getClientShiftsForWeek(id, month, day, year);
 							  }
-							  shiftJson.put("info", shifts);
+							  
+							  for(Shift shift : shifts) {
+						          if(null == currentUpdateTime || (shift.getLastUpdatedTime()!=null &&
+						        		  currentUpdateTime.isAfter(shift.getLastUpdatedTime()))) {
+						        	  currentUpdateTime=shift.getLastUpdatedTime();
+						          }
+						    	      
+						    	  shiftInfoJson.put(new JSONObject(mapper.writeValueAsString(shift)));
+						      }
+						    	    
+						      shiftJson.put("lastUpdated", currentUpdateTime);
+						    	    
+						      if(currentUpdateTime==null || lastUpdated == null ||currentUpdateTime.isAfter(lastUpdated)) {
+						      	    shiftJson.put("info", shiftInfoJson);
+						      }
 							  shiftJson.put("tableLastUpdated", updateInfo.getTime());
 
 							  result.put(Constants.SHIFTS,  shiftJson);
@@ -291,12 +307,12 @@ public class ScheduleController {
 							  JSONObject requestJson = new JSONObject();
 							    
 						      Iterable<ClientRequest> requests = requestRepository.findByClientId(id);
-						      ObjectMapper mapper = new ObjectMapper();
+
 						      JSONArray requestInfoJson = new JSONArray();
-						      LocalDateTime currentUpdateTime = null;
 						    	    
 						      for(ClientRequest selectedClientRequest : requests) {
-						          if(null == currentUpdateTime || selectedClientRequest.getLastUpdatedTime().isAfter(currentUpdateTime)) {
+						          if(null == currentUpdateTime || (selectedClientRequest.getLastUpdatedTime() !=null &&
+						        		  currentUpdateTime.isAfter(selectedClientRequest.getLastUpdatedTime()))) {
 						        	  currentUpdateTime=selectedClientRequest.getLastUpdatedTime();
 						          }
 						    	      
