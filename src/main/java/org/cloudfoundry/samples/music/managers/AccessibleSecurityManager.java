@@ -26,6 +26,9 @@ public class AccessibleSecurityManager {
 	@Autowired
 	private MongoAccessRequestRepository accessCrud;
 	
+	@Autowired
+    private UpdateInfoManager updateInfoManager;
+	
 	RestTemplate restTemplate = new RestTemplate();
     
     public AccessibleSecurityManager() {}
@@ -104,6 +107,7 @@ public class AccessibleSecurityManager {
     	if(null!=user) {
     		request = accessCrud.findOne(user.getUserId());
     		if(null==request) {
+    			updateInfoManager.set("alerts");
     			return accessCrud.insert(new AccessRequest(user.getUserId(),name));
     		}
     	};
@@ -145,6 +149,7 @@ public class AccessibleSecurityManager {
     	   	AccessRequest request = accessCrud.findOne(userId);
     	   	
     	   	if(request!=null) {
+    			updateInfoManager.set("alerts");
         		accessCrud.delete(request);    	   		
     	   	}
     	   	else {
@@ -157,13 +162,20 @@ public class AccessibleSecurityManager {
     
 	public String approve(String userId, String employeeId) {
     	if(null!=userId) {
-    	   	Employee employee = employeeCrud.findOne(employeeId);
-    	   	
-    	   	employee.setUserId(userId);
-    	   	employeeCrud.save(employee);
     	   	AccessRequest request = accessCrud.findOne(userId);
     	   	if(request!=null) {
-        		accessCrud.delete(request);    	   		
+        	   	Employee employee = employeeCrud.findOne(employeeId);
+        	   	if(employee!=null) {
+	        	   	employee.setUserId(userId);
+	    			updateInfoManager.set("employees");
+	        	   	employeeCrud.save(employee);
+	        	   	
+	    			updateInfoManager.set("alerts");
+	        		accessCrud.delete(request);    	   		
+        	   	}
+        	   	else {
+        	   		return "INVALID EMPLOYEE";
+        	   	}
     	   	}
     	   	else {
     	   		return "DELETED";

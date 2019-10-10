@@ -118,8 +118,7 @@ function MainNavigationController($scope, $modal, $http) {
 		}
 		
 		$scope.updateCycle=1;
-
-		$scope.autoUpdateData();
+		setTimeout($scope.autoUpdateData,15000);
 	 };
 	 
 	 $scope.getMinutesSinceLastInteraction = function(){
@@ -160,9 +159,7 @@ function MainNavigationController($scope, $modal, $http) {
 				 employeesInfo["tableLastUpdated"]=$scope.lastEmployeeTableUpdate;
 				 payload["employees"] = employeesInfo;
 				 
-				 //$scope.listShifts();//TODO Make this only update when new
-				 
-				 if($scope.page=="templates/page/employee.html" && $scope.employeeTab == "Schedule"){
+				 if($scope.page=="templates/page/employee.html" && $scope.employeeTab == "Schedule" && $scope.employee!=null){
 					 var shiftsInfo = {}; 
 					 shiftsInfo["tableLastUpdated"]=$scope.lastShiftTableUpdate;
 					 shiftsInfo["lastUpdated"]=$scope.lastShiftUpdate;
@@ -188,14 +185,13 @@ function MainNavigationController($scope, $modal, $http) {
 							 payload["requests"] = requestsInfo;
         				 }
         			 }
-//						 $scope.listRequests();//TODO Make this only update when new
 				 }
 			 }
 		 }else if($scope.page=="templates/page/alerts.html"){
 			 var alertsInfo = {}; 
 			 alertsInfo["tableLastUpdated"]=$scope.lastAlertTableUpdate;
 			 payload["alerts"] = alertsInfo;
-			 $scope.listAlerts();
+			 //$scope.listAlerts();
 		 }
 		 else if($scope.page=="templates/page/scheduler.html"){
 			 var statusInfo = {}; 
@@ -316,7 +312,7 @@ function MainNavigationController($scope, $modal, $http) {
 	    		if(data.status==404){
 	    			$scope.warn("Failed to update schedule data. If connection trouble persits contact your representative.");
 	    		}
-	    		else{
+	    		else if(!data.status==403){//Don't error on unauth, this is often the case after logging out
 	    			$scope.warn("Failed to update schedule data");
 	    		}
             });

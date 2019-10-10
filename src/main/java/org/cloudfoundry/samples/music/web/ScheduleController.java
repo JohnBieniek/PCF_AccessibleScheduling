@@ -41,6 +41,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import accessiblesolutions.accessiblescheduling.constants.Constants;
+import accessiblesolutions.accessiblescheduling.domain.AccessRequest;
 import accessiblesolutions.accessiblescheduling.domain.CallAuth;
 import accessiblesolutions.accessiblescheduling.domain.Client;
 import accessiblesolutions.accessiblescheduling.domain.ClientRequest;
@@ -319,16 +320,30 @@ public class ScheduleController {
 						    	  requestInfoJson.put(new JSONObject(mapper.writeValueAsString(selectedClientRequest)));
 						      }
 						    	    
-						      requestJson.put("lastUpdated", currentUpdateTime);
-						    	    
 						      if(currentUpdateTime==null || lastUpdated == null ||currentUpdateTime.isAfter(lastUpdated)) {
-						      	    requestJson.put("info", requestInfoJson);
+					      	      requestJson.put("info", requestInfoJson);
+							      requestJson.put("lastUpdated", currentUpdateTime);
+								  requestJson.put("tableLastUpdated", updateInfo.getTime());
 						      }
-							  requestJson.put("tableLastUpdated", updateInfo.getTime());
+
 							  result.put(Constants.REQUESTS,  requestJson);
 							  break; 
 						   case Constants.ALERTS :
-							  result.put(Constants.ALERTS, accessRequestRepository.findAll());
+							  JSONObject alertJson = new JSONObject();
+							    
+						      Iterable<AccessRequest> alerts = accessRequestRepository.findAll();
+
+						      JSONArray alertInfoJson = new JSONArray();
+						    	    
+						      for(AccessRequest alert:alerts) {
+						    	  alertInfoJson.put(new JSONObject(mapper.writeValueAsString(alert)));
+						      }
+						    	    
+				      	      alertJson.put("info", alertInfoJson);
+							  alertJson.put("tableLastUpdated", updateInfo.getTime());
+
+
+							  result.put(Constants.ALERTS, alertJson);
 							  break; 
 						   case Constants.CUSTOM_FIELDS :
 							  JSONObject customFieldsJson = new JSONObject();
@@ -344,12 +359,6 @@ public class ScheduleController {
 						   case Constants.CLIENT :
 							  result.put(Constants.CLIENT, client);
 							  result.put("customFieldData", customFieldDataRepository.findByOwnerId(id));
-							  break;
-						   case Constants.SHIFT :
-							  result.put(Constants.SHIFT, shiftRepository.findOne(id));
-							  break;
-						   case Constants.REQUEST :
-							  result.put(Constants.REQUEST, requestRepository.findOne(id));
 							  break;
 						   default : 
 						}
