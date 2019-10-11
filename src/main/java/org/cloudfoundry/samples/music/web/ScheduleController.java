@@ -719,10 +719,21 @@ public class ScheduleController {
 	    
 	    UpdateInfo updateInfo = updateInfoRepository.findOne(Constants.REQUESTS);
 
+    	if(updateInfo==null || updateInfo.getTime()==null) {
+    		updateInfoManager.set(Constants.REQUESTS);
+    		updateInfo = updateInfoRepository.findOne(Constants.REQUESTS);
+    	}
 	    	
-    	LocalDateTime tableLastUpdatedTime = Util.getLocalDateTimeFromString(tableLastUpdated);
-    	LocalDateTime lastUpdatedTime = Util.getLocalDateTimeFromString(lastUpdated);
-    	if(tableLastUpdated == null || updateInfo.getTime().isAfter(tableLastUpdatedTime)) {
+    	LocalDateTime tableLastUpdatedTime = null;
+    	LocalDateTime lastUpdatedTime = null;
+    	if(null!=tableLastUpdated && !"null".equalsIgnoreCase(tableLastUpdated)){
+    		tableLastUpdatedTime =Util.getLocalDateTimeFromString(tableLastUpdated);
+    	}
+    	if(null!=lastUpdated && !"null".equalsIgnoreCase(lastUpdated)){
+        	lastUpdatedTime = Util.getLocalDateTimeFromString(lastUpdated);
+    	}
+
+    	if(tableLastUpdated == null || lastUpdated==null || updateInfo.getTime().isAfter(tableLastUpdatedTime)) {
             Iterable<ClientRequest> requests = requestRepository.findByClientId(clientId);
     	    ObjectMapper mapper = new ObjectMapper();
     	    JSONArray requestInfoJson = new JSONArray();

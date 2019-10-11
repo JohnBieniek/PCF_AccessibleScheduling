@@ -763,8 +763,14 @@ function MainNavigationController($scope, $modal, $http) {
 	    	
 	    	if(null!=$scope.client){
 	    		id=$scope.client.id;
-
-	    	
+	    		var tableLastUpdated =$scope.lastRequestTableUpdate;
+	    		if(tableLastUpdated==null || tableLastUpdated==undefined){
+	    			tableLastUpdated="null";
+	    		}
+	    		var lastUpdated =$scope.client.lastUpdated;
+	    		if(lastUpdated==null || lastUpdated==undefined){
+	    			lastUpdated="null";
+	    		}
 		    	$http({
 		            url: '/schedule/clientsRequests',
 		            method: 'GET',
@@ -773,9 +779,9 @@ function MainNavigationController($scope, $modal, $http) {
 		                'Content-Type': 'application/x-www-form-urlencoded'
 		            },
 		            params: {
-		            	clientId:id,
-		            	tableLastUpdated:$scope.lastRequestTableUpdate,
-		            	lastUpdated:$scope.lastUpdated
+		            	clientId: id,
+		            	tableLastUpdated: tableLastUpdated,
+		            	lastUpdated:lastUpdated
 		            }
 		        })
 		        .then(function(response) {
