@@ -163,7 +163,6 @@ function MainNavigationController($scope, $modal, $http) {
 				 if($scope.page=="templates/page/employee.html" && $scope.employee!=null){
 					 if(!$scope.detailsChanged){
 						 var employeeInfo = {}; 
-						 employeeInfo["tableLastUpdated"]=$scope.lastEmployeeTableUpdate;
 						 employeeInfo["lastUpdated"]=$scope.employee.lastUpdated;
 						 employeeInfo["id"] = $scope.employee.id;
 						 payload["employee"] = employeeInfo;
@@ -180,11 +179,12 @@ function MainNavigationController($scope, $modal, $http) {
 				 }
 				 else if($scope.page=="templates/page/client.html"){
         			 if($scope.client!=null){
-        				 var clientInfo = {}; 
-    					 clientInfo["tableLastUpdated"]=$scope.lastEmployeeTableUpdate;
-    					 clientInfo["lastUpdated"]=$scope.client.lastUpdated;
-    					 clientInfo["id"] = $scope.client.id;
-    					 payload["client"] = clientInfo;
+    					 if(!$scope.detailsChanged){
+	        				 var clientInfo = {}; 
+	    					 clientInfo["lastUpdated"]=$scope.client.lastUpdated;
+	    					 clientInfo["id"] = $scope.client.id;
+	    					 payload["client"] = clientInfo;
+    					 }
     					 
         				 if($scope.tab == "Schedule"){
 							 var shiftsInfo = {}; 
@@ -208,7 +208,6 @@ function MainNavigationController($scope, $modal, $http) {
 			 var alertsInfo = {}; 
 			 alertsInfo["tableLastUpdated"]=$scope.lastAlertTableUpdate;
 			 payload["alerts"] = alertsInfo;
-			 //$scope.listAlerts();
 		 }
 		 else if($scope.page=="templates/page/scheduler.html"){
 			 var statusInfo = {}; 
@@ -289,6 +288,12 @@ function MainNavigationController($scope, $modal, $http) {
 	        			$scope.lastClientTableUpdate = response.data.clients.tableLastUpdated;
 	        		}
 	        		
+	        		//Don't update the client if the user has made changes as it's disruptive
+	        		if(response.data.client && !$scope.detailsChanged){
+	        			$scope.client = response.data.client;
+	        			$scope.customValue=response.data.customFieldData;
+	        		}
+	        		
 	        		if(response.data.employees){
 	        			$scope.employees = response.data.employees.names;
 	        			$scope.lastEmployeeTableUpdate = response.data.employees.tableLastUpdated;
@@ -297,16 +302,12 @@ function MainNavigationController($scope, $modal, $http) {
 	        		//Don't update the employee if the user has made changes as it's disruptive
 	        		if(response.data.employee && !$scope.detailsChanged){
 	        			$scope.employee = response.data.employee;
-	        			console.log("$scope.customValue",$scope.customValue);
 	        			$scope.customValue=response.data.customFieldData;
-	        			console.log("$scope.customValue",$scope.customValue);
 	        		}
 	        		
 	        		if(response.data.shifts){
 	        			if(response.data.shifts.info && response.data.shifts.info.length>0 && response.data.shifts.info !="[]"){
-	        				console.log("response.data.shifts.info.length",response.data.shifts.info.length);
 	        				$scope.shifts = response.data.shifts.info;
-	        				console.log("Updated shifts",$scope.shifts);
 	        			}
 	        			$scope.lastShiftTableUpdate = response.data.shifts.tableLastUpdated;
 	        		}
@@ -323,7 +324,6 @@ function MainNavigationController($scope, $modal, $http) {
 	        		
 	        		if(response.data.requests){
 	        			$scope.requests = response.data.requests.info;
-	        			console.log("got requests 1",$scope.requests);
 	        			for(var index = 0; index< $scope.requests.length;index++){
 	        				$scope.getDisplayValue($scope.requests[index]);
 	        			}
@@ -1231,6 +1231,7 @@ function MainNavigationController($scope, $modal, $http) {
 		 $scope.lastRequestTableUpdate=null;
 
 		 $scope.client = client;
+		 $scope.unmodifiedClient=client;
 	}
 	$scope.setSelectedClient = function(client){
 		 $scope.selectedClient=client;
@@ -1279,6 +1280,8 @@ function MainNavigationController($scope, $modal, $http) {
 		var newPage = "templates/page/" + viewName + ".html"
 		
 		if(newPage!=$scope.page){
+			$scope.detailsChanged=false;
+			
 	        $scope.shifts=null;//Clear to ease visual transition
 	        $scope.requests=null;//Clear to ease visual transition
 	        

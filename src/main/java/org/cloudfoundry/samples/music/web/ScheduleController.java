@@ -217,6 +217,21 @@ public class ScheduleController {
 					    
 					    if(null==employee) {
 					    	client = clientRepository.findOne(id);
+					    	if(client.getLastUpdated()==null || lastUpdated == null ||client.lastUpdatedTime().isAfter(lastUpdated)) {
+						    	result.put(Constants.CLIENT, new JSONObject(mapper.writeValueAsString(client)));
+						    	
+								JSONArray clientCustomDataJson = new JSONArray();							    
+							    Iterable<CustomFieldData> clientData = customFieldDataRepository.findByOwnerId(id);
+							    Iterable<CustomField> fields = customFieldRepository.findAll();
+							    for(CustomField clientField: fields) {
+							    	for(CustomFieldData clientsData:clientData) {
+							    		if(clientsData.getCustomFieldId().equalsIgnoreCase(clientField.getId())) {
+							    			clientCustomDataJson.put(clientsData.getBooleanData());
+							    		}
+							    	}
+							    }
+							  	result.put("customFieldData", clientCustomDataJson);
+						    }
 					    }
 					    else if(employee.getLastUpdated()==null || lastUpdated == null ||employee.getLastUpdatedTime().isAfter(lastUpdated)) {
 					    	result.put(Constants.EMPLOYEE, new JSONObject(mapper.writeValueAsString(employee)));
@@ -369,11 +384,6 @@ public class ScheduleController {
 
 							  result.put(Constants.CUSTOM_FIELDS, customFieldsJson);
 						      break; 
-						   case Constants.CLIENT :
-							  result.put(Constants.CLIENT, client);
-							  result.put("customFieldData", customFieldDataRepository.findByOwnerId(id));
-							  break;
-						   default : 
 						}
 				    }
 	    	    }

@@ -13,6 +13,8 @@ import org.hibernate.annotations.GenericGenerator;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import accessiblesolutions.accessiblescheduling.util.Util;
 @Entity
 @JsonIgnoreProperties
 public class Client implements Comparable<Client>{
@@ -47,8 +49,13 @@ public class Client implements Comparable<Client>{
         this.first = first;
         this.initial = initial;
     }
+	
 	@JsonIgnore
-	public JSONObject getNameInfo() throws JSONException {
+	public LocalDateTime lastUpdatedTime() {
+		return Util.getLocalDateTimeFromString(getLastUpdated());
+	}
+	@JsonIgnore
+	public JSONObject nameInfo() throws JSONException {
 		JSONObject json = new JSONObject();
 		
 		if(name!=null && name!="") {

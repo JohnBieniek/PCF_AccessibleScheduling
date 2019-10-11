@@ -41,8 +41,8 @@ function MobileClientController($scope, $modal, $http) {
 	 * Interaction notification is done in setClient
 	 */
 	$scope.setClientAndInfo = function(newClient){
-	  $scope.detailsChanged=false;
-      $scope.setClient(newClient);
+	  $scope.setDetailsChanged(false);
+      $scope.setSelectedClient(newClient);
       $scope.getAllClientCustomFieldData();//Done now for visual crispness
       
 	  if($scope.tab=="Requests"){		 
@@ -66,7 +66,7 @@ function MobileClientController($scope, $modal, $http) {
 	 */
 	$scope.setDetailsToChanged = function(){
 	  $scope.updateLastInteractionTime();
-      $scope.detailsChanged=true;;
+      $scope.setDetailsChanged(true);
 	}
 	
     /**
@@ -150,12 +150,10 @@ function MobileClientController($scope, $modal, $http) {
 		 }
 	 }
 	 
-    
-
-		/**
-		 * Enters or updates the provided shift in the database.
-		 * Requires a unique version per page due to the differences in how shifts are listed afterward.
-		 */
+	/**
+	 * Enters or updates the provided shift in the database.
+	 * Requires a unique version per page due to the differences in how shifts are listed afterward.
+	 */
     function saveShift(shift) {
     	$http({
             url: '/shifts',
@@ -512,7 +510,7 @@ function MobileClientController($scope, $modal, $http) {
     	$scope.updateLastInteractionTime();
     	var originalClient = $scope.clone($scope.unmodifiedClient);
     	var modifiedClient = $scope.clone($scope.client);
-    	var lastUpdated = originalClient.lastUpdated;
+    	var lastUpdated = modifiedClient.lastUpdated;
     	if(null==lastUpdated || undefined == lastUpdated){
     		lastUpdated="null";
     	}
@@ -532,7 +530,7 @@ function MobileClientController($scope, $modal, $http) {
 	        .then(function(response) {
 	        	var updateData=false;
     	    	if(response.data=="UPDATED"){
-    	    		   if(confirm(modifiedClient.first+" has just been modified by another user. Saving your changes will overwrite thier updates. Would you " +
+    	    		   if(confirm(modifiedClient.name+" has just been modified by another user. Saving your changes will overwrite thier updates. Would you " +
     	    		   				"still like to save your changes?")){
     	    			   updateData=true;
     	    			   $scope.updateLastInteractionTime();
@@ -546,7 +544,7 @@ function MobileClientController($scope, $modal, $http) {
     	    	}
     	    	
     	    	if(updateData){
-    		  		$scope.detailsChanged=false;
+    		  		$scope.setDetailsChanged(false);
     		  		
     		        var size = $scope.customFields.length;
     		        for(var i = 0; i < size ;i++){
@@ -580,7 +578,7 @@ function MobileClientController($scope, $modal, $http) {
     		        	if(response.data){
     		                $scope.notify("Client saved");
     		                
-    		            	$scope.detailsChanged=false;
+    		            	$scope.setDetailsChanged(false);//TODO try removing
     		            	$scope.updateClient();
     		            	$scope.getAllClientCustomFieldData();
     		        	}
@@ -589,7 +587,11 @@ function MobileClientController($scope, $modal, $http) {
     		        	}
     		        });
     	    	}
-	        });
+	        })
+	        .catch(function(data, status) {
+            	console.error('Error', data,status);
+        		$scope.warn("Failed to save client info.")
+    		});
     	}
     }
     
@@ -671,6 +673,7 @@ function MobileClientController($scope, $modal, $http) {
                 $scope.notify("Client deleted.");
         		$scope.clients =response.data;
         		$scope.client =response.data[0];
+            	$scope.setDetailsChanged(false);
         		$scope.tab="Schedule";
         	}
         	else{
@@ -680,6 +683,9 @@ function MobileClientController($scope, $modal, $http) {
  	   }
     }
     
+    /**
+     * Updates the local copy of client to the server version
+     */
     $scope.updateClient = function () {
         $http({
             url: '/clients/'+$scope.client.id,
@@ -694,13 +700,14 @@ function MobileClientController($scope, $modal, $http) {
         .then(function(response) {
         	if(response.data){
         		$scope.setClient(response.data);
+            	$scope.setDetailsChanged(false);
         	}
         });
     }
     
     $scope.cancel = function () {
     	$scope.updateLastInteractionTime();
-    	$scope.detailsChanged=false;
+    	$scope.setDetailsChanged(false);
     	$scope.updateClient();
     	$scope.getAllClientCustomFieldData();
     }
