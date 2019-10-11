@@ -72,6 +72,7 @@ public class EmployeeController {
     	securityManager.authorize(idToken, Constants.MANAGER);
     	logger.info("Adding employee " + employee.getId());
         updateInfoManager.set("employees");
+        employee.setLastUpdatedToNow();
         return repository.save(employee);
     }
 
@@ -94,6 +95,7 @@ public class EmployeeController {
 		}
     	logger.info(employee.toString());
     	employee.sortCallOffs();
+        employee.setLastUpdatedToNow();
     	updateInfoManager.set("employees");
         return repository.save(employee);
     }

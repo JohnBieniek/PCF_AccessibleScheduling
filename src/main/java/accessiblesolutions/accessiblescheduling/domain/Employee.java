@@ -38,6 +38,7 @@ public class Employee implements Comparable<Employee>{
 	
 	private boolean admin;
 	
+	@JsonIgnore
     public String compatibile;// For proccessing only, needs refactored out
     
 	private String[] days;
@@ -117,7 +118,12 @@ public class Employee implements Comparable<Employee>{
 	}
 	
 	@JsonIgnore
-	public JSONObject getNameInfo() throws JSONException {
+	public LocalDateTime getLastUpdatedTime() {
+		return Util.getLocalDateTimeFromString(getLastUpdated());
+	}
+	
+	@JsonIgnore
+	public JSONObject nameInfo() throws JSONException {
 		JSONObject json = new JSONObject();
 		
 		if(name!=null && name!="") {

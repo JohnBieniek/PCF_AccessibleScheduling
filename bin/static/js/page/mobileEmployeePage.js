@@ -82,7 +82,7 @@ function MobileEmployeeController($scope, $modal, $http) {
 	$scope.noAvailabilityDay= function(availability,day){
 		var unavailable =true;
 		
-		if($scope.emplyoee && $scope.employee.days){
+		if($scope.employee && $scope.employee.days){
 			$scope.employee.days.forEach(function(selectedDay) {
 			  if(selectedDay==day){
 			    unavailable=false;
@@ -118,7 +118,7 @@ function MobileEmployeeController($scope, $modal, $http) {
 	 * Changes which employee we are looking at
 	 */
 	$scope.setEmployeeAndInfo = function(newEmployee){		
-	  $scope.detailsChanged=false;
+	  $scope.setDetailsChanged(false);
 	  
 	  if(newEmployee.role==null){
 		  newEmployee.role="user";
@@ -138,7 +138,7 @@ function MobileEmployeeController($scope, $modal, $http) {
 	 */
 	$scope.setDetailsToChanged = function(){
 	  $scope.updateLastInteractionTime();
-      $scope.detailsChanged=true;;
+	  $scope.setDetailsChanged(true);
 	}
 	
      
@@ -593,7 +593,7 @@ function MobileEmployeeController($scope, $modal, $http) {
     	    	}
     	    	
     	    	if(updateData){
-    		  		$scope.detailsChanged=false;
+    	    		  $scope.setDetailsChanged(false);
     	
 			    	if($scope.customFields && $scope.customFields.length>0){
 				        var size = $scope.customFields.length;
@@ -629,7 +629,7 @@ function MobileEmployeeController($scope, $modal, $http) {
 			        	if(response.data){
 			        		$scope.notify("Employee saved");
     		                
-    		            	$scope.detailsChanged=false;
+			        		  $scope.setDetailsChanged(false);
     		            	$scope.updateEmployee();
     		            	$scope.getAllEmployeeCustomFieldData();
 			        	}
@@ -704,7 +704,7 @@ function MobileEmployeeController($scope, $modal, $http) {
             }
         })
         .then(function(response) {
-        	$scope.detailsChanged=false;
+      	    $scope.setDetailsChanged(false);
         	if(response.data){
         		$scope.setEmployeeAndInfo(response.data);
         	}

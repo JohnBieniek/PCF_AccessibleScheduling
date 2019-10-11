@@ -163,8 +163,10 @@ public class AccessibleSecurityManager {
 	public String approve(String userId, String employeeId) {
     	if(null!=userId) {
     	   	AccessRequest request = accessCrud.findOne(userId);
+    	   	
     	   	if(request!=null) {
         	   	Employee employee = employeeCrud.findOne(employeeId);
+        	   	
         	   	if(employee!=null) {
 	        	   	employee.setUserId(userId);
 	    			updateInfoManager.set("employees");

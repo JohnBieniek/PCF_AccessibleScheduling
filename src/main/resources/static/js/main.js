@@ -29,6 +29,7 @@ function MainNavigationController($scope, $modal, $http) {
 		$scope.employeeTab="Schedule";
         $scope.showToast=false;
         $scope.alertMessage="";
+        $scope.detailsChanged=false;//Used to toggle on/off ok&cancel buttons
         
         //Security data set on login
         $scope.profile = null;
@@ -159,16 +160,32 @@ function MainNavigationController($scope, $modal, $http) {
 				 employeesInfo["tableLastUpdated"]=$scope.lastEmployeeTableUpdate;
 				 payload["employees"] = employeesInfo;
 				 
-				 if($scope.page=="templates/page/employee.html" && $scope.employeeTab == "Schedule" && $scope.employee!=null){
-					 var shiftsInfo = {}; 
-					 shiftsInfo["tableLastUpdated"]=$scope.lastShiftTableUpdate;
-					 shiftsInfo["lastUpdated"]=$scope.lastShiftUpdate;
-					 shiftsInfo["date"]=$scope.getDateString($scope.week);
-					 shiftsInfo["id"] = $scope.employee.id;
-					 payload["shifts"] = shiftsInfo;
+				 if($scope.page=="templates/page/employee.html" && $scope.employee!=null){
+					 if(!$scope.detailsChanged){
+						 var employeeInfo = {}; 
+						 employeeInfo["tableLastUpdated"]=$scope.lastEmployeeTableUpdate;
+						 employeeInfo["lastUpdated"]=$scope.employee.lastUpdated;
+						 employeeInfo["id"] = $scope.employee.id;
+						 payload["employee"] = employeeInfo;
+					 }
+					 
+					 if($scope.employeeTab == "Schedule"){
+						 var shiftsInfo = {}; 
+						 shiftsInfo["tableLastUpdated"]=$scope.lastShiftTableUpdate;
+						 shiftsInfo["lastUpdated"]=$scope.lastShiftUpdate;
+						 shiftsInfo["date"]=$scope.getDateString($scope.week);
+						 shiftsInfo["id"] = $scope.employee.id;
+						 payload["shifts"] = shiftsInfo;
+					 }
 				 }
 				 else if($scope.page=="templates/page/client.html"){
         			 if($scope.client!=null){
+        				 var clientInfo = {}; 
+    					 clientInfo["tableLastUpdated"]=$scope.lastEmployeeTableUpdate;
+    					 clientInfo["lastUpdated"]=$scope.client.lastUpdated;
+    					 clientInfo["id"] = $scope.client.id;
+    					 payload["client"] = clientInfo;
+    					 
         				 if($scope.tab == "Schedule"){
 							 var shiftsInfo = {}; 
 							 shiftsInfo["tableLastUpdated"]=$scope.lastShiftTableUpdate;
@@ -275,6 +292,14 @@ function MainNavigationController($scope, $modal, $http) {
 	        		if(response.data.employees){
 	        			$scope.employees = response.data.employees.names;
 	        			$scope.lastEmployeeTableUpdate = response.data.employees.tableLastUpdated;
+	        		}
+	        		
+	        		//Don't update the employee if the user has made changes as it's disruptive
+	        		if(response.data.employee && !$scope.detailsChanged){
+	        			$scope.employee = response.data.employee;
+	        			console.log("$scope.customValue",$scope.customValue);
+	        			$scope.customValue=response.data.customFieldData;
+	        			console.log("$scope.customValue",$scope.customValue);
 	        		}
 	        		
 	        		if(response.data.shifts){
@@ -469,6 +494,10 @@ function MainNavigationController($scope, $modal, $http) {
 		 }
 	 }
 	 
+	 /**
+	  * Updates $scope.scheduled with the most recent number of assigned shifts for this month
+	  * Updates $scope.total using the existing $scope.unscheduled number
+	  */
 	 $scope.getScheduled = function getScheduled(month){
     	if(month!=null && month!=undefined){
 			$scope.shiftsForMonth=month;
@@ -490,6 +519,10 @@ function MainNavigationController($scope, $modal, $http) {
     	}
      }
     
+	 /**
+	  * Updates $scope.unscheduled with the most recent number of unassigned shifts for this month
+	  * Updates $scope.total using the existing $scope.scheduled number
+	  */
      $scope.getUnscheduled = function getUnscheduled(month){
     	if(month!=null && month!=undefined){
 			$scope.shiftsForMonth=month;
@@ -1172,6 +1205,9 @@ function MainNavigationController($scope, $modal, $http) {
 	$scope.setWeek = function (isWeek) {
        $scope.week = isWeek;
     };
+    $scope.setDetailsChanged = function setDetailsChanged(detailsChanged){
+		 $scope.detailsChanged=detailsChanged;
+	}
 	$scope.setShifts = function setShifts(shifts){
 		 $scope.shifts=shifts;
 	}

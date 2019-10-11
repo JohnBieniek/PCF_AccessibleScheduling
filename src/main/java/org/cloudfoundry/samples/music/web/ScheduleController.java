@@ -45,6 +45,7 @@ import accessiblesolutions.accessiblescheduling.domain.AccessRequest;
 import accessiblesolutions.accessiblescheduling.domain.CallAuth;
 import accessiblesolutions.accessiblescheduling.domain.Client;
 import accessiblesolutions.accessiblescheduling.domain.ClientRequest;
+import accessiblesolutions.accessiblescheduling.domain.CustomField;
 import accessiblesolutions.accessiblescheduling.domain.CustomFieldData;
 import accessiblesolutions.accessiblescheduling.domain.Employee;
 import accessiblesolutions.accessiblescheduling.domain.ScheduleStatus;
@@ -203,11 +204,6 @@ public class ScheduleController {
 				    
 				    if(updateRequest.has("id")) {
 				    	id=updateRequest.getString("id");
-				    	
-					    employee =employeeRepository.findOne(id);
-					    if(null==employee) {
-					    	client = clientRepository.findOne(id);
-					    }
 					    
 					    if(updateRequest.has("lastUpdated")){
 					    	String updateString = updateRequest.getString("lastUpdated");
@@ -216,8 +212,30 @@ public class ScheduleController {
 						    	lastUpdated = Util.getLocalDateTimeFromString(updateString);
 						    }
 					    }
+					    
+					    employee =employeeRepository.findOne(id);
+					    
+					    if(null==employee) {
+					    	client = clientRepository.findOne(id);
+					    }
+					    else if(employee.getLastUpdated()==null || lastUpdated == null ||employee.getLastUpdatedTime().isAfter(lastUpdated)) {
+					    	result.put(Constants.EMPLOYEE, new JSONObject(mapper.writeValueAsString(employee)));
+					    	
+							JSONArray employeeCustomDataJson = new JSONArray();							    
+						    Iterable<CustomFieldData> employeeData = customFieldDataRepository.findByOwnerId(id);
+						    Iterable<CustomField> fields = customFieldRepository.findAll();
+						    for(CustomField field: fields) {
+						    	for(CustomFieldData data:employeeData) {
+						    		if(data.getCustomFieldId().equalsIgnoreCase(field.getId())) {
+						    			employeeCustomDataJson.put(data.getBooleanData());
+						    		}
+						    	}
+						    }
+						  	result.put("customFieldData", employeeCustomDataJson);
+					    }
 				    }
 				    
+				    //Certain data is range based. Shifts currently need to know when they are for to get a managable result
 				    if(updateRequest.has("date")) {
 				    	date = updateRequest.getString("date");
 				    	String[] splitDate = date.split("-");
@@ -235,7 +253,6 @@ public class ScheduleController {
 				    if(null!=tableLastUpdated)System.out.println("tableLastUpdated"+tableLastUpdated.toString());
 				    if(null!=updateInfo)System.out.println("updateInfo:"+updateInfo.toString());
 				    if(tableLastUpdated == null || updateInfo.getTime().isAfter(tableLastUpdated)) {
-				    	
 						switch(key)
 						{
 						   case Constants.EMPLOYEES :
@@ -352,10 +369,6 @@ public class ScheduleController {
 
 							  result.put(Constants.CUSTOM_FIELDS, customFieldsJson);
 						      break; 
-						   case Constants.EMPLOYEE :
-							  result.put(Constants.EMPLOYEE, employee);
-							  result.put("customFieldData", customFieldDataRepository.findByOwnerId(id));
-							  break;
 						   case Constants.CLIENT :
 							  result.put(Constants.CLIENT, client);
 							  result.put("customFieldData", customFieldDataRepository.findByOwnerId(id));
