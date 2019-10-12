@@ -140,9 +140,26 @@ function MainNavigationController($scope, $modal, $http) {
 		 }
 	 }
 	 
+	 
 	 $scope.getDateString = function getDateString(date){
 		return  date.getFullYear() +"-" +(date.getMonth()+1)+"-"+date.getDate();
 	 }
+	 
+	 $scope.getEmployeeUpdatePayload = function (){
+		 var employeeInfo = {}; 
+		 
+		 if($scope.selectedEmployee.id!=$scope.employee.id){
+			 employeeInfo["lastUpdated"]=null;
+			 employeeInfo["id"] = $scope.selectedEmployee.id;
+		 }
+		 else{
+			 employeeInfo["lastUpdated"]=$scope.employee.lastUpdated;
+			 employeeInfo["id"] = $scope.employee.id;	        					 
+		 }
+		 
+		 return employeeInfo;
+	 }
+	 
 	 
 	 $scope.updateData = function updateData(){
 		 var payload = {};
@@ -162,10 +179,7 @@ function MainNavigationController($scope, $modal, $http) {
 				 
 				 if($scope.page=="templates/page/employee.html" && $scope.employee!=null){
 					 if(!$scope.detailsChanged){
-						 var employeeInfo = {}; 
-						 employeeInfo["lastUpdated"]=$scope.employee.lastUpdated;
-						 employeeInfo["id"] = $scope.employee.id;
-						 payload["employee"] = employeeInfo;
+						 payload["employee"] = $scope.getEmployeeUpdatePayload();
 					 }
 					 
 					 if($scope.employeeTab == "Schedule"){
@@ -173,16 +187,24 @@ function MainNavigationController($scope, $modal, $http) {
 						 shiftsInfo["tableLastUpdated"]=$scope.lastShiftTableUpdate;
 						 shiftsInfo["lastUpdated"]=$scope.lastShiftUpdate;
 						 shiftsInfo["date"]=$scope.getDateString($scope.week);
-						 shiftsInfo["id"] = $scope.employee.id;
+						 shiftsInfo["id"] = $scope.selectedEmployee.id;
 						 payload["shifts"] = shiftsInfo;
 					 }
 				 }
 				 else if($scope.page=="templates/page/client.html"){
         			 if($scope.client!=null){
     					 if(!$scope.detailsChanged){
-	        				 var clientInfo = {}; 
-	    					 clientInfo["lastUpdated"]=$scope.client.lastUpdated;
-	    					 clientInfo["id"] = $scope.client.id;
+	        				 var clientInfo = {};
+	        				 
+	        				 if($scope.selectedClient.id!=$scope.client.id){
+		    					 clientInfo["lastUpdated"]=null;
+		    					 clientInfo["id"] = $scope.selectedClient.id;
+	        				 }
+	        				 else{
+		    					 clientInfo["lastUpdated"]=$scope.client.lastUpdated;
+		    					 clientInfo["id"] = $scope.client.id;	        					 
+	        				 }
+
 	    					 payload["client"] = clientInfo;
     					 }
     					 
@@ -191,14 +213,14 @@ function MainNavigationController($scope, $modal, $http) {
 							 shiftsInfo["tableLastUpdated"]=$scope.lastShiftTableUpdate;
 							 shiftsInfo["lastUpdated"]=$scope.lastShiftUpdate;
 							 shiftsInfo["date"]=$scope.getDateString($scope.week);
-							 shiftsInfo["id"] = $scope.client.id;
+							 shiftsInfo["id"] = $scope.selectedClient.id;
 							 payload["shifts"] = shiftsInfo;
         				 }
         				 else if($scope.tab=="Requests"){
 							 var requestsInfo = {}; 
 							 requestsInfo["tableLastUpdated"]=$scope.lastRequestTableUpdate;
 							 requestsInfo["lastUpdated"]=$scope.lastRequestUpdate;
-							 requestsInfo["id"] = $scope.client.id;
+							 requestsInfo["id"] = $scope.selectedClient.id;
 							 payload["requests"] = requestsInfo;
         				 }
         			 }
@@ -214,7 +236,7 @@ function MainNavigationController($scope, $modal, $http) {
 			 statusInfo["tableLastUpdated"]=$scope.lastStatusTableUpdate;
 			 payload["status"] = statusInfo;
 
-			 $scope.listStatusItems();
+			// $scope.listStatusItems();
 		 }
 
 		 $scope.incrementCycle();
@@ -256,6 +278,27 @@ function MainNavigationController($scope, $modal, $http) {
 	 }
 	 
 	 //API Access
+	$scope.setEmployeeToUser = function(){
+		$http({
+            url: '/employees/'+$scope.profile.employeeId,
+            method: 'GET',
+            headers: {
+                'Authorization': $scope.idToken,
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            params: {
+            }
+        })
+        .then(function(response) {
+        	if(typeof $scope.employee !== 'undefined' && $scope.employee!=null && $scope.employee.role==null){
+  			  response.data.role="user";
+  		  	}
+
+        	$scope.setEmployee(response.data);
+        	$scope.setSelectedEmployeeWithoutGetEmployee(response.data);
+        	$scope.updateData();
+        });
+	}
 	 /**
 	  * Takes in a payload of all updates that are needed and when that area last got its data
 	  * Calls the allUpdates endpoint on the server to get all shifts, clients, etc that have changed.
@@ -282,10 +325,12 @@ function MainNavigationController($scope, $modal, $http) {
 
 	        		if(response.data.clients){
 	        			$scope.clients = response.data.clients.names;
-	        			if($scope.selectedClient==null){
-	        				$scope.selectedClient = $scope.clients[0];
-	        			}
 	        			$scope.lastClientTableUpdate = response.data.clients.tableLastUpdated;
+	        			
+	        			if($scope.selectedClient==null){//On the first call set our initial selected Client to the first 
+	        				$scope.selectedClient=$scope.clients[0];
+	        				$scope.getClient($scope.selectedClient.id);
+	        			}
 	        		}
 	        		
 	        		//Don't update the client if the user has made changes as it's disruptive
@@ -306,9 +351,7 @@ function MainNavigationController($scope, $modal, $http) {
 	        		}
 	        		
 	        		if(response.data.shifts){
-	        			if(response.data.shifts.info && response.data.shifts.info.length>0 && response.data.shifts.info !="[]"){
-	        				$scope.shifts = response.data.shifts.info;
-	        			}
+        				$scope.shifts = response.data.shifts.info;
 	        			$scope.lastShiftTableUpdate = response.data.shifts.tableLastUpdated;
 	        		}
 	        		
@@ -475,7 +518,7 @@ function MainNavigationController($scope, $modal, $http) {
 	        	if(response.data){
 	        		console.log("got client names with selected client:",$scope.selectedClient);
         			$scope.clients = response.data;
-        			if($scope.selectedClient==null ){
+        			if($scope.client==null ){
 	        			$scope.selectedClient = $scope.clients[0];
 		        		console.log("updated selected client to the first of the clients returned:",$scope.selectedClient);
 		        		$scope.getClient($scope.selectedClient.id);
@@ -761,13 +804,13 @@ function MainNavigationController($scope, $modal, $http) {
     	if($scope.manager || $scope.admin){
 	    	let id = "-1";
 	    	
-	    	if(null!=$scope.client){
-	    		id=$scope.client.id;
+	    	if(null!=$scope.selectedClient){
+	    		id=$scope.selectedClient.id;
 	    		var tableLastUpdated =$scope.lastRequestTableUpdate;
 	    		if(tableLastUpdated==null || tableLastUpdated==undefined){
 	    			tableLastUpdated="null";
 	    		}
-	    		var lastUpdated =$scope.client.lastUpdated;
+	    		var lastUpdated =$scope.lastRequestUpdate;
 	    		if(lastUpdated==null || lastUpdated==undefined){
 	    			lastUpdated="null";
 	    		}
@@ -787,9 +830,11 @@ function MainNavigationController($scope, $modal, $http) {
 		        .then(function(response) {
 		        	if(response.data){
 			    		$scope.requests = response.data.info;
-	        			for(var index = 0; index< $scope.requests.length;index++){
-	        				$scope.getDisplayValue($scope.requests[index]);
-	        			}
+			    		if(response.data.info){
+		        			for(var index = 0; index< $scope.requests.length;index++){
+		        				$scope.getDisplayValue($scope.requests[index]);
+		        			}
+			    		}
 	        			console.log("got requests",$scope.requests);
 	        			$scope.lastRequestTableUpdate = response.data.tableLastUpdated;
 	        			$scope.lastRequestUpdate = response.data.lastUpdated;
@@ -1197,7 +1242,6 @@ function MainNavigationController($scope, $modal, $http) {
 		 $scope.lastShiftUpdate=null;
 		 $scope.lastShiftTableUpdate=null;
 		 $scope.selectedEmployee=employee;
-		 $scope.getEmployee();
 	}
 	$scope.setEmployees = function(employees){
 		 $scope.employees=employees;
@@ -1230,18 +1274,18 @@ function MainNavigationController($scope, $modal, $http) {
 		 $scope.lastClientUpdate = time;
 	}
 	$scope.setClient = function (client){
-		 $scope.lastRequestUpdate=null;
-		 $scope.lastShiftUpdate=null;
-		 $scope.lastShiftTableUpdate=null;
-		 console.log("Nulled $scope.lastShiftTableUpdate to:",$scope.lastShiftTableUpdate);
-		 $scope.lastRequestTableUpdate=null;
-
 		 $scope.client = client;
 		 $scope.unmodifiedClient=client;
 	}
 	$scope.setSelectedClient = function(client){
 		 $scope.selectedClient=client;
-		 $scope.getClient(client.id);
+		 $scope.lastRequestUpdate=null;
+		 $scope.lastShiftUpdate=null;
+		 $scope.lastShiftTableUpdate=null;
+		 $scope.lastRequestTableUpdate=null;
+//		 $scope.requests=null;//Clear to ease visual transition
+//		 $scope.shifts=null;//Clear to ease visual transition
+		 //$scope.getClient(client.id);//Re-enable if no longer using only allUpdates
 	}
 	$scope.setClients = function (clients){
 		 $scope.clients = clients;

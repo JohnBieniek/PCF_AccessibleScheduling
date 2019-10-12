@@ -23,21 +23,22 @@ angular.module('client', ['ngResource', 'ui.bootstrap']).
 
 function MobileEmployeeController($scope, $modal, $http) {
 	$scope.init = function(){
+		//The date in the selection box for calling off
 		 $scope.newDate=$scope.week.getFullYear()+"-"+(($scope.week.getMonth()+1)<10?"0"+($scope.week.getMonth()+1):($scope.week.getMonth()+1))+"-"+$scope.week.getDate();
 		 
-		 if($scope.manager){
-	    	 $scope.getClientNames();
-		 }
+//		 if($scope.manager){
+//	    	 $scope.getClientNames();
+//		 }
+//		 
+//		 $scope.listCustomFields();
 		 
-		 $scope.listCustomFields();
-		 
-		 if($scope.selectedEmployee==undefined || $scope.selectedEmployee == null){
-            $scope.setEmployeeToUser();
-		 }
+//		 if($scope.selectedEmployee==undefined || $scope.selectedEmployee == null){
+//            $scope.setEmployeeToUser();
+//		 }
 
 		 $scope.getDisplayWeek();
 
-		 $scope.listShifts();
+//		 $scope.listShifts();
 	}
 	
 	/**
@@ -45,10 +46,11 @@ function MobileEmployeeController($scope, $modal, $http) {
 	 * function
 	 */
 	$scope.setEmployeeTabAndInfo=function(tab){
-		$scope.updateEmployee();
-		$scope.getAllEmployeeCustomFieldData();
-	    $scope.listShifts();
+//		$scope.updateEmployee();
+//		$scope.getAllEmployeeCustomFieldData();
+//	    $scope.listShifts();
 		$scope.setEmployeeTab(tab);
+		$scope.updateData();
 	}
 	
 	//TODO validate these are up to date first
@@ -93,27 +95,6 @@ function MobileEmployeeController($scope, $modal, $http) {
 		return unavailable;
 	}
 	
-	$scope.setEmployeeToUser = function(){
-		$http({
-            url: '/employees/'+$scope.profile.employeeId,
-            method: 'GET',
-            headers: {
-                'Authorization': $scope.idToken,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            params: {
-            }
-        })
-        .then(function(response) {
-        	if(typeof $scope.employee !== 'undefined' && $scope.employee!=null && $scope.employee.role==null){
-  			  response.data.role="user";
-  		  	}
-
-        	$scope.setEmployee(response.data);
-        	$scope.setSelectedEmployeeWithoutGetEmployee(response.data);
-        });
-	}
-	
 	/**
 	 * Changes which employee we are looking at
 	 */
@@ -124,8 +105,10 @@ function MobileEmployeeController($scope, $modal, $http) {
 		  newEmployee.role="user";
 	  }
       $scope.setSelectedEmployee(newEmployee);
-      $scope.getAllEmployeeCustomFieldData();
-      $scope.listShifts();
+      $scope.updateData();
+//      $scope.getEmployee();
+//      $scope.getAllEmployeeCustomFieldData();
+//      $scope.listShifts();
 	}
 	 
 	$scope.setInterval = function(newInterval){

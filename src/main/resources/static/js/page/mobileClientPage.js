@@ -23,36 +23,52 @@ angular.module('client', ['ngResource', 'ui.bootstrap']).
 
 function MobileClientController($scope, $modal, $http) {
 	/**
-	 * Changes what client info we are looking at and gets all info for that new client
+	 * Changes what client info we are looking at , does not change the client
 	 * Interaction notification is done in setTab
 	 */
 	$scope.setTabAndInfo = function(newTab){
-        $scope.setTab(newTab);
-        $scope.updateClient();
-        $scope.getAllClientCustomFieldData();
-        $scope.listRequests();
-        
-        $scope.listShifts();
-
-        $scope.listClients();//Consider removing and all auto update to do this
+		if($scope.tab!=newTab){
+	        $scope.setTab(newTab);
+	  	    
+	        $scope.setDetailsChanged(false);
+	        
+	        $scope.updateData();
+//	        
+//	        $scope.updateClient();//Currently we always check for all data needed when entering a screen
+//	        $scope.getAllClientCustomFieldData();//Updated now for visual crispness
+//	        
+//	        if(newTab=="Requests"){
+//		        $scope.listRequests();	        	
+//	        }
+//	        else if (newTab=="Schedule"){
+//		        $scope.listShifts();	        	
+//	        }
+//
+//	        $scope.listClients();//Currently we always check for all data needed when entering a screen
+		}
 	}
 	
 	/**
 	 * Interaction notification is done in setClient
 	 */
 	$scope.setClientAndInfo = function(newClient){
-	  $scope.setDetailsChanged(false);
-      $scope.setSelectedClient(newClient);
-      $scope.getAllClientCustomFieldData();//Done now for visual crispness
-      
-	  if($scope.tab=="Requests"){		 
-		  $scope.listRequests();
+	  if($scope.selectedClient!=newClient){
+		  $scope.setDetailsChanged(false);
+		  
+	      $scope.setSelectedClient(newClient);
+	      
+	      $scope.updateData();
+//      $scope.getAllClientCustomFieldData();//Done now for visual crispness
+//      
+//	  if($scope.tab=="Requests"){		 
+//		  $scope.listRequests();
+//	  }
+//	  else if($scope.tab == "Schedule"){
+//		  $scope.listShifts();
+//	  }
+//
+//      $scope.listClients();//Consider removing and all auto update to do this
 	  }
-	  else if($scope.tab == "Schedule"){
-		  $scope.listShifts();
-	  }
-
-      $scope.listClients();//Consider removing and all auto update to do this
 	}
 	
 	//May be used in checking if a shift or request is valid, TODO factor out

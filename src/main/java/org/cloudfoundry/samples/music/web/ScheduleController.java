@@ -217,7 +217,14 @@ public class ScheduleController {
 					    
 					    if(null==employee) {
 					    	client = clientRepository.findOne(id);
-					    	if(client.getLastUpdated()==null || lastUpdated == null ||client.lastUpdatedTime().isAfter(lastUpdated)) {
+					    	
+					    	if(client.getLastUpdated()==null) {
+					    		client.setLastUpdatedToNow();
+					    		clientRepository.save(client);
+					    	}
+					    	System.out.println("client.getLastUpdated():"+client.getLastUpdated()+" lastUpdated:"+lastUpdated);
+					    	if(key.equalsIgnoreCase(Constants.CLIENT) && 
+					    			(client.getLastUpdated()==null || lastUpdated == null ||client.lastUpdatedTime().isAfter(lastUpdated))) {
 						    	result.put(Constants.CLIENT, new JSONObject(mapper.writeValueAsString(client)));
 						    	
 								JSONArray clientCustomDataJson = new JSONArray();							    
@@ -233,7 +240,12 @@ public class ScheduleController {
 							  	result.put("customFieldData", clientCustomDataJson);
 						    }
 					    }
-					    else if(employee.getLastUpdated()==null || lastUpdated == null ||employee.getLastUpdatedTime().isAfter(lastUpdated)) {
+					    else if(key.equalsIgnoreCase(Constants.EMPLOYEE) && 
+					    		(employee.getLastUpdated()==null || lastUpdated == null ||employee.getLastUpdatedTime().isAfter(lastUpdated))) {
+					    	if(employee.getLastUpdated()==null) {
+					    		employee.setLastUpdatedToNow();
+					    		employeeRepository.save(employee);
+					    	}
 					    	result.put(Constants.EMPLOYEE, new JSONObject(mapper.writeValueAsString(employee)));
 					    	
 							JSONArray employeeCustomDataJson = new JSONArray();							    
@@ -379,7 +391,16 @@ public class ScheduleController {
 							  break; 
 						   case Constants.CUSTOM_FIELDS :
 							  JSONObject customFieldsJson = new JSONObject();
-							  customFieldsJson.put("info", customFieldRepository.findAll());
+							    
+						      Iterable<CustomField> customFields = customFieldRepository.findAll();
+
+						      JSONArray customFieldsInfoJson = new JSONArray();
+						    	    
+						      for(CustomField customField: customFields) {
+						    	  customFieldsInfoJson.put(new JSONObject(mapper.writeValueAsString(customField)));
+						      }
+						    	    
+							  customFieldsJson.put("info", customFieldsInfoJson );
 							  customFieldsJson.put("tableLastUpdated", updateInfo.getTime());
 
 							  result.put(Constants.CUSTOM_FIELDS, customFieldsJson);
@@ -733,7 +754,10 @@ public class ScheduleController {
         	lastUpdatedTime = Util.getLocalDateTimeFromString(lastUpdated);
     	}
 
-    	if(tableLastUpdated == null || lastUpdated==null || updateInfo.getTime().isAfter(tableLastUpdatedTime)) {
+    	if(tableLastUpdated == null || lastUpdated==null ||
+    	   "null".equalsIgnoreCase(tableLastUpdated) || "null".equalsIgnoreCase(lastUpdated) || 
+    	   updateInfo.getTime().isAfter(tableLastUpdatedTime)) {
+    		
             Iterable<ClientRequest> requests = requestRepository.findByClientId(clientId);
     	    ObjectMapper mapper = new ObjectMapper();
     	    JSONArray requestInfoJson = new JSONArray();
@@ -747,14 +771,14 @@ public class ScheduleController {
     		  requestInfoJson.put(new JSONObject(mapper.writeValueAsString(selectedClientRequest)));
     	    }
     	    
-    	    requestJson.put("lastUpdated", currentUpdateTime);
+
     	    
-    	    if(currentUpdateTime.isAfter(lastUpdatedTime)) {
+    	    if(lastUpdatedTime==null || "null".equalsIgnoreCase(lastUpdated) || currentUpdateTime.isAfter(lastUpdatedTime)) {
         	    requestJson.put("info", requestInfoJson);
+        	    requestJson.put("lastUpdated", currentUpdateTime);
+        	    requestJson.put("tableLastUpdated", updateInfo.getTime());
     	    }
     	}
-	    requestJson.put("tableLastUpdated", updateInfo.getTime());
-
 
     	return requestJson.toString();
     }

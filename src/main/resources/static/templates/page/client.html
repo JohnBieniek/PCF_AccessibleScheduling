@@ -37,7 +37,7 @@
 		    	</div>
 	    	</div>
 	    	<br>
-	    	<div ng-if="isSet('Schedule')" style="width:100%" ng-init="listShifts()">
+	    	<div ng-if="isSet('Schedule')" style="width:100%">
 	    		<div>
 	    			<div style="width:100%">
 	    				<div class="inline" style="margin-left:32%;width:40%;text-align: center;">
@@ -134,7 +134,7 @@
 			        
 				    <div ng-if="manager">
 				        <div ng-repeat="customField in customFields">
-			            	<div ng-init="getClientCustomFieldData(client,customField,$index)">
+			            	<div>
 			            		<label for="customField" style="font-size:38px">{{customField.clientVariable}}</label>
 			            		<input ng-change="setDetailsToChanged()" type="checkbox" id="customField" name="customField" style="height:20px;width:20px" ng-model="customValue[$index]">
 			            	</div>
