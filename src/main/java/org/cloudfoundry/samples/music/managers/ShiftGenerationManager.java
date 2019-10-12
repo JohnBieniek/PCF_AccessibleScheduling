@@ -44,9 +44,9 @@ public class ShiftGenerationManager {
     		status.setMonth(selectedMonth);
     	}
     	
-    	if(!status.isGenerated() && !status.isAssigning() && !status.isAssigned() && !status.isStopped() && !status.isErrored()) {
+    	if(!status.isGenerating() && !status.isGenerated() && !status.isAssigning() && !status.isAssigned() && !status.isStopped() && !status.isErrored()) {
 	    	scheduleStatusRepository.deleteByMonth(selectedMonth);
-	    	status.setGenerated(true);
+	    	status.setGenerating(true);
 	    	scheduleStatusCrud.save(status);
 	    	Iterable<ClientRequest> requests = requestRepository.findAll();
 	    	System.out.println("generating shifts for "+selectedMonth);
@@ -60,6 +60,10 @@ public class ShiftGenerationManager {
 				}
 	    	}
 	    	System.out.println(response+shiftsGenerated);
+	    	status.setGenerating(false);
+	    	status.setGenerated(true);
+	    	scheduleStatusRepository.deleteByMonth(selectedMonth);
+	    	scheduleStatusCrud.save(status);
     	}
     	
     	return response+shiftsGenerated;

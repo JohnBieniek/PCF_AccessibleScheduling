@@ -9,6 +9,7 @@ public class ScheduleStatus {
 	@Id
 	@Column(length = 2)
 	private String month;
+	private boolean generating;
 	private boolean generated;
 	private boolean assigned;
 	private boolean assigning;
@@ -67,11 +68,19 @@ public class ScheduleStatus {
 	public void setStopped(boolean stopped) {
 		this.stopped = stopped;
 	}
+	public boolean isGenerating() {
+		return generating;
+	}
+
+	public void setGenerating(boolean generating) {
+		this.generating = generating;
+	}
 
 	@Override
 	public String toString() {
-		return "ScheduleStatus [month=" + month + ", generated=" + generated + ", assigned=" + assigned + ", assigning="
-				+ assigning + ", errored=" + errored + ", stopped=" + stopped + ", scheduled=" + scheduled
-				+ ", unscheduled=" + unscheduled + ", lastUpdated=" + lastUpdated + "]";
+		return "ScheduleStatus [month=" + month + ", generating=" + generating + ", generated=" + generated
+				+ ", assigned=" + assigned + ", assigning=" + assigning + ", errored=" + errored + ", stopped="
+				+ stopped + ", scheduled=" + scheduled + ", unscheduled=" + unscheduled + ", lastUpdated=" + lastUpdated
+				+ "]";
 	}
 }

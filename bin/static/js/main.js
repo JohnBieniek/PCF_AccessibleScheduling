@@ -1298,19 +1298,25 @@ function MainNavigationController($scope, $modal, $http) {
 
 	 
 	//Navigation
+	/**
+	 * For the same client change what set of their info you are looking at
+	 */
 	$scope.setTab = function(newTab){//ClientTab
 		 $scope.updateLastInteractionTime();
 	     $scope.tab = newTab;
 	}
+	
+	/**
+	 * For the same employee change what set of their info you are looking at
+	 */
 	$scope.setEmployeeTab = function(newTab){
 		 $scope.updateLastInteractionTime();
 	     $scope.employeeTab = newTab;
-	     
 	}
 	
 	/**
 	 * Selects a different month to view the state of shifts for
-	 * Pulls the count of assigned and unassigned shifts for the selectetd month
+	 * Pulls the count of assigned and unassigned shifts for the selected month
 	 */
 	$scope.setScheduleTab = function(newTab){
 		if($scope.monthTab!=newTab){
@@ -1320,7 +1326,12 @@ function MainNavigationController($scope, $modal, $http) {
 			$scope.total="0";//Clear to ease visual transition
 		    $scope.monthName=$scope.getDisplayMonthFromInt(newTab);
 	        $scope.monthTab=newTab;
-	        
+			if($scope.statusList && $scope.statusList[newTab-1] && $scope.statusList[newTab-1].generating=="true"){
+		    	$scope.setGenerated("Generating");
+	    	}
+			else{
+		    	$scope.setGenerated("Generated");
+			}
 	        $scope.listStatusItems();
 		}
     };
@@ -1376,6 +1387,9 @@ function MainNavigationController($scope, $modal, $http) {
 	
      
     //Auth
+    /**
+     * Check if the user has logged in through google based on the presence of the idToken google returns after auth
+     */
 	$scope.loggedIn = function loggedIn() {
 		 if($scope.idToken!=null){
 			 return true;
