@@ -93,18 +93,23 @@ function SchedulingController($scope, $modal, $http) {
 			if($scope.statusList[month-1].generated=="false"){
 	    		  assignable=false;
 	    	}
+			if($scope.statusList[month-1].generating=="true"){
+	    		  assignable=false;
+	    	}
+			else if($scope.statusList[month-1].assigning=="true"){
+		   		assignable=false;
+		   	}
+		   	else if($scope.statusList[month-1].assigned=="true"){
+		  		  assignable=false;
+		   	}
     	}
     	  
 	   	if($scope.statusList && $scope.statusList[month-1]){ 
-		   	if($scope.statusList[month-1].assigning=="true"){
-		   		assignable=false;
-		   	}
+
 	   	}
   	  
 	   	if($scope.statusList && $scope.statusList[month-1]){ 
-		   	if($scope.statusList[month-1].assigned=="true"){
-	  		  assignable=false;
-		   	}
+		   	
 	   	}
 	   	
 	   	unassignable = !assignable;
@@ -118,6 +123,7 @@ function SchedulingController($scope, $modal, $http) {
 	
     //Button handlers
     $scope.generateShifts = function(month){
+    	$scope.statusList[month-1].generating=true;
    	 	$scope.updateLastInteractionTime();
     	$http({
             url: '/schedule/generateShifts',
@@ -132,8 +138,10 @@ function SchedulingController($scope, $modal, $http) {
             }
         })
         .then(function(response) {
-        	$scope.statusList = response.data.sort(function(a, b){return a.month-b.month});
-       	    setTimeout($scope.listStatusItems,3000);
+        	$scope.statusList[month-1].generated=true;
+        	if($scope.monthTab==month){
+        		$scope.setTotal(response.data);
+        	}
         });
     }
     $scope.deleteShifts = function(month){

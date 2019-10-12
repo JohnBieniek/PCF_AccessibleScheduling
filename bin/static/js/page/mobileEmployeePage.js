@@ -81,6 +81,10 @@ function MobileEmployeeController($scope, $modal, $http) {
 		return day==$scope.employee.days[availability];
 	}
 	
+	/**
+	 * Determines if for a given day we should show the unavailable descriptor
+	 * TODO factor out availability
+	 */
 	$scope.noAvailabilityDay= function(availability,day){
 		var unavailable =true;
 		
@@ -107,7 +111,7 @@ function MobileEmployeeController($scope, $modal, $http) {
 		  }
 	      $scope.setSelectedEmployee(newEmployee);
 	      $scope.updateData();
-	//      $scope.getEmployee();
+	//      $scope.getEmployee();//Re-enable if swapping back to doing updates individually
 	//      $scope.getAllEmployeeCustomFieldData();
 	//      $scope.listShifts();
 		}

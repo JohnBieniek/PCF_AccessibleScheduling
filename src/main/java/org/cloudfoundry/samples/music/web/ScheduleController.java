@@ -930,11 +930,12 @@ public class ScheduleController {
     }
     
     @RequestMapping(value = "/generateShifts", method = RequestMethod.GET)
-    public Iterable<ScheduleStatus> generateShifts(@RequestHeader(value="Authorization", required=false) String idToken,@RequestParam("month") String month,@RequestParam("year") String year) throws CorruptDataException, AuthenticationException {
+    public int generateShifts(@RequestHeader(value="Authorization", required=false) String idToken,@RequestParam("month") String month,@RequestParam("year") String year) throws CorruptDataException, AuthenticationException {
     	securityManager.authorize(idToken, Constants.ADMIN);
         updateInfoManager.set("scheduleStatus");
     	generationManager.generateShifts(month,year);
-        return scheduleStatusCrud.findAll();
+    	List<Shift> shifts = (List<Shift>)shiftRepository.findByStartMonth(Integer.parseInt(month));
+        return shifts.size();
     }
     
     @RequestMapping(value = "/getShiftsForMonth", method = RequestMethod.GET)
