@@ -1278,11 +1278,13 @@ function MainNavigationController($scope, $modal, $http) {
 		 $scope.unmodifiedClient=client;
 	}
 	$scope.setSelectedClient = function(client){
+		if(client!=$scope.selectedClient){
 		 $scope.selectedClient=client;
 		 $scope.lastRequestUpdate=null;
 		 $scope.lastShiftUpdate=null;
 		 $scope.lastShiftTableUpdate=null;
 		 $scope.lastRequestTableUpdate=null;
+		}
 //		 $scope.requests=null;//Clear to ease visual transition
 //		 $scope.shifts=null;//Clear to ease visual transition
 		 //$scope.getClient(client.id);//Re-enable if no longer using only allUpdates
@@ -1305,6 +1307,11 @@ function MainNavigationController($scope, $modal, $http) {
 	     $scope.employeeTab = newTab;
 	     
 	}
+	
+	/**
+	 * Selects a different month to view the state of shifts for
+	 * Pulls the count of assigned and unassigned shifts for the selectetd month
+	 */
 	$scope.setScheduleTab = function(newTab){
 		if($scope.monthTab!=newTab){
 			$scope.updateLastInteractionTime();
@@ -1332,8 +1339,10 @@ function MainNavigationController($scope, $modal, $http) {
 		if(newPage!=$scope.page){
 			$scope.detailsChanged=false;
 			
+			$scope.lastShiftUpdate=null;
+			$scope.lastShiftTableUpdate=null;
+			
 	        $scope.shifts=null;//Clear to ease visual transition
-	        $scope.requests=null;//Clear to ease visual transition
 	        
 	        if(newPage=="templates/page/scheduler.html"){
 	        	var month = $scope.monthTab;
@@ -1343,6 +1352,8 @@ function MainNavigationController($scope, $modal, $http) {
 	    		$scope.setScheduleTab(month);//Update early to ease visual transition
 	        }
 	    	$scope.page = newPage;
+	    	
+	    	$scope.updateData();
 		}
     };
     

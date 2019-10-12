@@ -322,15 +322,16 @@ public class ScheduleController {
 							  JSONObject shiftJson = new JSONObject();
 						      JSONArray shiftInfoJson = new JSONArray();
 							  Iterable<Shift> shifts = null;
-							  
+							  System.out.println("got shifts for day:"+day+" month:"+month+ " year:"+year);
 							  if(null!=employee) {
-								  shifts = manager.getEmployeeShiftsForWeek(id,day,month,year);
+								  shifts = manager.getEmployeeShiftsForWeek(id,month,day,year);
 							  }
 							  else if(null!=client) {
 								  shifts = manager.getClientShiftsForWeek(id, month, day, year);
 							  }
 							  
 							  for(Shift shift : shifts) {
+								  System.out.println(" found shift "+shift.toString());
 						          if(null == currentUpdateTime || (shift.getLastUpdatedTime()!=null &&
 						        		  currentUpdateTime.isAfter(shift.getLastUpdatedTime()))) {
 						        	  currentUpdateTime=shift.getLastUpdatedTime();
@@ -339,14 +340,14 @@ public class ScheduleController {
 						    	  shiftInfoJson.put(new JSONObject(mapper.writeValueAsString(shift)));
 						      }
 						    	    
-						      shiftJson.put("lastUpdated", currentUpdateTime);
+
 						    	    
 						      if(currentUpdateTime==null || lastUpdated == null ||currentUpdateTime.isAfter(lastUpdated)) {
 						      	    shiftJson.put("info", shiftInfoJson);
+							        shiftJson.put("lastUpdated", currentUpdateTime);
+								    shiftJson.put("tableLastUpdated", updateInfo.getTime());
+									result.put(Constants.SHIFTS,  shiftJson);
 						      }
-							  shiftJson.put("tableLastUpdated", updateInfo.getTime());
-
-							  result.put(Constants.SHIFTS,  shiftJson);
 							  break;
 						   case Constants.REQUESTS :
 							  JSONObject requestJson = new JSONObject();
@@ -368,9 +369,8 @@ public class ScheduleController {
 					      	      requestJson.put("info", requestInfoJson);
 							      requestJson.put("lastUpdated", currentUpdateTime);
 								  requestJson.put("tableLastUpdated", updateInfo.getTime());
+								  result.put(Constants.REQUESTS,  requestJson);
 						      }
-
-							  result.put(Constants.REQUESTS,  requestJson);
 							  break; 
 						   case Constants.ALERTS :
 							  JSONObject alertJson = new JSONObject();

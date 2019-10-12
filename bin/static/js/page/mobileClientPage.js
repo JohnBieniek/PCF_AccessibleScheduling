@@ -283,6 +283,9 @@ function MobileClientController($scope, $modal, $http) {
             	$scope.updateLastInteractionTime();
             	$scope.notify("Request saved.");
             	$scope.setRequests(response.data);
+            	for(var index = 0; index< $scope.requests.length;index++){
+    				$scope.getDisplayValue($scope.requests[index]);
+    			}
             });
        });
    }

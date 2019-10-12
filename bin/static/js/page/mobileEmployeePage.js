@@ -98,17 +98,19 @@ function MobileEmployeeController($scope, $modal, $http) {
 	/**
 	 * Changes which employee we are looking at
 	 */
-	$scope.setEmployeeAndInfo = function(newEmployee){		
-	  $scope.setDetailsChanged(false);
-	  
-	  if(newEmployee.role==null){
-		  newEmployee.role="user";
-	  }
-      $scope.setSelectedEmployee(newEmployee);
-      $scope.updateData();
-//      $scope.getEmployee();
-//      $scope.getAllEmployeeCustomFieldData();
-//      $scope.listShifts();
+	$scope.setEmployeeAndInfo = function(newEmployee){	
+		if($scope.selectedEmployee!=newEmployee){
+		  $scope.setDetailsChanged(false);
+		  
+		  if(newEmployee.role==null){
+			  newEmployee.role="user";
+		  }
+	      $scope.setSelectedEmployee(newEmployee);
+	      $scope.updateData();
+	//      $scope.getEmployee();
+	//      $scope.getAllEmployeeCustomFieldData();
+	//      $scope.listShifts();
+		}
 	}
 	 
 	$scope.setInterval = function(newInterval){
