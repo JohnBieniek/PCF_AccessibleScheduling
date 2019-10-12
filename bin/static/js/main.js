@@ -65,7 +65,7 @@ function MainNavigationController($scope, $modal, $http) {
         if($scope.week==undefined || $scope.week ==null){
 			 $scope.week = new Date();
 		}
-        $scope.monthTab=null;//Scheduler tab
+        $scope.monthTab=$scope.week.getMonth()+1;//Scheduler tab
         $scope.year = $scope.week.getYear()+1900;
 
         $scope.shiftsForMonth=null;
@@ -81,15 +81,15 @@ function MainNavigationController($scope, $modal, $http) {
         $scope.employee=null;//The full employee info for who we are looking at
         $scope.selectedEmployee=null;//The name and id of the employee we are looking at
         $scope.unmodifiedEmployee=null;
-        $scope.employees=null;
+        $scope.employees=null;//Employee names and ids
         $scope.client=null;//The full client info for who we are looking at
         $scope.selectedClient = null;//The name and id of the client we are looking at TODO check to see if this is still used
         $scope.unmodifiedClient=null;
-        $scope.clients=null;
+        $scope.clients=null;//Client names and ids
         $scope.customFields=null;
-        $scope.shifts=null;
-        $scope.requests=null;
-        $scope.alerts=null;
+        $scope.shifts=null;//Shift list in the employee and client page for the selected person
+        $scope.requests=null;//Shift needs for the selected client
+        $scope.alerts=null;//Alerts shown on the alerts page, currently only AccessRequests
         
         //Scheduler options
 		$scope.allowOvertime=false;
@@ -234,9 +234,8 @@ function MainNavigationController($scope, $modal, $http) {
 		 else if($scope.page=="templates/page/scheduler.html"){
 			 var statusInfo = {}; 
 			 statusInfo["tableLastUpdated"]=$scope.lastStatusTableUpdate;
+			 statusInfo["date"]=($scope.week.getYear()+1900)+"-"+$scope.monthTab+"-15";
 			 payload["status"] = statusInfo;
-
-			// $scope.listStatusItems();
 		 }
 
 		 $scope.incrementCycle();
@@ -278,6 +277,7 @@ function MainNavigationController($scope, $modal, $http) {
 	 }
 	 
 	 //API Access
+	 /** Called on app start as an easy way to select our initial employee*/
 	$scope.setEmployeeToUser = function(){
 		$http({
             url: '/employees/'+$scope.profile.employeeId,
@@ -306,7 +306,6 @@ function MainNavigationController($scope, $modal, $http) {
 	  */
 	 $scope.getAllUpdates = function getAllUpdates(json){
 		 if($scope.idToken!=null){
-			 console.log("getting all updates");
 	    	$http({
 	            url: '/schedule/allUpdates',
 	            method: 'GET',
@@ -323,6 +322,16 @@ function MainNavigationController($scope, $modal, $http) {
 		        	console.log("get all updates response");
 		        	console.log(response.data);
 
+		        	if(response.data.status){
+		        		if(response.data.status.info){//The status list only comes back when changed
+			        		$scope.statusList = response.data.status.info;
+				        	$scope.lastStatusTableUpdate=response.data.status.tableLastUpdated;		        			
+		        		}
+		        		
+			        	$scope.setScheduled(response.data.status.assigned);//The count always comes back as it's hard to track changed to
+			        	$scope.setUnscheduled(response.data.status.unassigned);
+			        	$scope.total= +$scope.scheduled + +$scope.unscheduled;
+		        	}
 	        		if(response.data.clients){
 	        			$scope.clients = response.data.clients.names;
 	        			$scope.lastClientTableUpdate = response.data.clients.tableLastUpdated;
@@ -388,13 +397,11 @@ function MainNavigationController($scope, $modal, $http) {
 	 }
 	
 	 /**
+	  * Used to set the initial client
 	  * Gets the full client model from the server for the selected client.
 	  * Saves it in $scope.client and $scope.unmodifiedClient
 	  */
 	 $scope.getClient = function getClient(clientInfo){
-		 console.log("getting client");
-		 console.log(clientInfo);
-
 		 if($scope.idToken!=null){
 	    	$http({
 	            url: '/clients/'+clientInfo,
@@ -428,9 +435,6 @@ function MainNavigationController($scope, $modal, $http) {
 	  * Saves it in $scope.employee and $scope.unmodifiedEmployee
 	  */
 	 $scope.getEmployee = function getEmployee(){
-		 console.log("getting employee");
-		 console.log($scope.selectedEmployee.id);
-		 
 		 if($scope.idToken!=null){
 	    	$http({
 	            url: '/employees/'+$scope.selectedEmployee.id,
@@ -477,8 +481,6 @@ function MainNavigationController($scope, $modal, $http) {
 	            }
 	        })
 	        .then(function(response) {
-	        	console.log("get employee names");
-	        	console.log(response.data);
 	        	if(response.data){
         			$scope.employees = response.data;
         			$scope.lastEmployeeTableUpdate = response.data.tableLastUpdated;
@@ -516,11 +518,9 @@ function MainNavigationController($scope, $modal, $http) {
 	        })
 	        .then(function(response) {
 	        	if(response.data){
-	        		console.log("got client names with selected client:",$scope.selectedClient);
         			$scope.clients = response.data;
         			if($scope.client==null ){
 	        			$scope.selectedClient = $scope.clients[0];
-		        		console.log("updated selected client to the first of the clients returned:",$scope.selectedClient);
 		        		$scope.getClient($scope.selectedClient.id);
         			}
         			$scope.lastClientTableUpdate = response.data.tableLastUpdated;
@@ -835,7 +835,6 @@ function MainNavigationController($scope, $modal, $http) {
 		        				$scope.getDisplayValue($scope.requests[index]);
 		        			}
 			    		}
-	        			console.log("got requests",$scope.requests);
 	        			$scope.lastRequestTableUpdate = response.data.tableLastUpdated;
 	        			$scope.lastRequestUpdate = response.data.lastUpdated;
 		        	}
@@ -1326,13 +1325,14 @@ function MainNavigationController($scope, $modal, $http) {
 			$scope.total="0";//Clear to ease visual transition
 		    $scope.monthName=$scope.getDisplayMonthFromInt(newTab);
 	        $scope.monthTab=newTab;
+
 			if($scope.statusList && $scope.statusList[newTab-1] && $scope.statusList[newTab-1].generating=="true"){
 		    	$scope.setGenerated("Generating");
 	    	}
 			else{
 		    	$scope.setGenerated("Generated");
 			}
-	        $scope.listStatusItems();
+			$scope.updateData();
 		}
     };
     
@@ -1355,13 +1355,6 @@ function MainNavigationController($scope, $modal, $http) {
 			
 	        $scope.shifts=null;//Clear to ease visual transition
 	        
-	        if(newPage=="templates/page/scheduler.html"){
-	        	var month = $scope.monthTab;
-	        	if(month ==null){
-	        		month = $scope.week.getMonth()+1;
-	        	}
-	    		$scope.setScheduleTab(month);//Update early to ease visual transition
-	        }
 	    	$scope.page = newPage;
 	    	
 	    	$scope.updateData();
@@ -1374,7 +1367,7 @@ function MainNavigationController($scope, $modal, $http) {
    	 
    	 $scope.getDisplayWeek();
    	 
-   	 $scope.listShifts();
+   	 $scope.listShifts();//Stays as a single call since there are no other updates that the time
     }
     $scope.incrementWeek = function(){
    	 	$scope.updateLastInteractionTime();
@@ -1382,7 +1375,7 @@ function MainNavigationController($scope, $modal, $http) {
    	 
    	 	$scope.getDisplayWeek();
    	 
-   	 	$scope.listShifts();
+   	 	$scope.listShifts();//Stays as a single call since there are no other updates that the time
     }
 	
      

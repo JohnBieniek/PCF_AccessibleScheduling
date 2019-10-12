@@ -11,6 +11,7 @@ public abstract class Constants {
 	public static final String REQUESTS = "requests";
 	public static final String REQUEST = "request";
 	public static final String ALERTS = "alerts";
+	public static final String STATUS = "status";
 	public static final String CUSTOM_FIELDS = "customFields";
 	public static final String LAST_UPDATED = "lastUpdated";
 	      

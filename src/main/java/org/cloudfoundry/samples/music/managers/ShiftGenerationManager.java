@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
 
+import accessiblesolutions.accessiblescheduling.constants.Constants;
 import accessiblesolutions.accessiblescheduling.domain.ClientRequest;
 import accessiblesolutions.accessiblescheduling.domain.Event;
 import accessiblesolutions.accessiblescheduling.domain.ScheduleStatus;
@@ -32,6 +33,9 @@ public class ShiftGenerationManager {
     @Autowired
     private ScheduleStatusRepository scheduleStatusRepository;    
     
+    @Autowired
+    private UpdateInfoManager updateInfoManager;
+    
     public ShiftGenerationManager() {
     }
     
@@ -48,6 +52,8 @@ public class ShiftGenerationManager {
 	    	scheduleStatusRepository.deleteByMonth(selectedMonth);
 	    	status.setGenerating(true);
 	    	scheduleStatusCrud.save(status);
+	        updateInfoManager.set(Constants.STATUS);
+
 	    	Iterable<ClientRequest> requests = requestRepository.findAll();
 	    	System.out.println("generating shifts for "+selectedMonth);
 	    	for(ClientRequest request: requests) {
@@ -64,6 +70,7 @@ public class ShiftGenerationManager {
 	    	status.setGenerated(true);
 	    	scheduleStatusRepository.deleteByMonth(selectedMonth);
 	    	scheduleStatusCrud.save(status);
+	        updateInfoManager.set(Constants.STATUS);
     	}
     	
     	return response+shiftsGenerated;

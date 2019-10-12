@@ -550,7 +550,10 @@ function MobileEmployeeController($scope, $modal, $http) {
     	$scope.updateLastInteractionTime();
       	var originalEmployee = $scope.clone($scope.unmodifiedEmployee);
     	var modifiedEmployee = $scope.clone($scope.employee);
-    	var lastUpdated = originalEmployee.lastUpdated;
+    	var lastUpdated = null;
+    	if(null!=originalEmployee && undefined !=originalEmployee){
+    		originalEmployee.lastUpdated;
+    	}
     	if(null==lastUpdated || undefined == lastUpdated){
     		lastUpdated="null";
     	}
@@ -564,7 +567,7 @@ function MobileEmployeeController($scope, $modal, $http) {
 	            },
 	            params: {
 	            	lastUpdated:lastUpdated,
-	            	employeeId:originalEmployee.id
+	            	employeeId:modifiedEmployee.id
 	            }
 	        })
 	        .then(function(response) {

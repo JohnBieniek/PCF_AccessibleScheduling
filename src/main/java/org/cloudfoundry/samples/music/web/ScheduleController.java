@@ -164,7 +164,7 @@ public class ScheduleController {
     }
     
     @RequestMapping(value = "/allUpdates",method = RequestMethod.GET)
-    public String getAllUpdates(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam String json) throws AuthenticationException, JSONException, JsonProcessingException {
+    public String getAllUpdates(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam String json) throws AuthenticationException, JSONException, JsonProcessingException, NumberFormatException, ProccessingException {
     	securityManager.authorize(idToken, Constants.USER);
     	System.out.println("called get allUpdates with json:"+json);
     	JSONObject jsonObject = new JSONObject(json);
@@ -271,14 +271,36 @@ public class ScheduleController {
 					    	month = splitDate[1];
 					    	year = splitDate[0];			    		
 				    	}
+				    	
+				    	if(key.equalsIgnoreCase("status")) {
+							   JSONObject statusJson = new JSONObject();
+							    
+						       List<ScheduleStatus> statuses = scheduleStatusRepository.findAll();
+						       Collections.sort(statuses);
+						       JSONArray statusInfoJson = new JSONArray();
+						    	    
+						       for(ScheduleStatus status: statuses) {
+						    	  statusInfoJson.put(new JSONObject(mapper.writeValueAsString(status)));
+						       }
+						       
+						       if(tableLastUpdated == null || updateInfo.getTime().isAfter(tableLastUpdated)){
+							       statusJson.put("info", statusInfoJson);
+								   statusJson.put("tableLastUpdated", updateInfo.getTime());
+						       }
+
+						       statusJson.put("assigned", shiftManager.getAssignedShiftsForMonth(Integer.parseInt(month)).size());    
+						       statusJson.put("unassigned", shiftManager.getUnassignedShiftsForMonth(Integer.parseInt(month)).size());    
+
+							   result.put("status", statusJson);
+				     	}
 				    }
 				    
+				    //TODO consider removing
 			    	if(updateInfo==null || updateInfo.getTime()==null) {
 			    		updateInfoManager.set(key);
 			    		updateInfo = updateInfoRepository.findOne(key);
 			    	}
-				    if(null!=tableLastUpdated)System.out.println("tableLastUpdated"+tableLastUpdated.toString());
-				    if(null!=updateInfo)System.out.println("updateInfo:"+updateInfo.toString());
+			    	
 				    if(tableLastUpdated == null || updateInfo.getTime().isAfter(tableLastUpdated)) {
 						switch(key)
 						{
@@ -820,25 +842,26 @@ public class ScheduleController {
     	
     	System.out.println("Starting assignment");
     	ScheduleStatus status = scheduleStatusCrud.findOne(month);
-    	scheduleStatusRepository.deleteByMonth(month);
-    	
     	if(null==status) {
     		status= new ScheduleStatus();
     		status.setMonth(month);
     	}
     
-    	if(status.isGenerated()) {
+    	if(status.isGenerated() && !status.isAssigning()) {
     		status.setAssigning(true);
     		status.setLastUpdatedToNow();
+        	scheduleStatusRepository.deleteByMonth(month);
         	scheduleStatusCrud.save(status);
-            updateInfoManager.set("scheduleStatus");
+            updateInfoManager.set(Constants.STATUS);
+            
+        	ScheduleOptions options = new ScheduleOptions(month, year, allowOvertime, allowInactive,allowUnavailable, 
+								prioritizeSecondShift, dailyMax,weeklyMax);
+			System.out.println("Schedule options:"+options.toString());
+			
+			assignmentManager.scheduleShifts(options);
     	}
     	
-    	ScheduleOptions options = new ScheduleOptions(month, year, allowOvertime, allowInactive,allowUnavailable, 
-    													prioritizeSecondShift, dailyMax,weeklyMax);
-    	System.out.println("Schedule options:"+options.toString());
-    	
-		assignmentManager.scheduleShifts(options);
+
 
     	return scheduleStatusCrud.findAll();
     }
@@ -876,7 +899,7 @@ public class ScheduleController {
     	securityManager.authorize(idToken, Constants.ADMIN);
     	
     	scheduleManager.generateStatusList();
-        updateInfoManager.set("scheduleStatus");
+        updateInfoManager.set(Constants.STATUS);
         return scheduleStatusCrud.findAll();
     }
     
@@ -900,7 +923,7 @@ public class ScheduleController {
     		status.setLastUpdatedToNow();
     		scheduleStatusRepository.deleteByMonth(month);
         	scheduleStatusCrud.save(status);
-            updateInfoManager.set("scheduleStatus");
+            updateInfoManager.set(Constants.STATUS);
     	}
     	
         return scheduleStatusCrud.findAll();
@@ -923,7 +946,7 @@ public class ScheduleController {
 		status.setStopped(true);
 		status.setLastUpdatedToNow();
     	scheduleStatusCrud.save(status);
-        updateInfoManager.set("scheduleStatus");
+        updateInfoManager.set(Constants.STATUS);
     	Thread.sleep(5000);//Can this be deleted?
     	finishAssignment(idToken, month);
         return scheduleStatusCrud.findAll();
@@ -932,7 +955,6 @@ public class ScheduleController {
     @RequestMapping(value = "/generateShifts", method = RequestMethod.GET)
     public int generateShifts(@RequestHeader(value="Authorization", required=false) String idToken,@RequestParam("month") String month,@RequestParam("year") String year) throws CorruptDataException, AuthenticationException {
     	securityManager.authorize(idToken, Constants.ADMIN);
-        updateInfoManager.set("scheduleStatus");
     	generationManager.generateShifts(month,year);
     	List<Shift> shifts = (List<Shift>)shiftRepository.findByStartMonth(Integer.parseInt(month));
         return shifts.size();

@@ -63,12 +63,10 @@ function SchedulingController($scope, $modal, $http) {
     	  return false;
     }
     $scope.isGenerating = function(month){
-    	console.log("$scope.statusList[month-1].generating",$scope.statusList[month-1].generating);
     	if($scope.statusList && $scope.statusList[month-1])return $scope.statusList[month-1].generating;
   	    return false;
     };
     $scope.isGenerated = function(month){
-    	console.log("$scope.statusList[month-1].generated",$scope.statusList[month-1].generated);
     	if($scope.statusList && $scope.statusList[month-1])return $scope.statusList[month-1].generated;
   	    return false;
     };
@@ -128,30 +126,52 @@ function SchedulingController($scope, $modal, $http) {
     
 	
     //Button handlers
+    /**
+     * Checks to ensure we aren't generating or generated
+     * Sets the generated box text to "Generating"
+     * Sets this months status to generating
+     * Updates last interaction
+     * Calls generateShifts on the server
+     * Sets this months status to generated 
+     * Sets the generated box text to "Generated"
+     * Updates the total shifts with the generateShfits response
+     * Warns "Failed to generate shifts on failure"
+     */
     $scope.generateShifts = function(month){
-    	$scope.statusList[month-1].generating=true;
-    	$scope.setGenerated("Generating");
-   	 	$scope.updateLastInteractionTime();
-    	$http({
-            url: '/schedule/generateShifts',
-            method: 'GET',
-            headers: {
-                'Authorization': $scope.idToken,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            params: {
-                month: month,
-                year: $scope.year
-            }
-        })
-        .then(function(response) {
-        	$scope.statusList[month-1].generating=false;
-        	$scope.statusList[month-1].generated=true;
-        	$scope.setGenerated("Generated");
-        	if($scope.monthTab==month){
-        		$scope.setTotal(response.data);
-        	}
-        });
+    	if($scope.statusList[month-1].generating==false && $scope.statusList[month-1].generated==false){
+        	$scope.statusList[month-1].generating=true;
+        	$scope.setGenerated("Generating");
+       	 	$scope.updateLastInteractionTime();
+        	$http({
+                url: '/schedule/generateShifts',
+                method: 'GET',
+                headers: {
+                    'Authorization': $scope.idToken,
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                params: {
+                    month: month,
+                    year: $scope.year
+                }
+            })
+            .then(function(response) {
+            	$scope.statusList[month-1].generating=false;
+            	$scope.statusList[month-1].generated=true;
+            	$scope.setGenerated("Generated");
+            	if($scope.monthTab==month){
+            		$scope.setTotal(response.data);
+            	}
+            }) 
+            .catch(function(data, status) {
+            	console.error('Gists error', data,status);
+        		if(data.status==404){
+        			$scope.warn("Failed to generate shifts. If connection trouble persits contact your representative.");
+        		}
+        		else{
+        			$scope.warn("Failed to generate shifts");
+        		}
+            });
+    	}
     }
     $scope.deleteShifts = function(month){
     	if(confirm("Are you sure to delete the shifts for "+$scope.monthName+"?")) {
@@ -171,7 +191,16 @@ function SchedulingController($scope, $modal, $http) {
 	        	$scope.setScheduled("0");
 	        	$scope.setUnscheduled("0");
 	        	$scope.setTotal("0");
-	        	setTimeout($scope.listStatusItems,2000);
+	        	setTimeout($scope.updateData,2000);
+	        }) 
+	        .catch(function(data, status) {
+	        	console.error('Gists error', data,status);
+	    		if(data.status==404){
+	    			$scope.warn("Failed to delete shifts. If connection trouble persits contact your representative.");
+	    		}
+	    		else{
+	    			$scope.warn("Failed to delete shifts");
+	    		}
 	        });
     	}
     }
@@ -200,7 +229,16 @@ function SchedulingController($scope, $modal, $http) {
         .then(function(response) {
         	$scope.statusList = response.data.sort(function(a, b){return a.month-b.month});
         	
-        	setTimeout($scope.listStatusItems,2000);
+        	setTimeout($scope.updateData,2000);
+        }) 
+        .catch(function(data, status) {
+        	console.error('Gists error', data,status);
+    		if(data.status==404){
+    			$scope.warn("Failed to assign shifts. If connection trouble persits contact your representative.");
+    		}
+    		else{
+    			$scope.warn("Failed to assign shifts");
+    		}
         });
     }
     $scope.stopAssignment = function(month){
@@ -221,7 +259,16 @@ function SchedulingController($scope, $modal, $http) {
 	        })
 	        .then(function(response) {
 	        	$scope.statusList = response.data.sort(function(a, b){return a.month-b.month});
-	    		setTimeout($scope.listStatusItems,2000);
+	    		setTimeout($scope.updateData,2000);
+	        }) 
+	        .catch(function(data, status) {
+	        	console.error('Gists error', data,status);
+	    		if(data.status==404){
+	    			$scope.warn("Failed to stop assigning shifts. If connection trouble persits contact your representative.");
+	    		}
+	    		else{
+	    			$scope.warn("Failed to stop assigning shifts");
+	    		}
 	        });
     	}
     }
@@ -239,7 +286,16 @@ function SchedulingController($scope, $modal, $http) {
         })
         .then(function(response) {
         	$scope.statusList = response.data.sort(function(a, b){return a.month-b.month});
-        	setTimeout($scope.listStatusItems,2000);
+        	setTimeout($scope.updateData,2000);
+        }) 
+        .catch(function(data, status) {
+        	console.error('Gists error', data,status);
+    		if(data.status==404){
+    			$scope.warn("Failed to assign shifts. If connection trouble persits contact your representative.");
+    		}
+    		else{
+    			$scope.warn("Failed to assign shifts");
+    		}
         });
     }
 }
