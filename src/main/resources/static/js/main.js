@@ -252,8 +252,10 @@ function MainNavigationController($scope, $modal, $http) {
 	 $scope.autoUpdateData = function autoUpdateData(){
 		 $scope.updateData();
 		 var timeSinceInteraction = $scope.getMinutesSinceLastInteraction();
- 		 if($scope.statusList !=undefined && $scope.statusList[$scope.monthTab-1] !=undefined &&
- 		    $scope.statusList[$scope.monthTab-1].assigning && $scope.page=="templates/page/scheduler.html"){
+ 		 if(($scope.page=="templates/page/scheduler.html" && $scope.statusList !=undefined && $scope.statusList[$scope.monthTab-1] !=undefined )&&
+ 				 	($scope.statusList[$scope.monthTab-1].assigning || 
+ 		    		$scope.statusList[$scope.monthTab-1].generating || 
+ 		    		$scope.statusList[$scope.monthTab-1].stopping) ){
 			 setTimeout(autoUpdateData,5000);
  		 }
  		 else if(timeSinceInteraction>120){
@@ -277,6 +279,43 @@ function MainNavigationController($scope, $modal, $http) {
 	 }
 	 
 	 //API Access
+	    $scope.deleteShifts = function(month){
+	    	if(confirm("Are you sure to delete the shifts for "+$scope.monthName+"?")) {
+	        	$scope.statusList[month-1].deleting=true;
+	        	$scope.statusList[month-1].assigned=false;
+	        	$scope.statusList[month-1].generated=false;
+            	$scope.setGenerated("Deleting");
+		    	$http({
+		            url: '/schedule/byMonth',
+		            method: 'DELETE',
+		            headers: {
+		                'Authorization': $scope.idToken,
+		                'Content-Type': 'application/x-www-form-urlencoded'
+		            },
+		            params: {
+		            	month: month
+		            }
+		        })
+		        .then(function(response) {
+		        	$scope.statusList = response.data.sort(function(a, b){return a.month-b.month});
+		        	$scope.setScheduled("0");
+		        	$scope.setUnscheduled("0");
+		        	$scope.setTotal("0");
+	            	$scope.setGenerated("Generated");
+		        	//setTimeout($scope.updateData,2000);
+		        }) 
+		        .catch(function(data, status) {
+	            	$scope.setGenerated("Generated");
+		        	console.error('Gists error', data,status);
+		    		if(data.status==404){
+		    			$scope.warn("Failed to delete shifts. If connection trouble persits contact your representative.");
+		    		}
+		    		else{
+		    			$scope.warn("Failed to delete shifts");
+		    		}
+		        });
+	    	}
+	    }
 	 /** Called on app start as an easy way to select our initial employee*/
 	$scope.setEmployeeToUser = function(){
 		$http({
@@ -325,6 +364,7 @@ function MainNavigationController($scope, $modal, $http) {
 		        	if(response.data.status){
 		        		if(response.data.status.info){//The status list only comes back when changed
 			        		$scope.statusList = response.data.status.info;
+			        		$scope.updateScheduleDisplay();
 				        	$scope.lastStatusTableUpdate=response.data.status.tableLastUpdated;		        			
 		        		}
 		        		
@@ -332,6 +372,7 @@ function MainNavigationController($scope, $modal, $http) {
 			        	$scope.setUnscheduled(response.data.status.unassigned);
 			        	$scope.total= +$scope.scheduled + +$scope.unscheduled;
 		        	}
+		        	
 	        		if(response.data.clients){
 	        			$scope.clients = response.data.clients.names;
 	        			$scope.lastClientTableUpdate = response.data.clients.tableLastUpdated;
@@ -1202,6 +1243,29 @@ function MainNavigationController($scope, $modal, $http) {
 			'Saturday '+$scope.getDisplayMonth(weekStart.addDays(6)) + " "+weekStart.addDays(6).getDate()
 		];
      }
+     
+     $scope.updateScheduleDisplay = function(){
+    	 var newTab = $scope.monthTab;
+    	if($scope.statusList && $scope.statusList[newTab-1] && $scope.statusList[newTab-1].generating=="true"){
+		   	$scope.setGenerated("Generating");
+    	}
+		else if($scope.statusList && $scope.statusList[newTab-1] && $scope.statusList[newTab-1].deleting=="true"){
+	    	$scope.setGenerated("Deleting");
+    	}
+		else{
+	    	$scope.setGenerated("Generated");
+		}
+    	
+		if($scope.statusList && $scope.statusList[newTab-1] && $scope.statusList[newTab-1].stopping=="true"){
+			$scope.setAssigned("Stopping");
+		}
+		else if($scope.statusList && $scope.statusList[newTab-1] && $scope.statusList[newTab-1].assigning=="true"){
+	    	$scope.setAssigned("Assigning");
+    	}
+		else{
+	    	$scope.setAssigned("Assigned");
+		}
+     }
      	 
 	 $scope.noShiftDay= function(day){
 		var unscheduled =true;
@@ -1326,12 +1390,7 @@ function MainNavigationController($scope, $modal, $http) {
 		    $scope.monthName=$scope.getDisplayMonthFromInt(newTab);
 	        $scope.monthTab=newTab;
 
-			if($scope.statusList && $scope.statusList[newTab-1] && $scope.statusList[newTab-1].generating=="true"){
-		    	$scope.setGenerated("Generating");
-	    	}
-			else{
-		    	$scope.setGenerated("Generated");
-			}
+			$scope.updateScheduleDisplay();
 			$scope.updateData();
 		}
     };

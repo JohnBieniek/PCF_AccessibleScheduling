@@ -69,7 +69,7 @@ public class ShiftAssignmentManager {
     	int month = Integer.parseInt(options.getMonth());
     	int year = Integer.parseInt(options.getYear());
     	
-    	ScheduleStatus status = scheduleStatusCrud.findOne(options.getMonth());
+    	ScheduleStatus status = scheduleStatus(options.getMonth());
     	
     	if(null==status) {
     		status= new ScheduleStatus();
@@ -77,7 +77,7 @@ public class ShiftAssignmentManager {
     	}
     	
     	scheduleStatusRepository.deleteByMonth(options.getMonth());
-    	
+    	status.setStopped(false);
     	status.setGenerated(true);
     	status.setAssigning(true);
     	scheduleStatusCrud.save(status);
@@ -92,23 +92,24 @@ public class ShiftAssignmentManager {
 	    		scheduleWeekendShifts(week,month,year,options);
 	    		scheduleWeekdayShifts(week,month,year,options);
 	    	}
+			
+	    	status.setAssigning(false);
+	    	status.setAssigned(true);
+	    	
+	    	scheduleStatusRepository.deleteByMonth(options.getMonth());
+	    	scheduleStatusCrud.save(status);
 		} catch (Exception e) {
 			scheduleStatusRepository.deleteByMonth(options.getMonth());
 	    	
 	    	status.setAssigning(false);
 	    	status.setAssigned(true);
+	    	status.setErrored(true);
 	    	scheduleStatusCrud.save(status);
 	    	System.out.println("Failed to assign everything. "+e.getMessage());
 	    	System.out.println("Failed to assign everything. "+e.getLocalizedMessage());
 	    	System.out.println("Failed to assign everything. "+e.getStackTrace().toString());
 	    	e.printStackTrace();
 		}
-    	
-    	scheduleStatusRepository.deleteByMonth(options.getMonth());
-    	
-    	status.setAssigning(false);
-    	status.setAssigned(true);
-    	scheduleStatusCrud.save(status);
     }
     
     public void scheduleWeekdayShifts(int week, int month,int year, ScheduleOptions options) throws ProccessingException, CorruptDataException {
@@ -138,6 +139,19 @@ public class ShiftAssignmentManager {
 	        	if(scheduleStatus(month+"").isStopped()) {
 	        		stopped=true;
 	        		i=maxItterations;
+	        		
+	            	ScheduleStatus status = scheduleStatus(options.getMonth());
+	            	
+	            	if(null==status) {
+	            		status= new ScheduleStatus();
+	            		status.setMonth(options.getMonth());
+	            	}
+	            	
+	            	status.setGenerated(true);
+	            	status.setStopped(true);
+	        		status.setStopping(false);
+	            	scheduleStatusRepository.deleteByMonth(options.getMonth());
+	            	scheduleStatusCrud.save(status);
 	        	}
 	        	else {
 					if(unassignedShifts!=null && unassignedShifts.size()>0) {

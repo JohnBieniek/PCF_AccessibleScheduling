@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Id;
 
-public class ScheduleStatus {
+public class ScheduleStatus implements Comparable<ScheduleStatus> {
 	@Id
 	@Column(length = 2)
 	private String month;
@@ -13,11 +13,18 @@ public class ScheduleStatus {
 	private boolean generated;
 	private boolean assigned;
 	private boolean assigning;
+	private boolean deleting;
 	private boolean errored;
 	private boolean stopped;
+	private boolean stopping;
 	private int scheduled;
 	private int unscheduled;
 	private String lastUpdated;
+
+	@Override
+	public int compareTo(ScheduleStatus status) {
+		return Integer.parseInt(month) - Integer.parseInt(status.getMonth());
+	}
 	
 	public String getLastUpdated() {
 		return lastUpdated;
@@ -76,11 +83,27 @@ public class ScheduleStatus {
 		this.generating = generating;
 	}
 
+	public boolean isDeleting() {
+		return deleting;
+	}
+
+	public void setDeleting(boolean deleting) {
+		this.deleting = deleting;
+	}
+
+	public boolean isStopping() {
+		return stopping;
+	}
+
+	public void setStopping(boolean stopping) {
+		this.stopping = stopping;
+	}
+
 	@Override
 	public String toString() {
 		return "ScheduleStatus [month=" + month + ", generating=" + generating + ", generated=" + generated
-				+ ", assigned=" + assigned + ", assigning=" + assigning + ", errored=" + errored + ", stopped="
-				+ stopped + ", scheduled=" + scheduled + ", unscheduled=" + unscheduled + ", lastUpdated=" + lastUpdated
-				+ "]";
+				+ ", assigned=" + assigned + ", assigning=" + assigning + ", deleting=" + deleting + ", errored="
+				+ errored + ", stopped=" + stopped + ", stopping=" + stopping + ", scheduled=" + scheduled
+				+ ", unscheduled=" + unscheduled + ", lastUpdated=" + lastUpdated + "]";
 	}
 }

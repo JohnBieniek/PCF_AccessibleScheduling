@@ -22,6 +22,7 @@ angular.module('vacation', ['ngResource', 'ui.bootstrap']).
     });
 
 function SchedulingController($scope, $modal, $http) {
+	//Set our initial tab as this month
 	$scope.init = function(){
 		$scope.setScheduleTab($scope.monthTab);
 	}
@@ -82,6 +83,10 @@ function SchedulingController($scope, $modal, $http) {
     	if($scope.statusList && $scope.statusList[month-1])return $scope.statusList[month-1].errored;
   	    return false;
     };
+    $scope.isDeleting = function(month){
+    	if($scope.statusList && $scope.statusList[month-1])return $scope.statusList[month-1].deleting
+  	    return false;
+    };
     $scope.isAssigning = function(month){
     	if($scope.statusList && $scope.statusList[month-1])return $scope.statusList[month-1].assigning
   	    return false;
@@ -89,6 +94,10 @@ function SchedulingController($scope, $modal, $http) {
     $scope.isStopped = function(month){
     	  if($scope.statusList && $scope.statusList[month-1])return $scope.statusList[month-1].stopped
     	  return false;
+    };
+    $scope.isStopping = function(month){
+  	  if($scope.statusList && $scope.statusList[month-1])return $scope.statusList[month-1].stopping
+  	  return false;
     };
     $scope.isNotAssignable = function(month){
     	assignable = true;  	  
@@ -161,141 +170,118 @@ function SchedulingController($scope, $modal, $http) {
             	if($scope.monthTab==month){
             		$scope.setTotal(response.data);
             	}
+            	$scope.updateData();
             }) 
             .catch(function(data, status) {
             	console.error('Gists error', data,status);
         		if(data.status==404){
         			$scope.warn("Failed to generate shifts. If connection trouble persits contact your representative.");
         		}
-        		else{
+        		else if (data.status!==429){
         			$scope.warn("Failed to generate shifts");
+	    		}
+        		else{
+                	$scope.updateData();
         		}
             });
     	}
     }
-    $scope.deleteShifts = function(month){
-    	if(confirm("Are you sure to delete the shifts for "+$scope.monthName+"?")) {
-	    	$http({
-	            url: '/schedule/byMonth',
-	            method: 'DELETE',
-	            headers: {
-	                'Authorization': $scope.idToken,
-	                'Content-Type': 'application/x-www-form-urlencoded'
-	            },
-	            params: {
-	            	month: month
-	            }
-	        })
-	        .then(function(response) {
-	        	$scope.statusList = response.data.sort(function(a, b){return a.month-b.month});
-	        	$scope.setScheduled("0");
-	        	$scope.setUnscheduled("0");
-	        	$scope.setTotal("0");
-	        	setTimeout($scope.updateData,2000);
-	        }) 
-	        .catch(function(data, status) {
-	        	console.error('Gists error', data,status);
-	    		if(data.status==404){
-	    			$scope.warn("Failed to delete shifts. If connection trouble persits contact your representative.");
-	    		}
-	    		else{
-	    			$scope.warn("Failed to delete shifts");
-	    		}
-	        });
-    	}
-    }
+
+    /**
+     * Checks to ensure we aren't ungenerated or assigning
+     * Sets the assigned box text to "Assigning"
+     * Sets this months status to assigning
+     * Updates last interaction
+     * Calls staffShiftsSafely on the server with all our selected options
+     * Sets this months status to assigned on completion 
+     * Sets the generated box text to "Assigned"
+     * Updates the status list on completion
+     * Warns "Failed to assign shifts on failure"
+     */
     $scope.assignShifts = function(month, allowOvertime,allowInactive,allowUnavailable,prioritizeSecondShift,dailyMax,weeklyMax){
-   	 	$scope.updateLastInteractionTime();
-    	$scope.statusList[month-1].assigning=true;
-    	$scope.assigned="Assigning";
-    	$http({
-            url: '/schedule/staffShiftsSafely',
-            method: 'GET',
-            headers: {
-                'Authorization': $scope.idToken,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            params: {
-                month: month,
-                year: '2019',
-                allowOvertime: allowOvertime,
-                allowInactive: allowInactive,
-                allowUnavailable: allowUnavailable,
-                prioritizeSecondShift: prioritizeSecondShift,
-                dailyMax: dailyMax,
-                weeklyMax: weeklyMax
-            }
-        })
-        .then(function(response) {
-        	$scope.statusList = response.data.sort(function(a, b){return a.month-b.month});
-        	
-        	setTimeout($scope.updateData,2000);
-        }) 
-        .catch(function(data, status) {
-        	console.error('Gists error', data,status);
-    		if(data.status==404){
-    			$scope.warn("Failed to assign shifts. If connection trouble persits contact your representative.");
-    		}
-    		else{
-    			$scope.warn("Failed to assign shifts");
-    		}
-        });
-    }
-    $scope.stopAssignment = function(month){
-   	 	$scope.updateLastInteractionTime();
-    	if(confirm("Are you sure you want to stop assigning shifts for "+$scope.monthName+"?")){
-        	$scope.statusList[month-1].assigning=false;
-        	$scope.setAssigning("Stopping");
+    	if($scope.statusList[month-1].generated==true && $scope.statusList[month-1].assigning==false){
+	   	 	$scope.updateLastInteractionTime();
+	    	$scope.statusList[month-1].assigning=true;
+	    	$scope.setAssigned("Assigning");
 	    	$http({
-	            url: '/schedule/stopAssignment',
+	            url: '/schedule/staffShiftsSafely',
 	            method: 'GET',
 	            headers: {
 	                'Authorization': $scope.idToken,
 	                'Content-Type': 'application/x-www-form-urlencoded'
 	            },
 	            params: {
-	                month: month
+	                month: month,
+	                year: '2019',
+	                allowOvertime: allowOvertime,
+	                allowInactive: allowInactive,
+	                allowUnavailable: allowUnavailable,
+	                prioritizeSecondShift: prioritizeSecondShift,
+	                dailyMax: dailyMax,
+	                weeklyMax: weeklyMax
 	            }
 	        })
 	        .then(function(response) {
-	        	$scope.statusList = response.data.sort(function(a, b){return a.month-b.month});
-	    		setTimeout($scope.updateData,2000);
+		    	$scope.statusList[month-1].assigning=false;
+		    	$scope.statusList[month-1].assigned=true;
+		    	$scope.setAssigned("Assigned");
+		    	$scope.updateData();
+	        	//$scope.statusList = response.data.sort(function(a, b){return a.month-b.month});
 	        }) 
 	        .catch(function(data, status) {
+	        	$scope.updateData();
 	        	console.error('Gists error', data,status);
 	    		if(data.status==404){
-	    			$scope.warn("Failed to stop assigning shifts. If connection trouble persits contact your representative.");
+	    			$scope.warn("Failed to assign shifts. If connection trouble persits contact your representative.");
+	    		}
+	    		else if (data.status==429){
+	    			$scope.warn("Assignment has just been started by another user and is already running for this month.");
 	    		}
 	    		else{
-	    			$scope.warn("Failed to stop assigning shifts");
+	    			$scope.warn("Failed to assign shifts");
 	    		}
 	        });
     	}
     }
-    $scope.finishAssignment = function finishAssignment(){
-    	$http({
-            url: '/schedule/finishAssignment',
-            method: 'GET',
-            headers: {
-                'Authorization': $scope.idToken,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            params: {
-                month: $scope.monthTab
-            }
-        })
-        .then(function(response) {
-        	$scope.statusList = response.data.sort(function(a, b){return a.month-b.month});
-        	setTimeout($scope.updateData,2000);
-        }) 
-        .catch(function(data, status) {
-        	console.error('Gists error', data,status);
-    		if(data.status==404){
-    			$scope.warn("Failed to assign shifts. If connection trouble persits contact your representative.");
-    		}
-    		else{
-    			$scope.warn("Failed to assign shifts");
-    		}
-        });
+    
+    /**
+     * Notes interaction
+     * Checks to ensure we are currently assigning
+     * Asks the user if they're certain they want to stop assignment
+     */
+    $scope.stopAssignment = function(month){
+   	 	$scope.updateLastInteractionTime();
+   	 	if($scope.statusList[month-1] && $scope.statusList[month-1].assigning==true){
+	    	if(confirm("Are you sure you want to stop assigning shifts for "+$scope.monthName+"?")){
+	        	$scope.statusList[month-1].stopping=true;
+	        	$scope.statusList[month-1].stopped=true;
+	        	$scope.statusList[month-1].assigning=false;
+	        	$scope.setAssigned("Stopping");
+		    	$http({
+		            url: '/schedule/stopAssignment',
+		            method: 'GET',
+		            headers: {
+		                'Authorization': $scope.idToken,
+		                'Content-Type': 'application/x-www-form-urlencoded'
+		            },
+		            params: {
+		                month: month
+		            }
+		        })
+		        .then(function(response) {
+		        	$scope.updateData();
+		        	//$scope.statusList = response.data.sort(function(a, b){return a.month-b.month});
+		        }) 
+		        .catch(function(data, status) {
+		        	console.error('Gists error', data,status);
+		    		if(data.status==404){
+		    			$scope.warn("Failed to stop assigning shifts. If connection trouble persits contact your representative.");
+		    		}
+		    		else{
+		    			$scope.warn("Failed to stop assigning shifts");
+		    		}
+		        });
+	    	}
+   	 	}
     }
 }

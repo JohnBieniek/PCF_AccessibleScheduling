@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import org.cloudfoundry.samples.music.repositories.mongodb.ScheduleStatusRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import accessiblesolutions.accessiblescheduling.constants.Constants;
@@ -36,13 +38,17 @@ public class ShiftGenerationManager {
     @Autowired
     private UpdateInfoManager updateInfoManager;
     
+    @Autowired
+    ShiftAssignmentManager assignmentManager;
+    
     public ShiftGenerationManager() {
     }
     
     public String generateShifts(String selectedMonth,String selectedYear) throws NumberFormatException{
     	String response = "Generated ";
     	int shiftsGenerated = 0;
-    	ScheduleStatus status = scheduleStatusCrud.findOne(selectedMonth);
+    	
+    	ScheduleStatus status = assignmentManager.scheduleStatus(selectedMonth);
     	if(null==status) {
     		status= new ScheduleStatus();
     		status.setMonth(selectedMonth);

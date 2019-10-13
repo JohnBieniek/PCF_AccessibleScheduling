@@ -34,6 +34,8 @@ import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.core.JsonPro
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.databind.JsonMappingException;
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -812,12 +814,19 @@ public class ScheduleController {
     	ScheduleStatus status = new ScheduleStatus();
          
      	status.setMonth(month);
-     	    	
+     	status.setDeleting(true);
      	scheduleStatusRepository.deleteByMonth(month);
+     	status.setLastUpdatedToNow();
      	scheduleStatusCrud.save(status);
-     	
+     	updateInfoManager.set(Constants.STATUS);
      
         shiftManager.deleteShiftsForMonth(Integer.parseInt(month));
+     	status.setDeleting(false);
+     	status.setErrored(false);
+     	scheduleStatusRepository.deleteByMonth(month);
+     	status.setLastUpdatedToNow();
+     	scheduleStatusCrud.save(status);
+     	updateInfoManager.set(Constants.STATUS);
     	return scheduleStatusCrud.findAll();
     }
     
@@ -829,7 +838,7 @@ public class ScheduleController {
     }
     
     @RequestMapping(value = "/staffShiftsSafely", method = RequestMethod.GET)
-    public Iterable<ScheduleStatus> staffShiftsSafely(@RequestHeader(value="Authorization", required=false) String idToken,
+    public ResponseEntity<?> staffShiftsSafely(@RequestHeader(value="Authorization", required=false) String idToken,
     													@RequestParam("month") String month
     													,@RequestParam("year") String year
     													,@RequestParam("allowOvertime") boolean allowOvertime
@@ -841,12 +850,13 @@ public class ScheduleController {
     	securityManager.authorize(idToken, Constants.ADMIN);
     	
     	System.out.println("Starting assignment");
-    	ScheduleStatus status = scheduleStatusCrud.findOne(month);
+    	ScheduleStatus status = assignmentManager.scheduleStatus(month);
     	if(null==status) {
+        	System.out.println("Status for assignment:null");
     		status= new ScheduleStatus();
     		status.setMonth(month);
     	}
-    
+    	System.out.println("Status for assignment:"+status.toString());
     	if(status.isGenerated() && !status.isAssigning()) {
     		status.setAssigning(true);
     		status.setLastUpdatedToNow();
@@ -860,10 +870,11 @@ public class ScheduleController {
 			
 			assignmentManager.scheduleShifts(options);
     	}
+    	else {
+    		return new ResponseEntity<String>("Already scheduling",HttpStatus.TOO_MANY_REQUESTS);
+    	}
     	
-
-
-    	return scheduleStatusCrud.findAll();
+    	return new ResponseEntity<>(scheduleStatusCrud.findAll(),HttpStatus.OK);	
     }
     
     @RequestMapping(value = "/assigning", method = RequestMethod.GET)
@@ -933,31 +944,39 @@ public class ScheduleController {
     public Iterable<ScheduleStatus> stopAssignment(@RequestHeader(value="Authorization", required=false) String idToken,@RequestParam("month") String month) throws CorruptDataException, InterruptedException, AuthenticationException {
     	securityManager.authorize(idToken, Constants.ADMIN);
     	
-    	ScheduleStatus status = scheduleStatusCrud.findOne(month);
+    	ScheduleStatus status = assignmentManager.scheduleStatus(month);
     	scheduleStatusRepository.deleteByMonth(month);
     	
     	if(null==status) {
     		status= new ScheduleStatus();
     		status.setMonth(month);
+        	status.setGenerated(true);
+    		status.setAssigning(true);
+
     	}
     	
-    	status.setGenerated(true);
-		status.setAssigning(true);
 		status.setStopped(true);
+		status.setStopping(true);
 		status.setLastUpdatedToNow();
     	scheduleStatusCrud.save(status);
         updateInfoManager.set(Constants.STATUS);
     	Thread.sleep(5000);//Can this be deleted?
-    	finishAssignment(idToken, month);
+    	finishAssignment(idToken, month);//What does this do?
         return scheduleStatusCrud.findAll();
     }
     
     @RequestMapping(value = "/generateShifts", method = RequestMethod.GET)
-    public int generateShifts(@RequestHeader(value="Authorization", required=false) String idToken,@RequestParam("month") String month,@RequestParam("year") String year) throws CorruptDataException, AuthenticationException {
+    public ResponseEntity<?> generateShifts(@RequestHeader(value="Authorization", required=false) String idToken,@RequestParam("month") String month,@RequestParam("year") String year) throws CorruptDataException, AuthenticationException {
     	securityManager.authorize(idToken, Constants.ADMIN);
+    	ScheduleStatus status = assignmentManager.scheduleStatus(month);
+    	if(null!=status) {
+        	if(status.isGenerating()  || status.isGenerated()) {
+        		return new ResponseEntity<String>("Already generated",HttpStatus.TOO_MANY_REQUESTS);
+        	}
+    	}
     	generationManager.generateShifts(month,year);
     	List<Shift> shifts = (List<Shift>)shiftRepository.findByStartMonth(Integer.parseInt(month));
-        return shifts.size();
+		return new ResponseEntity<Integer>(shifts.size(),HttpStatus.OK);
     }
     
     @RequestMapping(value = "/getShiftsForMonth", method = RequestMethod.GET)
