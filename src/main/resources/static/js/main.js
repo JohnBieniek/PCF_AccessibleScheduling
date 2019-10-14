@@ -364,10 +364,10 @@ function MainNavigationController($scope, $modal, $http) {
 		        	if(response.data.status){
 		        		if(response.data.status.info){//The status list only comes back when changed
 			        		$scope.statusList = response.data.status.info;
-			        		$scope.updateScheduleDisplay();
 				        	$scope.lastStatusTableUpdate=response.data.status.tableLastUpdated;		        			
 		        		}
 		        		
+		        		$scope.updateScheduleDisplay();
 			        	$scope.setScheduled(response.data.status.assigned);//The count always comes back as it's hard to track changed to
 			        	$scope.setUnscheduled(response.data.status.unassigned);
 			        	$scope.total= +$scope.scheduled + +$scope.unscheduled;
