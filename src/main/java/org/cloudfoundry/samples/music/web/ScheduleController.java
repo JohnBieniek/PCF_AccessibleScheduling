@@ -29,6 +29,7 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.core.JsonParseException;
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.databind.JsonMappingException;
@@ -122,8 +123,8 @@ public class ScheduleController {
     }
 
     @RequestMapping(value = "/employeeNames", method = RequestMethod.GET)
-    public String employeeNames(@RequestHeader(value="Authorization", required=false) String idToken) throws AuthenticationException, JSONException {
-    	securityManager.authorize(idToken, Constants.MANAGER);
+    public String employeeNames(@RequestHeader(value="Authorization", required=false) String idToken) throws AuthenticationException, JSONException, InterruptedException {
+    	//securityManager.authorize(idToken, Constants.MANAGER);
 	    UpdateInfo updateInfo = updateInfoRepository.findOne("employees");
 		  List<Employee> employeeList = employeeRepository.findAll();
           Collections.sort(employeeList);
@@ -139,7 +140,7 @@ public class ScheduleController {
 		  
 		  employeesInfoJson.put("names", employeeInfoJson);
 		  employeesInfoJson.put("tableLastUpdated", updateInfo.getTime());
-		  
+		  Thread.sleep(5000L);  
     	return employeeInfoJson.toString();
     }
     
