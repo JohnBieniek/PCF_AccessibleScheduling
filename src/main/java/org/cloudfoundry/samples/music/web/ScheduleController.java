@@ -122,9 +122,10 @@ public class ScheduleController {
         this.manager=manager;
     }
 
+    
     @RequestMapping(value = "/employeeNames", method = RequestMethod.GET)
     public String employeeNames(@RequestHeader(value="Authorization", required=false) String idToken) throws AuthenticationException, JSONException, InterruptedException {
-    	//securityManager.authorize(idToken, Constants.MANAGER);
+    	securityManager.authorize(idToken, Constants.MANAGER);
 	    UpdateInfo updateInfo = updateInfoRepository.findOne("employees");
 		  List<Employee> employeeList = employeeRepository.findAll();
           Collections.sort(employeeList);
@@ -140,7 +141,6 @@ public class ScheduleController {
 		  
 		  employeesInfoJson.put("names", employeeInfoJson);
 		  employeesInfoJson.put("tableLastUpdated", updateInfo.getTime());
-		  Thread.sleep(5000L);  
     	return employeeInfoJson.toString();
     }
     

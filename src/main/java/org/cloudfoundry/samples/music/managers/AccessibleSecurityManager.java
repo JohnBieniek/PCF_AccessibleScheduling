@@ -1,11 +1,13 @@
 package org.cloudfoundry.samples.music.managers;
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 
 import javax.security.sasl.AuthenticationException;
 
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoAccessRequestRepository;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoEmployeeRepository;
+import org.cloudfoundry.samples.music.repositories.mongodb.MongoSessionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -15,13 +17,17 @@ import accessiblesolutions.accessiblescheduling.constants.Constants;
 import accessiblesolutions.accessiblescheduling.domain.AccessRequest;
 import accessiblesolutions.accessiblescheduling.domain.CallAuth;
 import accessiblesolutions.accessiblescheduling.domain.Employee;
+import accessiblesolutions.accessiblescheduling.domain.Session;
 import accessiblesolutions.accessiblescheduling.domain.User;
-import accessiblesolutions.accessiblescheduling.proxy.SecurityProxy;
 
 @Component
 public class AccessibleSecurityManager {
 	@Autowired
 	private MongoEmployeeRepository employeeCrud;
+
+	@Autowired
+	private MongoSessionRepository sessionRepository;
+
 	
 	@Autowired
 	private MongoAccessRequestRepository accessCrud;
@@ -33,6 +39,12 @@ public class AccessibleSecurityManager {
     
     public AccessibleSecurityManager() {}
     
+    
+    @Scheduled(fixedRate = Constants.ONE_HOUR_IN_MILISECONDS)
+    public void clearSessions() {
+    	sessionRepository.deleteAll();
+    }
+    
     public CallAuth authorize(String idToken, String requiredRole) throws AuthenticationException {
     	CallAuth auth = null;
     	
@@ -41,27 +53,56 @@ public class AccessibleSecurityManager {
 			throw new AuthenticationException();
     	}
     	
-    	User user = getUser(idToken);
+    	boolean getUpdatedUser=false;
+    	
+    	User user = null;
+    	
+    	Session session = sessionRepository.findByToken(idToken);
+    	
+    	if(null!=session) {
+    		if(!session.hasExpired()) {
+    			user = new User();
+    			user.setUserId(session.getUserId());
+        		System.out.println("Pulled auth data from the session repository");
+    		}
+    		else {
+    			sessionRepository.delete(idToken);
+    			getUpdatedUser=true;
+    		}
+    	}
+    	else {
+    		getUpdatedUser=true;
+    	}
+    	
+    	if(getUpdatedUser) {
+    		user = getUser(idToken);
+    		System.out.println("Pulled auth data from google apis");
+    		session= new Session();
+    		session.setToken(idToken);
+    		session.setUserId(user.getUserId());
+    		session.setExpires(LocalDateTime.now().plusSeconds(user.getExpiresIn()));
+    		sessionRepository.insert(session);
+//    		if(!Constants.CLIENT_ID.equalsIgnoreCase(user.getIssuedTo())) {
+	//			System.out.println("invalid client id");
+	//			throw new AuthenticationException();
+	//		}
+	//		else 
+			if(!Constants.TOKEN_ISSUER.equalsIgnoreCase(user.getIssuer())) {
+				System.out.println("invalid id issuer");
+				throw new AuthenticationException();
+			}
+			else if(user.getExpiresIn()<=0) {
+				System.out.println("expired token");
+				throw new AuthenticationException();
+			}
+			else if(!user.isVerifiedEmail()) {
+				System.out.println("e-mail not verified");
+				throw new AuthenticationException();
+			}
+    	}
+    	
     	
     	if(null!=user) {
-//    		if(!Constants.CLIENT_ID.equalsIgnoreCase(user.getIssuedTo())) {
-//    			System.out.println("invalid client id");
-//    			throw new AuthenticationException();
-//    		}
-//    		else 
-    			 if(!Constants.TOKEN_ISSUER.equalsIgnoreCase(user.getIssuer())) {
-    			System.out.println("invalid id issuer");
-    			throw new AuthenticationException();
-    		}
-    		else if(user.getExpiresIn()<=0) {
-    			System.out.println("expired token");
-    			throw new AuthenticationException();
-    		}
-    		else if(!user.isVerifiedEmail()) {
-    			System.out.println("e-mail not verified");
-    			throw new AuthenticationException();
-    		}
-    		
     		user= getUserDetails(user);
     		
     		if(!requiredRole.equalsIgnoreCase("guest") && !user.isUser()) {
@@ -198,7 +239,7 @@ public class AccessibleSecurityManager {
 		} catch (Exception e) {	
 			throw new AuthenticationException();
 		}
-    	System.out.println("user found:"+user.toString());
+		
     	return user;
     }
 }
