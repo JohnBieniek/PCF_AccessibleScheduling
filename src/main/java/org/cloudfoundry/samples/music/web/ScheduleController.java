@@ -173,12 +173,11 @@ public class ScheduleController {
     	JSONObject jsonObject = new JSONObject(json);
     	System.out.println("called get allUpdates with jsonObject:"+jsonObject.toString());
     	JSONObject result = new JSONObject();
-	      ObjectMapper mapper = new ObjectMapper();
+	    ObjectMapper mapper = new ObjectMapper();
     	Iterator keys = jsonObject.keys();
 
     	while(keys.hasNext()) {
     		try {
-    			int index;
 			    String id = null;
 			    String date = null;
 			    String day = null;
@@ -824,6 +823,9 @@ public class ScheduleController {
         shiftManager.deleteShiftsForMonth(Integer.parseInt(month));
      	status.setDeleting(false);
      	status.setErrored(false);
+     	status.setAssigning(false);
+     	status.setAssigned(false);
+     	status.setGenerated(false);
      	scheduleStatusRepository.deleteByMonth(month);
      	status.setLastUpdatedToNow();
      	scheduleStatusCrud.save(status);
@@ -946,23 +948,21 @@ public class ScheduleController {
     	securityManager.authorize(idToken, Constants.ADMIN);
     	
     	ScheduleStatus status = assignmentManager.scheduleStatus(month);
-    	scheduleStatusRepository.deleteByMonth(month);
     	
     	if(null==status) {
     		status= new ScheduleStatus();
     		status.setMonth(month);
         	status.setGenerated(true);
-    		status.setAssigning(true);
 
     	}
     	
-		status.setStopped(true);
 		status.setStopping(true);
 		status.setLastUpdatedToNow();
+    	scheduleStatusRepository.deleteByMonth(month);
     	scheduleStatusCrud.save(status);
         updateInfoManager.set(Constants.STATUS);
-    	Thread.sleep(5000);//Can this be deleted?
-    	finishAssignment(idToken, month);//What does this do?
+    	//Thread.sleep(5000);//Can this be deleted?
+    	//finishAssignment(idToken, month);//What does this do?
         return scheduleStatusCrud.findAll();
     }
     

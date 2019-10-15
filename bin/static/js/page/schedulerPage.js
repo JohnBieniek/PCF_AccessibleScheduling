@@ -149,7 +149,7 @@ function SchedulingController($scope, $modal, $http) {
     $scope.generateShifts = function(month){
     	if($scope.statusList[month-1].generating==false && $scope.statusList[month-1].generated==false){
         	$scope.statusList[month-1].generating=true;
-        	$scope.setGenerated("Generating");
+        	$scope.updateScheduleDisplay();
        	 	$scope.updateLastInteractionTime();
         	$http({
                 url: '/schedule/generateShifts',
@@ -164,9 +164,6 @@ function SchedulingController($scope, $modal, $http) {
                 }
             })
             .then(function(response) {
-            	$scope.statusList[month-1].generating=false;
-            	$scope.statusList[month-1].generated=true;
-            	$scope.setGenerated("Generated");
             	if($scope.monthTab==month){
             		$scope.setTotal(response.data);
             	}
@@ -202,7 +199,10 @@ function SchedulingController($scope, $modal, $http) {
     	if($scope.statusList[month-1].generated==true && $scope.statusList[month-1].assigning==false){
 	   	 	$scope.updateLastInteractionTime();
 	    	$scope.statusList[month-1].assigning=true;
-	    	$scope.setAssigned("Assigning");
+	    	$scope.statusList[month-1].stopped=false;
+	    	$scope.statusList[month-1].assigned=false;
+	    	$scope.statusList[month-1].errored=false;
+	    	$scope.updateScheduleDisplay();
 	    	$http({
 	            url: '/schedule/staffShiftsSafely',
 	            method: 'GET',
@@ -222,9 +222,6 @@ function SchedulingController($scope, $modal, $http) {
 	            }
 	        })
 	        .then(function(response) {
-		    	$scope.statusList[month-1].assigning=false;
-		    	$scope.statusList[month-1].assigned=true;
-		    	$scope.setAssigned("Assigned");
 		    	$scope.updateData();
 	        	//$scope.statusList = response.data.sort(function(a, b){return a.month-b.month});
 	        }) 
@@ -254,9 +251,7 @@ function SchedulingController($scope, $modal, $http) {
    	 	if($scope.statusList[month-1] && $scope.statusList[month-1].assigning==true){
 	    	if(confirm("Are you sure you want to stop assigning shifts for "+$scope.monthName+"?")){
 	        	$scope.statusList[month-1].stopping=true;
-	        	$scope.statusList[month-1].stopped=true;
-	        	$scope.statusList[month-1].assigning=false;
-	        	$scope.setAssigned("Stopping");
+	        	$scope.updateScheduleDisplay();
 		    	$http({
 		            url: '/schedule/stopAssignment',
 		            method: 'GET',

@@ -76,12 +76,7 @@ public class AccessibleSecurityManager {
     	
     	if(getUpdatedUser) {
     		user = getUser(idToken);
-    		System.out.println("Pulled auth data from google apis");
-    		session= new Session();
-    		session.setToken(idToken);
-    		session.setUserId(user.getUserId());
-    		session.setExpires(LocalDateTime.now().plusSeconds(user.getExpiresIn()));
-    		sessionRepository.insert(session);
+
 //    		if(!Constants.CLIENT_ID.equalsIgnoreCase(user.getIssuedTo())) {
 	//			System.out.println("invalid client id");
 	//			throw new AuthenticationException();
@@ -99,6 +94,13 @@ public class AccessibleSecurityManager {
 				System.out.println("e-mail not verified");
 				throw new AuthenticationException();
 			}
+			
+    		System.out.println("Pulled auth data from google apis");
+    		session= new Session();
+    		session.setToken(idToken);
+    		session.setUserId(user.getUserId());
+    		session.setExpires(LocalDateTime.now().plusSeconds(user.getExpiresIn()));
+    		sessionRepository.insert(session);
     	}
     	
     	

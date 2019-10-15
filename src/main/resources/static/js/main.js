@@ -254,7 +254,8 @@ function MainNavigationController($scope, $modal, $http) {
 		 var timeSinceInteraction = $scope.getMinutesSinceLastInteraction();
  		 if(($scope.page=="templates/page/scheduler.html" && $scope.statusList !=undefined && $scope.statusList[$scope.monthTab-1] !=undefined )&&
  				 	($scope.statusList[$scope.monthTab-1].assigning || 
- 		    		$scope.statusList[$scope.monthTab-1].generating || 
+ 		    		$scope.statusList[$scope.monthTab-1].generating ||
+ 		    		$scope.statusList[$scope.monthTab-1].deleting ||
  		    		$scope.statusList[$scope.monthTab-1].stopping) ){
 			 setTimeout(autoUpdateData,5000);
  		 }
@@ -284,7 +285,7 @@ function MainNavigationController($scope, $modal, $http) {
 	        	$scope.statusList[month-1].deleting=true;
 	        	$scope.statusList[month-1].assigned=false;
 	        	$scope.statusList[month-1].generated=false;
-            	$scope.setGenerated("Deleting");
+	        	$scope.updateScheduleDisplay();
 		    	$http({
 		            url: '/schedule/byMonth',
 		            method: 'DELETE',
@@ -297,12 +298,10 @@ function MainNavigationController($scope, $modal, $http) {
 		            }
 		        })
 		        .then(function(response) {
-		        	$scope.statusList = response.data.sort(function(a, b){return a.month-b.month});
 		        	$scope.setScheduled("0");
 		        	$scope.setUnscheduled("0");
 		        	$scope.setTotal("0");
-	            	$scope.setGenerated("Generated");
-		        	//setTimeout($scope.updateData,2000);
+		        	$scope.updateData();
 		        }) 
 		        .catch(function(data, status) {
 	            	$scope.setGenerated("Generated");
@@ -663,20 +662,8 @@ function MainNavigationController($scope, $modal, $http) {
 			        })
 			        .then(function(response) {
 			    		$scope.statusList = response.data.sort(function(a, b){return a.month-b.month});
-			    	    if($scope.statusList!=undefined && $scope.statusList[month-1]!=undefined && $scope.statusList[month-1].generated){
-			  	    	  $scope.setGenerated("Generated");
-				  	    }
-				  	      
-				  	    if($scope.statusList!=undefined && $scope.statusList[month-1]!=undefined && $scope.statusList[month-1].assigned){
-				  	    	  $scope.setAssigned("Assigned");
-				  	    }
-				  	      
-				  	    if($scope.statusList!=undefined && $scope.statusList[month-1]!=undefined && $scope.statusList[month-1].assigning){
-				      	  $scope.setAssigned("Assigning");
-				      	  if($scope.statusList!=undefined && $scope.statusList[month-1]!=undefined && $scope.statusList[month-1].stopped){
-				      		  $scope.setAssigned("Stopping");
-				      	  }
-				  	    }
+			    	    
+			    		$scope.updateScheduleDisplay();
 				        if($scope.statusList[month-1]!=undefined){
 				    	   $scope.lastGeneratedStatus=$scope.statusList[month-1].generated;
 					       $scope.lastAssignedStatus=$scope.statusList[month-1].assigned;
@@ -1246,20 +1233,21 @@ function MainNavigationController($scope, $modal, $http) {
      
      $scope.updateScheduleDisplay = function(){
     	 var newTab = $scope.monthTab;
-    	if($scope.statusList && $scope.statusList[newTab-1] && $scope.statusList[newTab-1].generating=="true"){
+    	 console.log($scope.statusList[newTab-1]);
+    	if($scope.statusList && $scope.statusList[newTab-1] && $scope.statusList[newTab-1].generating){
 		   	$scope.setGenerated("Generating");
     	}
-		else if($scope.statusList && $scope.statusList[newTab-1] && $scope.statusList[newTab-1].deleting=="true"){
+		else if($scope.statusList && $scope.statusList[newTab-1] && $scope.statusList[newTab-1].deleting){
 	    	$scope.setGenerated("Deleting");
     	}
 		else{
 	    	$scope.setGenerated("Generated");
 		}
     	
-		if($scope.statusList && $scope.statusList[newTab-1] && $scope.statusList[newTab-1].stopping=="true"){
+		if($scope.statusList && $scope.statusList[newTab-1] && $scope.statusList[newTab-1].stopping){
 			$scope.setAssigned("Stopping");
 		}
-		else if($scope.statusList && $scope.statusList[newTab-1] && $scope.statusList[newTab-1].assigning=="true"){
+		else if($scope.statusList && $scope.statusList[newTab-1] && $scope.statusList[newTab-1].assigning){
 	    	$scope.setAssigned("Assigning");
     	}
 		else{
