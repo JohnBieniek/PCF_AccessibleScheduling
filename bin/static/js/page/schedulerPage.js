@@ -71,8 +71,9 @@ function SchedulingController($scope, $modal, $http) {
     	if($scope.statusList && $scope.statusList[month-1])return $scope.statusList[month-1].generated;
   	    return false;
     };
+    //I've currently disabled showing which month is scheduling on the side as only one should be and the colors look odd
     $scope.isWorking = function(month){
-    	  if($scope.statusList && $scope.statusList[month-1])return $scope.statusList[month-1].assigning  && $scope.monthTab != month;
+    	  //if($scope.statusList && $scope.statusList[month-1])return $scope.statusList[month-1].assigning  && $scope.monthTab != month;
     	  return false;
     };
     $scope.isAssigned = function(month){
@@ -233,6 +234,9 @@ function SchedulingController($scope, $modal, $http) {
 	    		}
 	    		else if (data.status==429){
 	    			$scope.warn("Assignment has just been started by another user and is already running for this month.");
+	    		}
+	    		else if (data.status==428){
+	    			$scope.warn("Failled to assign shifts because they were just deleted by another user.");
 	    		}
 	    		else{
 	    			$scope.warn("Failed to assign shifts");

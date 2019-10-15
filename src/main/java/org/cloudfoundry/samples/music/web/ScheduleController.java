@@ -874,7 +874,12 @@ public class ScheduleController {
 			assignmentManager.scheduleShifts(options);
     	}
     	else {
-    		return new ResponseEntity<String>("Already scheduling",HttpStatus.TOO_MANY_REQUESTS);
+    		if(status.isAssigning()) {
+    			return new ResponseEntity<String>("Already scheduling",HttpStatus.TOO_MANY_REQUESTS);
+    		}
+    		if(!status.isGenerated()) {
+    			return new ResponseEntity<String>("Cannot schedule without generating shifts",HttpStatus.PRECONDITION_REQUIRED);
+    		}
     	}
     	
     	return new ResponseEntity<>(scheduleStatusCrud.findAll(),HttpStatus.OK);	
