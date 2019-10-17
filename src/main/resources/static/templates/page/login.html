@@ -1,5 +1,7 @@
 <div ng-controller="LoginController">
-<style type="text/css">
+ <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" type="text/css">
+ 
+  <style type="text/css">
     #customBtn {
       display: inline-block;
       background: white;
@@ -35,16 +37,17 @@
       font-family: 'Roboto', sans-serif;
     }
   </style>
-<div>
-	    <div id="gSignInWrapper">
-	    <span class="label">Sign in with:</span>
-	    <div id="customBtn" class="customGPlusSignIn">
-	      <span class="buttonText">Google</span>
-	    </div>
+  <!-- In the callback, you would hide the gSignInWrapper element on a
+  successful sign in -->
+  <div ng-init="startApp()" id="gSignInWrapper">
+    <span class="label">Sign in with:</span>
+    <div id="customBtn" class="customGPlusSignIn">
+      <span class="icon"></span>
+      <span class="buttonText">Google</span>
+    </div>
+  </div>
+  <div id="name"></div>
 	</div>
-	<div id="name"></div>
-	<!-- <script>startApp();</script> -->
-	    </div>
 	<br>
 	<br>
 	<br>
