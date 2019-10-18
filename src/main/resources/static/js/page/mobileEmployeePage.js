@@ -25,20 +25,8 @@ function MobileEmployeeController($scope, $modal, $http) {
 	$scope.init = function(){
 		//The date in the selection box for calling off
 		 $scope.newDate=$scope.week.getFullYear()+"-"+(($scope.week.getMonth()+1)<10?"0"+($scope.week.getMonth()+1):($scope.week.getMonth()+1))+"-"+$scope.week.getDate();
-		 
-//		 if($scope.manager){
-//	    	 $scope.getClientNames();
-//		 }
-//		 
-//		 $scope.listCustomFields();
-		 
-//		 if($scope.selectedEmployee==undefined || $scope.selectedEmployee == null){
-//            $scope.setEmployeeToUser();
-//		 }
 
 		 $scope.getDisplayWeek();
-
-//		 $scope.listShifts();
 	}
 	
 	/**
@@ -46,25 +34,71 @@ function MobileEmployeeController($scope, $modal, $http) {
 	 * function
 	 */
 	$scope.setEmployeeTabAndInfo=function(tab){
-//		$scope.updateEmployee();
-//		$scope.getAllEmployeeCustomFieldData();
-//	    $scope.listShifts();
 		$scope.setEmployeeTab(tab);
 		$scope.updateData();
 	}
 	
-	//TODO validate these are up to date first
-	$scope.deleteAvailability=function(availability){ 
-		$scope.updateLastInteractionTime();
-		var currentEmployee = $scope.employee;
-		if(confirm("Are you sure you want to delete the selected availability? for "+ $scope.employee.days[availability]+ "?")){
-			currentEmployee.startTimes.splice(availability,1);    
-			currentEmployee.days.splice(availability,1);
-			currentEmployee.endTimes.splice(availability,1); 
-
-	        $scope.saveEmployee(currentEmployee);
-	    }
-    }
+	/**
+     * Checks to see if we have the latest info in this shift.
+     * If we don't we ask if they want to delete anyways or see what the changes are.
+     * If the choose to proceed or if we had the latest data we delete the shift.
+     */
+    $scope.deleteAvailability = function (availability) {
+    	$scope.updateLastInteractionTime();
+    	var employee = $scope.employee;
+    	if(employee.availability){
+	     	for(var index = 0; index<employee.availability.length;index++){
+				if(!employee.availabilityStartTimes){
+					employee.availabilityStartTimes=[];
+				}
+				if(!employee.availabilityEndTimes){
+					employee.availabilityEndTimes=[];
+				}			
+				if(!employee.availabilityDays){
+					employee.availabilityDays=[];
+				}
+				employee.availabilityStartTimes.push(employee.availability[index].startTime);
+				employee.availabilityEndTimes.push(employee.availability[index].endTime);
+				employee.days.push(employee.availability[index].day);	
+			}
+      	}
+    	$http({
+            url: '/schedule/availabilityWasUpdated',
+            method: 'GET',
+            headers: {
+                'Authorization': $scope.idToken,
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            params: {
+            	param:employee,
+            	index:availability
+            }
+        })
+        .then(function(response) {
+        	var deleteAvailability=false;
+        	
+        	if(response.data=="UPDATED"){
+    		   if(confirm("This availability has just been modified by another user. Deleteing this availability will overwrite thier updates. Would you " +
+    		   				"still like to delete this availability?")){
+    			   deleteAvailability=true;
+    		   }
+    		   else{
+    			   $scope.updateData();
+    		   }
+        	}
+    		else if(confirm("Are you sure you want to delete the selected availability? for "+ $scope.employee.days[availability]+ "?")){
+    			deleteAvailability=true;
+    		}
+        	
+        	if(deleteAvailability){
+    			employee.startTimes.splice(availability,1);    
+    			employee.days.splice(availability,1);
+    			employee.endTimes.splice(availability,1);
+    			
+    	        $scope.saveEmployee(employee);			
+        	}
+    	});
+     };
 	
 	$scope.addAvailability= function(day){
 		$scope.updateLastInteractionTime();

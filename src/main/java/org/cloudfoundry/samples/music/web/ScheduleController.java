@@ -472,6 +472,56 @@ public class ScheduleController {
     	return updated;
     }
     
+    @RequestMapping(value = "/availabilityWasUpdated",method = RequestMethod.GET)
+    public String availabilityRequiresUpdate(@RequestHeader(value="Authorization", required=false) String idToken,@RequestParam String param,@RequestParam String index) throws AuthenticationException {
+    	securityManager.authorize(idToken, Constants.USER);
+    	
+    	String updated ="UNMODIFIED";
+    	
+    	Employee employee =null;
+
+    	ObjectMapper mapper = new ObjectMapper();
+    	
+    	try {
+			employee = mapper.readValue(param, Employee.class);
+			
+	    	LocalDateTime time = null;
+	    	//2019-09-22T20:02:26.789Z
+	    	if(employee.getLastUpdated()!=null ) {
+	    		time=Util.getLocalDateTimeFromString(employee.getLastUpdated());
+	    	}
+
+	    	Employee serverEmployee = employeeRepository.findOne(employee.getId());
+	    	
+	    	if(null!=serverEmployee) {
+	    		if(time==null && serverEmployee.getLastUpdated()!=null){
+	    			updated="EMPLOYEE_UPDATED";
+	    		}
+	    		else {
+	        		if(!employee.getLastUpdatedTime().isEqual(serverEmployee.getLastUpdatedTime())) {
+	                	if(time!=null && time.isBefore(Util.getLocalDateTimeFromString(serverEmployee.getLastUpdated()))) {
+	                		updated="EMPLOYEE_UPDATED";
+	                	}
+	        		}
+	    		}
+	    	}
+	    	else {
+	    		updated="DELETED";
+	    	}
+	    	
+	    	if(updated.equalsIgnoreCase("EMPLOYEE_UPDATED")) {
+	    		//TODO determine if this availability was updated or if it's just the employee that got updated
+	    	}
+    	}
+    	catch(Exception e){
+    		System.out.println(e);
+    	}
+    	
+
+		
+    	return updated;
+    }
+    
     @RequestMapping(value = "/shiftWasUpdated",method = RequestMethod.GET)
     public String shiftRequiresUpdate(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam String lastUpdated,@RequestParam String shiftId) throws AuthenticationException {
     	securityManager.authorize(idToken, Constants.USER);

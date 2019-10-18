@@ -33,18 +33,6 @@ function MobileClientController($scope, $modal, $http) {
 	        $scope.setDetailsChanged(false);
 	        
 	        $scope.updateData();
-//	        
-//	        $scope.updateClient();//Currently we always check for all data needed when entering a screen
-//	        $scope.getAllClientCustomFieldData();//Updated now for visual crispness
-//	        
-//	        if(newTab=="Requests"){
-//		        $scope.listRequests();	        	
-//	        }
-//	        else if (newTab=="Schedule"){
-//		        $scope.listShifts();	        	
-//	        }
-//
-//	        $scope.listClients();//Currently we always check for all data needed when entering a screen
 		}
 	}
 	
@@ -58,16 +46,6 @@ function MobileClientController($scope, $modal, $http) {
 	      $scope.setSelectedClient(newClient);
 	      
 	      $scope.updateData();
-//      $scope.getAllClientCustomFieldData();//Done now for visual crispness
-//      
-//	  if($scope.tab=="Requests"){		 
-//		  $scope.listRequests();
-//	  }
-//	  else if($scope.tab == "Schedule"){
-//		  $scope.listShifts();
-//	  }
-//
-//      $scope.listClients();//Consider removing and all auto update to do this
 	  }
 	}
 	
