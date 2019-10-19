@@ -192,6 +192,18 @@ public class Employee implements Comparable<Employee>{
 		}
 	}
 	
+	public void removeAvailability(int index) {
+    	ArrayList<String> startTimes = new ArrayList<String>(Arrays.asList(getStartTimes()));
+    	ArrayList<String> endTimes = new ArrayList<String>(Arrays.asList(getEndTimes()));
+    	ArrayList<String> days = new ArrayList<String>(Arrays.asList(getDays()));
+    	days.remove(index);
+    	startTimes.remove(index);
+    	endTimes.remove(index);
+    	setDays(Arrays.asList(days.toArray()).toArray(new String[days.toArray().length]));
+    	setStartTimes(Arrays.asList(startTimes.toArray()).toArray(new String[startTimes.toArray().length]));
+    	setEndTimes(Arrays.asList(endTimes.toArray()).toArray(new String[endTimes.toArray().length]));
+	}
+	
 	public Availability setAvailability(Availability availability, int index) {
 		days[index]=availability.day.toString();
 		startTimes[index]=availability.startTime.toString();
@@ -205,7 +217,6 @@ public class Employee implements Comparable<Employee>{
 		System.out.println("get availability for day:"+getDays()[index]);
 		availability.day= DayOfWeek.of(Util.getDayInt(getDays()[index]));
 		System.out.println("day:"+availability.day.toString());
-		System.out.println("startTimes:"+getStartTimes().toString());
 		availability.startTime=LocalTime.parse(getStartTimes()[index]);
 		System.out.println("startTime:"+availability.startTime.toString());
 		availability.endTime=LocalTime.parse(getEndTimes()[index]);

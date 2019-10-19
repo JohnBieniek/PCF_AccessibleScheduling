@@ -773,8 +773,11 @@ public class ScheduleController {
 		}
 
     	Employee serverEmployee = employeeRepository.findOne(employee.getId());
+		System.out.println("employee.getAvailability(Integer.parseInt(index))"+ serverEmployee.getAvailability(Integer.parseInt(index)));
     	serverEmployee.setAvailability(employee.getAvailability(Integer.parseInt(index)), Integer.parseInt(index));
+		System.out.println("employee.getAvailability(Integer.parseInt(index))"+ serverEmployee.getAvailability(Integer.parseInt(index)));
     	serverEmployee.setLastUpdatedToNow();
+    	System.out.println(serverEmployee.toString());
     	employeeRepository.save(serverEmployee);
     	updateInfoManager.set("employees");
         return employeeRepository.findOne(employee.getId());
@@ -784,26 +787,12 @@ public class ScheduleController {
     public Employee removeAvailability(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam String param, @RequestParam String index) throws AuthenticationException {
     	securityManager.authorize(idToken, Constants.MANAGER);
     	
-    	Employee employee =null;
-
-    	ObjectMapper mapper = new ObjectMapper();
-    	
-    	try {
-			employee = mapper.readValue(param, Employee.class);
-		} catch (JsonParseException e) {
-			e.printStackTrace();
-		} catch (JsonMappingException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-    	Employee serverEmployee = employeeRepository.findOne(employee.getId());
-    	serverEmployee.setAvailability(employee.getAvailability(Integer.parseInt(index)), Integer.parseInt(index));
+    	Employee serverEmployee = employeeRepository.findOne(param);
+    	serverEmployee.removeAvailability(Integer.parseInt(index));
     	serverEmployee.setLastUpdatedToNow();
     	employeeRepository.save(serverEmployee);
     	updateInfoManager.set("employees");
-        return employeeRepository.findOne(employee.getId());
+        return employeeRepository.findOne(param);
     }
     
     @RequestMapping(value = "/addAvailability",method = RequestMethod.POST)

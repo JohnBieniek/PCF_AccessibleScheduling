@@ -105,7 +105,7 @@ function MobileEmployeeController($scope, $modal, $http) {
 	    			employee.days.splice(availability,1);
 	    			employee.endTimes.splice(availability,1);
 	    			
-	    	        $scope.saveAvailability(employee,availability);			
+	    	        $scope.removeAvailability(availability);			
 	        	}
 	    	});
     	}
@@ -142,7 +142,7 @@ function MobileEmployeeController($scope, $modal, $http) {
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
-            	param:employee,
+            	param:$scope.unmodifiedEmployee,
             	index:availability
             }
         })
@@ -247,8 +247,11 @@ function MobileEmployeeController($scope, $modal, $http) {
 		}
 	}
 	
+	/** Determines if the selected availability should be shown under this day of the week header
+	 * 
+	 */
 	$scope.isAvailabilityDay= function(availability,day){
-		return day==$scope.employee.days[availability];
+		return day.toLowerCase()==$scope.employee.days[availability].toLowerCase();
 	}
 	
 	/**
@@ -260,7 +263,7 @@ function MobileEmployeeController($scope, $modal, $http) {
 		
 		if($scope.employee && $scope.employee.days){
 			$scope.employee.days.forEach(function(selectedDay) {
-			  if(selectedDay==day){
+			  if(selectedDay.toLowerCase()==day.toLowerCase()){
 			    unavailable=false;
 			  }
 			});
@@ -293,7 +296,8 @@ function MobileEmployeeController($scope, $modal, $http) {
 	 * Updates the employee and its availability.
 	 * Checks for updates to the employee list afterwards
 	 */
-     $scope.removeAvailability = function saveAvailability(employee,availability) {
+     $scope.removeAvailability = function saveAvailability(availability) {
+    	var employee = $scope.employee;
      	if(employee.availability){
 	     	for(var index = 0; index<employee.availability.length;index++){
 				if(!employee.availabilityStartTimes){
@@ -318,7 +322,7 @@ function MobileEmployeeController($scope, $modal, $http) {
                'Content-Type': 'application/x-www-form-urlencoded'
            },
            params: {
-        	   param: employee,
+        	   param: employee.id,
         	   index:availability
            }
        })
@@ -847,27 +851,6 @@ function MobileEmployeeController($scope, $modal, $http) {
     	}
     };
     
-    /**
-	 * Updates $scope.employee and $scope.unmodifiedEmployee to be the most
-	 * recent copy of this employee from the server
-	 */
-    $scope.updateEmployee = function () {
-        $http({
-            url: '/employees/'+$scope.employee.id,
-            method: 'GET',
-            headers: {
-                'Authorization': $scope.idToken,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            params: {
-            }
-        })
-        .then(function(response) {
-        	if(response.data){
-        		$scope.setSelectedEmployee(response.data);
-        	}
-        });
-    }
      
     $scope.delete = function () {
     	$scope.updateLastInteractionTime();

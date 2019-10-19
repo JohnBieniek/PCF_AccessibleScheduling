@@ -80,7 +80,7 @@ function MainNavigationController($scope, $modal, $http) {
     	$scope.unmodifiedCustomValue=[];//Holds custom field data in the details tab
         $scope.employee=null;//The full employee info for who we are looking at
         $scope.selectedEmployee=null;//The name and id of the employee we are looking at
-        $scope.unmodifiedEmployee=null;
+        $scope.unmodifiedEmployee=null;//The full employee info for what we're looking for without any local changes, the last copy from the server
         $scope.employees=null;//Employee names and ids
         $scope.client=null;//The full client info for who we are looking at
         $scope.selectedClient = null;//The name and id of the client we are looking at TODO check to see if this is still used
@@ -161,6 +161,29 @@ function MainNavigationController($scope, $modal, $http) {
 	 }
 	 
 	 
+	 /**
+		 * Updates $scope.employee and $scope.unmodifiedEmployee to be the most
+		 * recent copy of this employee from the server
+		 */
+	    $scope.updateEmployee = function () {
+	        $http({
+	            url: '/employees/'+$scope.employee.id,
+	            method: 'GET',
+	            headers: {
+	                'Authorization': $scope.idToken,
+	                'Content-Type': 'application/x-www-form-urlencoded'
+	            },
+	            params: {
+	            }
+	        })
+	        .then(function(response) {
+	        	if(response.data){
+	        		$scope.unmodifiedEmployee=$scope.clone(response.data);
+	        		$scope.setSelectedEmployee(response.data);
+	        	}
+	        });
+	    }
+	    
 	 $scope.updateData = function updateData(){
 		 var payload = {};
 		 if($scope.page!="templates/page/scheduler.html" && $scope.page!="templates/page/alerts.html"){
@@ -331,7 +354,8 @@ function MainNavigationController($scope, $modal, $http) {
         	if(typeof $scope.employee !== 'undefined' && $scope.employee!=null && $scope.employee.role==null){
   			  response.data.role="user";
   		  	}
-
+        	
+        	$scope.unmodifiedEmployee=$scope.clone(response.data);
         	$scope.setEmployee(response.data);
         	$scope.setSelectedEmployeeWithoutGetEmployee(response.data);
         	$scope.updateData();
@@ -396,6 +420,7 @@ function MainNavigationController($scope, $modal, $http) {
 	        		//Don't update the employee if the user has made changes as it's disruptive
 	        		if(response.data.employee && !$scope.detailsChanged){
 	        			$scope.employee = response.data.employee;
+	        			$scope.unmodifiedEmployee=$scope.clone(response.data.employee);
 	        			$scope.customValue=response.data.customFieldData;
 	        		}
 	        		
@@ -489,7 +514,7 @@ function MainNavigationController($scope, $modal, $http) {
 	        .then(function(response) {
 	        	if(response.data){
         			$scope.employee = response.data;
-        			$scope.unmodifiedEmployee=response.data;
+        			$scope.unmodifiedEmployee=$scope.clone(response.data);
 	        	}
 	        	else{
 	        		if(response.status==404){
@@ -1447,6 +1472,7 @@ function MainNavigationController($scope, $modal, $http) {
 		 $scope.idToken=null;
 		 $scope.profile=null;
 		 $scope.employee=null;
+		 $scope.unmodifiedEmployee=null;
 		 $scope.tab="Schedule";
 		 $scope.employeeTab="Schedule";
 	    
