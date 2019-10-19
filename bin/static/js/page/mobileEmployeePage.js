@@ -39,13 +39,85 @@ function MobileEmployeeController($scope, $modal, $http) {
 	}
 	
 	/**
-     * Checks to see if we have the latest info in this shift.
+     * Checks to see if we have the latest info in this availability.
      * If we don't we ask if they want to delete anyways or see what the changes are.
-     * If the choose to proceed or if we had the latest data we delete the shift.
+     * If the choose to proceed or if we had the latest data we delete the availability.
      */
     $scope.deleteAvailability = function (availability) {
     	$scope.updateLastInteractionTime();
-    	var employee = $scope.employee;
+    	if(confirm("Are you sure you want to delete the selected availability for "+ $scope.employee.days[availability]+ "?")){
+	    	var employee = $scope.employee;
+	    	if(employee.availability){
+		     	for(var index = 0; index<employee.availability.length;index++){
+					if(!employee.availabilityStartTimes){
+						employee.availabilityStartTimes=[];
+					}
+					if(!employee.availabilityEndTimes){
+						employee.availabilityEndTimes=[];
+					}			
+					if(!employee.availabilityDays){
+						employee.availabilityDays=[];
+					}
+					employee.availabilityStartTimes.push(employee.availability[index].startTime);
+					employee.availabilityEndTimes.push(employee.availability[index].endTime);
+					employee.days.push(employee.availability[index].day);	
+				}
+	      	}
+	    	$http({
+	            url: '/schedule/availabilityWasUpdated',
+	            method: 'GET',
+	            headers: {
+	                'Authorization': $scope.idToken,
+	                'Content-Type': 'application/x-www-form-urlencoded'
+	            },
+	            params: {
+	            	param:employee,
+	            	index:availability
+	            }
+	        })
+	        .then(function(response) {
+	        	var deleteAvailability=false;
+	        	
+	        	if(response.data=="UPDATED"){
+	    		   if(confirm("This availability has just been modified by another user. Deleteing this availability will overwrite thier updates. Would you " +
+	    		   				"still like to delete this availability?")){
+	    			   deleteAvailability=true;
+	    		   }
+	    		   else{
+	    			   $scope.updateData();
+	    		   }
+	        	}
+	        	else if(response.data=="POSSIBLY_UPDATED"){
+	     		   if(confirm("This availability may have just been modified by another user. Deleteing this availability may overwrite thier updates. Would you " +
+	     		   				"still like to delete this availability?")){
+	     			   deleteAvailability=true;
+	     		   }
+	     		   else{
+	     			   $scope.updateData();
+	     		   }
+	        	}
+	    		else{
+	    			deleteAvailability=true;
+	    		}
+	        	
+	        	if(deleteAvailability){
+	    			employee.startTimes.splice(availability,1);    
+	    			employee.days.splice(availability,1);
+	    			employee.endTimes.splice(availability,1);
+	    			
+	    	        $scope.saveAvailability(employee,availability);			
+	        	}
+	    	});
+    	}
+     };
+     
+ 	/**
+      * Checks to see if we have the latest info in this availability.
+      * If we don't we ask if they want to update anyways or see what the changes are.
+      * If the choose to proceed or if we had the latest data we update the availability.
+      */
+     $scope.updateAvailability = function (employee, availability) {
+     	$scope.updateLastInteractionTime();
     	if(employee.availability){
 	     	for(var index = 0; index<employee.availability.length;index++){
 				if(!employee.availabilityStartTimes){
@@ -75,31 +147,81 @@ function MobileEmployeeController($scope, $modal, $http) {
             }
         })
         .then(function(response) {
-        	var deleteAvailability=false;
+        	var updateAvailability=false;
         	
         	if(response.data=="UPDATED"){
-    		   if(confirm("This availability has just been modified by another user. Deleteing this availability will overwrite thier updates. Would you " +
-    		   				"still like to delete this availability?")){
-    			   deleteAvailability=true;
+    		   if(confirm("This availability has just been modified by another user. Updating this availability will overwrite thier changes. Would you " +
+    		   				"still like to update this availability?")){
+    			   updateAvailability=true;
     		   }
     		   else{
     			   $scope.updateData();
     		   }
         	}
-    		else if(confirm("Are you sure you want to delete the selected availability? for "+ $scope.employee.days[availability]+ "?")){
-    			deleteAvailability=true;
+        	else if(response.data=="POSSIBLY_UPDATED"){
+     		   if(confirm("This availability may have just been modified by another user. Updating this availability may overwrite thier changes. Would you " +
+     		   				"still like to update this availability?")){
+     			   updateAvailability=true;
+     		   }
+     		   else{
+     			   $scope.updateData();
+     		   }
+        	}
+    		else{
+    			updateAvailability=true;
     		}
         	
-        	if(deleteAvailability){
-    			employee.startTimes.splice(availability,1);    
-    			employee.days.splice(availability,1);
-    			employee.endTimes.splice(availability,1);
-    			
-    	        $scope.saveEmployee(employee);			
+        	if(updateAvailability){
+    	        $scope.saveAvailability(employee,availability);			
         	}
     	});
-     };
+      };
 	
+  	/**
+  	 * Updates the employee and its availability.
+  	 * Checks for updates to the employee list afterwards
+  	 */
+       $scope.saveAvailability = function saveAvailability(employee,availability) {
+       	if(employee.availability){
+  	     	for(var index = 0; index<employee.availability.length;index++){
+  				if(!employee.availabilityStartTimes){
+  					employee.availabilityStartTimes=[];
+  				}
+  				if(!employee.availabilityEndTimes){
+  					employee.availabilityEndTimes=[];
+  				}			
+  				if(!employee.availabilityDays){
+  					employee.availabilityDays=[];
+  				}
+  				employee.availabilityStartTimes.push(employee.availability[index].startTime);
+  				employee.availabilityEndTimes.push(employee.availability[index].endTime);
+  				employee.days.push(employee.availability[index].day);	
+  			}
+        	}
+   	   $http({
+             url: '/schedule/updateAvailability',
+             method: 'POST',
+             headers: {
+                 'Authorization': $scope.idToken,
+                 'Content-Type': 'application/x-www-form-urlencoded'
+             },
+             params: {
+          	   param: employee,
+          	   index:availability
+             }
+         })
+         .then(function (response) {// TODO handle error state
+      	   if(response.data){
+  	    	   $scope.setEmployeeAndInfo(response.data);
+  	       	   employee.id=response.data.id;
+  	           $scope.listEmployeesAndInfo();
+  			   $scope.notify("Availability saved.");
+      	   }
+      	   else{
+      		   $scope.warn("Failed to update availability. Please try again shortly. If problems persist contact your representative.");
+      	   }
+         });
+      }
 	$scope.addAvailability= function(day){
 		$scope.updateLastInteractionTime();
 		var currentEmployee = $scope.employee;
@@ -143,17 +265,61 @@ function MobileEmployeeController($scope, $modal, $http) {
 		  if(newEmployee.role==null){
 			  newEmployee.role="user";
 		  }
-	      $scope.setSelectedEmployee(newEmployee);
+
+		  $scope.setSelectedEmployee(newEmployee);
 	      $scope.updateData();
-	//      $scope.getEmployee();//Re-enable if swapping back to doing updates individually
-	//      $scope.getAllEmployeeCustomFieldData();
-	//      $scope.listShifts();
 		}
 	}
 	 
 	$scope.setInterval = function(newInterval){
       $scope.interval = newInterval;
 	}
+	
+	/**
+	 * Updates the employee and its availability.
+	 * Checks for updates to the employee list afterwards
+	 */
+     $scope.removeAvailability = function saveAvailability(employee,availability) {
+     	if(employee.availability){
+	     	for(var index = 0; index<employee.availability.length;index++){
+				if(!employee.availabilityStartTimes){
+					employee.availabilityStartTimes=[];
+				}
+				if(!employee.availabilityEndTimes){
+					employee.availabilityEndTimes=[];
+				}			
+				if(!employee.availabilityDays){
+					employee.availabilityDays=[];
+				}
+				employee.availabilityStartTimes.push(employee.availability[index].startTime);
+				employee.availabilityEndTimes.push(employee.availability[index].endTime);
+				employee.days.push(employee.availability[index].day);	
+			}
+      	}
+ 	   $http({
+           url: '/schedule/removeAvailability',
+           method: 'POST',
+           headers: {
+               'Authorization': $scope.idToken,
+               'Content-Type': 'application/x-www-form-urlencoded'
+           },
+           params: {
+        	   param: employee,
+        	   index:availability
+           }
+       })
+       .then(function (response) {// TODO handle error state
+    	   if(response.data){
+	    	   $scope.setEmployeeAndInfo(response.data);
+	       	   employee.id=response.data.id;
+	           $scope.listEmployeesAndInfo();
+			   $scope.notify("Availability deleted.");
+    	   }
+    	   else{
+    		   $scope.warn("Failed to update availability. Please try again shortly. If problems persist contact your representative.");
+    	   }
+       });
+    }
 	
 	/**
 	 * Toggled whenever a user changes something in the details section. Used to
@@ -163,7 +329,6 @@ function MobileEmployeeController($scope, $modal, $http) {
 	  $scope.updateLastInteractionTime();
 	  $scope.setDetailsChanged(true);
 	}
-	
      
 	/**
 	 * Updates the employee and its custom field data. Checks for updates to the

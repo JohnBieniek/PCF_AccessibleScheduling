@@ -191,6 +191,15 @@ public class Employee implements Comparable<Employee>{
 			}
 		}
 	}
+	
+	public Availability setAvailability(Availability availability, int index) {
+		days[index]=availability.day.toString();
+		startTimes[index]=availability.startTime.toString();
+		endTimes[index]=availability.endTime.toString();
+		
+		return availability;
+	}
+	
 	public Availability getAvailability(int index) {
 		Availability availability = new Availability();
 		System.out.println("get availability for day:"+getDays()[index]);

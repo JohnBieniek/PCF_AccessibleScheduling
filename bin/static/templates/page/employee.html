@@ -107,10 +107,10 @@
 				    		</div>
 				    		<div ng-repeat="availabilitysDay in employee.days track by $index" style="margin-right:20px">
 				    			<div ng-if="isAvailabilityDay($index,day)" class="inline availabilityTile">
-				    				<input ng-if="manager" max = "employee.endTimes[$index]" ng-blur="saveEmployee(employee)" style="font-size:23px ;margin-left: 5px" type="time" ng-model="employee.startTimes[$index]"> 
+				    				<input ng-if="manager" max = "employee.endTimes[$index]" ng-blur="updateAvailability(employee,$index)" style="font-size:23px ;margin-left: 5px" type="time" ng-model="employee.startTimes[$index]"> 
 				    				<p ng-if="!manager" style="font-size:23px ;margin-left: 5px">{{employee.startTimes[$index]}} to {{employee.endTimes[$index]}}</p>
 				    				<span ng-if="manager" style="display:inline-block;font-size: 25px;" class="inline"> to </span>
-				    				<input ng-if="manager" min="employee.startTimes[$index]" ng-blur="saveEmployee(employee)" style="font-size:23px;margin-left: 5px" type="time" ng-model="employee.endTimes[$index]">
+				    				<input ng-if="manager" min="employee.startTimes[$index]" ng-blur="updateAvailability(employee,$index)" style="font-size:23px;margin-left: 5px" type="time" ng-model="employee.endTimes[$index]">
 				    				<span ng-if="manager" ng-click="deleteAvailability($index)" style="display:inline-block;float:right;font-size: 25px;margin-left: 12px" class="glyphicon inline rightAlign red trash glyphicon-trash"></span>
 								</div>
 							</div>

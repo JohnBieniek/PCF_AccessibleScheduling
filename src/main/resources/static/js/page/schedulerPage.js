@@ -224,7 +224,6 @@ function SchedulingController($scope, $modal, $http) {
 	        })
 	        .then(function(response) {
 		    	$scope.updateData();
-	        	//$scope.statusList = response.data.sort(function(a, b){return a.month-b.month});
 	        }) 
 	        .catch(function(data, status) {
 	        	$scope.updateData();

@@ -29,7 +29,6 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.core.JsonParseException;
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.databind.JsonMappingException;
@@ -56,6 +55,7 @@ import accessiblesolutions.accessiblescheduling.domain.Shift;
 import accessiblesolutions.accessiblescheduling.domain.UpdateInfo;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
+import accessiblesolutions.accessiblescheduling.to.Availability;
 import accessiblesolutions.accessiblescheduling.to.ScheduleOptions;
 import accessiblesolutions.accessiblescheduling.util.Util;
 
@@ -510,14 +510,29 @@ public class ScheduleController {
 	    	}
 	    	
 	    	if(updated.equalsIgnoreCase("EMPLOYEE_UPDATED")) {
-	    		//TODO determine if this availability was updated or if it's just the employee that got updated
+	    		if(employee.getStartTimes().length==serverEmployee.getStartTimes().length) {
+	    			System.out.println("employee.getAvailability(Integer.parseInt(index))"+employee.getAvailability(Integer.parseInt(index)));
+	    			System.out.println("serverEmployee.getAvailability(Integer.parseInt(index))"+serverEmployee.getAvailability(Integer.parseInt(index)));
+	    			Availability availability = employee.getAvailability(Integer.parseInt(index));
+	    			Availability serverAvailability = serverEmployee.getAvailability(Integer.parseInt(index));
+	    			if(availability.day.getValue()!=serverAvailability.day.getValue()) {
+	    				updated="UPDATED";
+	    			}
+	    			else if(!availability.startTime.toString().equalsIgnoreCase(serverAvailability.startTime.toString())) {
+	    				updated="UPDATED";
+	    			}
+	    			else if(!availability.endTime.toString().equalsIgnoreCase(serverAvailability.endTime.toString())) {
+	    				updated="UPDATED";
+	    			}
+	    		}
+	    		else {
+	    			updated="POSSIBLY_UPDATED";
+	    		}
 	    	}
     	}
     	catch(Exception e){
     		System.out.println(e);
     	}
-    	
-
 		
     	return updated;
     }
@@ -738,6 +753,58 @@ public class ScheduleController {
 		return clients;
     }
 
+    @RequestMapping(value = "/updateAvailability",method = RequestMethod.POST)
+    public Employee updateAvailability(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam String param, @RequestParam String index) throws AuthenticationException {
+    	securityManager.authorize(idToken, Constants.MANAGER);
+    	
+    	Employee employee =null;
+
+    	ObjectMapper mapper = new ObjectMapper();
+    	
+    	try {
+			employee = mapper.readValue(param, Employee.class);
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+    	Employee serverEmployee = employeeRepository.findOne(employee.getId());
+    	serverEmployee.setAvailability(employee.getAvailability(Integer.parseInt(index)), Integer.parseInt(index));
+    	serverEmployee.setLastUpdatedToNow();
+    	employeeRepository.save(serverEmployee);
+    	updateInfoManager.set("employees");
+        return employeeRepository.findOne(employee.getId());
+    }
+    
+    @RequestMapping(value = "/removeAvailability",method = RequestMethod.POST)
+    public Employee removeAvailability(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam String param, @RequestParam String index) throws AuthenticationException {
+    	securityManager.authorize(idToken, Constants.MANAGER);
+    	
+    	Employee employee =null;
+
+    	ObjectMapper mapper = new ObjectMapper();
+    	
+    	try {
+			employee = mapper.readValue(param, Employee.class);
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+    	Employee serverEmployee = employeeRepository.findOne(employee.getId());
+    	serverEmployee.setAvailability(employee.getAvailability(Integer.parseInt(index)), Integer.parseInt(index));
+    	serverEmployee.setLastUpdatedToNow();
+    	employeeRepository.save(serverEmployee);
+    	updateInfoManager.set("employees");
+        return employeeRepository.findOne(employee.getId());
+    }
+    
     @RequestMapping(value = "/updateEmployee",method = RequestMethod.POST)
     public Employee updateEmployee(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam String param) throws AuthenticationException {
     	securityManager.authorize(idToken, Constants.MANAGER);
