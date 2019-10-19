@@ -979,6 +979,7 @@ public class ScheduleController {
     	System.out.println("Status for assignment:"+status.toString());
     	if(status.isGenerated() && !status.isAssigning()) {
     		status.setAssigning(true);
+    		status.setAssigningThreadId(Thread.currentThread().getId());
     		status.setLastUpdatedToNow();
         	scheduleStatusRepository.deleteByMonth(month);
         	scheduleStatusCrud.save(status);

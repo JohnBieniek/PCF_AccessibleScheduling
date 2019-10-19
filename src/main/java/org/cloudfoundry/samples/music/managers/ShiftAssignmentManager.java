@@ -150,14 +150,9 @@ public class ShiftAssignmentManager {
     	for(int i= 0;i< maxItterations;i++){
     		if(!stopped) {
     			ScheduleStatus status = scheduleStatus(month+"");
-	        	if(status.isStopping() || status.isStopped() || !status.isAssigning()) {
+	        	if(status.getAssigningThreadId()!=Thread.currentThread().getId() || status.isStopping() || status.isStopped() || !status.isAssigning()) {
 	        		stopped=true;
 	        		i=maxItterations;
-	            	
-	            	if(null==status) {
-	            		status= new ScheduleStatus();
-	            		status.setMonth(month+"");
-	            	}
 	            	
 	            	status.setGenerated(true);
 	            	status.setAssigning(false);

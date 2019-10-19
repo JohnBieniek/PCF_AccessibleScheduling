@@ -13,6 +13,7 @@ public class ScheduleStatus implements Comparable<ScheduleStatus> {
 	private boolean generated;
 	private boolean assigned;
 	private boolean assigning;
+	private long assigningThreadId;
 	private boolean deleting;
 	private boolean errored;
 	private boolean stopped;
@@ -105,5 +106,13 @@ public class ScheduleStatus implements Comparable<ScheduleStatus> {
 				+ ", assigned=" + assigned + ", assigning=" + assigning + ", deleting=" + deleting + ", errored="
 				+ errored + ", stopped=" + stopped + ", stopping=" + stopping + ", scheduled=" + scheduled
 				+ ", unscheduled=" + unscheduled + ", lastUpdated=" + lastUpdated + "]";
+	}
+
+	public long getAssigningThreadId() {
+		return assigningThreadId;
+	}
+
+	public void setAssigningThreadId(long assigningThreadId) {
+		this.assigningThreadId = assigningThreadId;
 	}
 }
