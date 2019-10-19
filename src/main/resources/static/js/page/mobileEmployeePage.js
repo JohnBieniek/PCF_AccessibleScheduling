@@ -222,14 +222,28 @@ function MobileEmployeeController($scope, $modal, $http) {
       	   }
          });
       }
+       
 	$scope.addAvailability= function(day){
 		$scope.updateLastInteractionTime();
 		var currentEmployee = $scope.employee;
-		if($scope.employee){
-			currentEmployee.days.push(day);
-			currentEmployee.startTimes.push("08:00");
-			currentEmployee.endTimes.push("16:00");
-	        $scope.saveEmployee(currentEmployee);		
+		if(currentEmployee){
+			$http({
+	             url: '/schedule/addAvailability',
+	             method: 'POST',
+	             headers: {
+	                 'Authorization': $scope.idToken,
+	                 'Content-Type': 'application/x-www-form-urlencoded'
+	             },
+	             params: {
+	          	   employeeId: currentEmployee.id,
+	          	   day:day
+	             }
+	         })
+	         .then(function (response) {// TODO handle error state
+	  	    	   $scope.setEmployeeAndInfo(response.data);
+	  	           $scope.listEmployeesAndInfo();
+	  			   $scope.notify("Availability added.");
+	         });
 		}
 	}
 	

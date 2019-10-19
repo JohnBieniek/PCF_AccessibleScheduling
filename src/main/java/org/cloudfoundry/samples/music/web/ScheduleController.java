@@ -3,6 +3,7 @@ package org.cloudfoundry.samples.music.web;//Ignore complaints
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
@@ -801,6 +802,26 @@ public class ScheduleController {
     	serverEmployee.setAvailability(employee.getAvailability(Integer.parseInt(index)), Integer.parseInt(index));
     	serverEmployee.setLastUpdatedToNow();
     	employeeRepository.save(serverEmployee);
+    	updateInfoManager.set("employees");
+        return employeeRepository.findOne(employee.getId());
+    }
+    
+    @RequestMapping(value = "/addAvailability",method = RequestMethod.POST)
+    public Employee addAvailability(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam String employeeId, @RequestParam String day) throws AuthenticationException {
+    	securityManager.authorize(idToken, Constants.MANAGER);
+    	
+    	Employee employee =employeeRepository.findOne(employeeId);
+    	ArrayList<String> startTimes = new ArrayList<String>(Arrays.asList(employee.getStartTimes()));
+    	startTimes.add("08:00");
+    	ArrayList<String> endTimes = new ArrayList<String>(Arrays.asList(employee.getEndTimes()));
+    	endTimes.add("16:00");
+    	ArrayList<String> days = new ArrayList<String>(Arrays.asList(employee.getDays()));
+    	days.add(day);
+    	employee.setDays(Arrays.asList(days.toArray()).toArray(new String[days.toArray().length]));
+    	employee.setStartTimes(Arrays.asList(startTimes.toArray()).toArray(new String[startTimes.toArray().length]));
+    	employee.setEndTimes(Arrays.asList(endTimes.toArray()).toArray(new String[endTimes.toArray().length]));
+    	employee.setLastUpdatedToNow();
+    	employeeRepository.save(employee);
     	updateInfoManager.set("employees");
         return employeeRepository.findOne(employee.getId());
     }
