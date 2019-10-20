@@ -66,7 +66,6 @@ public class AccessibleSecurityManager {
         		System.out.println("Pulled auth data from the session repository");
     		}
     		else {
-    			sessionRepository.delete(idToken);
     			getUpdatedUser=true;
     		}
     	}

@@ -85,6 +85,7 @@ public class ClientRequestController {
     	securityManager.authorize(idToken, Constants.MANAGER);
     	logger.info("Adding clientRequest " + clientRequest.getId());
     	clientRequest.setLastUpdatedToNow();
+        updateInfoManager.set("requests");
         return repository.save(clientRequest);
     }
 
@@ -106,7 +107,7 @@ public class ClientRequestController {
 		}
     	clientRequest.setLastUpdatedToNow();
         repository.save(clientRequest);
-        updateInfoManager.set("clientRequests");
+        updateInfoManager.set("requests");
 
         return mongoRepository.findByClientId(clientRequest.getClientId());
     }
@@ -127,7 +128,7 @@ public class ClientRequestController {
     	}
     	
     	repository.save(requests);
-    	updateInfoManager.set("clientRequests");
+    	updateInfoManager.set("requests");
     	
     	return requests;
     }

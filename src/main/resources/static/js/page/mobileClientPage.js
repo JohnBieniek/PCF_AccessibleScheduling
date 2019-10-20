@@ -421,54 +421,56 @@ function MobileClientController($scope, $modal, $http) {
    
    $scope.deleteShiftRequest = function (shiftRequest) {
 	    $scope.updateLastInteractionTime();
-	   	var lastUpdated = (shiftRequest.lastUpdated!=null?shiftRequest.lastUpdated:"null");
-    	$http({
-            url: '/schedule/requestWasUpdated',
-            method: 'GET',
-            headers: {
-                'Authorization': $scope.idToken,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            params: {
-            	lastUpdated:lastUpdated,
-            	requestId:shiftRequest.id
-            }
-        })
-        .then(function(response) {
-        	var deleteRequest=false;
-        	
-        	if(response.data=="UPDATED"){
-    		   if(confirm("This request has just been modified by another user. Deleteing this request will overwrite thier updates. Would you " +
-    		   				"still like to delete this request?")){
-    			   deleteRequest=true;
-    		   }
-    		   else{
-    			   $scope.listRequests();
-    		   }
-        	}
-    		else if(confirm("Are you sure you want to delete this request?")){
-    			deleteRequest=true;
-    		}
-        	
-        	if(deleteRequest){
-			   $http({
-	               url: '/schedule/deleteRequest',
-	               method: 'GET',
-	               headers: {
-	            	   'Authorization': $scope.idToken,
-	                   'Content-Type': 'application/x-www-form-urlencoded'
-	               },
-	               params: {
-	                   id: shiftRequest.id
-	               }
-	           })
-	           .then(function(response) {
-	        	   $scope.notify("Request removed.");
-    			   $scope.listRequests();
-    			   $scope.updateLastInteractionTime();
-	           });
-        	}
-	   });
+	    if(confirm("Are you sure you want to delete this request?")){
+		   	var lastUpdated = (shiftRequest.lastUpdated!=null?shiftRequest.lastUpdated:"null");
+	    	$http({
+	            url: '/schedule/requestWasUpdated',
+	            method: 'GET',
+	            headers: {
+	                'Authorization': $scope.idToken,
+	                'Content-Type': 'application/x-www-form-urlencoded'
+	            },
+	            params: {
+	            	lastUpdated:lastUpdated,
+	            	requestId:shiftRequest.id
+	            }
+	        })
+	        .then(function(response) {
+	        	var deleteRequest=false;
+	        	
+	        	if(response.data=="UPDATED"){
+	    		   if(confirm("This request has just been modified by another user. Deleteing this request will overwrite thier updates. Would you " +
+	    		   				"still like to delete this request?")){
+	    			   deleteRequest=true;
+	    		   }
+	    		   else{
+	    			   $scope.listRequests();
+	    		   }
+	        	}
+	    		else{
+	    			deleteRequest=true;
+	    		}
+	        	
+	        	if(deleteRequest){
+				   $http({
+		               url: '/schedule/deleteRequest',
+		               method: 'GET',
+		               headers: {
+		            	   'Authorization': $scope.idToken,
+		                   'Content-Type': 'application/x-www-form-urlencoded'
+		               },
+		               params: {
+		                   id: shiftRequest.id
+		               }
+		           })
+		           .then(function(response) {
+		        	   $scope.notify("Request removed.");
+	    			   $scope.listRequests();
+	    			   $scope.updateLastInteractionTime();
+		           });
+	        	}
+		   });
+	    }
     }
     
    /**

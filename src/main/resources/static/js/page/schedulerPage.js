@@ -55,8 +55,9 @@ function SchedulingController($scope, $modal, $http) {
     
     
     //Conditional class checks
+    /**Currently shows the tab as generated when generated and not assigned**/
     $scope.isTabGenerated = function(month){
-    	if($scope.statusList && $scope.statusList[month-1]) return $scope.statusList[month-1].generated && $scope.monthTab != month && !$scope.statusList[month-1].assigned&& !$scope.statusList[month-1].assigning;
+    	if($scope.statusList && $scope.statusList[month-1]) return $scope.statusList[month-1].generated && $scope.monthTab != month && !$scope.statusList[month-1].assigned;
   	  	return false;
     };
     $scope.isTabAssigned = function(month){
@@ -236,9 +237,6 @@ function SchedulingController($scope, $modal, $http) {
 	    		}
 	    		else if (data.status==428){
 	    			$scope.warn("Failled to assign shifts because they were just deleted by another user.");
-	    		}
-	    		else{
-	    			$scope.warn("Failed to assign shifts");
 	    		}
 	        });
     	}

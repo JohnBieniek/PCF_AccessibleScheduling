@@ -262,7 +262,12 @@ function MainNavigationController($scope, $modal, $http) {
 		 }
 
 		 $scope.incrementCycle();
- 		 $scope.getAllUpdates(payload);
+		 
+		 if($scope.page!="templates/page/awaitingAccess.html" && 
+			 $scope.page !="templates/page/login.html" &&
+			 $scope.page !="templates/page/signUp.html"){
+				 $scope.getAllUpdates(payload);
+		 }
 	 }
 	 
 	 /**
@@ -338,6 +343,7 @@ function MainNavigationController($scope, $modal, $http) {
 		        });
 	    	}
 	    }
+	 //TODO factor out to a name search and update
 	 /** Called on app start as an easy way to select our initial employee*/
 	$scope.setEmployeeToUser = function(){
 		$http({
@@ -358,6 +364,7 @@ function MainNavigationController($scope, $modal, $http) {
         	$scope.unmodifiedEmployee=$scope.clone(response.data);
         	$scope.setEmployee(response.data);
         	$scope.setSelectedEmployeeWithoutGetEmployee(response.data);
+        	$scope.getAllEmployeeCustomFieldData();
         	$scope.updateData();
         });
 	}
