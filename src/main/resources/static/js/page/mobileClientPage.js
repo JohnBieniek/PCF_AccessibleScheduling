@@ -408,11 +408,11 @@ function MobileClientController($scope, $modal, $http) {
 						
 				updateModal.result.then(function (shiftRequest) {
 					saveShiftRequest(shiftRequest);
-    			    $scope.listRequests();
-    			    $scope.updateLastInteractionTime();
 				}, function () {
+					//Error case
+		        }).finally(function() {
 					$scope.updateLastInteractionTime();
-			        $scope.listRequests();
+					$scope.updateData();
 		        });
    	    	}
         });

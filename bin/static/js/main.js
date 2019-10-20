@@ -140,7 +140,9 @@ function MainNavigationController($scope, $modal, $http) {
 		 }
 	 }
 	 
-	 
+	 /**
+	  * Takes in a JS date object and returns a string in the form YYYY-MM-DD
+	  */
 	 $scope.getDateString = function getDateString(date){
 		return  date.getFullYear() +"-" +(date.getMonth()+1)+"-"+date.getDate();
 	 }
@@ -148,7 +150,7 @@ function MainNavigationController($scope, $modal, $http) {
 	 $scope.getEmployeeUpdatePayload = function (){
 		 var employeeInfo = {}; 
 		 
-		 if($scope.selectedEmployee.id!=$scope.employee.id){
+		 if($scope.employee == null || $scope.selectedEmployee.id!=$scope.employee.id){
 			 employeeInfo["lastUpdated"]=null;
 			 employeeInfo["id"] = $scope.selectedEmployee.id;
 		 }
@@ -184,6 +186,11 @@ function MainNavigationController($scope, $modal, $http) {
 	        });
 	    }
 	    
+	 /**
+	  * Evaluate the state of the application and determine what info we need to ask for updates on
+	  * Construct a payload based on the last updated timestamps of those information and call the api
+	  * The API will look for anything that has changed and return all altered information for display
+	  */
 	 $scope.updateData = function updateData(){
 		 var payload = {};
 		 if($scope.page!="templates/page/scheduler.html" && $scope.page!="templates/page/alerts.html"){
@@ -200,7 +207,7 @@ function MainNavigationController($scope, $modal, $http) {
 				 employeesInfo["tableLastUpdated"]=$scope.lastEmployeeTableUpdate;
 				 payload["employees"] = employeesInfo;
 				 
-				 if($scope.page=="templates/page/employee.html" && $scope.employee!=null){
+				 if($scope.page=="templates/page/employee.html" && $scope.selectedEmployee!=null){
 					 if(!$scope.detailsChanged){
 						 payload["employee"] = $scope.getEmployeeUpdatePayload();
 					 }
@@ -346,27 +353,39 @@ function MainNavigationController($scope, $modal, $http) {
 	 //TODO factor out to a name search and update
 	 /** Called on app start as an easy way to select our initial employee*/
 	$scope.setEmployeeToUser = function(){
-		$http({
-            url: '/employees/'+$scope.profile.employeeId,
-            method: 'GET',
-            headers: {
-                'Authorization': $scope.idToken,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            params: {
-            }
-        })
-        .then(function(response) {
-        	if(typeof $scope.employee !== 'undefined' && $scope.employee!=null && $scope.employee.role==null){
-  			  response.data.role="user";
-  		  	}
-        	
-        	$scope.unmodifiedEmployee=$scope.clone(response.data);
-        	$scope.setEmployee(response.data);
-        	$scope.setSelectedEmployeeWithoutGetEmployee(response.data);
-        	$scope.getAllEmployeeCustomFieldData();
-        	$scope.updateData();
-        });
+		for(var index = 0; index< $scope.employees.length;index++){
+			console.log("$scope.employees[index].id",$scope.employees[index].id);
+			console.log("$scope.profile.employeeId",$scope.profile.employeeId);
+			console.log("$scope.employees[index].id==$scope.profile.employeeId",$scope.employees[index].id==$scope.profile.employeeId);
+			if($scope.employees[index].id==$scope.profile.employeeId){
+				console.log("set selected employee",$scope.employees[index]);
+				$scope.selectedEmployee=$scope.employees[index];
+			}
+		}
+		console.log("$scope.selectedEmployee",$scope.selectedEmployee);
+		console.log("$scope.selectedEmployee",$scope.selectedEmployee);
+    	$scope.updateData();
+//		$http({
+//            url: '/employees/'+$scope.profile.employeeId,
+//            method: 'GET',
+//            headers: {
+//                'Authorization': $scope.idToken,
+//                'Content-Type': 'application/x-www-form-urlencoded'
+//            },
+//            params: {
+//            }
+//        })
+//        .then(function(response) {
+//        	if(typeof $scope.employee !== 'undefined' && $scope.employee!=null && $scope.employee.role==null){
+//  			  response.data.role="user";
+//  		  	}
+//        	
+//        	$scope.unmodifiedEmployee=$scope.clone(response.data);
+//        	$scope.setEmployee(response.data);
+//        	$scope.setSelectedEmployeeWithoutGetEmployee(response.data);
+//        	$scope.getAllEmployeeCustomFieldData();
+//
+//        });
 	}
 	 /**
 	  * Takes in a payload of all updates that are needed and when that area last got its data
@@ -538,6 +557,7 @@ function MainNavigationController($scope, $modal, $http) {
 	 /**
 	  * Gets the employee list and save it in $scope.employees
 	  * The list comes back sorted alphabeticly with each object containing employee.id and employee.name
+	  * Sets the employee to user if none is currently selected
 	  */
 	 $scope.getEmployeeNames = function getEmployeeNames(){
 		 if($scope.idToken!=null){
@@ -556,6 +576,10 @@ function MainNavigationController($scope, $modal, $http) {
 	        	if(response.data){
         			$scope.employees = response.data;
         			$scope.lastEmployeeTableUpdate = response.data.tableLastUpdated;
+        			
+        			if($scope.selectedEmployee==null){
+        			    $scope.setEmployeeToUser();
+        			}
 	        	}
 	        	else{
 	        		if(response.status==404){

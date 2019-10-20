@@ -769,7 +769,7 @@ function MobileEmployeeController($scope, $modal, $http) {
     	var modifiedEmployee = $scope.clone($scope.employee);
     	var lastUpdated = null;
     	if(null!=originalEmployee && undefined !=originalEmployee){
-    		originalEmployee.lastUpdated;
+    		lastUpdated=originalEmployee.lastUpdated;
     	}
     	if(null==lastUpdated || undefined == lastUpdated){
     		lastUpdated="null";
