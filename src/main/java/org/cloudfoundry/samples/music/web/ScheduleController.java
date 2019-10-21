@@ -189,19 +189,24 @@ public class ScheduleController {
 			    LocalDateTime tableLastUpdated = null;
 			    LocalDateTime lastUpdated = null;
 			    LocalDateTime currentUpdateTime = null;
+			    String tableString = null;
 	    	    String key = (String) keys.next();
 	    	    
+	    	    //Pull the payload for each segment of data, ensure it's a json payload first to avoid deserialization troubles on bad data
 	    	    if (jsonObject.get(key) instanceof JSONObject) {
 	    			JSONObject updateRequest = (JSONObject)jsonObject.get(key);
 					
-				    UpdateInfo updateInfo = updateInfoRepository.findOne(key);
-				    String tableString = null;
+				    UpdateInfo updateInfo = updateInfoRepository.findOne(key);//Get information about when this data was last updated on server
 				    
+				    System.out.println("key:"+key+" | server has tableLastUpdated:"+updateInfo.getTime().toString());
+				    
+				    //Get information about when this data was last updated on the clients side
 				    if(updateRequest.has("tableLastUpdated")){
 				    	tableString = updateRequest.getString("tableLastUpdated");
 				    	
 					    if(null!=tableString && !"null".equalsIgnoreCase(tableString)) {
 					    	tableLastUpdated = Util.getLocalDateTimeFromString(tableString);
+					    	System.out.println("key:"+key+" | client has tableLastUpdated:"+tableLastUpdated.toString());
 					    }
 				    }
 				    
@@ -213,6 +218,7 @@ public class ScheduleController {
 					    	
 						    if(null!=updateString && !"null".equalsIgnoreCase(updateString)) {
 						    	lastUpdated = Util.getLocalDateTimeFromString(updateString);
+						    	System.out.println("key:"+key+" | client has lastUpdated:"+lastUpdated.toString());
 						    }
 					    }
 					    
@@ -225,7 +231,6 @@ public class ScheduleController {
 					    		client.setLastUpdatedToNow();
 					    		clientRepository.save(client);
 					    	}
-					    	System.out.println("client.getLastUpdated():"+client.getLastUpdated()+" lastUpdated:"+lastUpdated);
 					    	if(key.equalsIgnoreCase(Constants.CLIENT) && 
 					    			(client.getLastUpdated()==null || lastUpdated == null ||client.lastUpdatedTime().isAfter(lastUpdated))) {
 						    	result.put(Constants.CLIENT, new JSONObject(mapper.writeValueAsString(client)));
@@ -367,12 +372,12 @@ public class ScheduleController {
 						    	    
 
 						    	    
-						      if(currentUpdateTime==null || lastUpdated == null ||currentUpdateTime.isAfter(lastUpdated)) {
+						     // if(currentUpdateTime==null || lastUpdated == null ||currentUpdateTime.isAfter(lastUpdated)) {
 						      	    shiftJson.put("info", shiftInfoJson);
 							        shiftJson.put("lastUpdated", currentUpdateTime);
 								    shiftJson.put("tableLastUpdated", updateInfo.getTime());
 									result.put(Constants.SHIFTS,  shiftJson);
-						      }
+						      //}
 							  break;
 						   case Constants.REQUESTS :
 							  JSONObject requestJson = new JSONObject();
@@ -390,12 +395,12 @@ public class ScheduleController {
 						    	  requestInfoJson.put(new JSONObject(mapper.writeValueAsString(selectedClientRequest)));
 						      }
 						    	    
-						      if(currentUpdateTime==null || lastUpdated == null ||currentUpdateTime.isAfter(lastUpdated)) {
+						     // if(currentUpdateTime==null || lastUpdated == null ||currentUpdateTime.isAfter(lastUpdated)) {
 					      	      requestJson.put("info", requestInfoJson);
 							      requestJson.put("lastUpdated", currentUpdateTime);
 								  requestJson.put("tableLastUpdated", updateInfo.getTime());
 								  result.put(Constants.REQUESTS,  requestJson);
-						      }
+						      //}
 							  break; 
 						   case Constants.ALERTS :
 							  JSONObject alertJson = new JSONObject();
