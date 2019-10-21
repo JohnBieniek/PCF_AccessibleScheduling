@@ -480,8 +480,19 @@ function MainNavigationController($scope, $modal, $http) {
 	    		if(data.status==404){
 	    			$scope.warn("Failed to update schedule data. If connection trouble persits contact your representative.");
 	    		}
-	    		else if(!data.status==403){//Don't error on unauth, this is often the case after logging out
-	    			$scope.warn("Failed to update schedule data");
+	    		else if(data.status!=403){//Don't error on unauth, this is often the case after logging out
+	    			console.log("data",data);
+	    			console.log("data.status",data.status);
+	    			console.log("data.data.message",data.data.message);
+	    			console.log("data.data.message==400 Bad Request",data.data.message=="400 Bad Request");
+	    			console.log("data.status==500",data.status==500);
+	    			if(data.status==500 && (data.data.message=="400 Bad Request" || data.data.message=="No message available")){
+	    				$scope.warn("Session has expired. Please re-authenticate.");
+	    				$scope.signOut();
+	    			}
+	    			else{
+	    				$scope.warn("Failed to update schedule data");
+	    			}
 	    		}
             });
 		 }
@@ -1508,7 +1519,9 @@ function MainNavigationController($scope, $modal, $http) {
 		 $scope.employeeTab="Schedule";
 	    
 		 var auth2 = gapi.auth2.getAuthInstance();
-	     auth2.signOut().then(function () {});
+	     auth2.signOut().then(function () {
+	    	 $scope.setPage("login");
+	     });
     }
     $scope.setIdToken = function (idToken) {
         $scope.idToken = idToken;

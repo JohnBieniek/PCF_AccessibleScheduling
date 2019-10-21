@@ -879,6 +879,7 @@ public class ScheduleController {
     	ClientRequest request = requestRepository.findOne(id);
     	String clientId=request.getClientId();
     	requestRepository.delete(id);
+        updateInfoManager.set("requests");
         
         return requestRepository.findByClientId(clientId);
     }
