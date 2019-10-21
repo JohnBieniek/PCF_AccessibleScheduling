@@ -601,57 +601,59 @@ function MobileClientController($scope, $modal, $http) {
      */
     $scope.deleteShift = function (shift) {
     	$scope.updateLastInteractionTime();
-    	var lastUpdated = (shift.lastUpdated!=null?shift.lastUpdated:"null");
-    	$http({
-            url: '/schedule/shiftWasUpdated',
-            method: 'GET',
-            headers: {
-                'Authorization': $scope.idToken,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            params: {
-            	lastUpdated:lastUpdated,
-            	shiftId:shift.id
-            }
-        })
-        .then(function(response) {
-        	var deleteShift=false;
-        	
-        	if(response.data=="UPDATED"){
-    		   if(confirm("This shift has just been modified by another user. Deleteing this shift will overwrite thier updates. Would you " +
-    		   				"still like to delete this shift?")){
-    			   deleteShift=true;
-    		   }
-    		   else{
-    			   $scope.listShifts();
-    		   }
-        	}
-    		else if(confirm("Are you sure you want to delete this shift?")){
-    			deleteShift=true;
-    		}
-        	
-        	if(deleteShift){
-             	$http({
-                    url: '/shifts/'+shift.id,
-                    method: 'DELETE',
-                    headers: {
-                       'Authorization': $scope.idToken,
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    params: {
-                    }
-                })
-                .then(function(response) {
-                	if(response){
-                        $scope.notify("Shift deleted.");
-                        $scope.listShifts();
-                	}
-                	else{
-                		$scope.warn("Failed to delete shift info.")
-                	}
-                });
-        	}
-    	});
+    	if(confirm("Are you sure you want to delete this shift?")){
+	    	var lastUpdated = (shift.lastUpdated!=null?shift.lastUpdated:"null");
+	    	$http({
+	            url: '/schedule/shiftWasUpdated',
+	            method: 'GET',
+	            headers: {
+	                'Authorization': $scope.idToken,
+	                'Content-Type': 'application/x-www-form-urlencoded'
+	            },
+	            params: {
+	            	lastUpdated:lastUpdated,
+	            	shiftId:shift.id
+	            }
+	        })
+	        .then(function(response) {
+	        	var deleteShift=false;
+	        	
+	        	if(response.data=="UPDATED"){
+	    		   if(confirm("This shift has just been modified by another user. Deleteing this shift will overwrite thier updates. Would you " +
+	    		   				"still like to delete this shift?")){
+	    			   deleteShift=true;
+	    		   }
+	    		   else{
+	    			   $scope.listShifts();
+	    		   }
+	        	}
+	    		else{
+	    			deleteShift=true;
+	    		}
+	        	
+	        	if(deleteShift){
+	             	$http({
+	                    url: '/shifts/'+shift.id,
+	                    method: 'DELETE',
+	                    headers: {
+	                       'Authorization': $scope.idToken,
+	                        'Content-Type': 'application/x-www-form-urlencoded'
+	                    },
+	                    params: {
+	                    }
+	                })
+	                .then(function(response) {
+	                	if(response){
+	                        $scope.notify("Shift deleted.");
+	                        $scope.listShifts();
+	                	}
+	                	else{
+	                		$scope.warn("Failed to delete shift info.")
+	                	}
+	                });
+	        	}
+	    	});
+    	}
      };
      
     $scope.delete = function () {
