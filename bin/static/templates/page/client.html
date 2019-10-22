@@ -89,6 +89,10 @@
 	    	<div ng-if="isSet('Details')" class = 'rightAlign'>
 	    		<form name="clientForm" role="form" style="margin-right:3%">
 			        <div>
+			            <label for="first" class="inline" style="font-size:38px">Name</label>
+			            <input ng-change="setDetailsToChanged()" type="text" class="form-control inline input-large rightAlign nameInput" id="name" name="name" required ng-model="client.name">
+			        </div>
+<!-- 			        <div>
 			            <label for="first" class="inline" style="font-size:38px">First</label>
 			            <input ng-change="setDetailsToChanged()" type="text" class="form-control inline input-large rightAlign nameInput" id="first" name="first" required ng-model="client.first">
 			        </div>
@@ -97,7 +101,7 @@
 			            <label for="initial" class="inline" style="font-size:38px">Initial</label>
 			            <input ng-change="setDetailsToChanged()" type="text" class="inline form-control input-large rightAlign nameInput" id="initial" name="initial" ng-model="client.initial">
 			        </div>
-			        
+ -->			        
 			        <div>
 			            <label for="preferSigning" style="font-size:38px">Prefers Signing Staff</label>
 			            <input ng-change="setDetailsToChanged()" type="checkbox" id="preferSigning" name="preferSigning" style="height:20px;width:20px" ng-model="client.preferSigning">

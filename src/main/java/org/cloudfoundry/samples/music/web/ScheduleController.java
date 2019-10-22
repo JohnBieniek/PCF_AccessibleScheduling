@@ -170,12 +170,10 @@ public class ScheduleController {
     @RequestMapping(value = "/allUpdates",method = RequestMethod.GET)
     public String getAllUpdates(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam String json) throws AuthenticationException, JSONException, JsonProcessingException, NumberFormatException, ProccessingException {
     	securityManager.authorize(idToken, Constants.USER);
-    	System.out.println("called get allUpdates with json:"+json);
     	JSONObject jsonObject = new JSONObject(json);
-    	System.out.println("called get allUpdates with jsonObject:"+jsonObject.toString());
     	JSONObject result = new JSONObject();
 	    ObjectMapper mapper = new ObjectMapper();
-    	Iterator keys = jsonObject.keys();
+    	Iterator<?> keys = jsonObject.keys();
 
     	while(keys.hasNext()) {
     		try {
@@ -352,7 +350,6 @@ public class ScheduleController {
 							  JSONObject shiftJson = new JSONObject();
 						      JSONArray shiftInfoJson = new JSONArray();
 							  Iterable<Shift> shifts = null;
-							  System.out.println("got shifts for day:"+day+" month:"+month+ " year:"+year);
 							  if(null!=employee) {
 								  shifts = manager.getEmployeeShiftsForWeek(id,month,day,year);
 							  }
@@ -371,7 +368,7 @@ public class ScheduleController {
 						      }
 						    	    
 
-						    	    
+						    //Temporarily disabled, re-enable after count is added and evaluated    
 						     // if(currentUpdateTime==null || lastUpdated == null ||currentUpdateTime.isAfter(lastUpdated)) {
 						      	    shiftJson.put("info", shiftInfoJson);
 							        shiftJson.put("lastUpdated", currentUpdateTime);
@@ -394,7 +391,9 @@ public class ScheduleController {
 						    	      
 						    	  requestInfoJson.put(new JSONObject(mapper.writeValueAsString(selectedClientRequest)));
 						      }
-						    	    
+
+
+						    //Temporarily disabled, re-enable after count is added and evaluated
 						     // if(currentUpdateTime==null || lastUpdated == null ||currentUpdateTime.isAfter(lastUpdated)) {
 					      	      requestJson.put("info", requestInfoJson);
 							      requestJson.put("lastUpdated", currentUpdateTime);
@@ -517,8 +516,6 @@ public class ScheduleController {
 	    	
 	    	if(updated.equalsIgnoreCase("EMPLOYEE_UPDATED")) {
 	    		if(employee.getStartTimes().length==serverEmployee.getStartTimes().length) {
-	    			System.out.println("employee.getAvailability(Integer.parseInt(index))"+employee.getAvailability(Integer.parseInt(index)));
-	    			System.out.println("serverEmployee.getAvailability(Integer.parseInt(index))"+serverEmployee.getAvailability(Integer.parseInt(index)));
 	    			Availability availability = employee.getAvailability(Integer.parseInt(index));
 	    			Availability serverAvailability = serverEmployee.getAvailability(Integer.parseInt(index));
 	    			if(availability.day.getValue()!=serverAvailability.day.getValue()) {
@@ -618,8 +615,6 @@ public class ScheduleController {
     	Client client = clientRepository.findOne(clientId);
     	
     	if(null!=client) {
-    		System.out.println("client:"+client.toString());
-    		
     		if(time==null && client.getLastUpdated()!=null){
     			updated="UPDATED";
     		}
@@ -654,7 +649,7 @@ public class ScheduleController {
     public Employee staffShift(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam String param) throws AuthenticationException {
     	securityManager.authorize(idToken, Constants.MANAGER);
     	Shift shift =null;
-    	System.out.println(param);
+
     	ObjectMapper mapper = new ObjectMapper();
     	
     	try {
@@ -666,9 +661,8 @@ public class ScheduleController {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-    	System.out.println(shift.toString());
-    	//shiftRepository.save(shift);
-        ScheduleOptions options = new ScheduleOptions();
+
+    	ScheduleOptions options = new ScheduleOptions();
         options.setDailyMax(true);
         options.setWeeklyMax(true);
         options.setYear(shift.getStartYear()+"");
@@ -678,7 +672,6 @@ public class ScheduleController {
         try {
 			employee = shiftAssignmentManager.suggestScheduleShiftSafely(shift, options);
 		} catch (CorruptDataException | ProccessingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
         
@@ -778,11 +771,8 @@ public class ScheduleController {
 		}
 
     	Employee serverEmployee = employeeRepository.findOne(employee.getId());
-		System.out.println("employee.getAvailability(Integer.parseInt(index))"+ serverEmployee.getAvailability(Integer.parseInt(index)));
     	serverEmployee.setAvailability(employee.getAvailability(Integer.parseInt(index)), Integer.parseInt(index));
-		System.out.println("employee.getAvailability(Integer.parseInt(index))"+ serverEmployee.getAvailability(Integer.parseInt(index)));
     	serverEmployee.setLastUpdatedToNow();
-    	System.out.println(serverEmployee.toString());
     	employeeRepository.save(serverEmployee);
     	updateInfoManager.set("employees");
         return employeeRepository.findOne(employee.getId());

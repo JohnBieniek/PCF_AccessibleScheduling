@@ -157,6 +157,11 @@
 	    	<div ng-if="isSet('Details')" class = 'rightAlign'>
 	    		<form name="employeeForm" role="form" style="margin-right:8%">
 			        <div>
+			            <label for="first" class="inline employeeDetails" >Name</label>
+			            <input ng-change="setDetailsToChanged()" type="text" class="form-control inline input-large rightAlign nameInput" id="name" name="name" required ng-model="employee.name">
+			        </div>
+			        
+			        <!-- <div>
 			            <label for="first" class="inline employeeDetails" >First</label>
 			            <input ng-change="setDetailsToChanged()" type="text" class="form-control inline input-large rightAlign nameInput" id="first" name="first" required ng-model="employee.first">
 			        </div>
@@ -165,7 +170,7 @@
 			            <label for="initial" class="inline employeeDetails">Initial</label>
 			            <input ng-change="setDetailsToChanged()" type="text" class="inline form-control input-large rightAlign nameInput" id="initial" name="initial"  ng-model="employee.initial">
 			        </div>
-			    
+			    --> 
   				     <div ng-if="admin">
 			        	<div style="display:inline-block">
 				        	<label for="gender" class="employeeDetails">Role:</label>

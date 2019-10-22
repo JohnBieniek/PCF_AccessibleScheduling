@@ -523,7 +523,7 @@ function MobileClientController($scope, $modal, $http) {
 	            },
 	            params: {
 	            	lastUpdated:lastUpdated,
-	            	clientId:originalClient.id
+	            	clientId:modifiedClient.id
 	            }
 	        })
 	        .then(function(response) {
