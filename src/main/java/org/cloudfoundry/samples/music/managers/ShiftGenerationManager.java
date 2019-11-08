@@ -249,7 +249,7 @@ public class ShiftGenerationManager {
 	    			timeCursor=timeCursor.plusDays(1);
 	    		}
 	    		System.out.println("Starting week time generation at:"+timeCursor.toString()+ timeCursor.getDayOfWeek().toString());
-	    		while(timeCursor.minusDays(6).getMonthValue()<=selectedMonth) {
+	    		while(timeCursor.minusDays(6).getMonthValue()<=selectedMonth && timeCursor.minusDays(6).getYear()<=selectedYear) {
 	    			System.out.println("Finding times for week of :"+timeCursor.toString());
 	    			for(int index = 0; index<7;index++) {
 	    				boolean working = request.getDays()[index];
