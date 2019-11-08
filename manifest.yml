@@ -5,3 +5,7 @@ applications:
   path: build/libs/spring-music.jar
   buildpack: https://github.com/cloudfoundry/java-buildpack.git
   stack: cflinuxfs3
+  services:
+   - db1
+  routes:
+  - route: accessiblescheduling-dev.cfapps.io 
