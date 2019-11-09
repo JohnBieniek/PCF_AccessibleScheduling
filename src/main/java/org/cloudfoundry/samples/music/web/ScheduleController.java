@@ -700,6 +700,10 @@ public class ScheduleController {
     	if(maxMonth>11) {
     		maxMonth=1;
     	}
+    	maxMonth=maxMonth+1;
+    	if(maxMonth>11) {
+    		maxMonth=1;
+    	}
     	
     	ArrayList<Shift> shifts = (ArrayList<Shift>) manager.getEmployeeShiftsForWeek(employeeId,month,day,year);
     	ArrayList<Shift> returnValue = new ArrayList<Shift>();

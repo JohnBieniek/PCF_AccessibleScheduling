@@ -1,0 +1,12 @@
+---
+applications:
+- name: Accessible Scheduling
+  memory: 1G
+  path: build/libs/spring-music.jar
+  buildpack: https://github.com/cloudfoundry/java-buildpack.git
+  stack: cflinuxfs3
+  services:
+   - PR
+   - autoscale-PR
+  routes:
+  - route: accessiblescheduling-green.cfapps.io

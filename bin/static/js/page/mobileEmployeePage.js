@@ -352,6 +352,25 @@ function MobileEmployeeController($scope, $modal, $http) {
 	 * Updates the employee and its custom field data. Checks for updates to the
 	 * employee names list afterwards and updates if needbe
 	 */
+     $scope.decrementWeek = function(){
+    	 if($scope.manager || $scope.admin || $scope.week.getMonth()>$scope.minMonth){
+	    	 $scope.setWeek($scope.week.addDays(-7));
+	    	 $scope.getDisplayWeek();
+	    	 $scope.listShifts();
+    	 }
+     }
+     
+     $scope.incrementWeek = function(){
+    	 var weeksStart = $scope.week.addDays($scope.week.getDay()-1);
+    	 var weeksEnd = weeksStart.addDays(6);
+    	 var nextWeeksStart = weeksEnd.addDays(1);
+    	 //if($scope.manager || $scope.admin || nextWeeksStart.getMonth()<$scope.maxMonth){
+    		 $scope.setWeek($scope.week.addDays(7));
+	    	 $scope.getDisplayWeek();
+	    	 $scope.listShifts();
+    	 //}
+     }
+     
      $scope.saveEmployee = function saveEmployee(employee) {
      	if(employee.availability){
 	     	for(var index = 0; index<employee.availability.length;index++){
