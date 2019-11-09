@@ -37,9 +37,23 @@ function VacationController($scope, $modal, $http) {
     $scope.removeAbsence=function(selectedEmployee,item){ 
     	$scope.updateLastInteractionTime();
     	 if(confirm("Are you sure you want to delete this request?")){
-	        var index=selectedEmployee.requestedOff.indexOf(item)
-	        selectedEmployee.requestedOff.splice(index,1);     
-	        $scope.saveEmployee(selectedEmployee);
+    		 $http({
+    	           url: '/employees/removeAbsence',
+    	           method: 'POST',
+    	           headers: {
+    	               'Authorization': $scope.idToken,
+    	               'Content-Type': 'application/x-www-form-urlencoded'
+    	           },
+    	           params: {
+    	        	   id: selectedEmployee.id,
+    	        	   date: item
+    	           }
+    	       })
+    	       .then(function (response) {//TODO handle error state
+    	    	   $scope.setEmployee(response.data);
+
+    	    	   $scope.notify("Employee saved");
+    	       });
 	    }
       }
 	    

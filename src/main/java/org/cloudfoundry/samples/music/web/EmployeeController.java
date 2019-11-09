@@ -2,6 +2,8 @@ package org.cloudfoundry.samples.music.web;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -76,6 +78,27 @@ public class EmployeeController {
         return repository.save(employee);
     }
 
+    @RequestMapping(value = "/removeAbsence",method = RequestMethod.POST)
+    public Employee removeAbsence(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam String id,@RequestParam String date) throws AuthenticationException, ParseException {
+    	securityManager.authorize(idToken, Constants.MANAGER);
+    	
+    	Employee employee=repository.findOne(id);
+    	ArrayList<String> requestedOff = new ArrayList<String>(Arrays.asList(employee.getRequestedOff()));
+    	ArrayList<String> updatedRequestedOff = new ArrayList<String>();
+    	if(null!=requestedOff && requestedOff.size()>0) {
+    		for(String day :requestedOff) {
+    			if(!day.equalsIgnoreCase(date)) {
+    				updatedRequestedOff.add(day);
+    			}
+    		}
+    	}
+
+    	employee.setRequestedOff(Arrays.asList(updatedRequestedOff.toArray()).toArray(new String[updatedRequestedOff.toArray().length]));
+        employee.setLastUpdatedToNow();
+    	updateInfoManager.set("employees");
+        return repository.save(employee);
+    }
+    
     @RequestMapping(method = RequestMethod.POST)
     public Employee update(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam String param) throws AuthenticationException, ParseException {
     	securityManager.authorize(idToken, Constants.MANAGER);
