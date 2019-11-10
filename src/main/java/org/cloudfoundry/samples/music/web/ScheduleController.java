@@ -305,7 +305,11 @@ public class ScheduleController {
 				    		if(callAuth.isAdmin()) {
 							   JSONObject statusJson = new JSONObject();
 							    
-						       List<ScheduleStatus> statuses = scheduleStatusRepository.findAll();
+						       List<ScheduleStatus> statuses = scheduleStatusRepository.findByYear(year);
+						       if(null==statuses || statuses.size()==0) {
+						    	   scheduleManager.generateStatusList(year);
+						    	   statuses = scheduleStatusRepository.findByYear(year);
+						       }
 						       Collections.sort(statuses);
 						       JSONArray statusInfoJson = new JSONArray();
 						    	    
@@ -318,8 +322,8 @@ public class ScheduleController {
 								   statusJson.put("tableLastUpdated", updateInfo.getTime());
 						       }
 
-						       statusJson.put("assigned", shiftManager.getAssignedShiftsForMonth(Integer.parseInt(month)).size());    
-						       statusJson.put("unassigned", shiftManager.getUnassignedShiftsForMonth(Integer.parseInt(month)).size());    
+						       statusJson.put("assigned", shiftManager.getAssignedShiftsForMonth(Integer.parseInt(month),Integer.parseInt(year)).size());    
+						       statusJson.put("unassigned", shiftManager.getUnassignedShiftsForMonth(Integer.parseInt(month),Integer.parseInt(year)).size());    
 
 							   result.put("status", statusJson);
 				    		}
@@ -993,7 +997,7 @@ public class ScheduleController {
     }
 
     @RequestMapping(value = "/byMonth", method = RequestMethod.DELETE)
-    public Iterable<ScheduleStatus> deleteByMonth(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam("month") String  month) throws AuthenticationException {
+    public Iterable<ScheduleStatus> deleteByMonth(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam("month") String  month, @RequestParam("month") String  year) throws AuthenticationException {
     	securityManager.authorize(idToken, Constants.ADMIN);
     	
     	ScheduleStatus status = new ScheduleStatus();
@@ -1005,7 +1009,7 @@ public class ScheduleController {
      	scheduleStatusCrud.save(status);
      	updateInfoManager.set(Constants.STATUS);
      
-        shiftManager.deleteShiftsForMonth(Integer.parseInt(month));
+        shiftManager.deleteShiftsForMonth(Integer.parseInt(month),Integer.parseInt(year));
      	status.setDeleting(false);
      	status.setErrored(false);
      	status.setAssigning(false);
@@ -1086,24 +1090,24 @@ public class ScheduleController {
     }
     
     @RequestMapping(value = "/unscheduled", method = RequestMethod.GET)
-    public int unscheduled(@RequestHeader(value="Authorization", required=false) String idToken,@RequestParam("month") String month) throws NumberFormatException, ProccessingException, AuthenticationException {
+    public int unscheduled(@RequestHeader(value="Authorization", required=false) String idToken,@RequestParam("month") String month,@RequestParam("year") String  year) throws NumberFormatException, ProccessingException, AuthenticationException {
     	securityManager.authorize(idToken, Constants.ADMIN);
     	
-    	return shiftManager.getUnassignedShiftsForMonth(Integer.parseInt(month)).size();
+    	return shiftManager.getUnassignedShiftsForMonth(Integer.parseInt(month),Integer.parseInt(year)).size();
     }
     
     @RequestMapping(value = "/scheduled", method = RequestMethod.GET)
-    public int scheduled(@RequestHeader(value="Authorization", required=false) String idToken,@RequestParam("month") String month) throws NumberFormatException, ProccessingException, AuthenticationException {
+    public int scheduled(@RequestHeader(value="Authorization", required=false) String idToken,@RequestParam("month") String month,@RequestParam("year") String  year) throws NumberFormatException, ProccessingException, AuthenticationException {
     	securityManager.authorize(idToken, Constants.ADMIN);
     	
-    	return shiftManager.getAssignedShiftsForMonth(Integer.parseInt(month)).size();
+    	return shiftManager.getAssignedShiftsForMonth(Integer.parseInt(month),Integer.parseInt(year)).size();
     }
     
     @RequestMapping(value = "/generateStatusList", method = RequestMethod.GET)
-    public Iterable<ScheduleStatus> generateStatusList(@RequestHeader(value="Authorization", required=false) String idToken) throws AuthenticationException {
+    public Iterable<ScheduleStatus> generateStatusList(@RequestHeader(value="Authorization", required=false) String idToken, String year) throws AuthenticationException {
     	securityManager.authorize(idToken, Constants.ADMIN);
     	
-    	scheduleManager.generateStatusList();
+    	scheduleManager.generateStatusList(year);
         updateInfoManager.set(Constants.STATUS);
         return scheduleStatusCrud.findAll();
     }
@@ -1167,21 +1171,21 @@ public class ScheduleController {
         	}
     	}
     	generationManager.generateShifts(month,year);
-    	List<Shift> shifts = (List<Shift>)shiftRepository.findByStartMonth(Integer.parseInt(month));
+    	List<Shift> shifts = (List<Shift>)shiftRepository.findByStartMonthAndStartYear(Integer.parseInt(month),Integer.parseInt(year));
 		return new ResponseEntity<Integer>(shifts.size(),HttpStatus.OK);
     }
     
     @RequestMapping(value = "/getShiftsForMonth", method = RequestMethod.GET)
-    public String getShiftsForOfMonth(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam("month") String month) throws AuthenticationException {
+    public String getShiftsForOfMonth(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam("month") String month,@RequestParam("year") String  year) throws AuthenticationException {
     	securityManager.authorize(idToken, Constants.MANAGER);
     	
-    	return shiftManager.getShiftsForMonth(Integer.parseInt(month)).toString();
+    	return shiftManager.getShiftsForMonth(Integer.parseInt(month),Integer.parseInt(year)).toString();
     }
     
     @RequestMapping(value = "/getShiftsPerEmployeeForMonth", method = RequestMethod.GET)
-    public String getShiftsPerEmployeeForOfMonth(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam("month") String month) throws ProccessingException, AuthenticationException {
+    public String getShiftsPerEmployeeForOfMonth(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam("month") String month, @RequestParam("year") String year) throws ProccessingException, AuthenticationException {
     	securityManager.authorize(idToken, Constants.MANAGER);
     	
-    	return employeeShiftMapManager.getAssignedShiftsPerEmployeeForMonth(Integer.parseInt(month)).toString();
+    	return employeeShiftMapManager.getAssignedShiftsPerEmployeeForMonth(Integer.parseInt(month),Integer.parseInt(year)).toString();
     }
 }

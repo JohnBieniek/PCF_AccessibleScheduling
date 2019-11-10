@@ -167,9 +167,9 @@ public class EmployeeShiftCompatibilityManager {
 					nextMonth=1;
 				}
 				
-				ArrayList<Shift> lastMonthsShifts = employeeShiftManager.getAssignedShiftsForEmployeeForMonth(employee.getId(),lastMonth);
-				ArrayList<Shift> thisMonthsShifts = employeeShiftManager.getAssignedShiftsForEmployeeForMonth(employee.getId(),thisMonth);
-				ArrayList<Shift> nextMonthsShifts = employeeShiftManager.getAssignedShiftsForEmployeeForMonth(employee.getId(),nextMonth);
+				ArrayList<Shift> lastMonthsShifts = employeeShiftManager.getAssignedShiftsForEmployeeForMonth(employee.getId(),lastMonth,lastMonth==12?shift.getStartYear()-1:shift.getStartYear());
+				ArrayList<Shift> thisMonthsShifts = employeeShiftManager.getAssignedShiftsForEmployeeForMonth(employee.getId(),thisMonth,lastMonth==12?shift.getStartYear()-1:shift.getStartYear());
+				ArrayList<Shift> nextMonthsShifts = employeeShiftManager.getAssignedShiftsForEmployeeForMonth(employee.getId(),nextMonth,lastMonth==12?shift.getStartYear()-1:shift.getStartYear());
 				
 				for(Shift selectedShift :lastMonthsShifts){
 					if(selectedShift.getStartDate().equals(lastSaturday.toString())
@@ -232,7 +232,7 @@ public class EmployeeShiftCompatibilityManager {
 			
 			if(null!=shift && null!=employee) {
 				if(shift.isValid()) {
-					ArrayList<Shift> shiftsForDay =employeeShiftManager.getAssignedShiftsForEmployeeForDayOfMonth(employee.getId(), shift.getStartDay(), shift.getStartMonth());
+					ArrayList<Shift> shiftsForDay =employeeShiftManager.getAssignedShiftsForEmployeeForDayOfMonth(employee.getId(), shift.getStartDay(), shift.getStartMonth(),shift.getStartYear());
 					
 					if(!(shiftsForDay.size()>=MAX_SHIFTS_PER_DAY)){
 						violatesMaxShiftsPerDay=false;
@@ -272,7 +272,7 @@ public class EmployeeShiftCompatibilityManager {
 				if(shift.isValid()) {
 					int daysWorked = 0;
 					
-					ArrayList<Shift> shiftsForWeek =employeeShiftManager.getAssignedShiftsForEmployeeForWeekOfMonth(employee.getId(), shift.getStartWeek(), shift.getStartMonth());
+					ArrayList<Shift> shiftsForWeek =employeeShiftManager.getAssignedShiftsForEmployeeForWeekOfMonth(employee.getId(), shift.getStartWeek(), shift.getStartMonth(),shift.getStartYear());
 
 					ArrayList<Boolean> workedDays = new ArrayList<Boolean>();
 					for(int i =0;i<7;i++){
@@ -600,7 +600,7 @@ public class EmployeeShiftCompatibilityManager {
 				int week = Util.getWeekOfDate(shift.getStartDate());
 				
 				try {
-					hours = employeeShiftManager.getHoursScheduledWeekOfMonth(employee,week,shift.getStartMonth());
+					hours = employeeShiftManager.getHoursScheduledWeekOfMonth(employee,week,shift.getStartMonth(),shift.getStartYear());
 				} catch (CorruptDataException e) {
 					throw new ProccessingException(e);
 				}

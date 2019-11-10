@@ -29,10 +29,11 @@ public class ScheduleManager {
     
     public ScheduleManager() {}
 
-    public void generateStatusList() {
+    public void generateStatusList(String year) {
     	for(int month=1;month<13;month++) {
     		ScheduleStatus status = new ScheduleStatus();
     		status.setMonth(month+"");
+    		status.setYear(year);
     		scheduleStatusCrud.save(status);
     	}
     }
@@ -48,14 +49,14 @@ public class ScheduleManager {
 		}
 		weekEnd=weekStart.plusDays(6);
 		
-		Iterable<Shift> firstMonthsShifts = shiftCrud.findByStartMonthAndStaffId(weekStart.getMonthValue(),employeeId);
+		Iterable<Shift> firstMonthsShifts = shiftCrud.findByStartMonthAndStartYearAndStaffId(weekStart.getMonthValue(),weekStart.getYear(),employeeId);
 		Iterable<Shift> secondMonthsShifts = null;
 		System.out.println("weekStart"+weekStart.getMonthValue());
 		System.out.println("weekEnd:"+weekEnd.getMonthValue());
 		if(weekStart.getMonthValue()!=weekEnd.getMonthValue()) {
 			System.out.println("getting second months shifts");
 			
-			secondMonthsShifts = shiftCrud.findByStartMonthAndStaffId(weekEnd.getMonthValue(),employeeId);
+			secondMonthsShifts = shiftCrud.findByStartMonthAndStartYearAndStaffId(weekEnd.getMonthValue(),weekStart.getYear(),employeeId);
 			if(null!=secondMonthsShifts) {
 				System.out.println("shifts found for second month:"+secondMonthsShifts.toString());
 			}
@@ -135,16 +136,14 @@ public class ScheduleManager {
 		}
 		weekEnd=weekStart.plusDays(6);
 		
-		Iterable<Shift> firstMonthsShifts = shiftCrud.findByStartMonthAndClientId(weekStart.getMonthValue(),clientId);
+		Iterable<Shift> firstMonthsShifts = shiftCrud.findByStartMonthAndStartYearAndClientId(weekStart.getMonthValue(),weekStart.getYear(),clientId);
 		Iterable<Shift> secondMonthsShifts = null;
 		if(weekStart.getMonthValue()!=weekEnd.getMonthValue()) {
-			secondMonthsShifts = shiftCrud.findByStartMonthAndClientId(weekEnd.getMonthValue(),clientId);
+			secondMonthsShifts = shiftCrud.findByStartMonthAndStartYearAndClientId(weekEnd.getMonthValue(),weekStart.getYear(),clientId);
 		}
 		
-		System.out.println("getting shifts starting:"+weekStart.toString()+" and ending:"+weekEnd.toString());
 		for(Shift shift:firstMonthsShifts) {
 			try {
-				System.out.println("shifts start:"+shift.getStartsLocalDate().toString());
 				if(shift.getStartsLocalDate().isAfter(weekStart.minusDays(1)) &&
 						shift.getStartsLocalDate().isBefore(weekEnd.plusDays(1))){
 					boolean alreadyAdded=false;
@@ -165,7 +164,6 @@ public class ScheduleManager {
 		if(null!=secondMonthsShifts) {
 			for(Shift shift:secondMonthsShifts) {
 				try {
-					System.out.println("shifts start:"+shift.getStartsLocalDate().toString());
 					if(shift.getStartsLocalDate().isAfter(weekStart.minusDays(1)) &&
 							shift.getStartsLocalDate().isBefore(weekEnd.plusDays(1))){
 						boolean alreadyAdded=false;

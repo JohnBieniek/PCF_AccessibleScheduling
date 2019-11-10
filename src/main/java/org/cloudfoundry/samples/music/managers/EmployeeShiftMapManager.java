@@ -26,8 +26,8 @@ public class EmployeeShiftMapManager {
         this.shiftRepository = shiftRepository;
     }
 
-    public HashMap<String, ArrayList<Shift>> getShiftsPerEmployeePerMonthUnconflictingWithAssignedShifts(HashMap<String, ArrayList<Shift>> shiftsPerEmployee, int month) throws CorruptDataException, ProccessingException{
-		HashMap<String,ArrayList<Shift>> assignedShiftsPerEmployee = getAssignedShiftsPerEmployeeForMonth(month);
+    public HashMap<String, ArrayList<Shift>> getShiftsPerEmployeePerMonthUnconflictingWithAssignedShifts(HashMap<String, ArrayList<Shift>> shiftsPerEmployee, int month, int year) throws CorruptDataException, ProccessingException{
+		HashMap<String,ArrayList<Shift>> assignedShiftsPerEmployee = getAssignedShiftsPerEmployeeForMonth(month,year);
 		HashMap<String,ArrayList<Shift>> unconflictedShiftsPerEmployee = new HashMap<String, ArrayList<Shift>>();
     	for(String employeeId:shiftsPerEmployee.keySet()){
     		ArrayList<Shift> shiftsForSelectedEmployee = shiftsPerEmployee.get(employeeId);
@@ -60,8 +60,8 @@ public class EmployeeShiftMapManager {
 		return unconflictedShiftsPerEmployee;
 	}
 	
-    public HashMap<String, ArrayList<Shift>> getAssignedShiftsPerEmployeeForMonth(int month) throws ProccessingException {
-    	Iterable<Shift> shifts = shiftRepository.findByStartMonth(month);
+    public HashMap<String, ArrayList<Shift>> getAssignedShiftsPerEmployeeForMonth(int month,int year) throws ProccessingException {
+    	Iterable<Shift> shifts = shiftRepository.findByStartMonthAndStartYear(month,year);
     	ArrayList<Shift> assignedShifts = ShiftWorker.getAssignedShifts(shifts);
     	HashMap<String,ArrayList<Shift>> assignedShiftsPerEmployee =ShiftWorker.getPrestaffedEmployeeShiftMap(assignedShifts);
     	

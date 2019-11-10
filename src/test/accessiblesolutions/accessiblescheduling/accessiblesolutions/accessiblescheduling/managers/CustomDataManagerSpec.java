@@ -136,7 +136,7 @@ public class CustomDataManagerSpec {
 	    assignedOneDayShifts.add(assignedOneDayShift1);
 	    assignedOneDayShifts.add(assignedOneDayShift2);
 	    assignedOneDayShifts.add(assignedOneDayShift3);
-	    when(shiftRepository.findByStartMonth(4)).thenReturn(assignedOneDayShifts);
+	    when(shiftRepository.findByStartMonthAndStartYear(4,2018)).thenReturn(assignedOneDayShifts);
 	    when(employeeCrud.findOne("assignedOneDay")).thenReturn(assignedOneDay);
 	    when(employeeRepository.findOne("assignedOneDay")).thenReturn(assignedOneDay);
 	    
@@ -150,11 +150,11 @@ public class CustomDataManagerSpec {
 	    crossMonthShift1.setStartTime("20:00");
 	    crossMonthShift1.setEndTime("10:00");
 	    crossMonthShifts.add(crossMonthShift1);
-	    when(shiftRepository.findByStartMonth(5)).thenReturn(crossMonthShifts);
+	    when(shiftRepository.findByStartMonthAndStartYear(5,2018)).thenReturn(crossMonthShifts);
 	    when(employeeCrud.findOne("crossMonth")).thenReturn(crossMonthEmployee);
 	    when(employeeRepository.findOne("crossMonth")).thenReturn(crossMonthEmployee);
 	    employeeShiftManager.shiftRepository=shiftRepository;
-	    when(shiftRepository.findByStartMonth(6)).thenReturn(crossMonthShifts);
+	    when(shiftRepository.findByStartMonthAndStartYear(6,2018)).thenReturn(crossMonthShifts);
 	   
 	    Employee inOvertime = new Employee("In","Overtime");
 	    inOvertime.setMaxHours(1);
@@ -169,7 +169,7 @@ public class CustomDataManagerSpec {
 	    inOvertimeShift1.setStartMonth(7);
 	    ArrayList<Shift> inOvertimeShifts = new ArrayList<Shift>();
 		inOvertimeShifts.add(inOvertimeShift1);
-	    when(shiftRepository.findByStartMonth(7)).thenReturn(inOvertimeShifts);
+	    when(shiftRepository.findByStartMonthAndStartYear(7,2018)).thenReturn(inOvertimeShifts);
 	    
 	    ArrayList<Employee> employees = new ArrayList<Employee>();
 		employees.add(inOvertime);
@@ -226,7 +226,7 @@ public class CustomDataManagerSpec {
 	    assignedFiveDayShifts.add(assignedFiveDayShift4);
 	    assignedFiveDayShifts.add(assignedFiveDayShift5);
 	    
-	    when(shiftRepository.findByStartMonth(2)).thenReturn(assignedFiveDayShifts);
+	    when(shiftRepository.findByStartMonthAndStartYear(2,2018)).thenReturn(assignedFiveDayShifts);
 	    when(employeeCrud.findOne("assignedFiveDay")).thenReturn(assignedFiveDay);
 	    when(employeeRepository.findOne("assignedFiveDay")).thenReturn(assignedFiveDay);
 	    

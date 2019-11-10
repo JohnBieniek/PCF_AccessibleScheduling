@@ -88,7 +88,7 @@ public class CompatibilityController {
     		to.setEmployeeId(employee.getId());
     	}
     	
-    	to.setNumericResponse(employeeShiftManager.getAssignedShiftsForEmployeeForWeekOfMonth(employee.getId(),shift.getStartWeek(),shift.getStartMonth()).size());
+    	to.setNumericResponse(employeeShiftManager.getAssignedShiftsForEmployeeForWeekOfMonth(employee.getId(),shift.getStartWeek(),shift.getStartMonth(),shift.getStartYear()).size());
 
     	return to;
     }
@@ -127,7 +127,7 @@ public class CompatibilityController {
     		to.setEmployeeId(employee.getId());
     	}
     	
-    	to.setNumericResponse(employeeShiftManager.getHoursScheduledWeekOfMonth(employee,shift.getStartWeek(),shift.getStartMonth()));
+    	to.setNumericResponse(employeeShiftManager.getHoursScheduledWeekOfMonth(employee,shift.getStartWeek(),shift.getStartMonth(),shift.getStartYear()));
 
     	return to;
     }

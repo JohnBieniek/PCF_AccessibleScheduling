@@ -44,11 +44,6 @@ public class CleaningController {
         return cleaningManager.getAlternateWeekendsOffNotifications();
     }
     
-    @RequestMapping(value = "/scheduleNotifications", method = RequestMethod.GET)
-    public ArrayList<ScheduleNotification> getScheduleNotifications(@RequestHeader(value="Authorization", required=false) String idToken) throws CorruptDataException, ProccessingException{
-        return cleaningManager.getScheduleNotifications();
-    }
-    
     @RequestMapping(value = "/dailyMaxNotifications", method = RequestMethod.GET)
     public ArrayList<ShiftNotification> getDailyMaxNotifications(@RequestHeader(value="Authorization", required=false) String idToken) throws CorruptDataException, ProccessingException{
         return cleaningManager.getOverDailyShiftNotifications();

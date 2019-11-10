@@ -55,7 +55,7 @@ public class ShiftGenerationManager {
     	}
     	
     	if(!status.isGenerating() && !status.isGenerated() && !status.isAssigning() && !status.isAssigned() && !status.isStopped() && !status.isErrored()) {
-	    	scheduleStatusRepository.deleteByMonth(selectedMonth);
+	    	scheduleStatusRepository.deleteByMonthAndYear(selectedMonth);
 	    	status.setGenerating(true);
 	    	scheduleStatusCrud.save(status);
 	        updateInfoManager.set(Constants.STATUS);

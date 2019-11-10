@@ -42,7 +42,7 @@ public class EmployeeShiftManager {
 			System.out.println("getting assign shisfts for employee for week after shift, calling get week of date:"+weekAftersDate.toString());
 			int weekAfter = Util.getWeekOfDate(weekAftersDate.getYear()+"-"+month+"-"+day);
 			
-			shifts = getAssignedShiftsForEmployeeForWeekOfMonth(employeeId,weekAfter,weekAftersDate.getMonthValue());
+			shifts = getAssignedShiftsForEmployeeForWeekOfMonth(employeeId,weekAfter,weekAftersDate.getMonthValue(),weekAftersDate.getYear());
     	}
     	
 		return shifts;
@@ -62,7 +62,7 @@ public class EmployeeShiftManager {
   		ArrayList<Shift> assignedShiftsForEmployee = new ArrayList<Shift>();
   		
   		if(null!=shift) {
-  			assignedShiftsForEmployee = getAssignedShiftsForEmployeeForWeekOfMonth(employeeId,shift.getStartWeek(), shift.getStartMonth());
+  			assignedShiftsForEmployee = getAssignedShiftsForEmployeeForWeekOfMonth(employeeId,shift.getStartWeek(), shift.getStartMonth(), shift.getStartYear());
   		}
   		
   		return assignedShiftsForEmployee;
@@ -77,8 +77,8 @@ public class EmployeeShiftManager {
   	 * @throws CorruptDataException when a shift has a malformed or missing start week
   	 * @Tested
   	 */
-  	public ArrayList<Shift> getAssignedShiftsForEmployeeForWeekOfMonth(String employeeId, int week, int month) throws CorruptDataException{
-		ArrayList<Shift> assignedShiftsForEmployeeForMonth =getAssignedShiftsForEmployeeForMonth(employeeId,month);
+  	public ArrayList<Shift> getAssignedShiftsForEmployeeForWeekOfMonth(String employeeId, int week, int month, int year) throws CorruptDataException{
+		ArrayList<Shift> assignedShiftsForEmployeeForMonth =getAssignedShiftsForEmployeeForMonth(employeeId,month,year);
 		System.out.println("getting assigned shifts for week:"+week+" of month : "+month);
 		ArrayList<Shift> assignedShiftsForEmployeeForWeekOfMonth = new ArrayList<Shift>();
 		if(assignedShiftsForEmployeeForMonth!=null){
@@ -107,14 +107,14 @@ public class EmployeeShiftManager {
   	 * @return ArrayList<Shift> Shift
   	 * @Tested
   	 */
-  	public ArrayList<Shift> getAssignedShiftsForEmployeeForDayOfMonth(String employeeId, int day, int month){
+  	public ArrayList<Shift> getAssignedShiftsForEmployeeForDayOfMonth(String employeeId, int day, int month,int year){
 		ArrayList<Shift> assignedShiftsForEmployeeForDayOfMonth = new ArrayList<Shift>();
 		
 		if(null!=employeeId && day>0) {
-			assignedShiftsForEmployeeForDayOfMonth = getAssignedShiftsForEmployeeStartingDayOfMonth(employeeId,day,month);
+			assignedShiftsForEmployeeForDayOfMonth = getAssignedShiftsForEmployeeStartingDayOfMonth(employeeId,day,month,year);
 			LocalDate previousDay = LocalDate.of(2018,month,day).minusDays(1);
 			
-			ArrayList<Shift> assignedShiftsForEmployeeForPreviousDayOfMonth = getAssignedShiftsForEmployeeStartingDayOfMonth(employeeId,previousDay.getDayOfMonth(),previousDay.getMonthValue());
+			ArrayList<Shift> assignedShiftsForEmployeeForPreviousDayOfMonth = getAssignedShiftsForEmployeeStartingDayOfMonth(employeeId,previousDay.getDayOfMonth(),previousDay.getMonthValue(),previousDay.getYear());
 			if(assignedShiftsForEmployeeForPreviousDayOfMonth!=null){
 				for(Shift shift: assignedShiftsForEmployeeForPreviousDayOfMonth){
 					int endDay=-1;
@@ -138,8 +138,8 @@ public class EmployeeShiftManager {
   	 * 
   	 * @Tested
   	 */
-  	public ArrayList<Shift> getAssignedShiftsForEmployeeStartingDayOfMonth(String employeeId, int day, int month){
-		ArrayList<Shift> assignedShiftsForEmployeeForMonth =getAssignedShiftsForEmployeeForMonth(employeeId,month);
+  	public ArrayList<Shift> getAssignedShiftsForEmployeeStartingDayOfMonth(String employeeId, int day, int month,int year){
+		ArrayList<Shift> assignedShiftsForEmployeeForMonth =getAssignedShiftsForEmployeeForMonth(employeeId,month,year);
 		
 		ArrayList<Shift> assignedShiftsForEmployeeForDayOfMonth = new ArrayList<Shift>();
 		
@@ -161,16 +161,16 @@ public class EmployeeShiftManager {
   	 * @return ArrayList<Shift> Shift
   	 * @Tested
   	 */
-  	public ArrayList<Shift> getAssignedShiftsForEmployeeForMonth(String employeeId, int month){
+  	public ArrayList<Shift> getAssignedShiftsForEmployeeForMonth(String employeeId, int month, int year){
 		ArrayList<Shift> assignedShiftsForEmployeeForMonth = new ArrayList<Shift>();
 		if(null!=employeeId) {
-			for(Shift shift: shiftRepository.findByStartMonth(month)){
+			for(Shift shift: shiftRepository.findByStartMonthAndStartYear(month,year)){
 				if(shift!=null&& shift.getStaffId()!=null&&shift.getStaffId().equals(employeeId)){
 					assignedShiftsForEmployeeForMonth.add(shift);
 				}
 			}
 			
-			for(Shift shift: shiftRepository.findByStartMonth(month-1>0?month-1:12)){
+			for(Shift shift: shiftRepository.findByStartMonthAndStartYear(month-1>0?month-1:12,year)){
 				try {
 					if(shift!=null&& shift.getStaffId()!=null&&shift.getStaffId().equals(employeeId)&& shift.getEndsLocalDate().getMonthValue()==month){
 						if(!assignedShiftsForEmployeeForMonth.contains(shift)){
@@ -189,7 +189,7 @@ public class EmployeeShiftManager {
   
 
   	//TODO Test
-  	public ArrayList<Shift> getAssignedOvernightShiftsForEmployeForTheLastDayOfMonthBefore(String employeeId, int month) throws CorruptDataException, ProccessingException{
+  	public ArrayList<Shift> getAssignedOvernightShiftsForEmployeForTheLastDayOfMonthBefore(String employeeId, int month,int year) throws CorruptDataException, ProccessingException{
   		ArrayList<Shift> assignedOvernightShiftsForEmployeForTheLastDayOfMonthBefore = new ArrayList<Shift>();
   		
   		if(month==1){
@@ -199,16 +199,16 @@ public class EmployeeShiftManager {
   			month--;
   		}
   		
-  		assignedOvernightShiftsForEmployeForTheLastDayOfMonthBefore = getAssignedOvernightShiftsForEmployeForTheLastDayOfMonth(employeeId,month);
+  		assignedOvernightShiftsForEmployeForTheLastDayOfMonthBefore = getAssignedOvernightShiftsForEmployeForTheLastDayOfMonth(employeeId,month,year);
   		
   		return assignedOvernightShiftsForEmployeForTheLastDayOfMonthBefore;
   	}
   	
   	//TODO test
-	public ArrayList<Shift> getAssignedOvernightShiftsForEmployeForTheLastDayOfMonth(String employeeId, int month) throws CorruptDataException, ProccessingException{
+	public ArrayList<Shift> getAssignedOvernightShiftsForEmployeForTheLastDayOfMonth(String employeeId, int month,int year) throws CorruptDataException, ProccessingException{
 		ArrayList<Shift> assignedOvernightShiftsForEmployeForTheLastDayOfMonth = new ArrayList<Shift>();
 		
-		ArrayList<Shift> shifts = getAssignedOvernightShiftsForEmployeeForMonth(employeeId,month);
+		ArrayList<Shift> shifts = getAssignedOvernightShiftsForEmployeeForMonth(employeeId,month,year);
 		
 		assignedOvernightShiftsForEmployeForTheLastDayOfMonth = ShiftWorker.getShiftsStartingTheLastDayOfMonth(shifts, month);
 		
@@ -229,10 +229,10 @@ public class EmployeeShiftManager {
 	 * @throws ProccessingException Shifts are null internally
 	 * @Tested
 	 */
-	public ArrayList<Shift> getAssignedOvernightShiftsForEmployeeForMonth(String employeeId, int month) throws CorruptDataException, ProccessingException{
+	public ArrayList<Shift> getAssignedOvernightShiftsForEmployeeForMonth(String employeeId, int month, int year) throws CorruptDataException, ProccessingException{
 		ArrayList<Shift> assignedOvernightShiftsForEmployeeForMonth = new ArrayList<Shift>();
 		
-		ArrayList<Shift> shifts = getAssignedShiftsForEmployeeForMonth(employeeId,month);
+		ArrayList<Shift> shifts = getAssignedShiftsForEmployeeForMonth(employeeId,month,year);
 		
 		assignedOvernightShiftsForEmployeeForMonth = ShiftWorker.getOvernightShifts(shifts);
 		
@@ -260,7 +260,7 @@ public class EmployeeShiftManager {
 			System.out.println("getting assign shisfts for employee for week before shift, calling get week of date:"+weekBeforesDate.toString());
 			int weekBefore = Util.getWeekOfDate(weekBeforesDate.getYear()+"-"+month+"-"+day);
 	  		
-			shifts = getAssignedShiftsForEmployeeForWeekOfMonth(employeeId,weekBefore,weekBeforesDate.getMonthValue());
+			shifts = getAssignedShiftsForEmployeeForWeekOfMonth(employeeId,weekBefore,weekBeforesDate.getMonthValue(), weekBeforesDate.getYear());
   		}
   		
 		return shifts;
@@ -277,7 +277,7 @@ public class EmployeeShiftManager {
   	 * @throws ProccessingException when no employee is provided
   	 * @Tested
   	 */
-  	public float getHoursScheduledWeekOfMonth(Employee employee,int week, int month) throws CorruptDataException, ProccessingException{
+  	public float getHoursScheduledWeekOfMonth(Employee employee,int week, int month,int year) throws CorruptDataException, ProccessingException{
 		float hours = 0;
 		ArrayList<Shift> shiftsForWeek = null;
 		int weekBefore = -1;//The week before the one provided
@@ -292,7 +292,7 @@ public class EmployeeShiftManager {
 			previousMonth=12;
 		}
 		if(null!=employee){
-			shiftsForWeek = getAssignedShiftsForEmployeeForWeekOfMonth(employee.getId(), week, month);
+			shiftsForWeek = getAssignedShiftsForEmployeeForWeekOfMonth(employee.getId(), week, month,year);
 			
 			if(null!=shiftsForWeek){
 				for(Shift scheduledShift : shiftsForWeek){
@@ -304,14 +304,14 @@ public class EmployeeShiftManager {
 				if(week==0 && localDate.getDayOfMonth()<7) {//handle the possibility that there are shifts from the previous month this week
 					System.out.println("getting week of date in getHoursScheduledWeekOfMonth");
 					int weekInPreviousMonth = Util.getWeekOfDate(localDate.minusDays(localDate.getDayOfMonth()).toString());
-					shiftsForWeek = getAssignedShiftsForEmployeeForWeekOfMonth(employee.getId(), weekInPreviousMonth, previousMonth);
+					shiftsForWeek = getAssignedShiftsForEmployeeForWeekOfMonth(employee.getId(), weekInPreviousMonth, previousMonth,localDate.minusDays(localDate.getDayOfMonth()).getYear());
 					for(Shift scheduledShift : shiftsForWeek){
 						hours+= scheduledShift.getDuration();
 					}
 				}
 				//Handle the possibility of a shift on the last day of the week going overnight
-				weekBefore = Util.getWeekBeforeDate(Util.getLocalDateOfDayInWeek(2018, month,  week).toString());
-				shiftsForPreviousWeek = getAssignedShiftsForEmployeeForWeekOfMonth(employee.getId(), weekBefore, weekBefore>week?previousMonth:month);
+				weekBefore = Util.getWeekBeforeDate(Util.getLocalDateOfDayInWeek(year, month,  week).toString());
+				shiftsForPreviousWeek = getAssignedShiftsForEmployeeForWeekOfMonth(employee.getId(), weekBefore, weekBefore>week?previousMonth:month,Util.getLocalDateOfDayInWeek(year, month,  week).getYear());
 //
 				if(null!=shiftsForPreviousWeek){
 					for(Shift scheduledShift : shiftsForPreviousWeek){

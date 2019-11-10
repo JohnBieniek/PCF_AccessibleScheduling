@@ -519,12 +519,12 @@ public class CleaningManager {
     	return issues;
     }
     
-    public float getHoursScheduledWeekOfMonth(Employee employee, int week,int month) throws CorruptDataException{		
+    public float getHoursScheduledWeekOfMonth(Employee employee, int week,int month,int year) throws CorruptDataException{		
     	float hours = 80;
 		if(null!=employee){
 			hours= 0;
 			ArrayList<Shift> shiftsForWeek = null;
-			shiftsForWeek = employeeShiftManager.getAssignedShiftsForEmployeeForWeekOfMonth(employee.getId(),week,month);
+			shiftsForWeek = employeeShiftManager.getAssignedShiftsForEmployeeForWeekOfMonth(employee.getId(),week,month,year);
 			
 			if(null!=shiftsForWeek){
 				for(Shift scheduledShift : shiftsForWeek){
@@ -534,45 +534,7 @@ public class CleaningManager {
 		}
 		return hours;
 	}
-    
-    public ArrayList<ScheduleNotification> getScheduleNotifications() throws ProccessingException, CorruptDataException{
-    	ArrayList<ScheduleNotification> notifications = new ArrayList<ScheduleNotification>();
-    	
-        ZoneId defaultZoneId = ZoneId.systemDefault();
-        //toString() append +8 automatically.
-        Date date = new Date();
 
-        //1. Convert Date -> Instant
-        Instant instant = date.toInstant();
-
-        //3. Instant + system default time zone + toLocalDateTime() = LocalDateTime
-        LocalDateTime now = instant.atZone(defaultZoneId).plusWeeks(2).toLocalDateTime();//Update without +1 glitch
-
-        int month = now.getMonthValue();
-    	
-    	ArrayList<Employee> employees = (ArrayList<Employee>) employeeCrud.findAll();
-		LocalDate monthStart = LocalDate.of(2018,month,1);
-		
-    	for(int i =0; i <6;i++){
-			for(Employee employee: employees){
-				float scheduled =getHoursScheduledWeekOfMonth(employee,i, month);
-				
-				if(!employee.getInactive()){
-            		if(i>0&&monthStart.plusWeeks(i).getMonthValue()==month){
-	        			if(scheduled<employee.getMinHours()){
-	        				notifications.add(getMinNotification(employee,i,now.getMonth().name(),scheduled));
-	        			}
-            		}
-				}
-				
-				if(monthStart.plusWeeks(i-1).getMonthValue()==month && scheduled>employee.getMaxHours()){
-    				notifications.add(getMaxNotification(employee,i,now.getMonth().name(),scheduled));
-    			}
-    		}
-    	}
-    	
-    	return notifications;
-    }
     public ScheduleNotification getMinNotification(Employee employee,int week, String month, float scheduled){
     	ScheduleNotification notification = new ScheduleNotification();
 		String description = "For week " +(week+1)+ " of "+ month+ " " +employee.getFirst() + " " + employee.getInitial();

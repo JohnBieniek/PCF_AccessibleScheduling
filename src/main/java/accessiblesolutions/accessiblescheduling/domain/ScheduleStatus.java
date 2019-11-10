@@ -9,6 +9,7 @@ public class ScheduleStatus implements Comparable<ScheduleStatus> {
 	@Id
 	@Column(length = 2)
 	private String month;
+	private String year;
 	private boolean generating;
 	private boolean generated;
 	private boolean assigned;
@@ -24,7 +25,7 @@ public class ScheduleStatus implements Comparable<ScheduleStatus> {
 
 	@Override
 	public int compareTo(ScheduleStatus status) {
-		return Integer.parseInt(month) - Integer.parseInt(status.getMonth());
+		return Integer.parseInt(month) - Integer.parseInt(status.getMonth()) +((Integer.parseInt(year) - Integer.parseInt(status.getYear()))*365);
 	}
 	
 	public String getLastUpdated() {
@@ -100,19 +101,28 @@ public class ScheduleStatus implements Comparable<ScheduleStatus> {
 		this.stopping = stopping;
 	}
 
-	@Override
-	public String toString() {
-		return "ScheduleStatus [month=" + month + ", generating=" + generating + ", generated=" + generated
-				+ ", assigned=" + assigned + ", assigning=" + assigning + ", deleting=" + deleting + ", errored="
-				+ errored + ", stopped=" + stopped + ", stopping=" + stopping + ", scheduled=" + scheduled
-				+ ", unscheduled=" + unscheduled + ", lastUpdated=" + lastUpdated + "]";
-	}
-
 	public long getAssigningThreadId() {
 		return assigningThreadId;
 	}
 
 	public void setAssigningThreadId(long assigningThreadId) {
 		this.assigningThreadId = assigningThreadId;
+	}
+
+	public String getYear() {
+		return year;
+	}
+
+	public void setYear(String year) {
+		this.year = year;
+	}
+
+	@Override
+	public String toString() {
+		return "ScheduleStatus [month=" + month + ", year=" + year + ", generating=" + generating + ", generated="
+				+ generated + ", assigned=" + assigned + ", assigning=" + assigning + ", assigningThreadId="
+				+ assigningThreadId + ", deleting=" + deleting + ", errored=" + errored + ", stopped=" + stopped
+				+ ", stopping=" + stopping + ", scheduled=" + scheduled + ", unscheduled=" + unscheduled
+				+ ", lastUpdated=" + lastUpdated + "]";
 	}
 }

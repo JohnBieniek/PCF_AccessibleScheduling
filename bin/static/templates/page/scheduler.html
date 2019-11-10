@@ -68,12 +68,20 @@
 	   	</div>
 	   	<div style="display:inline-block; vertical-align: top; width:75%">
 			<div style="margin-left:5%" class="scheduler" >
-				<div>
-					<label style="font-size:43px;line-height:1">Scheduler</label>
-				</div>
-				<div ng-init="setScheduleTab(monthTab)">
-					<label style="font-size:38px;line-height:1">{{monthName}}</label>
-				</div>
+    			<div style="width:100%">
+    				<div class="inline" style="width:100%;text-align: center;">
+	    				<div class = 'inline centered'>
+				    		<div>
+				    			<h1 class = 'centered'>Scheduler</h1>
+				    		</div>
+				    		<div>
+					    		<button class="inline" ng-click="decrementYear()"><span class="changeWeek glyphicon glyphicon-chevron-left"></span></button>
+					    		<h2 class = 'inline centered'>{{monthName}}  {{year}}</h2>
+					    		<button class="inline" ng-click="incrementYear()"><span class="changeWeek glyphicon glyphicon-chevron-right"></span></button>
+				    		</div>
+			    		</div>
+		    		</div>
+	    		</div>
 				<div>
 					<label style="font-size:24px">Generate shifts from requests. Assign shifts to employees.</label>
 				</div>

@@ -1478,13 +1478,14 @@ function MainNavigationController($scope, $modal, $http) {
     };
     
     $scope.decrementWeek = function(){
-   	 $scope.updateLastInteractionTime();
-   	 $scope.setWeek($scope.week.addDays(-7));
-   	 
-   	 $scope.getDisplayWeek();
-   	 
-   	 $scope.listShifts();//Stays as a single call since there are no other updates that the time
+      	 $scope.updateLastInteractionTime();
+      	 $scope.setWeek($scope.week.addDays(-365));
+      	 
+      	 $scope.getDisplayWeek();
+      	 
+      	 $scope.listShifts();//Stays as a single call since there are no other updates that the time
     }
+    
     $scope.incrementWeek = function(){
    	 	$scope.updateLastInteractionTime();
     	$scope.setWeek($scope.week.addDays(7));
@@ -1494,6 +1495,33 @@ function MainNavigationController($scope, $modal, $http) {
    	 	$scope.listShifts();//Stays as a single call since there are no other updates that the time
     }
 	
+    $scope.decrementYear = function(){
+      	 $scope.updateLastInteractionTime();
+      	 var year = $scope.week.getFullYear();
+      	 var month = $scope.week.getMonth();
+      	 var day = $scope.week.getDate();
+      	 var c = new Date(year - 1, month, day)
+      	 
+      	 $scope.year=year-1;
+      	 $scope.setWeek(c);
+      	 
+       	 $scope.lastStatusTableUpdate=null;
+      	 $scope.updateData();
+       }
+    
+    $scope.incrementYear = function(){
+      	 $scope.updateLastInteractionTime();
+      	 var year = $scope.week.getFullYear();
+      	 var month = $scope.week.getMonth();
+      	 var day = $scope.week.getDate();
+      	 var c = new Date(year + 1, month, day)
+      	 
+      	 $scope.year=year+1;
+      	 $scope.setWeek(c);
+      	 
+      	$scope.lastStatusTableUpdate=null;
+      	$scope.updateData();
+       }
      
     //Auth
     /**
