@@ -22,181 +22,51 @@ angular.module('client', ['ngResource', 'ui.bootstrap']).
     });
 
 function MobileClientController($scope, $modal, $http) {
-	$scope.allowOvertime=false;
-	$scope.allowUnavailable=false;
-	$scope.prioritizeSecondShift=false;
-	$scope.useDailyMax=true;
-	$scope.useWeeklyMax=true;
-	$scope.allowInactive=false;
-	$scope.generatedBool = false;
-	$scope.generated="Generated";
-	$scope.assigned="Unassigned";
-	$scope.monthName="January";
-	$scope.customValue=[];
-	$scope.unscheduled=0;
-	$scope.scheduled=0;
-	$scope.selectedInterval="day(s)";
-	$scope.detailsChanged=false;
-	$scope.days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-	
-	$scope.getClientCustomFieldData = function (client,customField,index){
-     	$http({
-            url: '/compatibility/clientCustomFieldData',
-            method: 'POST',
-            headers: {
-                'Authorization': $scope.idToken,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            params: {
-                client: client,
-                customField: customField,
-                index:index,
-            }
-        })
-        .then(function(response) {
-        	$scope.customValue[response.data.numericResponse] = response.data.booleanResponse;
-        });
-    }
-	
+	/**
+	 * Changes what client info we are looking at , does not change the client
+	 * Interaction notification is done in setTab
+	 */
 	$scope.setTabAndInfo = function(newTab){
-        $scope.setTab(newTab);
-		$scope.listShifts();
+		if($scope.tab!=newTab){
+	        $scope.setTab(newTab);
+	  	    
+	        $scope.setDetailsChanged(false);
+	        
+	        $scope.updateData();
+		}
 	}
 	
+	/**
+	 * Interaction notification is done in setClient
+	 */
 	$scope.setClientAndInfo = function(newClient){
-	  $scope.detailsChanged=false;
-      $scope.setClient(newClient);
-      
-      $scope.listRequests(newClient);
-      
-      $scope.listShifts();
-
-      if($scope.client!=null && $scope.customFields !=null){
-	      for(var index = 0; index<$scope.customFields.length;index++){
-		      $scope.getClientCustomFieldData($scope.client,$scope.customFields[index],index);
-	      }
-      }
-      $scope.listClients();
+	  if($scope.selectedClient!=newClient){
+		  $scope.setDetailsChanged(false);
+		  
+	      $scope.setSelectedClient(newClient);
+	      
+	      $scope.updateData();
+	  }
 	}
 	
-	 $scope.listCustomFields = function listCustomFields() {
-		$http({
-            url: '/customFields/',
-            method: 'GET',
-            headers: {
-	            'Authorization': $scope.idToken,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            params: {
-            }
-        })
-        .then(function(response) {
-        	$scope.customFields=response.data;
-        });
-     }
-	
+	//May be used in checking if a shift or request is valid, TODO factor out
 	$scope.setInterval = function(newInterval){
       $scope.interval = newInterval;
 	}
 	
+	/**
+	 * Called whenever something in the client object is changed.
+	 * Used to show the okay and cancel buttons at the bottom of the screen to save the changes
+	 */
 	$scope.setDetailsToChanged = function(){
-      $scope.detailsChanged=true;;
+	  $scope.updateLastInteractionTime();
+      $scope.setDetailsChanged(true);
 	}
 	
-    $scope.isDay = function(shift, day){
-    	 return day.toUpperCase().includes(shift.startsLocalDate.dayOfWeek.toUpperCase());
-    }
-     
-    Date.prototype.addDays = function(days) {
-	    var date = new Date(this.valueOf());
-	    date.setDate(date.getDate() + days);
-	    
-	    return date;
-	}
-     
-    $scope.decrementWeek = function(){
-    	$scope.setWeek($scope.week.addDays(-7));
-    	 
-    	 $scope.getDisplayWeek();
-    	 
-    	 $scope.listShifts();
-    }
-     
-    $scope.incrementWeek = function(){
-    	$scope.setWeek($scope.week.addDays(7));
-    	 
-    	 $scope.getDisplayWeek();
-    	 
-    	 $scope.listShifts();
-    }
-     
-     $scope.getDisplayMonth = function(date){
-    	 var monthName = "January";
-    	 
-		 switch(parseInt(date.getMonth())+1){
-		  	  case 1:
-		  		  monthName="January";
-		  		  break;
-		  	  case 2:
-		  		  monthName="Febuary";
-		  		  break;
-		  	  case 3:
-		  		  monthName="March";
-		  		  break;
-		  	  case 4:
-		  		  monthName="April";
-		  		  break;
-		  	  case 5:
-		  		  monthName="May";
-		  		  break;
-		  	  case 6:
-		  		  monthName="June";
-		  		  break;
-		  	  case 7:
-		  		  monthName="July";
-		  		  break;
-		  	  case 8:
-		  		  monthName="August";
-		  		  break;
-		  	  case 9:
-		  		  monthName="September";
-		  		  break;
-		  	  case 10:
-		  		  monthName="October";
-		  		  break;
-		  	  case 11:
-		  		  monthName="November";
-		  		  break;
-		  	  case 12:
-		  		  monthName="December";
-		  		  break;
-	 	}
-		 
-		return monthName;
-    }
-     
-     $scope.getDisplayWeek = function(){
-    	 var date = parseInt($scope.week.getDate());
-    	 var day = parseInt($scope.week.getDay());
-    	 
-    	 var weekStart = $scope.week.addDays(-day);
-    	 var weekEnd = weekStart.addDays(6);
-    	 
-    	 $scope.displayWeek = weekStart.getDate()+ " - " +weekEnd.getDate();
-
-    	 $scope.year = parseInt(weekStart.getYear())+1900;
-    	 $scope.monthName=$scope.getDisplayMonth(weekStart);
-    	 $scope.displayDays=[
-			'Sunday '+$scope.monthName + " "+weekStart.getDate(),
-			'Monday '+$scope.getDisplayMonth(weekStart.addDays(1)) + " "+weekStart.addDays(1).getDate(),
-			'Tuesday '+$scope.getDisplayMonth(weekStart.addDays(2)) + " "+weekStart.addDays(2).getDate(),
-			'Wednesday '+$scope.getDisplayMonth(weekStart.addDays(3)) + " "+weekStart.addDays(3).getDate(),
-			'Thursday '+$scope.getDisplayMonth(weekStart.addDays(4)) + " "+weekStart.addDays(4).getDate(),
-			'Friday '+$scope.getDisplayMonth(weekStart.addDays(5)) + " "+weekStart.addDays(5).getDate(),
-			'Saturday '+$scope.getDisplayMonth(weekStart.addDays(6)) + " "+weekStart.addDays(6).getDate()
-		];
-     }
-     
+    /**
+     * Updates the provided object with .displayValue containing a human readable string of what this shift is for.
+     * Differs from the client version in its description of who this is for.
+     */
      $scope.setShiftDisplay = function(shift){
     	 if(shift.startsLocalDateTime==null || shift.startsLocalDateTime==undefined){
 			 return null;
@@ -238,14 +108,23 @@ function MobileClientController($scope, $modal, $http) {
 		shift.displayValue+= ".";
      }
      
+     /**
+      * Determines if the given tab should have the selected style applied
+      */
 	$scope.isSet = function(tabNum){
       return $scope.tab === tabNum;
     }
     
+    /**
+     * Determines if the given tab should have the selected style applied
+     */
     $scope.isClientSet = function(client){
         return client !==null && $scope.client !==null && client !==undefined && $scope.client !==undefined && $scope.client.id === client.id;
     }
-      
+  
+    /**
+     * Determines if the ok button can pop up in client details
+     */
     $scope.isClientChangeValid = function(client){
       let valid = true;
       
@@ -259,174 +138,16 @@ function MobileClientController($scope, $modal, $http) {
       return valid;
     }
     
-    function clone (obj) {
-    	return JSON.parse(JSON.stringify(obj));
-    }
- 
 	 $scope.setInitialDays = function setInitialDays(request){
 		 if(request.days==null || request.days==undefined){
 			 request.days=[false,false,false,false,false,false,false];
 		 }
 	 }
 	 
-	 $scope.getDisplayValue = function getDisplayValue(request) {
-		 if(request.startsLocalDateTime==null || request.startsLocalDateTime==undefined){
-			 return null;
-		 }
-		 
-		let startHour = parseInt(request.startsLocalDateTime.hour);
-	 	let endHour= parseInt(request.endsLocalDateTime.hour);
-	 	
-	 	let startMinute = parseInt(request.startsLocalDateTime.minute);
-	 	let endMinute= parseInt(request.endsLocalDateTime.minute);
-	 	
-	 	let startModifier = "AM";
-	 	let endModifier = "AM";
-	 	
-	 	if(startHour>11){
-	 		startHour-=12;
-	 		startModifier="PM"
-	 	}
-	 	
-	 	if(endHour>11){
-	 		endHour-=12;
-	 		endModifier="PM"
-	 	}
-	 	
-	 	if(startMinute<10){
-	 		startMinute="0"+startMinute
-	 	}
-	 	
-	 	if(endMinute<10){
-	 		endMinute="0"+endMinute
-	 	}
-        request.displayValue = (startHour!=0?startHour:"12")+":"+startMinute+startModifier+"-";
-        request.displayValue += (endHour!=0?endHour:"12")+":"+endMinute+endModifier;
-		 
-		 if(request.requestEmployee){
-			 request.displayValue+=" with "+request.staffName;
-		 }
-		 if(request.repeats){
-			 request.displayValue+= " every "+request.repeatsEvery + " " +request.interval; 
-		 }
-		 if(request.days && request.interval=="week(s)"){
-			 request.displayValue+=" [";
-			 if(request.days[0]){
-				 request.displayValue+="Su";
-			 }
-			 if(request.days[1]){
-				 request.displayValue+="M";
-			 }
-			 if(request.days[2]){
-				 request.displayValue+="Tu";
-			 }
-			 if(request.days[3]){
-				 request.displayValue+="W";
-			 }
-			 if(request.days[4]){
-				 request.displayValue+="Th";
-			 }
-			 if(request.days[5]){
-				 request.displayValue+="F";
-			 }
-			 if(request.days[6]){
-				 request.displayValue+="Sa";
-			 }
-			 request.displayValue+="]";
-		 }
-		 var weekOfMonth = 0;
-		 var dateCursor = request.startsLocalDate.dayOfMonth;
-		 
-		 for(var i =0; i<8;i++){
-			 if(dateCursor>0){
-				 dateCursor-=7;
-				 weekOfMonth+=1;
-			 }
-		 }
-		 
-		 if(request.interval=="month(s)"){
-			 if(request.monthInterval=="days"){
-				 request.displayValue+=" on day "+request.startsLocalDate.dayOfMonth;
-			 }
-			 else{
-				 request.displayValue+=" on "+request.startsLocalDate.dayOfWeek + " of week "+weekOfMonth;
-			 }
-		 }
-		 if(request.interval=="year(s)"){
-			 request.displayValue+= " in " +request.startsLocalDate.month;
-			 if(request.yearInterval=="days"){
-				 request.displayValue+=" on day "+request.startsLocalDate.dayOfMonth;
-			 }
-			 else{
-				 request.displayValue+=" on "+request.startsLocalDate.dayOfWeek + " of week "+weekOfMonth;
-			 }
-		 }
-		 
-		 if(request.repeats){
-			 request.displayValue+= " starting "+request.startDate; 
-		 }
-		 else{
-			 request.displayValue+=" on "+ request.startDate;
-		 }
-
-		 //Add exceptions
-		 if(request.exceptions !=undefined && request.exceptions!=null && request.exceptions.length>0){
-			 request.displayValue+=" except ";
-			 
-			 if(request.exceptions.length<4){
-				 for(var index = 0; index <request.exceptions.length;index++){
-					 if(index==request.exceptions.length-1 && request.exceptions.length>1){
-						 request.displayValue+=" and " 
-					 }
-					 else if(index>0){
-						 request.displayValue+=" ,"
-					 }
-					 request.displayValue+=request.exceptions[index];
-				 }
-			 }
-			 else{
-				 request.displayValue+=" as noted";
-			 }
-		 }
-		 
-		 request.displayValue+=".";
-	 }
-
-	 $scope.listClients = function listClients() {
-		$http({
-	        url: '/clients',
-	        method: 'GET',
-	        headers: {
-	            'Authorization': $scope.idToken
-	        },
-	        params: {
-	        }
-	    })
-	    .then(function(response) {
-	    	$scope.clients=response.data;
-	    	
-	        if($scope.client==null){
-	        	$scope.setClientAndInfo($scope.clients[0]);
-	        }
-	        $scope.listEmployees();
-	    });
-    }
-    
-    $scope.listEmployees = function listEmployees() {
-  		$http({
-	        url: '/employees',
-	        method: 'GET',
-	        headers: {
-	            'Authorization': $scope.idToken
-	        },
-	        params: {
-	        }
-	    })
-	    .then(function(response) {
-	    	$scope.employees=response.data;
-	    });
-    }
-    
+	/**
+	 * Enters or updates the provided shift in the database.
+	 * Requires a unique version per page due to the differences in how shifts are listed afterward.
+	 */
     function saveShift(shift) {
     	$http({
             url: '/shifts',
@@ -447,24 +168,25 @@ function MobileClientController($scope, $modal, $http) {
     }
     
     $scope.addShift = function () {
+    	$scope.updateLastInteractionTime();
         var addModal = $modal.open({
             templateUrl: 'templates/modal/shiftForm.html',
             controller: ShiftModalController,
             resolve: {
             	idToken: function(){
-         		   return clone($scope.idToken);
+         		   return $scope.clone($scope.idToken);
          	    },
             	shift: function(){
             		return {};
             	},
             	client: function(){
-            		return clone($scope.client);
+            		return $scope.clone($scope.client);
             	},
             	clients: function(){
-            		return clone($scope.clients);
+            		return $scope.clone($scope.clients);
             	},
             	employees:function(){
-            		return clone($scope.employees);
+            		return $scope.clone($scope.employees);
             	},
             	date: function(){
              	   return $scope.week;
@@ -483,168 +205,30 @@ function MobileClientController($scope, $modal, $http) {
         	if(shift.startMonth==0 || shift.startMonth == undefined || shift.startMonth==null){
         		shift.startMonth=shift.startDate.split("-")[1];
         	}
-        	
+        	$scope.updateLastInteractionTime();
             saveShift(shift);
         });
     }
-    
-    
-    $scope.deleteShift = function (shift) {
-    	$http({
-            url: '/shifts/'+shift.id,
-            method: 'DELETE',
-            headers: {
-                'Authorization': $scope.idToken,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            params: {
-            }
-        })
-        .then(function (response) {//TODO handle error state
-            $scope.notify("Shift removed.");
-            
-            $scope.listEmployees();
-        });
-    }
-    
-    $scope.listShifts = function listShifts(){
-    	let id = "-1";
-    	
-    	if(null!=$scope.client){
-    		id=$scope.client.id;
-    	}
-    	$scope.getDisplayWeek();
-    	$http({
-            url: '/schedule/clientShiftsForWeek',
-            method: 'GET',
-            headers: {
-	            'Authorization': $scope.idToken,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            params: {
-            	clientId:id,
-            	month:$scope.week.getMonth()+1,
-            	day: $scope.week.getDate(),
-            	year:$scope.week.getFullYear()
-            }
-        })
-        .then(function(response) {
-    		$scope.shifts = response.data;
-    	});
-    }
-   
-    $scope.listRequests = function listRequests(client){
-    	let id = "-1";
-    	
-    	if(null!=client){
-    		id=client.id;
-    	}
-    	
-    	$http({
-            url: '/schedule/clientsRequests',
-            method: 'GET',
-            headers: {
-	            'Authorization': $scope.idToken,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            params: {
-            	clientId:id
-            }
-        })
-        .then(function(response) {
-    		$scope.requests = response.data;
-    	});
-    }
-    
-    $scope.listCurrentShifts = function listCurrentShifts(){
-    	let id = "-1";
-    	
-    	if(null!=$scope.client){
-    		id=$scope.client.id;
-    	}
-    	
-    	$http({
-            url: '/schedule/currentShifts',
-            method: 'GET',
-            headers: {
-	            'Authorization': $scope.idToken,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            params: {
-            	clientId:id
-            }
-        })
-        .then(function(response) {
-    		$scope.currentShifts = response.data;
-    	});
-    }
-    
  
-    $scope.editRequest = function (selectedRequest,selectedClient,employees) {
-      var editModal = $modal.open({
-          templateUrl: 'templates/modal/requestForm.html',
-          controller: RequestModalController,
-          windowClass: 'app-modal-window',
-          resolve: {
-          	selectedClient: function(){
-          		return clone(selectedClient);
-          	},
-          	employees: function(){
-          		return clone(employees);
-          	},
-          	selectedEmployee: function(){
-          		return selectedRequest.staffId;
-          	},
-            shiftRequest: function () {
-            	return selectedRequest;
-            },
-            date:function(){
-            	return "";
-            },
-            action: function() {
-                return 'edit';
-            }
-          }
-      });
-
-    editModal.result.then(function (shiftRequest) {
-   		$http({
-               url: '/clientRequests',
-               method: 'POST',
-               headers: {
-            	   'Authorization': $scope.idToken,
-                   'Content-Type': 'application/x-www-form-urlencoded'
-               },
-               params: {
-                   param: shiftRequest
-               }
-           })
-           .then(function(response) {
-
-           		$scope.notify("Request saved");
-        		$scope.requests = response.data;
-           });
-      	});
-	}
-  
     $scope.addRequest = function (selectedClient,employees) {
+       $scope.updateLastInteractionTime();
        var addModal = $modal.open({
            templateUrl: 'templates/modal/requestForm.html',
            controller: RequestModalController,
            windowClass: 'app-modal-window',
            resolve: {
-        	client : function(){
-        		return clone(selectedClient);
-        	},
-           	selectedClient: function(){
-           		return clone(selectedClient);
-           	},
-           	employees: function(){
-           		return clone(employees);
-           	},
-           	selectedEmployee: function(){
-           		return "";
-           	},
+	        	client : function(){
+	        		return $scope.clone(selectedClient);
+	        	},
+	           	selectedClient: function(){
+	           		return $scope.clone(selectedClient);
+	           	},
+	           	employees: function(){
+	           		return $scope.clone(employees);
+	           	},
+	           	selectedEmployee: function(){
+	           		return "";
+	           	},
                shiftRequest: function () {
                    return {};
                },
@@ -653,7 +237,10 @@ function MobileClientController($scope, $modal, $http) {
                },
                action: function() {
                    return 'add';
-               }
+               },
+				idToken: function(){
+        	    	return $scope.clone($scope.idToken);
+        	    }
            }
        });
 
@@ -671,15 +258,14 @@ function MobileClientController($scope, $modal, $http) {
                 }
             })
             .then(function(response) {
-
+            	$scope.updateLastInteractionTime();
             	$scope.notify("Request saved.");
-            	$scope.requests = response.data;
+            	$scope.setRequests(response.data);
+            	for(var index = 0; index< $scope.requests.length;index++){
+    				$scope.getDisplayValue($scope.requests[index]);
+    			}
             });
        });
-   }
-   
-   function clone (obj) {
-       return JSON.parse(JSON.stringify(obj));
    }
    
    function saveShiftRequest(shiftRequest) {
@@ -697,102 +283,201 @@ function MobileClientController($scope, $modal, $http) {
        .then(function (response) {//TODO handle error state
            $scope.notify("Request saved.");
 
-           $scope.listShiftRequests();
+           $scope.listRequests();
        });
    }
    
    $scope.editShift = function (shift) {
-       var updateModal = $modal.open({
-           templateUrl: 'templates/modal/shiftForm.html',
-           controller: ShiftModalController,
-           resolve: {
-        	   idToken: function(){
-        		   return clone($scope.idToken);
-        	   },
-               shift: function() {
-                   return clone(shift);
-               },
-               client: function(){
-            	   return clone($scope.selectedClient);
-               },
-               clients: function(){
-           		return {};
-	           	},
-	           	employees:function(){
-	        		return clone($scope.employees);
-	        	},
-	           	date: function(){
-	         	   return $scope.week;
-	            },
-               action: function() {
-                   return 'update';
-               }
-           }
-       });
+	   $scope.updateLastInteractionTime();
+	   var lastUpdated = (shift.lastUpdated!=null?shift.lastUpdated:"null");
+	   $http({
+            url: '/schedule/shiftWasUpdated',
+            method: 'GET',
+            headers: {
+                'Authorization': $scope.idToken,
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            params: {
+            	lastUpdated:lastUpdated,
+            	shiftId:shift.id
+            }
+        })
+        .then(function(response) {
+        	var updateData=true;
 
-       updateModal.result.then(function (shift) {
-           saveShift(shift);
-       });
+        	if(response.data=="DELETED"){
+        	   updateDate=false;
+	    	   $scope.warn("This shift has just been deleted by another user. If you still wish to make edits please make a new shift.");
+   	    	}
+   	    	
+   	    	if(updateData){
+		       var updateModal = $modal.open({
+		           templateUrl: 'templates/modal/shiftForm.html',
+		           controller: ShiftModalController,
+		           resolve: {
+		        	    idToken: function(){
+		        	    	return $scope.clone($scope.idToken);
+		        	    },
+		                shift: function() {
+		                	return $scope.clone(shift);
+		                },
+		                client: function(){
+		                	return $scope.clone($scope.selectedClient);
+		                },
+		                clients: function(){
+		                	return {};
+			            },
+			            employees:function(){
+			        		return $scope.clone($scope.employees);
+			            },
+			           	date: function(){
+			           		return $scope.week;
+			            },
+		                action: function() {
+		                	return 'update';
+		                }
+		           }
+		       });
+		
+		       updateModal.result.then(function (shift) {
+				   saveShift(shift);
+		           $scope.listShifts();
+		           $scope.updateLastInteractionTime();
+		       }, function () {
+		           $scope.listShifts();
+		           $scope.updateLastInteractionTime();
+		       });
+   	    	}
+        });
    }
    
    $scope.updateShiftRequest = function (selectedClient, shiftRequest,employees) {
-	   var selectedEmployee = employees.filter(function( employee ) {
-			   										return employee.id == shiftRequest.staffId;
-			   									});
-       var updateModal = $modal.open({
-           templateUrl: 'templates/modal/requestForm.html',
-           controller: RequestModalController,
-           resolve: {
-           	selectedClient: function(){
-           		return clone(selectedClient);
-           	},
-               shiftRequest: function() {
-                   return clone(shiftRequest);
-               },
-           	employees: function(){
-           		return clone(employees);
-           	},
-           	selectedEmployee: function(){
-           		if(selectedEmployee!=null && selectedEmployee.length>0){
-           			return clone(selectedEmployee[0]);
-           		}
-           		return "";
-           	},
-           	date: function(){
-           		return "";
-           	},
-               action: function() {
-                   return 'update';
-               }
-           }
-       });
+	   $scope.updateLastInteractionTime();
+	   var lastUpdated = (shiftRequest.lastUpdated!=null?shiftRequest.lastUpdated:"null");
+	   $http({
+            url: '/schedule/requestWasUpdated',
+            method: 'GET',
+            headers: {
+                'Authorization': $scope.idToken,
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            params: {
+            	lastUpdated:lastUpdated,
+            	requestId:shiftRequest.id
+            }
+        })
+        .then(function(response) {
+        	if(response.data=="DELETED"){
+	    	   $scope.warn("This request has just been deleted by another user. If you still wish to make edits please make a new shift.");
+	    	   $scope.listRequests();
+   	    	}
+        	else{
+	   	  	    var selectedEmployee = employees.filter(function( employee ) {
+	   	  	    	return employee.id == shiftRequest.staffId;
+				});
+				var updateModal = $modal.open({
+					templateUrl: 'templates/modal/requestForm.html',
+					controller: RequestModalController,
+					resolve: {
+						selectedClient: function(){
+							return $scope.clone(selectedClient);
+						},
+						shiftRequest: function() {
+							return $scope.clone(shiftRequest);
+						},
+						employees: function(){
+							return $scope.clone(employees);
+						},
+						selectedEmployee: function(){
+							if(selectedEmployee!=null && selectedEmployee.length>0){
+								return $scope.clone(selectedEmployee[0]);
+							}
+							return "";
+						},
+						date: function(){
+							return "";
+						},
+						action: function() {
+							return 'update';
+						},
+						idToken: function(){
+		        	    	return $scope.clone($scope.idToken);
+		        	    }
+					}
+				});
+						
+				updateModal.result.then(function (shiftRequest) {
+					saveShiftRequest(shiftRequest);
+				}, function () {
+					//Error case
+		        }).finally(function() {
+					$scope.updateLastInteractionTime();
+					$scope.updateData();
+		        });
+   	    	}
+        });
 
-       updateModal.result.then(function (shiftRequest) {
-           saveShiftRequest(shiftRequest);
-       });
    }
    
    $scope.deleteShiftRequest = function (shiftRequest) {
-	   if(confirm("Are you sure to delete info for the following request?"+shiftRequest.displayValue)){
-		   $http({
-               url: '/schedule/deleteRequest',
-               method: 'GET',
-               headers: {
-            	   'Authorization': $scope.idToken,
-                   'Content-Type': 'application/x-www-form-urlencoded'
-               },
-               params: {
-                   id: shiftRequest.id
-               }
-           })
-           .then(function(response) {
-        	   	$scope.notify("Request removed.");
-           		$scope.requests = response.data;
-           });
-	   }
+	    $scope.updateLastInteractionTime();
+	    if(confirm("Are you sure you want to delete this request?")){
+		   	var lastUpdated = (shiftRequest.lastUpdated!=null?shiftRequest.lastUpdated:"null");
+	    	$http({
+	            url: '/schedule/requestWasUpdated',
+	            method: 'GET',
+	            headers: {
+	                'Authorization': $scope.idToken,
+	                'Content-Type': 'application/x-www-form-urlencoded'
+	            },
+	            params: {
+	            	lastUpdated:lastUpdated,
+	            	requestId:shiftRequest.id
+	            }
+	        })
+	        .then(function(response) {
+	        	var deleteRequest=false;
+	        	
+	        	if(response.data=="UPDATED"){
+	    		   if(confirm("This request has just been modified by another user. Deleteing this request will overwrite thier updates. Would you " +
+	    		   				"still like to delete this request?")){
+	    			   deleteRequest=true;
+	    		   }
+	    		   else{
+	    			   $scope.listRequests();
+	    		   }
+	        	}
+	    		else{
+	    			deleteRequest=true;
+	    		}
+	        	
+	        	if(deleteRequest){
+				   $http({
+		               url: '/schedule/deleteRequest',
+		               method: 'GET',
+		               headers: {
+		            	   'Authorization': $scope.idToken,
+		                   'Content-Type': 'application/x-www-form-urlencoded'
+		               },
+		               params: {
+		                   id: shiftRequest.id
+		               }
+		           })
+		           .then(function(response) {
+		        	   $scope.notify("Request removed.");
+	    			   $scope.listRequests();
+	    			   $scope.updateLastInteractionTime();
+		           });
+	        	}
+		   });
+	    }
     }
     
+   /**
+    * Creates a new client with name A Client and refreshes the client list to contain the change
+    */
     $scope.newClient = function () {
+    	$scope.updateLastInteractionTime();
     	$http({
             url: '/schedule/createClient',
             method: 'POST',
@@ -815,74 +500,164 @@ function MobileClientController($scope, $modal, $http) {
         });
     }
     
+    /**
+     * Checks to see if we have the latest info in this client.
+     * If we don't we ask if they want to overwrite what's on the server or see what the changes are.
+     * If the choose to proceed or if we had the latest data we save the client and custom field data.
+     */
     $scope.ok = function () {
-    	$scope.detailsChanged=false;
-
-        var size = $scope.customFields.length;
-        for(var i = 0; i < size ;i++){
-            $http({
-                url: '/compatibility/setClientCustomFieldData',
-                method: 'POST',
-                headers: {
-    	            'Authorization': $scope.idToken,
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                params: {
-                    client: $scope.client,
-                    customField: $scope.customFields[i],
-                    value:$scope.customValue[i],
-                }
-            });
-        }
-        
-    	$http({
-            url: '/schedule/updateClient',
-            method: 'POST',
-            headers: {
-	            'Authorization': $scope.idToken,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            params: {
-                param: $scope.client
-            }
-        })
-        .then(function(response) {
-        	if(response.data){
-                $scope.notify("Client saved");
-                
-            	$scope.detailsChanged=false;
-        	}
-        	else{
+    	$scope.updateLastInteractionTime();
+    	var originalClient = $scope.clone($scope.unmodifiedClient);
+    	var modifiedClient = $scope.clone($scope.client);
+    	var lastUpdated = modifiedClient.lastUpdated;
+    	if(null==lastUpdated || undefined == lastUpdated){
+    		lastUpdated="null";
+    	}
+    	if(modifiedClient!=$scope.unmodifiedClient){
+		   $http({
+	            url: '/schedule/clientWasUpdated',
+	            method: 'GET',
+	            headers: {
+	                'Authorization': $scope.idToken,
+	                'Content-Type': 'application/x-www-form-urlencoded'
+	            },
+	            params: {
+	            	lastUpdated:lastUpdated,
+	            	clientId:modifiedClient.id
+	            }
+	        })
+	        .then(function(response) {
+	        	var updateData=false;
+    	    	if(response.data=="UPDATED"){
+    	    		   if(confirm(modifiedClient.name+" has just been modified by another user. Saving your changes will overwrite thier updates. Would you " +
+    	    		   				"still like to save your changes?")){
+    	    			   updateData=true;
+    	    			   $scope.updateLastInteractionTime();
+    	    		   }else{
+    	    			   $scope.updateLastInteractionTime();
+    	    			   $scope.cancel();
+    	    		   }
+    	    	}
+    	    	else{
+    	    		updateData=true;
+    	    	}
+    	    	
+    	    	if(updateData){
+    		  		$scope.setDetailsChanged(false);
+    		  		
+    		        var size = $scope.customFields.length;
+    		        for(var i = 0; i < size ;i++){
+    		            $http({
+    		                url: '/compatibility/setClientCustomFieldData',
+    		                method: 'POST',
+    		                headers: {
+    		    	            'Authorization': $scope.idToken,
+    		                    'Content-Type': 'application/x-www-form-urlencoded'
+    		                },
+    		                params: {
+    		                    client: $scope.client,
+    		                    customField: $scope.customFields[i],
+    		                    value:$scope.customValue[i],
+    		                }
+    		            });
+    		        }
+    		        
+    		    	$http({
+    		            url: '/schedule/updateClient',
+    		            method: 'POST',
+    		            headers: {
+    			            'Authorization': $scope.idToken,
+    		                'Content-Type': 'application/x-www-form-urlencoded'
+    		            },
+    		            params: {
+    		                param: $scope.client
+    		            }
+    		        })
+    		        .then(function(response) {
+    		        	if(response.data){
+    		                $scope.notify("Client saved");
+    		                
+    		            	$scope.setDetailsChanged(false);//TODO try removing
+    		            	$scope.updateClient();
+    		            	$scope.getAllClientCustomFieldData();
+    		        	}
+    		        	else{
+    		        		$scope.warn("Failed to save client info.")
+    		        	}
+    		        });
+    	    	}
+	        })
+	        .catch(function(data, status) {
+            	console.error('Error', data,status);
         		$scope.warn("Failed to save client info.")
-        	}
-        });
+    		});
+    	}
     }
     
+    /**
+     * Checks to see if we have the latest info in this shift.
+     * If we don't we ask if they want to delete anyways or see what the changes are.
+     * If the choose to proceed or if we had the latest data we delete the shift.
+     */
     $scope.deleteShift = function (shift) {
-  	   if(confirm("Are you sure you want to delete the following shift? "+shift.display)){
-     	$http({
-             url: '/shifts/'+shift.id,
-             method: 'DELETE',
-             headers: {
- 	            'Authorization': $scope.idToken,
-                 'Content-Type': 'application/x-www-form-urlencoded'
-             },
-             params: {
-             }
-         })
-         .then(function(response) {
-         	if(response){
-                 $scope.notify("Shift deleted.");
-                 $scope.listShifts();
-         	}
-         	else{
-         		$scope.warn("Failed to delete client info.")
-         	}
-         });
-  	   }
-     }
+    	$scope.updateLastInteractionTime();
+    	if(confirm("Are you sure you want to delete this shift?")){
+	    	var lastUpdated = (shift.lastUpdated!=null?shift.lastUpdated:"null");
+	    	$http({
+	            url: '/schedule/shiftWasUpdated',
+	            method: 'GET',
+	            headers: {
+	                'Authorization': $scope.idToken,
+	                'Content-Type': 'application/x-www-form-urlencoded'
+	            },
+	            params: {
+	            	lastUpdated:lastUpdated,
+	            	shiftId:shift.id
+	            }
+	        })
+	        .then(function(response) {
+	        	var deleteShift=false;
+	        	
+	        	if(response.data=="UPDATED"){
+	    		   if(confirm("This shift has just been modified by another user. Deleteing this shift will overwrite thier updates. Would you " +
+	    		   				"still like to delete this shift?")){
+	    			   deleteShift=true;
+	    		   }
+	    		   else{
+	    			   $scope.listShifts();
+	    		   }
+	        	}
+	    		else{
+	    			deleteShift=true;
+	    		}
+	        	
+	        	if(deleteShift){
+	             	$http({
+	                    url: '/shifts/'+shift.id,
+	                    method: 'DELETE',
+	                    headers: {
+	                       'Authorization': $scope.idToken,
+	                        'Content-Type': 'application/x-www-form-urlencoded'
+	                    },
+	                    params: {
+	                    }
+	                })
+	                .then(function(response) {
+	                	if(response){
+	                        $scope.notify("Shift deleted.");
+	                        $scope.listShifts();
+	                	}
+	                	else{
+	                		$scope.warn("Failed to delete shift info.")
+	                	}
+	                });
+	        	}
+	    	});
+    	}
+     };
      
     $scope.delete = function () {
+    	$scope.updateLastInteractionTime();
  	   if(confirm("Are you sure you want to delete info for "+$scope.client.first + " "+$scope.client.initial+"?")){
     	$http({
             url: '/clients/'+$scope.client.id,
@@ -899,6 +674,7 @@ function MobileClientController($scope, $modal, $http) {
                 $scope.notify("Client deleted.");
         		$scope.clients =response.data;
         		$scope.client =response.data[0];
+            	$scope.setDetailsChanged(false);
         		$scope.tab="Schedule";
         	}
         	else{
@@ -908,27 +684,32 @@ function MobileClientController($scope, $modal, $http) {
  	   }
     }
     
-    $scope.cancel = function () {
-    	$http({
+    /**
+     * Updates the local copy of client to the server version
+     */
+    $scope.updateClient = function () {
+        $http({
             url: '/clients/'+$scope.client.id,
             method: 'GET',
             headers: {
-	            'Authorization': $scope.idToken,
+                'Authorization': $scope.idToken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             params: {
             }
         })
         .then(function(response) {
-        	$scope.detailsChanged=false;
-        	
         	if(response.data){
         		$scope.setClient(response.data);
+            	$scope.setDetailsChanged(false);
         	}
         });
     }
     
-    $scope.init = function(){
-    	//$scope.listClients();
+    $scope.cancel = function () {
+    	$scope.updateLastInteractionTime();
+    	$scope.setDetailsChanged(false);
+    	$scope.updateClient();
+    	$scope.getAllClientCustomFieldData();
     }
 }

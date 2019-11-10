@@ -31,6 +31,52 @@ function ShiftModalController($scope, $modalInstance, $http, idToken,shift, clie
 		}
 	}
    
+	$scope.ok = function (){
+    	let id = "-1";
+    	
+    	if(null!=$scope.shift){
+    		id=$scope.shift.id;
+    	}
+    	
+    	if(action!="add" && id!=-1 && id!=null){
+ 		   $http({
+	            url: '/schedule/shiftWasUpdated',
+	            method: 'GET',
+	            headers: {
+	                'Authorization': $scope.idToken,
+	                'Content-Type': 'application/x-www-form-urlencoded'
+	            },
+	            params: {
+	            	lastUpdated:($scope.shift.lastUpdated!=null?$scope.shift.lastUpdated:"null"),
+	            	shiftId:id
+	            }
+	        })
+	        .then(function(response) {
+	        	var updateData=false;
+	        	console.log("shiftWasUpdatedResponse:");
+	        	console.log(response.data);
+	        	if(response.data=="UPDATED"){
+    	    		   if(confirm("This shift has just been modified by another user. Saving your changes will overwrite thier updates. Would you " +
+    	    		   				"still like to save your changes?")){
+    	    			   updateData=true;
+    	    		   }else{
+    	    			   $scope.cancel();
+    	    		   }
+    	    	}
+    	    	else{
+    	    		updateData=true;
+    	    	}
+    	    	
+    	    	if(updateData){
+    	            $modalInstance.close($scope.shift);
+    	    	}
+ 	       })
+    	}
+    	else if(action=="add"){
+            $modalInstance.close($scope.shift);
+    	}
+    }
+	
 	$scope.clearSelectedEmployee = function(){
 		$scope.showEmployee=false;
 		$scope.showEmployee=true;
@@ -132,10 +178,6 @@ function ShiftModalController($scope, $modalInstance, $http, idToken,shift, clie
         });
     };
     
-    $scope.ok = function () {          
-        $modalInstance.close($scope.shift);
-    };
-
     $scope.cancel = function () {
         $modalInstance.dismiss('cancel');
     };

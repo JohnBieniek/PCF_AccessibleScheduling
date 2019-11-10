@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.util.List;
 
 import javax.security.sasl.AuthenticationException;
-import javax.validation.Valid;
 
 import org.cloudfoundry.samples.music.managers.AccessibleSecurityManager;
+import org.cloudfoundry.samples.music.managers.UpdateInfoManager;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoCustomFieldDataRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.RestController;
 import accessiblesolutions.accessiblescheduling.constants.Constants;
 import accessiblesolutions.accessiblescheduling.domain.CustomField;
 import accessiblesolutions.accessiblescheduling.domain.CustomFieldData;
-import accessiblesolutions.accessiblescheduling.domain.Employee;
 
 @RestController
 @RequestMapping(value = "/customFields")
@@ -40,6 +39,9 @@ public class CustomFieldController {
     private CrudRepository<CustomField, String> repository;
     @Autowired
     private MongoCustomFieldDataRepository customDataRepository;
+    
+    @Autowired
+    private UpdateInfoManager updateInfoManager;
     
     @Autowired
     public CustomFieldController(CrudRepository<CustomField, String> repository) {
@@ -56,6 +58,7 @@ public class CustomFieldController {
     public CustomField add(@RequestHeader(value="Authorization", required=false) String idToken, @RequestBody CustomField customField) throws AuthenticationException {
     	securityManager.authorize(idToken, Constants.ADMIN);
     	logger.info("Adding customField " + customField.getId());
+    	updateInfoManager.set("customFields");
         return repository.save(customField);
     }
 
@@ -79,6 +82,7 @@ public class CustomFieldController {
     		logger.info("Updating customField " + customField.toString());
     	}
     	
+    	updateInfoManager.set("customFields");
     	return repository.save(customField);
     }
 
@@ -94,7 +98,7 @@ public class CustomFieldController {
     	securityManager.authorize(idToken, Constants.ADMIN);
         logger.info("Deleting customField " + id);
         repository.delete(id);
-        
+        updateInfoManager.set("customFields");
         List<CustomFieldData> customFieldData = customDataRepository.findByCustomFieldId(id);
         for(CustomFieldData entry:customFieldData) {
         	customDataRepository.delete(entry.getId());
@@ -105,7 +109,7 @@ public class CustomFieldController {
     public List<CustomField> set(@RequestHeader(value="Authorization", required=false) String idToken,@RequestBody List<CustomField> customFields) throws AuthenticationException {
     	securityManager.authorize(idToken, Constants.ADMIN);
     	repository.save(customFields);
-    	
+    	updateInfoManager.set("customFields");
     	return customFields;
     }
 }

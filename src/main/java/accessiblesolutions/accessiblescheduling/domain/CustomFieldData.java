@@ -1,5 +1,7 @@
 package accessiblesolutions.accessiblescheduling.domain;
 
+import java.time.LocalDateTime;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -24,8 +26,14 @@ public class CustomFieldData {
 	private String ownerId;
 
 	private String variableType = "boolean";
-
+	
+	private LocalDateTime lastUpdated;
+	
 	public CustomFieldData() {
+	}
+	
+	public void update() {
+		setLastUpdated(LocalDateTime.now());
 	}
 
 	public boolean getBooleanData() {
@@ -68,5 +76,13 @@ public class CustomFieldData {
 	public String toString() {
 		return "CustomFieldData [id=" + id + ", booleanData=" + booleanData + ", customFieldId=" + customFieldId
 				+ ", ownerId=" + ownerId + ", variableType=" + variableType + "]";
+	}
+
+	public LocalDateTime getLastUpdated() {
+		return lastUpdated;
+	}
+
+	public void setLastUpdated(LocalDateTime lastUpdated) {
+		this.lastUpdated = lastUpdated;
 	}
 }

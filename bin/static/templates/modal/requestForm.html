@@ -7,7 +7,7 @@
     <form name="requestForm" role="form">
         <div ng-if="selectedClient">
     	    <label for="clientName" style="font-size:25px">Client Name:</label>
-    	    <label for="clientName" style="font-size:23px">{{selectedClient.first}}</label>
+    	    <label for="clientName" style="font-size:23px">{{selectedClient.name}}</label>
         </div>
         
         <div>
@@ -23,14 +23,14 @@
             		style="font-size:23px"
             		ng-change="setChanged();isValid(shiftRequest)"
             		ng-init = "selectedEmployee"
-      				ng-options="employee.first for employee in employees | orderBy:'first' track by employee.id"
+      				ng-options="employee.name for employee in employees | orderBy:'name' track by employee.id"
       				ng-model="selectedEmployee"
-      				ng-value="{{employee.first}}">
-      			{{employee.first}}
+      				ng-value="{{employee.name}}">
+      			{{employee.name}}
       		</select>
       				
             <input type="text" ng-hide="true" id="staffId" name="staffId" ng-model="shiftRequest.staffId" ng-value="shiftRequest.staffId=selectedEmployee.id">
-            <input type="text" ng-hide="true" id="staffName" name="staffName" ng-model="shiftRequest.staffName" ng-value="shiftRequest.staffName=selectedEmployee.first">
+            <input type="text" ng-hide="true" id="staffName" name="staffName" ng-model="shiftRequest.staffName" ng-value="shiftRequest.staffName=selectedEmployee.name">
         </div>
         
         <div>
@@ -197,8 +197,6 @@
 				     </ul>
 				  </div>
 				  </br>
-				     
-				 
 			   </div>
 	        </div>
         </div>

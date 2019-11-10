@@ -1,6 +1,7 @@
 package org.cloudfoundry.samples.music.web;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.security.sasl.AuthenticationException;
@@ -10,6 +11,7 @@ import javax.validation.Valid;
 import org.cloudfoundry.samples.music.managers.AccessibleSecurityManager;
 import org.cloudfoundry.samples.music.managers.ScheduleManager;
 import org.cloudfoundry.samples.music.managers.ShiftManager;
+import org.cloudfoundry.samples.music.managers.UpdateInfoManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +30,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import accessiblesolutions.accessiblescheduling.constants.Constants;
 import accessiblesolutions.accessiblescheduling.domain.CallAuth;
-import accessiblesolutions.accessiblescheduling.domain.CustomField;
 import accessiblesolutions.accessiblescheduling.domain.Shift;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 
@@ -48,6 +49,9 @@ public class ShiftController {
     @Autowired
     ShiftManager shiftManager;
     
+	@Autowired
+    private UpdateInfoManager updateInfoManager;
+    
     @Autowired
     public ShiftController(CrudRepository<Shift, String> repository) {
         this.repository = repository;
@@ -55,8 +59,12 @@ public class ShiftController {
     
     @RequestMapping(value = "/set", method = RequestMethod.POST)
     public List<Shift> set(@RequestHeader(value="Authorization", required=false) String idToken,@RequestBody List<Shift> shifts) {
-    	repository.save(shifts);
+    	for(Shift shift:shifts) {
+        	shift.setLastUpdatedToNow();
+    	}
     	
+    	repository.save(shifts);
+    	updateInfoManager.set("shifts");
     	return shifts;
     }
     
@@ -129,7 +137,8 @@ public class ShiftController {
         if(shift.getStartYear()==0){
         	shift.setStartYear((int) Integer.parseInt(shift.getStartDate().split("-")[0]));
         }
-        
+    	updateInfoManager.set("shifts");
+    	shift.setLastUpdatedToNow();
         return repository.save(shift);
     }
 
@@ -160,6 +169,8 @@ public class ShiftController {
         if(shift.getStartYear()==0){
         	shift.setStartYear((int) Integer.parseInt(shift.getStartDate().split("-")[0]));
         }
+    	updateInfoManager.set("shifts");
+    	shift.setLastUpdatedToNow();
         
         return repository.save(shift);
     }
@@ -181,8 +192,9 @@ public class ShiftController {
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public void deleteById(@RequestHeader(value="Authorization", required=false) String idToken, @PathVariable String id) throws AuthenticationException {
-    	securityManager.authorize(idToken, Constants.ADMIN);
+    	securityManager.authorize(idToken, Constants.MANAGER);
         logger.info("Deleting shift " + id);
+    	updateInfoManager.set("shifts");
         repository.delete(id);
     }
 }

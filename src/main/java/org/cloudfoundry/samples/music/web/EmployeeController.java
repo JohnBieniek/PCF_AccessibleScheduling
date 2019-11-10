@@ -1,6 +1,9 @@
 package org.cloudfoundry.samples.music.web;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -8,6 +11,7 @@ import javax.security.sasl.AuthenticationException;
 import javax.validation.Valid;
 
 import org.cloudfoundry.samples.music.managers.AccessibleSecurityManager;
+import org.cloudfoundry.samples.music.managers.UpdateInfoManager;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoCustomFieldDataRepository;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoShiftRepository;
 import org.json.JSONArray;
@@ -48,6 +52,9 @@ public class EmployeeController {
     private MongoCustomFieldDataRepository customDataRepository;
 	@Autowired
     private MongoShiftRepository shiftRepository;
+	@Autowired
+    private UpdateInfoManager updateInfoManager;
+
     
     @Autowired
     public EmployeeController(CrudRepository<Employee, String> repository) {
@@ -66,11 +73,50 @@ public class EmployeeController {
     public Employee add(@RequestHeader(value="Authorization", required=false) String idToken,@RequestBody @Valid Employee employee) throws AuthenticationException {
     	securityManager.authorize(idToken, Constants.MANAGER);
     	logger.info("Adding employee " + employee.getId());
+        updateInfoManager.set("employees");
+        employee.setLastUpdatedToNow();
         return repository.save(employee);
     }
 
+    @RequestMapping(value = "/addAbsence",method = RequestMethod.POST)
+    public Employee addAbsence(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam String id,@RequestParam String date) throws AuthenticationException, ParseException {
+    	securityManager.authorize(idToken, Constants.MANAGER);
+    	
+    	Employee employee=repository.findOne(id);
+    	ArrayList<String> requestedOff = new ArrayList<String>(Arrays.asList(employee.getRequestedOff()));
+    	if(!requestedOff.contains(date)) {
+    		requestedOff.add(date);
+    	}
+
+    	employee.setRequestedOff(Arrays.asList(requestedOff.toArray()).toArray(new String[requestedOff.toArray().length]));
+        employee.setLastUpdatedToNow();
+    	updateInfoManager.set("employees");
+        return repository.save(employee);
+    }
+    
+    @RequestMapping(value = "/removeAbsence",method = RequestMethod.POST)
+    public Employee removeAbsence(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam String id,@RequestParam String date) throws AuthenticationException, ParseException {
+    	securityManager.authorize(idToken, Constants.MANAGER);
+    	
+    	Employee employee=repository.findOne(id);
+    	ArrayList<String> requestedOff = new ArrayList<String>(Arrays.asList(employee.getRequestedOff()));
+    	ArrayList<String> updatedRequestedOff = new ArrayList<String>();
+    	if(null!=requestedOff && requestedOff.size()>0) {
+    		for(String day :requestedOff) {
+    			if(!day.equalsIgnoreCase(date)) {
+    				updatedRequestedOff.add(day);
+    			}
+    		}
+    	}
+
+    	employee.setRequestedOff(Arrays.asList(updatedRequestedOff.toArray()).toArray(new String[updatedRequestedOff.toArray().length]));
+        employee.setLastUpdatedToNow();
+    	updateInfoManager.set("employees");
+        return repository.save(employee);
+    }
+    
     @RequestMapping(method = RequestMethod.POST)
-    public Employee update(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam String param) throws AuthenticationException {
+    public Employee update(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam String param) throws AuthenticationException, ParseException {
     	securityManager.authorize(idToken, Constants.MANAGER);
     	
     	Employee employee=null;
@@ -87,6 +133,9 @@ public class EmployeeController {
 			e.printStackTrace();
 		}
     	logger.info(employee.toString());
+    	employee.sortCallOffs();
+        employee.setLastUpdatedToNow();
+    	updateInfoManager.set("employees");
         return repository.save(employee);
     }
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
@@ -131,6 +180,10 @@ public class EmployeeController {
         	shift.setRequestedStaffName(null);
         	shiftRepository.save(shift);
         }
+        
+        updateInfoManager.set("employees");
+        updateInfoManager.set("customFieldData");
+        updateInfoManager.set("shifts");
     }
     
     @RequestMapping(value = "/set", method = RequestMethod.POST)
@@ -159,6 +212,8 @@ public class EmployeeController {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+    	
+    	updateInfoManager.set("employees");
     	
     	return json;
     }

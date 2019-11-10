@@ -23,215 +23,335 @@ angular.module('client', ['ngResource', 'ui.bootstrap']).
 
 function MobileEmployeeController($scope, $modal, $http) {
 	$scope.init = function(){
-		 $scope.allowOvertime=false;
-		 $scope.allowUnavailable=false;
-		 $scope.prioritizeSecondShift=false;
-		 $scope.useDailyMax=true;
-		 $scope.useWeeklyMax=true;
-		 $scope.allowInactive=false;
-		 $scope.generatedBool = false;
-		 $scope.monthName="January";
-		 $scope.statusList=[];
-		 $scope.customValue=[];
-		 $scope.unscheduled=0;
-		 $scope.scheduled=0;
-		 $scope.selectedInterval="day(s)";
-		 $scope.detailsChanged=false;
-		 $scope.customFieldDateEditing=true;
-		 $scope.days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-		 
-		 $scope.maxMonth=$scope.week.getMonth();
-		 $scope.minMonth=$scope.maxMonth-1;
-		 if($scope.minMonth<0){
-			 $scope.minMonth=11;
-		 }
-		 $scope.minMonth=$scope.minMonth-1;
-		 if($scope.minMonth<0){
-			 $scope.minMonth=11;
-		 }
-		 $scope.maxMonth=$scope.maxMonth+1;
-		 if($scope.maxMonth>11){
-			 $scope.maxMonth=0;
-		 }
+		//The date in the selection box for calling off
 		 $scope.newDate=$scope.week.getFullYear()+"-"+(($scope.week.getMonth()+1)<10?"0"+($scope.week.getMonth()+1):($scope.week.getMonth()+1))+"-"+$scope.week.getDate();
-		 
-		 if($scope.manager){
-			 $scope.listEmployees();
-		 }
-		 
-		 if($scope.employee==undefined || $scope.employee == null){
-			 $scope.setEmployeeToUser();
-		 }
-		 
-		 $scope.listShifts();
+
+		 $scope.getDisplayWeek();
 	}
-
-	$scope.deleteAvailability=function(availability){ 
-		var currentEmployee = $scope.employee;
-		if(confirm("Are you sure you want to delete the selected availability? for "+ $scope.employee.days[availability]+ "?")){
-			currentEmployee.startTimes.splice(availability,1);    
-			currentEmployee.days.splice(availability,1);
-			currentEmployee.endTimes.splice(availability,1); 
-
-	        $scope.saveEmployee(currentEmployee);
-            //setTimeout($scope.hideToast,3000);
-	    }
-    }
 	
+	/**
+	 * $scope.updateLastInteractionTime() is called from the setEmployeeTab
+	 * function
+	 */
+	$scope.setEmployeeTabAndInfo=function(tab){
+		$scope.setEmployeeTab(tab);
+		$scope.updateData();
+	}
+	
+	/**
+     * Checks to see if we have the latest info in this availability.
+     * If we don't we ask if they want to delete anyways or see what the changes are.
+     * If the choose to proceed or if we had the latest data we delete the availability.
+     */
+    $scope.deleteAvailability = function (availability) {
+    	$scope.updateLastInteractionTime();
+    	if(confirm("Are you sure you want to delete the selected availability for "+ $scope.employee.days[availability]+ "?")){
+	    	var employee = $scope.employee;
+	    	if(employee.availability){
+		     	for(var index = 0; index<employee.availability.length;index++){
+					if(!employee.availabilityStartTimes){
+						employee.availabilityStartTimes=[];
+					}
+					if(!employee.availabilityEndTimes){
+						employee.availabilityEndTimes=[];
+					}			
+					if(!employee.availabilityDays){
+						employee.availabilityDays=[];
+					}
+					employee.availabilityStartTimes.push(employee.availability[index].startTime);
+					employee.availabilityEndTimes.push(employee.availability[index].endTime);
+					employee.days.push(employee.availability[index].day);	
+				}
+	      	}
+	    	$http({
+	            url: '/schedule/availabilityWasUpdated',
+	            method: 'GET',
+	            headers: {
+	                'Authorization': $scope.idToken,
+	                'Content-Type': 'application/x-www-form-urlencoded'
+	            },
+	            params: {
+	            	param:employee,
+	            	index:availability
+	            }
+	        })
+	        .then(function(response) {
+	        	var deleteAvailability=false;
+	        	
+	        	if(response.data=="UPDATED"){
+	    		   if(confirm("This availability has just been modified by another user. Deleteing this availability will overwrite thier updates. Would you " +
+	    		   				"still like to delete this availability?")){
+	    			   deleteAvailability=true;
+	    		   }
+	    		   else{
+	    			   $scope.updateData();
+	    		   }
+	        	}
+	        	else if(response.data=="POSSIBLY_UPDATED"){
+	     		   if(confirm("This availability may have just been modified by another user. Deleteing this availability may overwrite thier updates. Would you " +
+	     		   				"still like to delete this availability?")){
+	     			   deleteAvailability=true;
+	     		   }
+	     		   else{
+	     			   $scope.updateData();
+	     		   }
+	        	}
+	    		else{
+	    			deleteAvailability=true;
+	    		}
+	        	
+	        	if(deleteAvailability){
+	    			employee.startTimes.splice(availability,1);    
+	    			employee.days.splice(availability,1);
+	    			employee.endTimes.splice(availability,1);
+	    			
+	    	        $scope.removeAvailability(availability);			
+	        	}
+	    	});
+    	}
+     };
+     
+ 	/**
+      * Checks to see if we have the latest info in this availability.
+      * If we don't we ask if they want to update anyways or see what the changes are.
+      * If the choose to proceed or if we had the latest data we update the availability.
+      */
+     $scope.updateAvailability = function (employee, availability) {
+     	$scope.updateLastInteractionTime();
+    	if(employee.availability){
+	     	for(var index = 0; index<employee.availability.length;index++){
+				if(!employee.availabilityStartTimes){
+					employee.availabilityStartTimes=[];
+				}
+				if(!employee.availabilityEndTimes){
+					employee.availabilityEndTimes=[];
+				}			
+				if(!employee.availabilityDays){
+					employee.availabilityDays=[];
+				}
+				employee.availabilityStartTimes.push(employee.availability[index].startTime);
+				employee.availabilityEndTimes.push(employee.availability[index].endTime);
+				employee.days.push(employee.availability[index].day);	
+			}
+      	}
+    	$http({
+            url: '/schedule/availabilityWasUpdated',
+            method: 'GET',
+            headers: {
+                'Authorization': $scope.idToken,
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            params: {
+            	param:$scope.unmodifiedEmployee,
+            	index:availability
+            }
+        })
+        .then(function(response) {
+        	var updateAvailability=false;
+        	
+        	if(response.data=="UPDATED"){
+    		   if(confirm("This availability has just been modified by another user. Updating this availability will overwrite thier changes. Would you " +
+    		   				"still like to update this availability?")){
+    			   updateAvailability=true;
+    		   }
+    		   else{
+    			   $scope.updateData();
+    		   }
+        	}
+        	else if(response.data=="POSSIBLY_UPDATED"){
+     		   if(confirm("This availability may have just been modified by another user. Updating this availability may overwrite thier changes. Would you " +
+     		   				"still like to update this availability?")){
+     			   updateAvailability=true;
+     		   }
+     		   else{
+     			   $scope.updateData();
+     		   }
+        	}
+    		else{
+    			updateAvailability=true;
+    		}
+        	
+        	if(updateAvailability){
+    	        $scope.saveAvailability(employee,availability);			
+        	}
+    	});
+      };
+	
+  	/**
+  	 * Updates the employee and its availability.
+  	 * Checks for updates to the employee list afterwards
+  	 */
+       $scope.saveAvailability = function saveAvailability(employee,availability) {
+       	if(employee.availability){
+  	     	for(var index = 0; index<employee.availability.length;index++){
+  				if(!employee.availabilityStartTimes){
+  					employee.availabilityStartTimes=[];
+  				}
+  				if(!employee.availabilityEndTimes){
+  					employee.availabilityEndTimes=[];
+  				}			
+  				if(!employee.availabilityDays){
+  					employee.availabilityDays=[];
+  				}
+  				employee.availabilityStartTimes.push(employee.availability[index].startTime);
+  				employee.availabilityEndTimes.push(employee.availability[index].endTime);
+  				employee.days.push(employee.availability[index].day);	
+  			}
+        	}
+   	   $http({
+             url: '/schedule/updateAvailability',
+             method: 'POST',
+             headers: {
+                 'Authorization': $scope.idToken,
+                 'Content-Type': 'application/x-www-form-urlencoded'
+             },
+             params: {
+          	   param: employee,
+          	   index:availability
+             }
+         })
+         .then(function (response) {// TODO handle error state
+      	   if(response.data){
+  	    	   $scope.setEmployeeAndInfo(response.data);
+  	       	   employee.id=response.data.id;
+  	           $scope.listEmployeesAndInfo();
+  			   $scope.notify("Availability saved.");
+      	   }
+      	   else{
+      		   $scope.warn("Failed to update availability. Please try again shortly. If problems persist contact your representative.");
+      	   }
+         });
+      }
+       
 	$scope.addAvailability= function(day){
+		$scope.updateLastInteractionTime();
 		var currentEmployee = $scope.employee;
-		if($scope.employee){
-			currentEmployee.days.push(day);
-			currentEmployee.startTimes.push("08:00");
-			currentEmployee.endTimes.push("16:00");
-	        $scope.saveEmployee(currentEmployee);		
+		if(currentEmployee){
+			$http({
+	             url: '/schedule/addAvailability',
+	             method: 'POST',
+	             headers: {
+	                 'Authorization': $scope.idToken,
+	                 'Content-Type': 'application/x-www-form-urlencoded'
+	             },
+	             params: {
+	          	   employeeId: currentEmployee.id,
+	          	   day:day
+	             }
+	         })
+	         .then(function (response) {// TODO handle error state
+	  	    	   $scope.setEmployeeAndInfo(response.data);
+	  	           $scope.listEmployeesAndInfo();
+	  			   $scope.notify("Availability added.");
+	         });
 		}
 	}
 	
+	/** Determines if the selected availability should be shown under this day of the week header
+	 * 
+	 */
 	$scope.isAvailabilityDay= function(availability,day){
-		return day==$scope.employee.days[availability];
+		return day.toLowerCase()==$scope.employee.days[availability].toLowerCase();
 	}
 	
-	$scope.getLastShiftUpdate = function (){
-		$http({
-	           url: '/updateInfo/shifts',
-	           method: 'GET',
-	           headers: {
-	               'Authorization': $scope.idToken,
-	               'Content-Type': 'application/x-www-form-urlencoded'
-	           },
-	           params: {
-	           }
-	       })
-	       .then(function (response) {//TODO handle error state
-	    	   $scope.setLastShiftUpdate(response.data);
-	       })
+	/**
+	 * Determines if for a given day we should show the unavailable descriptor
+	 * TODO factor out availability
+	 */
+	$scope.noAvailabilityDay= function(availability,day){
+		var unavailable =true;
+		
+		if($scope.employee && $scope.employee.days){
+			$scope.employee.days.forEach(function(selectedDay) {
+			  if(selectedDay.toLowerCase()==day.toLowerCase()){
+			    unavailable=false;
+			  }
+			});
+		}
+		
+		return unavailable;
 	}
 	
-	$scope.getLastClientUpdate = function (){
-		$http({
-	           url: '/updateInfo/clients',
-	           method: 'GET',
-	           headers: {
-	               'Authorization': $scope.idToken,
-	               'Content-Type': 'application/x-www-form-urlencoded'
-	           },
-	           params: {
-	           }
-	       })
-	       .then(function (response) {//TODO handle error state
-	    	   $scope.setLastClientUpdate(response.data);
-	       })
+	/**
+	 * Changes which employee we are looking at
+	 */
+	$scope.setEmployeeAndInfo = function(newEmployee){	
+		if($scope.selectedEmployee!=newEmployee){
+		  $scope.setDetailsChanged(false);
+		  
+		  if(newEmployee.role==null){
+			  newEmployee.role="user";
+		  }
+
+		  $scope.setSelectedEmployee(newEmployee);
+	      $scope.updateData();
+		}
 	}
-	
-	$scope.getLastEmployeeUpdate = function (){
-		$http({
-	           url: '/updateInfo/employees',
-	           method: 'GET',
-	           headers: {
-	               'Authorization': $scope.idToken,
-	               'Content-Type': 'application/x-www-form-urlencoded'
-	           },
-	           params: {
-	           }
-	       })
-	       .then(function (response) {//TODO handle error state
-	    	   $scope.setLastEmployeeUpdate(response.data);
-	       })
-	}
-	
-	$scope.getEmployeeCustomFieldData = function (employee,customField,index){
-     	$http({
-            url: '/compatibility/employeeCustomFieldData',
-            method: 'POST',
-            headers: {
-                'Authorization': $scope.idToken,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            params: {
-                employee: employee,
-                customField: customField,
-                index:index,
-            }
-        })
-        .then(function(response) {
-        	$scope.customValue[response.data.numericResponse] = response.data.booleanResponse;
-        });
-    }
-	
-	$scope.setEmployeeToUser = function(){
-		$http({
-            url: '/employees/'+$scope.profile.employeeId,
-            method: 'GET',
-            headers: {
-                'Authorization': $scope.idToken,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            params: {
-            }
-        })
-        .then(function(response) {
-        	if(typeof $scope.employee !== 'undefined' && $scope.employee!=null && $scope.employee.role==null){
-  			  response.data.role="user";
-  		  	}
-        	
-        	$scope.setEmployeeAndInfo(response.data);
-        	
-        	$scope.employeeModel=clone($scope.employee);
-        });
-	}
-	
-	$scope.setEmployeeAndInfo = function(newEmployee){		
-	  $scope.detailsChanged=false;
-	  
-	  if(newEmployee.role==null){
-		  newEmployee.role="user";
-	  }
-      $scope.setEmployee(newEmployee);
-      $scope.employeeModel = clone(newEmployee);
-      if($scope.employee!=null && $scope.customFields !=null){
-	      for(var index = 0; index<$scope.customFields.length;index++){
-		      $scope.getEmployeeCustomFieldData($scope.employee,$scope.customFields[index],index);
-	      }
-      }
-      $scope.listEmployees();
-      $scope.listShifts();
-	}
-	
-	 $scope.listCustomFields = function listCustomFields() {
-		$http({
-            url: '/customFields/',
-            method: 'GET',
-            headers: {
-	            'Authorization': $scope.idToken,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            params: {
-            }
-        })
-        .then(function(response) {
-        	$scope.customFields=response.data;
-        });
-     }
 	 
 	$scope.setInterval = function(newInterval){
       $scope.interval = newInterval;
 	}
 	
-	$scope.setDetailsToChanged = function(){
-      $scope.detailsChanged=true;;
-	}
+	/**
+	 * Updates the employee and its availability.
+	 * Checks for updates to the employee list afterwards
+	 */
+     $scope.removeAvailability = function saveAvailability(availability) {
+    	var employee = $scope.employee;
+     	if(employee.availability){
+	     	for(var index = 0; index<employee.availability.length;index++){
+				if(!employee.availabilityStartTimes){
+					employee.availabilityStartTimes=[];
+				}
+				if(!employee.availabilityEndTimes){
+					employee.availabilityEndTimes=[];
+				}			
+				if(!employee.availabilityDays){
+					employee.availabilityDays=[];
+				}
+				employee.availabilityStartTimes.push(employee.availability[index].startTime);
+				employee.availabilityEndTimes.push(employee.availability[index].endTime);
+				employee.days.push(employee.availability[index].day);	
+			}
+      	}
+ 	   $http({
+           url: '/schedule/removeAvailability',
+           method: 'POST',
+           headers: {
+               'Authorization': $scope.idToken,
+               'Content-Type': 'application/x-www-form-urlencoded'
+           },
+           params: {
+        	   param: employee.id,
+        	   index:availability
+           }
+       })
+       .then(function (response) {// TODO handle error state
+    	   if(response.data){
+	    	   $scope.setEmployeeAndInfo(response.data);
+	       	   employee.id=response.data.id;
+	           $scope.listEmployeesAndInfo();
+			   $scope.notify("Availability deleted.");
+    	   }
+    	   else{
+    		   $scope.warn("Failed to update availability. Please try again shortly. If problems persist contact your representative.");
+    	   }
+       });
+    }
 	
-     $scope.isDay = function(shift, day){
-    	 return day.toUpperCase().includes(shift.startsLocalDate.dayOfWeek.toUpperCase());
-     }
-     
-     Date.prototype.addDays = function(days) {
-	    var date = new Date(this.valueOf());
-	    date.setDate(date.getDate() + days);
-	    return date;
+	/**
+	 * Toggled whenever a user changes something in the details section. Used to
+	 * determine if the ok and cancel buttons should show.
+	 */
+	$scope.setDetailsToChanged = function(){
+	  $scope.updateLastInteractionTime();
+	  $scope.setDetailsChanged(true);
 	}
      
+	/**
+	 * Updates the employee and its custom field data. Checks for updates to the
+	 * employee names list afterwards and updates if needbe
+	 */
      $scope.decrementWeek = function(){
     	 if($scope.manager || $scope.admin || $scope.week.getMonth()>$scope.minMonth){
 	    	 $scope.setWeek($scope.week.addDays(-7));
@@ -279,99 +399,42 @@ function MobileEmployeeController($scope, $modal, $http) {
         	   param: employee
            }
        })
-       .then(function (response) {//TODO handle error state
-    	   $scope.setEmployeeAndInfo(response.data);
-       	   employee.id=response.data.id;
-           if(employee.customFields){
-	            var size = employee.customFields.length;
-	           
-	            for(var i = 0; i < size ;i++){
-	                $http({
-	                    url: 'https://scheduleaccessqa.cfapps.io/compatibility/setCustomFieldData',
-	                    method: 'POST',
-	                    headers: {
-	                        'Content-Type': 'application/x-www-form-urlencoded'
-	                    },
-	                    params: {
-	                        employee: employee,
-	                        customField: employee.customFields[i],
-	                        value:employee.customValue[i]
-	                    }
-	                });
-	            }
-           }
-           $scope.listEmployees();
-		   $scope.notify("Employee saved.");
+       .then(function (response) {// TODO handle error state
+    	   if(response.data){
+	    	   $scope.setEmployeeAndInfo(response.data);
+	       	   employee.id=response.data.id;
+	           if(employee.customFields){
+		            var size = employee.customFields.length;
+		           
+		            for(var i = 0; i < size ;i++){
+		                $http({
+		                    url: 'https://scheduleaccessqa.cfapps.io/compatibility/setCustomFieldData',
+		                    method: 'POST',
+		                    headers: {
+		                        'Content-Type': 'application/x-www-form-urlencoded'
+		                    },
+		                    params: {
+		                        employee: employee,
+		                        customField: employee.customFields[i],
+		                        value:employee.customValue[i]
+		                    }
+		                });
+		            }
+	           }
+	           $scope.listEmployeesAndInfo();
+			   $scope.notify("Employee saved.");
+    	   }
+    	   else{
+    		   $scope.warn("Failed to update employee. Please try again shortly. If problems persist contact your representative.");
+    	   }
        });
     }
-
-     $scope.getDisplayMonth = function(date){
-    	 var monthName = "January";
-    	 
-		 switch(parseInt(date.getMonth())+1){
-		  	  case 1:
-		  		  monthName="January";
-		  		  break;
-		  	  case 2:
-		  		  monthName="Febuary";
-		  		  break;
-		  	  case 3:
-		  		  monthName="March";
-		  		  break;
-		  	  case 4:
-		  		  monthName="April";
-		  		  break;
-		  	  case 5:
-		  		  monthName="May";
-		  		  break;
-		  	  case 6:
-		  		  monthName="June";
-		  		  break;
-		  	  case 7:
-		  		  monthName="July";
-		  		  break;
-		  	  case 8:
-		  		  monthName="August";
-		  		  break;
-		  	  case 9:
-		  		  monthName="September";
-		  		  break;
-		  	  case 10:
-		  		  monthName="October";
-		  		  break;
-		  	  case 11:
-		  		  monthName="November";
-		  		  break;
-		  	  case 12:
-		  		  monthName="December";
-		  		  break;
-	 	 }
-		 
-		 return monthName;
-     }
      
-     $scope.getDisplayWeek = function(){
-    	 var date = parseInt($scope.week.getDate());
-    	 var day = parseInt($scope.week.getDay());
-    	 
-    	 var weekStart = $scope.week.addDays(-day);
-    	 var weekEnd = weekStart.addDays(6);
-    	 
-    	 $scope.displayWeek = weekStart.getDate()+ " - " +weekEnd.getDate();
-
-    	 $scope.year = parseInt(weekStart.getYear())+1900;
-    	 $scope.monthName=$scope.getDisplayMonth(weekStart);
-    	 $scope.displayDays=[
-			'Sunday '+$scope.monthName + " "+weekStart.getDate(),
-			'Monday '+$scope.getDisplayMonth(weekStart.addDays(1)) + " "+weekStart.addDays(1).getDate(),
-			'Tuesday '+$scope.getDisplayMonth(weekStart.addDays(2)) + " "+weekStart.addDays(2).getDate(),
-			'Wednesday '+$scope.getDisplayMonth(weekStart.addDays(3)) + " "+weekStart.addDays(3).getDate(),
-			'Thursday '+$scope.getDisplayMonth(weekStart.addDays(4)) + " "+weekStart.addDays(4).getDate(),
-			'Friday '+$scope.getDisplayMonth(weekStart.addDays(5)) + " "+weekStart.addDays(5).getDate(),
-			'Saturday '+$scope.getDisplayMonth(weekStart.addDays(6)) + " "+weekStart.addDays(6).getDate()
-		];
-     }
-     
+     /**
+		 * Updates the provided object with .displayValue containing a human
+		 * readable string of what this shift is for. Differs from the client
+		 * version in its description of who this is for.
+		 */
      $scope.setShiftDisplay = function(shift){
     	if(shift.startsLocalDateTime==null || shift.startsLocalDateTime==undefined){
 			 return null;
@@ -432,10 +495,6 @@ function MobileEmployeeController($scope, $modal, $http) {
 	
 	      return valid;
 	};
-    
-	function clone (obj) {
-		return JSON.parse(JSON.stringify(obj));
-    }
     
 	$scope.setInitialDays = function setInitialDays(request){
 		 if(request.days==null || request.days==undefined){
@@ -545,7 +604,7 @@ function MobileEmployeeController($scope, $modal, $http) {
 			 request.displayValue+=" on "+ request.startDate;
 		}
 
-		//Add exceptions
+		// Add exceptions
 		if(request.exceptions !=undefined && request.exceptions!=null && request.exceptions.length>0){
 			 request.displayValue+=" except ";
 			 
@@ -568,47 +627,17 @@ function MobileEmployeeController($scope, $modal, $http) {
 		request.displayValue+=".";
 	}
 
-	$scope.listClients = function listClients() {
-		$http({
-            url: '/clients/',
-            method: 'GET',
-            headers: {
-	            'Authorization': $scope.idToken,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            params: {
-            }
-        })
-        .then(function(response) {
-        	$scope.clients=response.data;
-        });
-    }
+	$scope.listEmployeesAndInfo = function listEmployeesAndInfo(){
+		$scope.getEmployeeNames();
+    	$scope.getClientNames();
+		$scope.getDisplayWeek();
+	}
     
-    $scope.listEmployees = function listEmployees() {
-    	if($scope.manager || $scope.admin){
-	    	$http({
-	            url: '/employees/',
-	            method: 'GET',
-	            headers: {
-		            'Authorization': $scope.idToken,
-	                'Content-Type': 'application/x-www-form-urlencoded'
-	            },
-	            params: {
-	            }
-	        })
-	        .then(function(response) {
-	        	$scope.employees=response.data;
-	        	
-	        	if($scope.employee==null){
-	                 $scope.setEmployeeToUser();
-	            }
-	
-	            $scope.listClients();
-	    		$scope.getDisplayWeek();
-	        });
-    	}
-    }
-    
+	/**
+	 * Enters or updates the provided shift in the database. Requires a unique
+	 * version per page due to the differences in how shifts are listed
+	 * afterward.
+	 */
     function saveShift(shift) {
     	$http({
             url: '/shifts',
@@ -627,123 +656,101 @@ function MobileEmployeeController($scope, $modal, $http) {
             $scope.listShifts();
         });
     }
-    
-    
-    $scope.listShifts = function listShifts(){
-    	let id = "-1";
-    	
-    	if(null!=$scope.employee){
-    		id=$scope.employee.id;
-    	}
-    	$scope.getDisplayWeek();
-    	if(id!=-1){
-	    	$http({
-	            url: '/schedule/employeeShiftsForWeek',
+
+    /**
+	 * When you click on a shift see if it's around. If it is bring them to an
+	 * edit modal. When accepting changes in the modal we check to ensure we
+	 * aren't overwriting any changes that just happened while we were editing.
+	 * If changes occurred check if the user wants to view the changes or
+	 * overwrite with their edits. Accept their input then refresh the list of
+	 * shifts to reflect any changes.
+	 */
+    $scope.editShift = function (shift) {
+       $scope.updateLastInteractionTime();
+       // Only managers and above can currently edit shifts
+	   if($scope.profile && $scope.profile.manager){
+		   var lastUpdated = (shift.lastUpdated!=null?shift.lastUpdated:"null");// Account
+																				// for
+																				// old
+																				// data
+																				// having
+																				// no
+																				// lastUpdated
+																				// info
+		   $http({// Ensure this shift hasn't been deleted out from under us
+					// before we start editing
+	            url: '/schedule/shiftWasUpdated',
 	            method: 'GET',
 	            headers: {
 	                'Authorization': $scope.idToken,
 	                'Content-Type': 'application/x-www-form-urlencoded'
 	            },
 	            params: {
-	            	employeeId:id,
-	            	month:$scope.week.getMonth()+1,
-	            	day: $scope.week.getDate(),
-	            	year:$scope.week.getFullYear()
+	            	lastUpdated:lastUpdated,
+	            	shiftId:shift.id// If it can be deleted it already exists
+									// and has an id, unlike new shifts
 	            }
 	        })
 	        .then(function(response) {
-	    		$scope.shifts = response.data;
-	    	});
-    	}
-    }
-    
-    $scope.listCurrentShifts = function listCurrentShifts(){
-    	let id = "-1";
-    	
-    	if(null!=$scope.employee){
-    		id=$scope.employee.id;
-    	}
-    	
-    	$http({
-            url: '/schedule/currentShifts',
-            method: 'GET',
-            headers: {
-                'Authorization': $scope.idToken,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            params: {
-            	employeeId:id
-            }
-        })
-        .then(function(response) {
-    		$scope.currentShifts = response.data;
-    	});
-    }
-    
-
-  
-   
-   function clone (obj) {
-       return JSON.parse(JSON.stringify(obj));
-   }
-   
-   function saveShiftRequest(shiftRequest) {
-	   $http({
-           url: '/clientRequests',
-           method: 'POST',
-           headers: {
-               'Authorization': $scope.idToken,
-               'Content-Type': 'application/x-www-form-urlencoded'
-           },
-           params: {
-           }
-       })
-       .then(function(response) {
-           $scope.notify("Request saved");
-           
-           $scope.listShiftRequests();
-       });
-   }
-   
-   $scope.editShift = function (shift) {
-	   if($scope.profile && $scope.profile.manager){
-	       var updateModal = $modal.open({
-	           templateUrl: 'templates/modal/shiftForm.html',
-	           controller: ShiftModalController,
-	           resolve: {
-	        	   idToken: function(){
-	        		   return clone($scope.idToken);
-	        	   },
-	               shift: function() {
-	                   return clone(shift);
-	               },
-	               client: function(){
-	            	   return {};
-	               },
-	               clients: function(){
-	           		return {};
-		           	},
-		           	employees:function(){
-		        		return clone($scope.employees);
-		        	},
-		           	date: function(){
-		         	   return $scope.week;
-		            },
-	               action: function() {
-	                   return 'update';
-	               }
-	           }
-	       });
-	
-	       updateModal.result.then(function (shift) {
-	           saveShift(shift);
-	           $scope.listShifts();
-	       });
+	        	if(response.data=="DELETED"){// If this was delted out from
+												// under us let the user know
+												// and refresh our dated shift
+												// list
+	        	   $scope.warn("This shift has just been deleted by another user. If you still wish to make edits please make a new shift.");
+	        	   $scope.listShifts();
+	   	    	}
+	        	else{// If, as usual, this shift is around, edit it
+			       var updateModal = $modal.open({
+			           templateUrl: 'templates/modal/shiftForm.html',
+			           controller: ShiftModalController,
+			           resolve: {
+			        	   idToken: function(){
+			        		   return $scope.clone($scope.idToken);
+			        	   },
+			               shift: function() {
+			                   return $scope.clone(shift);
+			               },
+			               client: function(){
+			            	   return {};
+			               },
+			               clients: function(){
+			           		return {};
+				           	},
+				           	employees:function(){
+				        		return $scope.clone($scope.employees);
+				        	},
+				           	date: function(){
+				         	   return $scope.week;
+				            },
+			               action: function() {
+			                   return 'update';
+			               }
+			           }
+			       });
+			
+			       updateModal.result.then(function (shift) {
+		    		   saveShift(shift);// Update this shift on the server if ok
+										// was pressed
+			           $scope.listShifts();// Refresh our list to show the
+											// update and any others that may
+											// have occurred while editing
+			       }, function () {
+			           $scope.listShifts();// If we canceled we still want to
+											// make sure we come back to the
+											// latest shift data
+			       });
+	        	}
+	        });
 	   }
    };
 
 
+   /**
+	 * Creates a new employee with name An Employee and refreshes the employee
+	 * list to contain the change
+	 */
     $scope.newEmployee = function () {
+    	$scope.updateLastInteractionTime();
     	$http({
             url: '/schedule/createEmployee',
             method: 'POST',
@@ -758,7 +765,8 @@ function MobileEmployeeController($scope, $modal, $http) {
         	if(response.data){
                 $scope.notify("Employee created");
                 
-        		$scope.listEmployees();
+        		$scope.listEmployeesAndInfo();// TODO refactor to ensure the
+												// new employee is selected
         		
         		$scope.setEmployeeTab("Schedule");
         	}
@@ -767,109 +775,104 @@ function MobileEmployeeController($scope, $modal, $http) {
         	}
         });
     };
-    
-     $scope.toggleAvailabilityFor = function toggleAvailabilityFor(day,boolean) {
-    	var existingEmployee = $scope.employee;
-    	$scope.detailsChanged=true;	
-    	var hoursAvailable=[];
-    	
-    	for(var i=0;i<24;i++){
-        	hoursAvailable.push(boolean);
-    	}
-    	
-    	if(day==0){//sunday
-    		existingEmployee.sundaysAvailability=hoursAvailable;
-    	}
-    	if(day==1){//monday
-    		existingEmployee.mondaysAvailability=hoursAvailable;
-    	}
-    	if(day==2){//tuesday
-    		existingEmployee.tuesdaysAvailability=hoursAvailable;
-    	}
-    	if(day==3){//wednesday
-    		existingEmployee.wednesdaysAvailability=hoursAvailable;
-    	}
-    	if(day==4){
-    		existingEmployee.thursdaysAvailability=hoursAvailable;
-    	}
-    	if(day==5){
-    		existingEmployee.fridaysAvailability=hoursAvailable;
-    	}
-    	if(day==6){
-    		existingEmployee.saturdaysAvailability=hoursAvailable;
-    	}
-    }
 
+    /**
+	 * Checks to see if we have the latest info in this employee. If we don't we
+	 * ask if they want to overwrite what's on the server or see what the
+	 * changes are. If the choose to proceed or if we had the latest data we
+	 * save the employee and custom field data.
+	 */
     $scope.ok = function () {
-    	$scope.detailsChanged=false;
+    	$scope.updateLastInteractionTime();
+      	var originalEmployee = $scope.clone($scope.unmodifiedEmployee);
+    	var modifiedEmployee = $scope.clone($scope.employee);
+    	var lastUpdated = null;
+    	if(null!=originalEmployee && undefined !=originalEmployee){
+    		lastUpdated=originalEmployee.lastUpdated;
+    	}
+    	if(null==lastUpdated || undefined == lastUpdated){
+    		lastUpdated="null";
+    	}
+    	if(modifiedEmployee!=$scope.unmodifiedEmployee){
+		   $http({
+	            url: '/schedule/employeeWasUpdated',
+	            method: 'GET',
+	            headers: {
+	                'Authorization': $scope.idToken,
+	                'Content-Type': 'application/x-www-form-urlencoded'
+	            },
+	            params: {
+	            	lastUpdated:lastUpdated,
+	            	employeeId:modifiedEmployee.id
+	            }
+	        })
+	        .then(function(response) {
+	        	var updateData=false;
+    	    	if(response.data=="UPDATED"){
+    	    		   if(confirm(modifiedEmployee.first+" has just been modified by another user. Saving your changes will overwrite thier updates. Would you " +
+    	    		   				"still like to save your changes?")){
+    	    			   updateData=true;
+    	    		   }else{
+    	    			   $scope.cancel();
+    	    		   }
+    	    	}
+    	    	else{
+    	    		updateData=true;
+    	    	}
+    	    	
+    	    	if(updateData){
+    	    		  $scope.setDetailsChanged(false);
     	
-    	if($scope.customFields && $scope.customFields.length>0){
-	        var size = $scope.customFields.length;
-	        for(var i = 0; i < size ;i++){
-	            $http({
-	                url: '/compatibility/setEmployeeCustomFieldData',
-	                method: 'POST',
-	                headers: {
-		                'Authorization': $scope.idToken,
-	                    'Content-Type': 'application/x-www-form-urlencoded'
-	                },
-	                params: {
-	                    employee: $scope.employee,
-	                    customField: $scope.customFields[i],
-	                    value:$scope.customValue[i],
-	                }
-	            });
-	        }
-	    }
-    	
-    	$http({
-            url: '/schedule/updateEmployee',
-            method: 'POST',
-            headers: {
-                'Authorization': $scope.idToken,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            params: {
-                param: $scope.employee
-            }
-        })
-        .then(function(response) {
-        	if(response.data){
-                $scope.notify("Employee saved");
-                
-            	$scope.detailsChanged=false;
-        	}
-        	else{
-        		$scope.warn("Failed to save employee info.")
-        	}
-        });
+			    	if($scope.customFields && $scope.customFields.length>0){
+				        var size = $scope.customFields.length;
+				        for(var i = 0; i < size ;i++){
+				            $http({
+				                url: '/compatibility/setEmployeeCustomFieldData',
+				                method: 'POST',
+				                headers: {
+					                'Authorization': $scope.idToken,
+				                    'Content-Type': 'application/x-www-form-urlencoded'
+				                },
+				                params: {
+				                    employee: modifiedEmployee,
+				                    customField: $scope.customFields[i],
+				                    value:$scope.customValue[i],
+				                }
+				            });
+				        }
+				    }
+			    	
+			    	$http({// TODO refactor to saveEmployee method call
+			            url: '/schedule/updateEmployee',
+			            method: 'POST',
+			            headers: {
+			                'Authorization': $scope.idToken,
+			                'Content-Type': 'application/x-www-form-urlencoded'
+			            },
+			            params: {
+			                param: modifiedEmployee
+			            }
+			        })
+			        .then(function(response) {
+			        	if(response.data){
+			        		$scope.notify("Employee saved");
+    		                
+			        		  $scope.setDetailsChanged(false);
+    		            	$scope.updateEmployee();
+    		            	$scope.getAllEmployeeCustomFieldData();
+			        	}
+			        	else{
+			        		$scope.warn("Failed to save employee info.")
+			        	}
+			        });
+    	    	}
+	        });
+    	}
     };
     
-    $scope.deleteShift = function (shift) {
-  	   if(confirm("Are you sure you want to delete the following shift? "+shift.display)){
-     	$http({
-             url: '/shifts/'+shift.id,
-             method: 'DELETE',
-             headers: {
-                'Authorization': $scope.idToken,
-                 'Content-Type': 'application/x-www-form-urlencoded'
-             },
-             params: {
-             }
-         })
-         .then(function(response) {
-         	if(response){
-                 $scope.notify("Shift deleted.");
-                 $scope.listShifts();
-         	}
-         	else{
-         		$scope.warn("Failed to delete employee info.")
-         	}
-         });
-  	   }
-     };
      
     $scope.delete = function () {
+    	$scope.updateLastInteractionTime();
  	   if(confirm("Are you sure you want to delete info for "+$scope.employee.first + " "+$scope.employee.initial+"?")){
     	$http({
             url: '/employees/'+$scope.employee.id,
@@ -884,7 +887,7 @@ function MobileEmployeeController($scope, $modal, $http) {
         .then(function(response) {
         	if(response){
                 $scope.notify("Employee deleted.");
-        		$scope.listEmployees();
+        		$scope.listEmployeesAndInfo();
      			$scope.setEmployeeAndInfo(response.data[0]);
         		$scope.setEmployeeTab("Schedule");
         	}
@@ -896,6 +899,7 @@ function MobileEmployeeController($scope, $modal, $http) {
     };
     
     $scope.cancel = function () {
+    	$scope.updateLastInteractionTime();
 	  	$http({
             url: '/employees/'+$scope.employee.id,
             method: 'GET',
@@ -907,7 +911,7 @@ function MobileEmployeeController($scope, $modal, $http) {
             }
         })
         .then(function(response) {
-        	$scope.detailsChanged=false;
+      	    $scope.setDetailsChanged(false);
         	if(response.data){
         		$scope.setEmployeeAndInfo(response.data);
         	}

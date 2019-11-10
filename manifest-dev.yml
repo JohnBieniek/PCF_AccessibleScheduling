@@ -1,6 +1,6 @@
 ---
 applications:
-- name: spring-music
+- name: AccessibleScheduling
   memory: 1G
   path: build/libs/spring-music.jar
   buildpack: https://github.com/cloudfoundry/java-buildpack.git

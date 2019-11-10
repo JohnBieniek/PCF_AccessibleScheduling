@@ -629,6 +629,7 @@ public class CompatibilityController {
     	securityManager.authorize(idToken, Constants.MANAGER);
     	Client client =null;
     	CustomField customField =null;
+    	
     	int index = 0;
     	String param1= request.getParameter("client");
     	String param2= request.getParameter("customField");
