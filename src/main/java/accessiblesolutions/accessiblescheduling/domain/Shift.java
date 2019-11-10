@@ -54,6 +54,7 @@ public class Shift implements Comparable{
     private int startWeek;
     private int startMonth;
     private int startYear;
+    private String employeeNotes;
     
     private boolean weekend;
     
@@ -520,6 +521,10 @@ public class Shift implements Comparable{
     		string+= " with the assigned staff of "+ staffName;
     	}
     	
+    	if(null!=employeeNotes) {
+    		string+=". "+employeeNotes;
+    	}
+    	
     	return string;
     }
 
@@ -581,5 +586,13 @@ public class Shift implements Comparable{
 
 	public void setLastUpdated(String lastUpdated) {
 		this.lastUpdated = lastUpdated;
+	}
+
+	public String getEmployeeNotes() {
+		return employeeNotes;
+	}
+
+	public void setEmployeeNotes(String employeeNotes) {
+		this.employeeNotes = employeeNotes;
 	}
 }
