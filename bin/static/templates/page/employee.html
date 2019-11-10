@@ -129,7 +129,7 @@
  
 					  </br>
 				  		<div ng-if="manager" class="inline">
-						  <form ng-submit="addAbsence(newDate)">
+						  <form ng-submit="addAbsence(employee,newDate)">
 					           <input style="font-size: 30px;width: 250px;" type="date" ng-model="newDate" placeholder="Date" ng-required/>
 					           <button ng-if="manager" class="inline newShiftButton" ng-click="addAbsence(employee,newDate)"><span class="glyphicon glyphicon-plus"></span>&nbsp;New Date</button>
 					      </form>

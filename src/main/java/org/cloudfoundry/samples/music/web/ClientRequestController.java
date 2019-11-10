@@ -89,6 +89,7 @@ public class ClientRequestController {
         return repository.save(clientRequest);
     }
 
+    //TODO put failed update in different http response
     @RequestMapping(method = RequestMethod.POST)
     public List<ClientRequest> update(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam String param) throws AuthenticationException {
     	securityManager.authorize(idToken, Constants.MANAGER);
@@ -105,9 +106,12 @@ public class ClientRequestController {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-    	clientRequest.setLastUpdatedToNow();
-        repository.save(clientRequest);
-        updateInfoManager.set("requests");
+    	
+    	if(clientRequest.isValid()) {
+    		clientRequest.setLastUpdatedToNow();
+	        repository.save(clientRequest);
+	        updateInfoManager.set("requests");
+    	}
 
         return mongoRepository.findByClientId(clientRequest.getClientId());
     }

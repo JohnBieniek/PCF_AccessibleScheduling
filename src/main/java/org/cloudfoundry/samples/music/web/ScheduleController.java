@@ -126,20 +126,29 @@ public class ScheduleController {
     
     @RequestMapping(value = "/employeeNames", method = RequestMethod.GET)
     public String employeeNames(@RequestHeader(value="Authorization", required=false) String idToken) throws AuthenticationException, JSONException, InterruptedException {
-    	securityManager.authorize(idToken, Constants.MANAGER);
-	    UpdateInfo updateInfo = updateInfoRepository.findOne("employees");
-		  List<Employee> employeeList = employeeRepository.findAll();
-          Collections.sort(employeeList);
-		  JSONObject employeeJson = new JSONObject();
-		  JSONArray employeeInfoJson = new JSONArray();
-		  JSONObject employeesInfoJson = new JSONObject();
-		  for(Employee selectedEmployee : employeeList) {
+    	CallAuth callAuth = securityManager.authorize(idToken, Constants.USER);
+		JSONObject employeeJson = new JSONObject();
+		JSONArray employeeInfoJson = new JSONArray();
+		JSONObject employeesInfoJson = new JSONObject();
+		UpdateInfo updateInfo = updateInfoRepository.findOne("employees");
+
+    	if(callAuth.isManager() || callAuth.isAdmin()) {
+			  List<Employee> employeeList = employeeRepository.findAll();
+	          Collections.sort(employeeList);
+			  for(Employee selectedEmployee : employeeList) {
+				  employeeJson = new JSONObject();
+				  employeeJson.put("name", selectedEmployee.getName());
+				  employeeJson.put("id", selectedEmployee.getId());
+				  employeeInfoJson.put(employeeJson);
+			  }
+    	}
+    	else {
 			  employeeJson = new JSONObject();
+			  Employee selectedEmployee = employeeRepository.findOne(callAuth.getEmployeeId());
 			  employeeJson.put("name", selectedEmployee.getName());
 			  employeeJson.put("id", selectedEmployee.getId());
 			  employeeInfoJson.put(employeeJson);
-		  }
-		  
+    	}
 		  employeesInfoJson.put("names", employeeInfoJson);
 		  employeesInfoJson.put("tableLastUpdated", updateInfo.getTime());
     	return employeeInfoJson.toString();

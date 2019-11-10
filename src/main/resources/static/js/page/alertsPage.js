@@ -34,7 +34,7 @@ function AlertsController($scope, $modal, $http) {
 	  $scope.assignSelectedEmployee = function(alert,employee){
 		  $scope.updateLastInteractionTime();
 		  if(typeof employee !== 'undefined' && employee !=null && employee != undefined && employee !=false){
-			  if(confirm("Are you sure you want to give "+alert.name +" access to the profile of " +employee.first+"?")){
+			  if(confirm("Are you sure you want to give "+alert.name +" access to the profile of " +employee.name+"?")){
 		    	$http({
 		            url: '/auth/approve',
 		            method: 'GET',

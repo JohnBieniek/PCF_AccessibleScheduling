@@ -78,6 +78,22 @@ public class EmployeeController {
         return repository.save(employee);
     }
 
+    @RequestMapping(value = "/addAbsence",method = RequestMethod.POST)
+    public Employee addAbsence(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam String id,@RequestParam String date) throws AuthenticationException, ParseException {
+    	securityManager.authorize(idToken, Constants.MANAGER);
+    	
+    	Employee employee=repository.findOne(id);
+    	ArrayList<String> requestedOff = new ArrayList<String>(Arrays.asList(employee.getRequestedOff()));
+    	if(!requestedOff.contains(date)) {
+    		requestedOff.add(date);
+    	}
+
+    	employee.setRequestedOff(Arrays.asList(requestedOff.toArray()).toArray(new String[requestedOff.toArray().length]));
+        employee.setLastUpdatedToNow();
+    	updateInfoManager.set("employees");
+        return repository.save(employee);
+    }
+    
     @RequestMapping(value = "/removeAbsence",method = RequestMethod.POST)
     public Employee removeAbsence(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam String id,@RequestParam String date) throws AuthenticationException, ParseException {
     	securityManager.authorize(idToken, Constants.MANAGER);

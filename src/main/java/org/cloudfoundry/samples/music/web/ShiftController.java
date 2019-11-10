@@ -192,7 +192,7 @@ public class ShiftController {
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public void deleteById(@RequestHeader(value="Authorization", required=false) String idToken, @PathVariable String id) throws AuthenticationException {
-    	securityManager.authorize(idToken, Constants.ADMIN);
+    	securityManager.authorize(idToken, Constants.MANAGER);
         logger.info("Deleting shift " + id);
     	updateInfoManager.set("shifts");
         repository.delete(id);

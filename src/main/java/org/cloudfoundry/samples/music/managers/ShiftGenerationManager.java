@@ -44,7 +44,7 @@ public class ShiftGenerationManager {
     public ShiftGenerationManager() {
     }
     
-    public String generateShifts(String selectedMonth,String selectedYear) throws NumberFormatException{
+    public String generateShifts(String selectedMonth,String selectedYear){
     	String response = "Generated ";
     	int shiftsGenerated = 0;
     	
