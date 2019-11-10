@@ -178,7 +178,7 @@ public class ScheduleController {
     
     @RequestMapping(value = "/allUpdates",method = RequestMethod.GET)
     public String getAllUpdates(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam String json) throws AuthenticationException, JSONException, JsonProcessingException, NumberFormatException, ProccessingException {
-    	securityManager.authorize(idToken, Constants.USER);
+    	CallAuth callAuth = securityManager.authorize(idToken, Constants.USER);
     	JSONObject jsonObject = new JSONObject(json);
     	JSONObject result = new JSONObject();
 	    ObjectMapper mapper = new ObjectMapper();
@@ -229,7 +229,9 @@ public class ScheduleController {
 						    }
 					    }
 					    
-					    employee =employeeRepository.findOne(id);
+					    if(callAuth.isAdmin() || callAuth.isManager() || callAuth.getEmployeeId()==id) {
+					    	employee =employeeRepository.findOne(id);
+					    }
 					    
 					    if(null==employee) {
 					    	client = clientRepository.findOne(id);
@@ -240,40 +242,50 @@ public class ScheduleController {
 					    	}
 					    	if(key.equalsIgnoreCase(Constants.CLIENT) && 
 					    			(client.getLastUpdated()==null || lastUpdated == null ||client.lastUpdatedTime().isAfter(lastUpdated))) {
-						    	result.put(Constants.CLIENT, new JSONObject(mapper.writeValueAsString(client)));
-						    	
-								JSONArray clientCustomDataJson = new JSONArray();							    
-							    Iterable<CustomFieldData> clientData = customFieldDataRepository.findByOwnerId(id);
-							    Iterable<CustomField> fields = customFieldRepository.findAll();
-							    for(CustomField clientField: fields) {
-							    	for(CustomFieldData clientsData:clientData) {
-							    		if(clientsData.getCustomFieldId().equalsIgnoreCase(clientField.getId())) {
-							    			clientCustomDataJson.put(clientsData.getBooleanData());
-							    		}
-							    	}
-							    }
-							  	result.put("customFieldData", clientCustomDataJson);
+						    	if((callAuth.isAdmin() || callAuth.isManager())) {
+						    		result.put(Constants.CLIENT, new JSONObject(mapper.writeValueAsString(client)));
+							    	
+									JSONArray clientCustomDataJson = new JSONArray();							    
+								    Iterable<CustomFieldData> clientData = customFieldDataRepository.findByOwnerId(id);
+								    Iterable<CustomField> fields = customFieldRepository.findAll();
+								    for(CustomField clientField: fields) {
+								    	for(CustomFieldData clientsData:clientData) {
+								    		if(clientsData.getCustomFieldId().equalsIgnoreCase(clientField.getId())) {
+								    			clientCustomDataJson.put(clientsData.getBooleanData());
+								    		}
+								    	}
+								    }
+								  	result.put("customFieldData", clientCustomDataJson);
+						    	}
+						    	else {
+						    		throw new AuthenticationException("No access to requested client");
+						    	}
 						    }
 					    }
 					    else if(key.equalsIgnoreCase(Constants.EMPLOYEE) && 
 					    		(employee.getLastUpdated()==null || lastUpdated == null ||employee.getLastUpdatedTime().isAfter(lastUpdated))) {
-					    	if(employee.getLastUpdated()==null) {
-					    		employee.setLastUpdatedToNow();
-					    		employeeRepository.save(employee);
-					    	}
-					    	result.put(Constants.EMPLOYEE, new JSONObject(mapper.writeValueAsString(employee)));
-					    	
-							JSONArray employeeCustomDataJson = new JSONArray();							    
-						    Iterable<CustomFieldData> employeeData = customFieldDataRepository.findByOwnerId(id);
-						    Iterable<CustomField> fields = customFieldRepository.findAll();
-						    for(CustomField field: fields) {
-						    	for(CustomFieldData data:employeeData) {
-						    		if(data.getCustomFieldId().equalsIgnoreCase(field.getId())) {
-						    			employeeCustomDataJson.put(data.getBooleanData());
-						    		}
+					    	if(callAuth.isAdmin() || callAuth.isManager() || callAuth.getEmployeeId()==id){
+						    	if(employee.getLastUpdated()==null) {
+						    		employee.setLastUpdatedToNow();
+						    		employeeRepository.save(employee);
 						    	}
-						    }
-						  	result.put("customFieldData", employeeCustomDataJson);
+						    	result.put(Constants.EMPLOYEE, new JSONObject(mapper.writeValueAsString(employee)));
+						    	
+								JSONArray employeeCustomDataJson = new JSONArray();							    
+							    Iterable<CustomFieldData> employeeData = customFieldDataRepository.findByOwnerId(id);
+							    Iterable<CustomField> fields = customFieldRepository.findAll();
+							    for(CustomField field: fields) {
+							    	for(CustomFieldData data:employeeData) {
+							    		if(data.getCustomFieldId().equalsIgnoreCase(field.getId())) {
+							    			employeeCustomDataJson.put(data.getBooleanData());
+							    		}
+							    	}
+							    }
+							  	result.put("customFieldData", employeeCustomDataJson);
+					    	}
+					    	else {
+					    		throw new AuthenticationException("No access to requested employee");
+					    	}
 					    }
 				    }
 				    
@@ -288,6 +300,7 @@ public class ScheduleController {
 				    	}
 				    	
 				    	if(key.equalsIgnoreCase("status")) {
+				    		if(callAuth.isAdmin()) {
 							   JSONObject statusJson = new JSONObject();
 							    
 						       List<ScheduleStatus> statuses = scheduleStatusRepository.findAll();
@@ -307,6 +320,10 @@ public class ScheduleController {
 						       statusJson.put("unassigned", shiftManager.getUnassignedShiftsForMonth(Integer.parseInt(month)).size());    
 
 							   result.put("status", statusJson);
+				    		}
+				    		else {
+				    			throw new AuthenticationException("No access to schedule status");
+				    		}
 				     	}
 				    }
 				    
@@ -320,22 +337,41 @@ public class ScheduleController {
 						switch(key)
 						{
 						   case Constants.EMPLOYEES :
-							  List<Employee> employeeList = employeeRepository.findAll();
-					          Collections.sort(employeeList);
-							  JSONObject employeeJson = new JSONObject();
+							  JSONObject employeeJson = new JSONObject();	
 							  JSONArray employeeInfoJson = new JSONArray();
 							  JSONObject employeesInfoJson = new JSONObject();
-							  for(Employee selectedEmployee : employeeList) {
+							  
+							  if(callAuth.isAdmin() || callAuth.isManager()) {
+								  List<Employee> employeeList = employeeRepository.findAll();
+						          Collections.sort(employeeList);
+								  for(Employee selectedEmployee : employeeList) {
+									  employeeJson = new JSONObject();
+									  employeeJson.put("name", selectedEmployee.getName());
+									  employeeJson.put("id", selectedEmployee.getId());
+									  employeeInfoJson.put(employeeJson);
+								  }
+								  
+								  employeesInfoJson.put("names", employeeInfoJson);
+								  employeesInfoJson.put("tableLastUpdated", updateInfo.getTime());
+								  
+								  result.put(Constants.EMPLOYEES, employeesInfoJson);
+							  }
+							  else if(callAuth.getEmployeeId()==id) {
+								  employee=employeeRepository.findOne(callAuth.getEmployeeId());
 								  employeeJson = new JSONObject();
-								  employeeJson.put("name", selectedEmployee.getName());
-								  employeeJson.put("id", selectedEmployee.getId());
+								  employeeJson.put("name", employee.getName());
+								  employeeJson.put("id", employee.getId());
 								  employeeInfoJson.put(employeeJson);
+								  
+								  employeesInfoJson.put("names", employeeInfoJson);
+								  employeesInfoJson.put("tableLastUpdated", updateInfo.getTime());
+								  
+								  result.put(Constants.EMPLOYEES, employeesInfoJson);
+							  }
+							  else{
+								  throw new AuthenticationException("No access to requested employees");
 							  }
 							  
-							  employeesInfoJson.put("names", employeeInfoJson);
-							  employeesInfoJson.put("tableLastUpdated", updateInfo.getTime());
-							  
-							  result.put(Constants.EMPLOYEES, employeesInfoJson);
 						      break;
 						   case Constants.CLIENTS :
 							  List<Client> clientList = clientRepository.findAll();
@@ -356,76 +392,91 @@ public class ScheduleController {
 							  result.put(Constants.CLIENTS, clientsInfoJson);
 						      break; 
 						   case Constants.SHIFTS :
-							  JSONObject shiftJson = new JSONObject();
-						      JSONArray shiftInfoJson = new JSONArray();
-							  Iterable<Shift> shifts = null;
-							  if(null!=employee) {
-								  shifts = manager.getEmployeeShiftsForWeek(id,month,day,year);
-							  }
-							  else if(null!=client) {
-								  shifts = manager.getClientShiftsForWeek(id, month, day, year);
-							  }
-							  
-							  for(Shift shift : shifts) {
-								  System.out.println(" found shift "+shift.toString());
-						          if(null == currentUpdateTime || (shift.getLastUpdatedTime()!=null &&
-						        		  currentUpdateTime.isAfter(shift.getLastUpdatedTime()))) {
-						        	  currentUpdateTime=shift.getLastUpdatedTime();
-						          }
-						    	      
-						    	  shiftInfoJson.put(new JSONObject(mapper.writeValueAsString(shift)));
-						      }
-						    	    
-
-						    //Temporarily disabled, re-enable after count is added and evaluated    
-						     // if(currentUpdateTime==null || lastUpdated == null ||currentUpdateTime.isAfter(lastUpdated)) {
-						      	    shiftJson.put("info", shiftInfoJson);
-							        shiftJson.put("lastUpdated", currentUpdateTime);
-								    shiftJson.put("tableLastUpdated", updateInfo.getTime());
-									result.put(Constants.SHIFTS,  shiftJson);
-						      //}
+							   if(callAuth.isAdmin() || callAuth.isManager() || callAuth.getEmployeeId()==id) {
+								  JSONObject shiftJson = new JSONObject();
+							      JSONArray shiftInfoJson = new JSONArray();
+								  Iterable<Shift> shifts = null;
+								  if(null!=employee) {
+									  shifts = manager.getEmployeeShiftsForWeek(id,month,day,year);
+								  }
+								  else if(null!=client) {
+									  shifts = manager.getClientShiftsForWeek(id, month, day, year);
+								  }
+								  
+								  for(Shift shift : shifts) {
+									  System.out.println(" found shift "+shift.toString());
+							          if(null == currentUpdateTime || (shift.getLastUpdatedTime()!=null &&
+							        		  currentUpdateTime.isAfter(shift.getLastUpdatedTime()))) {
+							        	  currentUpdateTime=shift.getLastUpdatedTime();
+							          }
+							    	      
+							    	  shiftInfoJson.put(new JSONObject(mapper.writeValueAsString(shift)));
+							      }
+							    	    
+	
+							    //Temporarily disabled, re-enable after count is added and evaluated    
+							     // if(currentUpdateTime==null || lastUpdated == null ||currentUpdateTime.isAfter(lastUpdated)) {
+							      	    shiftJson.put("info", shiftInfoJson);
+								        shiftJson.put("lastUpdated", currentUpdateTime);
+									    shiftJson.put("tableLastUpdated", updateInfo.getTime());
+										result.put(Constants.SHIFTS,  shiftJson);
+							      //}
+							   }
+							   else {
+								   throw new AuthenticationException("No access to requested shifts");
+							   }
 							  break;
 						   case Constants.REQUESTS :
-							  JSONObject requestJson = new JSONObject();
-							    
-						      Iterable<ClientRequest> requests = requestRepository.findByClientId(id);
-
-						      JSONArray requestInfoJson = new JSONArray();
-						    	    
-						      for(ClientRequest selectedClientRequest : requests) {
-						          if(null == currentUpdateTime || (selectedClientRequest.getLastUpdatedTime() !=null &&
-						        		  currentUpdateTime.isAfter(selectedClientRequest.getLastUpdatedTime()))) {
-						        	  currentUpdateTime=selectedClientRequest.getLastUpdatedTime();
-						          }
-						    	      
-						    	  requestInfoJson.put(new JSONObject(mapper.writeValueAsString(selectedClientRequest)));
-						      }
-
-
-						    //Temporarily disabled, re-enable after count is added and evaluated
-						     // if(currentUpdateTime==null || lastUpdated == null ||currentUpdateTime.isAfter(lastUpdated)) {
-					      	      requestJson.put("info", requestInfoJson);
-							      requestJson.put("lastUpdated", currentUpdateTime);
-								  requestJson.put("tableLastUpdated", updateInfo.getTime());
-								  result.put(Constants.REQUESTS,  requestJson);
-						      //}
+							   if(callAuth.isAdmin() || callAuth.isManager()) {
+								  JSONObject requestJson = new JSONObject();
+								    
+							      Iterable<ClientRequest> requests = requestRepository.findByClientId(id);
+	
+							      JSONArray requestInfoJson = new JSONArray();
+							    	    
+							      for(ClientRequest selectedClientRequest : requests) {
+							          if(null == currentUpdateTime || (selectedClientRequest.getLastUpdatedTime() !=null &&
+							        		  currentUpdateTime.isAfter(selectedClientRequest.getLastUpdatedTime()))) {
+							        	  currentUpdateTime=selectedClientRequest.getLastUpdatedTime();
+							          }
+							    	      
+							    	  requestInfoJson.put(new JSONObject(mapper.writeValueAsString(selectedClientRequest)));
+							      }
+	
+	
+							    //Temporarily disabled, re-enable after count is added and evaluated
+							     // if(currentUpdateTime==null || lastUpdated == null ||currentUpdateTime.isAfter(lastUpdated)) {
+						      	      requestJson.put("info", requestInfoJson);
+								      requestJson.put("lastUpdated", currentUpdateTime);
+									  requestJson.put("tableLastUpdated", updateInfo.getTime());
+									  result.put(Constants.REQUESTS,  requestJson);
+							      //}
+							   }
+							   else {
+								   throw new AuthenticationException("No access to requests");
+							   }
 							  break; 
 						   case Constants.ALERTS :
-							  JSONObject alertJson = new JSONObject();
-							    
-						      Iterable<AccessRequest> alerts = accessRequestRepository.findAll();
-
-						      JSONArray alertInfoJson = new JSONArray();
-						    	    
-						      for(AccessRequest alert:alerts) {
-						    	  alertInfoJson.put(new JSONObject(mapper.writeValueAsString(alert)));
-						      }
-						    	    
-				      	      alertJson.put("info", alertInfoJson);
-							  alertJson.put("tableLastUpdated", updateInfo.getTime());
-
-
-							  result.put(Constants.ALERTS, alertJson);
+							   if(callAuth.isAdmin()) {
+								  JSONObject alertJson = new JSONObject();
+								    
+							      Iterable<AccessRequest> alerts = accessRequestRepository.findAll();
+	
+							      JSONArray alertInfoJson = new JSONArray();
+							    	    
+							      for(AccessRequest alert:alerts) {
+							    	  alertInfoJson.put(new JSONObject(mapper.writeValueAsString(alert)));
+							      }
+							    	    
+					      	      alertJson.put("info", alertInfoJson);
+								  alertJson.put("tableLastUpdated", updateInfo.getTime());
+	
+	
+								  result.put(Constants.ALERTS, alertJson);
+							   }
+							   else {
+								   throw new AuthenticationException("No access to alerts");
+							   }
 							  break; 
 						   case Constants.CUSTOM_FIELDS :
 							  JSONObject customFieldsJson = new JSONObject();
