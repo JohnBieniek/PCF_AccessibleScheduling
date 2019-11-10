@@ -199,9 +199,11 @@ function MainNavigationController($scope, $modal, $http) {
 			 payload["customFields"] = customFieldsInfo;
 			 
 			 if($scope.page=="templates/page/employee.html" || $scope.page=="templates/page/client.html"){
-				 var clientsInfo = {}; 
-				 clientsInfo["tableLastUpdated"]=$scope.lastClientTableUpdate;
-				 payload["clients"] = clientsInfo;
+				 if($scope.manager || $scope.admin){
+					 var clientsInfo = {}; 
+					 clientsInfo["tableLastUpdated"]=$scope.lastClientTableUpdate;
+					 payload["clients"] = clientsInfo;
+				 }
 				 
 				 var employeesInfo = {}; 
 				 employeesInfo["tableLastUpdated"]=$scope.lastEmployeeTableUpdate;
@@ -504,7 +506,7 @@ function MainNavigationController($scope, $modal, $http) {
 	  * Saves it in $scope.client and $scope.unmodifiedClient
 	  */
 	 $scope.getClient = function getClient(clientInfo){
-		 if($scope.idToken!=null){
+		 if($scope.idToken!=null && ($scope.manager || $scope.admin)){
 	    	$http({
 	            url: '/clients/'+clientInfo,
 	            method: 'GET',

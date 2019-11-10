@@ -229,7 +229,7 @@ public class ScheduleController {
 						    }
 					    }
 					    
-					    if(callAuth.isAdmin() || callAuth.isManager() || callAuth.getEmployeeId()==id) {
+					    if(callAuth.isAdmin() || callAuth.isManager() || callAuth.getEmployeeId().equalsIgnoreCase(id)) {
 					    	employee =employeeRepository.findOne(id);
 					    }
 					    
@@ -264,7 +264,7 @@ public class ScheduleController {
 					    }
 					    else if(key.equalsIgnoreCase(Constants.EMPLOYEE) && 
 					    		(employee.getLastUpdated()==null || lastUpdated == null ||employee.getLastUpdatedTime().isAfter(lastUpdated))) {
-					    	if(callAuth.isAdmin() || callAuth.isManager() || callAuth.getEmployeeId()==id){
+					    	if(callAuth.isAdmin() || callAuth.isManager() || callAuth.getEmployeeId().equalsIgnoreCase(id)){
 						    	if(employee.getLastUpdated()==null) {
 						    		employee.setLastUpdatedToNow();
 						    		employeeRepository.save(employee);
@@ -356,7 +356,7 @@ public class ScheduleController {
 								  
 								  result.put(Constants.EMPLOYEES, employeesInfoJson);
 							  }
-							  else if(callAuth.getEmployeeId()==id) {
+							  else{
 								  employee=employeeRepository.findOne(callAuth.getEmployeeId());
 								  employeeJson = new JSONObject();
 								  employeeJson.put("name", employee.getName());
@@ -368,31 +368,33 @@ public class ScheduleController {
 								  
 								  result.put(Constants.EMPLOYEES, employeesInfoJson);
 							  }
-							  else{
-								  throw new AuthenticationException("No access to requested employees");
-							  }
 							  
 						      break;
 						   case Constants.CLIENTS :
-							  List<Client> clientList = clientRepository.findAll();
-					          Collections.sort(clientList);
-							  JSONObject clientJson = new JSONObject();
-							  JSONArray clientInfoJson = new JSONArray();
-							  JSONObject clientsInfoJson = new JSONObject();
-							  for(Client selectedClient : clientList) {
-								  clientJson = new JSONObject();
-								  clientJson.put("name", selectedClient.getName());
-								  clientJson.put("id", selectedClient.getId());
-								  clientInfoJson.put(clientJson);
-							  }
-							  
-							  clientsInfoJson.put("names", clientInfoJson);
-							  clientsInfoJson.put("tableLastUpdated", updateInfo.getTime());
-							  
-							  result.put(Constants.CLIENTS, clientsInfoJson);
+							   if(callAuth.isAdmin() || callAuth.isManager()) {
+								  List<Client> clientList = clientRepository.findAll();
+						          Collections.sort(clientList);
+								  JSONObject clientJson = new JSONObject();
+								  JSONArray clientInfoJson = new JSONArray();
+								  JSONObject clientsInfoJson = new JSONObject();
+								  for(Client selectedClient : clientList) {
+									  clientJson = new JSONObject();
+									  clientJson.put("name", selectedClient.getName());
+									  clientJson.put("id", selectedClient.getId());
+									  clientInfoJson.put(clientJson);
+								  }
+								  
+								  clientsInfoJson.put("names", clientInfoJson);
+								  clientsInfoJson.put("tableLastUpdated", updateInfo.getTime());
+								  
+								  result.put(Constants.CLIENTS, clientsInfoJson);
+							   }
+							   else {
+								   throw new AuthenticationException("No access to clients");
+							   }
 						      break; 
 						   case Constants.SHIFTS :
-							   if(callAuth.isAdmin() || callAuth.isManager() || callAuth.getEmployeeId()==id) {
+							   if(callAuth.isAdmin() || callAuth.isManager() || callAuth.getEmployeeId().equalsIgnoreCase(id)) {
 								  JSONObject shiftJson = new JSONObject();
 							      JSONArray shiftInfoJson = new JSONArray();
 								  Iterable<Shift> shifts = null;
