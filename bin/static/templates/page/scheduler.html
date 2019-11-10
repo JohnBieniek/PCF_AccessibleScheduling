@@ -66,41 +66,40 @@
 		    	</div>
 	    	</ul>
 	   	</div>
-	   	<div style="display:inline-block; vertical-align: top; width:75%" ng-init="getScheduled(monthTab)">
-			<div style="margin-left:5%" class="scheduler" ng-init="getUnscheduled(monthTab)" >
+	   	<div style="display:inline-block; vertical-align: top; width:75%">
+			<div style="margin-left:5%" class="scheduler" >
 				<div>
-					<label style="font-size:43px">Scheduler</label>
+					<label style="font-size:43px;line-height:1">Scheduler</label>
 				</div>
 				<div ng-init="setScheduleTab(monthTab)">
-					<label style="font-size:38px">{{monthName}}</label>
+					<label style="font-size:38px;line-height:1">{{monthName}}</label>
 				</div>
 				<div>
-					<label style="font-size:24px">Generate shifts from requests. Assign them to employees.</label>
+					<label style="font-size:24px">Generate shifts from requests. Assign shifts to employees.</label>
 				</div>
 				<div style="display:inline-block">
-					<div style="display:inline-block;height:120px" class = "incomplete" ng-class="{ complete: isGenerated(monthTab) }">
+					<div style="display:inline-block;height:100px;line-height: 1;" class = "incomplete" ng-class="{ complete: isGenerated(monthTab), working: isGenerating(monthTab) || isDeleting(monthTab) }">
 						<p style="font-weight:700">{{generated}}</p>
-						<p style="font-weight:700">{{total}}</p>
+						<p style="font-weight:700">{{total}} shifts</p>
 					</div>
-					<div class = "incomplete" style="display:inline-block;height:120px" ng-class="{ complete: isAssigned(monthTab), working: isAssigning(monthTab) || isStopped(monthTab), errored: isErrored(monthTab) }">
+					<div class = "incomplete" style="display:inline-block;height:100px;line-height: 1;" ng-class="{ complete: (isAssigned(monthTab) && !isErrored(monthTab)) , working: isAssigning(monthTab) || isStopping(monthTab), errored: isErrored(monthTab) }">
 						<p style="font-weight:700">{{assigned}}</p>
 						<p style="font-weight:700">{{scheduled}} of {{total}}</p>
 					</div>
 				</div>
-					<br>
-					<br>
-					<br>
+				<br>
+				<br>
 				<div style="display:inline-block;" ng-if="isGenerated(monthTab)">
-					<button class="deleteButton scheduleButton" ng-class="{ disabled: !isGenerated(monthTab) || isAssigning(monthTab) }" type="button" ng-click="deleteShifts(monthTab)">Delete</button>
+					<button class="deleteButton scheduleButton" ng-class="{ disabled: !isGenerated(monthTab) || isAssigning(monthTab) || isStopping(monthTab) || isDeleting(monthTab)}" type="button" ng-click="deleteShifts(monthTab)">Delete</button>
 				</div>
 				<div style="display:inline-block;" ng-if="!isGenerated(monthTab)">
-					<button class="scheduleButton" ng-class="{ disabled: isGenerated(monthTab) }" type="button" ng-click="generateShifts(monthTab)">Generate</button>
+					<button class="scheduleButton" ng-class="{ disabled: isGenerated(monthTab) || isGenerating(monthTab) || isDeleting(monthTab)}" type="button" ng-click="generateShifts(monthTab)">Generate</button>
 				</div>
 				<div style="display:inline-block;" ng-if="isAssigning(monthTab)">
-					<button style="display:inline-block;"  align="right" ng-class="{ disabled:  !isAssigning(monthTab) || isStopped(monthTab)}" class="deleteButton scheduleButton" type="button" ng-click="stopAssignment(monthTab)">Stop</button>
+					<button style="display:inline-block;"  align="right" ng-class="{ disabled:  !isAssigning(monthTab) || isStopping(monthTab) || isStopped(monthTab)}" class="deleteButton scheduleButton" type="button" ng-click="stopAssignment(monthTab)">Stop</button>
 				</div>
 				<div style="display:inline-block;" ng-if="!isAssigning(monthTab)">
-					<button style="display:inline-block;"  align="right" ng-class="{ disabled:  !isGenerated(monthTab) || isAssigning(monthTab) ||  isAssigned(monthTab) || isStopped(monthTab)}" class="scheduleButton" type="button" ng-click="assignShifts(monthTab,allowOvertime,allowInactive,allowUnavailable,prioritizeSecondShift,useDailyMax,useWeeklyMax)">Assign</button>
+					<button style="display:inline-block;"  align="right" ng-class="{ disabled:  !isGenerated(monthTab) || isStopping(monthTab) || isAssigning(monthTab)}" class="scheduleButton" type="button" ng-click="assignShifts(monthTab,allowOvertime,allowInactive,allowUnavailable,prioritizeSecondShift,useDailyMax,useWeeklyMax)">Assign</button>
 				</div>
 			</div>
 			<br>
@@ -138,5 +137,4 @@
 		    </div>
 		 <div>
     </div>
-    <script type="text/javascript" src="js/page/schedulerPage.js"></script>
 </div>

@@ -17,6 +17,14 @@ public class UpdateInfo {
 	
 	public UpdateInfo() {
 	}
+	
+	public String getId() {
+		return id;
+	}
+	
+	public void setId(String id) {
+		this.id=id;
+	}
 
 	public LocalDateTime getTime() {
 		return time;
@@ -24,5 +32,10 @@ public class UpdateInfo {
 
 	public void setTime(LocalDateTime time) {
 		this.time = time;
+	}
+
+	@Override
+	public String toString() {
+		return "UpdateInfo [id=" + id + ", time=" + time + "]";
 	}
 }

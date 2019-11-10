@@ -22,36 +22,39 @@ angular.module('login', ['ngResource', 'ui.bootstrap']).
     });
 
 function LoginController($scope, $modal, $http) {
-	
 	function onSignIn(googleUser) {
 	    // The ID token you need to pass to your backend:
-	    var id_token = googleUser.getAuthResponse().id_token;
-	    $scope.setIdToken(id_token);
-	    $scope.$apply();
-	    
-	    var xhr = new XMLHttpRequest();
-	    xhr.open('POST', window.location.href+"/auth/tokensignin");	    	
-
-	    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-	    xhr.onload = function() {
-	        $scope.setProfile(JSON.parse(xhr.responseText));
+	    var idToken = googleUser.getAuthResponse().id_token;
+	    $scope.setIdToken(idToken);
+		$scope.updateLastInteractionTime();
+    	$http({
+            url: '/auth/tokensignin',
+            method: 'GET',
+            headers: {
+	            'Authorization': $scope.idToken,
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            params: {
+            }
+        })
+        .then(function(response) {
+	        $scope.setProfile(response.data);
 	        $scope.setUser($scope.profile.user);
 	        $scope.setManager($scope.profile.manager);
 	        $scope.setAdmin($scope.profile.admin);
-		    $scope.$apply();
 		    if($scope.profile.user){
-			    $scope.setPage('employee');
-			    $scope.$apply();
+			    $scope.getEmployeeNames();
+		    	$scope.setPage('employee');
 		    }
 		    else{
 		    	$http({
 		            url: '/auth/signedup',
 		            method: 'GET',
 		            headers: {
+    		            'Authorization': $scope.idToken,
 		                'Content-Type': 'application/x-www-form-urlencoded'
 		            },
 		            params: {
-		            	idtoken:$scope.idToken
 		            }
 		        })
 		        .then(function(response) {
@@ -61,11 +64,9 @@ function LoginController($scope, $modal, $http) {
 		        	else{
 					    $scope.setPage('signUp');		        		
 		        	}
-		        	$scope.$apply();
 		        });
 		    }
-	    };
-	    xhr.send('idtoken=' + id_token);
-	  }
+	    });
+	}
 	window.onSignIn = onSignIn;
 }

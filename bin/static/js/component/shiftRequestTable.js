@@ -37,15 +37,12 @@ function ShiftRequestsController($scope, $modal, $http, Requests, Request, Emplo
 	 
 	 $scope.list= function list(){
 		 $scope.listShiftRequests();
-		 $scope.listEmployees();
+		 $scope.getEmployeeNames();
 	 }
 	 $scope.listShiftRequests = function listShiftRequests() {
          $scope.shiftRequests = ShiftRequests.query();
      }
-	  
-	 $scope.listEmployees = function listEmployees(){
-		 $scope.employees = Employees.query();
-	 }
+
 	 $scope.addRequest = function (selectedClient,employees) {
         var addModal = $modal.open({
             templateUrl: 'templates/modal/requestForm.html',

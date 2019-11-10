@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
 
+import accessiblesolutions.accessiblescheduling.constants.Constants;
 import accessiblesolutions.accessiblescheduling.domain.Employee;
 import accessiblesolutions.accessiblescheduling.domain.EmployeeShiftCompatibilities;
 import accessiblesolutions.accessiblescheduling.domain.EmployeeShiftCompatibility;
@@ -43,6 +44,9 @@ public class ShiftAssignmentManager {
     private CrudRepository<ScheduleStatus, String> scheduleStatusCrud;
     
     @Autowired
+    private UpdateInfoManager updateInfoManager;
+    
+    @Autowired
     private ScheduleStatusRepository scheduleStatusRepository;  
     
     public ShiftAssignmentManager() {
@@ -69,19 +73,23 @@ public class ShiftAssignmentManager {
     	int month = Integer.parseInt(options.getMonth());
     	int year = Integer.parseInt(options.getYear());
     	
-    	ScheduleStatus status = scheduleStatusCrud.findOne(options.getMonth());
+    	ScheduleStatus status = scheduleStatus(options.getMonth());
     	
     	if(null==status) {
     		status= new ScheduleStatus();
     		status.setMonth(options.getMonth());
     	}
     	
-    	scheduleStatusRepository.deleteByMonth(options.getMonth());
     	
+    	status.setStopped(false);
     	status.setGenerated(true);
     	status.setAssigning(true);
+    	status.setAssigned(false);
+    	status.setErrored(false);
+    	status.setLastUpdatedToNow();
+    	scheduleStatusRepository.deleteByMonth(options.getMonth());
     	scheduleStatusCrud.save(status);
-    	
+    	updateInfoManager.set(Constants.STATUS);
     	try {
     		System.out.println("staffing preassigned shifts:"+options.toString());
 
@@ -92,20 +100,29 @@ public class ShiftAssignmentManager {
 	    		scheduleWeekendShifts(week,month,year,options);
 	    		scheduleWeekdayShifts(week,month,year,options);
 	    	}
-		} catch (Exception e) {
-			scheduleStatusRepository.deleteByMonth(options.getMonth());
-	    	
+			
 	    	status.setAssigning(false);
 	    	status.setAssigned(true);
+	    	
+	    	status.setLastUpdatedToNow();
+	    	scheduleStatusRepository.deleteByMonth(options.getMonth());
 	    	scheduleStatusCrud.save(status);
+	    	updateInfoManager.set(Constants.STATUS);
+		} catch (Exception e) {
+	    	status.setAssigning(false);
+	    	status.setAssigned(false);
+	    	status.setStopped(false);
+	    	status.setStopping(false);
+	    	status.setErrored(true);
+	    	status.setLastUpdatedToNow();
+	    	scheduleStatusRepository.deleteByMonth(options.getMonth());
+	    	scheduleStatusCrud.save(status);
+	    	updateInfoManager.set(Constants.STATUS);
 	    	System.out.println("Failed to assign everything. "+e.getMessage());
+	    	System.out.println("Failed to assign everything. "+e.getLocalizedMessage());
+	    	System.out.println("Failed to assign everything. "+e.getStackTrace().toString());
+	    	e.printStackTrace();
 		}
-    	
-    	scheduleStatusRepository.deleteByMonth(options.getMonth());
-    	
-    	status.setAssigning(false);
-    	status.setAssigned(true);
-    	scheduleStatusCrud.save(status);
     }
     
     public void scheduleWeekdayShifts(int week, int month,int year, ScheduleOptions options) throws ProccessingException, CorruptDataException {
@@ -132,9 +149,20 @@ public class ShiftAssignmentManager {
 	    
     	for(int i= 0;i< maxItterations;i++){
     		if(!stopped) {
-	        	if(scheduleStatus(month+"").isStopped()) {
+    			ScheduleStatus status = scheduleStatus(month+"");
+	        	if(status.getAssigningThreadId()!=Thread.currentThread().getId() || status.isStopping() || status.isStopped() || !status.isAssigning()) {
 	        		stopped=true;
 	        		i=maxItterations;
+	            	
+	            	status.setGenerated(true);
+	            	status.setAssigning(false);
+	            	status.setAssigned(true);
+	            	status.setStopped(true);
+	        		status.setStopping(false);
+	        		status.setLastUpdatedToNow();
+	    	    	scheduleStatusRepository.deleteByMonth(options.getMonth());
+	    	    	scheduleStatusCrud.save(status);
+	    	    	updateInfoManager.set(Constants.STATUS);
 	        	}
 	        	else {
 					if(unassignedShifts!=null && unassignedShifts.size()>0) {

@@ -8,9 +8,10 @@ import javax.security.sasl.AuthenticationException;
 import javax.validation.Valid;
 
 import org.cloudfoundry.samples.music.managers.AccessibleSecurityManager;
+import org.cloudfoundry.samples.music.managers.UpdateInfoManager;
+import org.cloudfoundry.samples.music.repositories.mongodb.MongoClientRequestRepository;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoCustomFieldDataRepository;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoShiftRepository;
-import org.cloudfoundry.samples.music.repositories.mongodb.MongoShiftRequestRepository;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,9 +31,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import accessiblesolutions.accessiblescheduling.constants.Constants;
 import accessiblesolutions.accessiblescheduling.domain.Client;
+import accessiblesolutions.accessiblescheduling.domain.ClientRequest;
 import accessiblesolutions.accessiblescheduling.domain.CustomFieldData;
 import accessiblesolutions.accessiblescheduling.domain.Shift;
-import accessiblesolutions.accessiblescheduling.domain.ShiftRequest;
 
 @RestController
 @RequestMapping(value = "/clients")
@@ -44,10 +45,15 @@ public class ClientController {
     private CrudRepository<Client, String> repository;
     @Autowired
     private MongoShiftRepository shiftRepository;
-    @Autowired
-    private MongoShiftRequestRepository requestRepository;
+
     @Autowired
     private MongoCustomFieldDataRepository customDataRepository;
+
+    @Autowired
+    private UpdateInfoManager updateInfoManager;
+    
+    @Autowired
+    private MongoClientRequestRepository requestRepository;
 
     @Autowired
     public ClientController(CrudRepository<Client, String> repository) {
@@ -67,6 +73,8 @@ public class ClientController {
     public Client add(@RequestHeader(value="Authorization", required=false) String idToken, @RequestBody @Valid Client client) throws AuthenticationException {
     	securityManager.authorize(idToken, Constants.MANAGER);
         logger.info("Adding client " + client.getId());
+        updateInfoManager.set("clients");
+        client.setLastUpdatedToNow();
         return repository.save(client);
     }
 
@@ -74,6 +82,8 @@ public class ClientController {
     public Client update(@RequestHeader(value="Authorization", required=false) String idToken, @RequestBody @Valid Client client) throws AuthenticationException {
     	securityManager.authorize(idToken, Constants.MANAGER);
         logger.info("Updating client " + client.getId());
+        updateInfoManager.set("clients");
+        client.setLastUpdatedToNow();
         return repository.save(client);
     }
 
@@ -97,8 +107,8 @@ public class ClientController {
         	shiftRepository.delete(shift.getId());
         }
         
-        List<ShiftRequest> shiftRequests = requestRepository.findByClientId(id);
-        for(ShiftRequest shiftRequest:shiftRequests) {
+        List<ClientRequest> shiftRequests = requestRepository.findByClientId(id);
+        for(ClientRequest shiftRequest:shiftRequests) {
         	requestRepository.delete(shiftRequest.getId());
         }
         
@@ -106,6 +116,9 @@ public class ClientController {
         for(CustomFieldData entry:customFieldData) {
         	customDataRepository.delete(entry.getId());
         }
+        
+        updateInfoManager.set("clients");
+        updateInfoManager.set("customFieldData");
         
 		return clients;
     }
@@ -121,6 +134,7 @@ public class ClientController {
 				
 				ObjectMapper objectMapper = new ObjectMapper();
 				Client client = objectMapper.readValue(jsonObject.toString(), Client.class);
+		        client.setLastUpdatedToNow();
 				repository.save(client);
 			}
 		} catch (JSONException e) {
@@ -136,6 +150,8 @@ public class ClientController {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+    	
+        updateInfoManager.set("clients");
     	
     	return json;
     }

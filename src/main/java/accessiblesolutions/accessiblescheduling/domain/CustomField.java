@@ -1,12 +1,16 @@
 package accessiblesolutions.accessiblescheduling.domain;
 
+import java.time.LocalDateTime;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import org.hibernate.annotations.GenericGenerator;
 
+import org.hibernate.annotations.GenericGenerator;
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CustomField {
@@ -24,13 +28,30 @@ public class CustomField {
     
     private boolean overrideable;
     
+    private String lastUpdated;
+    
+    
     public CustomField() {
     	clientVariable="";
     	employeeVariable="";
     	clientRequirement=false;
     	employeeRequirement=false;
     	overrideable=true;
+    	lastUpdated=null;
     }
+    
+	public String getLastUpdated() {
+		return lastUpdated;
+	}
+
+	@JsonIgnore
+	public void setLastUpdatedToNow() {
+    	setLastUpdated(LocalDateTime.now().toString());
+    }
+
+	public void setLastUpdated(String lastUpdated) {
+		this.lastUpdated = lastUpdated;
+	}
     
     public boolean getOverrideable(){
     	return overrideable;
@@ -82,6 +103,7 @@ public class CustomField {
 	public String toString() {
 		return "CustomField [id=" + id + ", clientVariable=" + clientVariable + ", employeeVariable=" + employeeVariable
 				+ ", clientRequirement=" + clientRequirement + ", employeeRequirement=" + employeeRequirement
-				+ ", overrideable=" + overrideable + "]";
+				+ ", overrideable=" + overrideable + ", lastUpdated=" + lastUpdated + "]";
 	}
+
 }

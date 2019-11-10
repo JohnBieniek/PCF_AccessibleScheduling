@@ -1,33 +1,29 @@
 package org.cloudfoundry.samples.music.managers;
-import java.time.DayOfWeek;
-
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.temporal.TemporalAdjuster;
-import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 
 import org.cloudfoundry.samples.music.repositories.mongodb.ScheduleStatusRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import accessiblesolutions.accessiblescheduling.constants.Constants;
 import accessiblesolutions.accessiblescheduling.domain.ClientRequest;
 import accessiblesolutions.accessiblescheduling.domain.Event;
-import accessiblesolutions.accessiblescheduling.domain.RecurringShiftNeed;
 import accessiblesolutions.accessiblescheduling.domain.ScheduleStatus;
 import accessiblesolutions.accessiblescheduling.domain.Shift;
-import accessiblesolutions.accessiblescheduling.domain.ShiftRequest;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
 import accessiblesolutions.accessiblescheduling.util.Util;
 
 @Component
 public class ShiftGenerationManager {
-	private static final Logger logger = LoggerFactory.getLogger(ShiftGenerationManager.class);
-    private CrudRepository<Event, String> eventRepository;//TODO switch to autowired
+	@Autowired
+    private CrudRepository<Event, String> eventRepository;
+	
+	@Autowired
     private CrudRepository<Shift, String> shiftCrud;
     
     @Autowired
@@ -40,45 +36,48 @@ public class ShiftGenerationManager {
     private ScheduleStatusRepository scheduleStatusRepository;    
     
     @Autowired
-    private CrudRepository<ShiftRequest, String> shiftRequestCrud;
-    private CrudRepository<ShiftRequest, String> shiftRequestRepository;    
-    private CrudRepository<RecurringShiftNeed, String> recurringShiftNeedRepository;    
+    private UpdateInfoManager updateInfoManager;
     
     @Autowired
-    public ShiftGenerationManager(CrudRepository<Event, String> eventRepository,CrudRepository<Shift, String> shiftCrud,
-    		CrudRepository<ShiftRequest, String> shiftRequestRepository, CrudRepository<RecurringShiftNeed, String> recurringShiftNeedRepository) {
-        this.eventRepository = eventRepository;
-        this.shiftCrud = shiftCrud;
-        this.shiftRequestRepository = shiftRequestRepository;
-        this.recurringShiftNeedRepository = recurringShiftNeedRepository;
+    ShiftAssignmentManager assignmentManager;
+    
+    public ShiftGenerationManager() {
     }
     
-    public String generateShifts(String selectedMonth,String selectedYear) throws NumberFormatException{
+    public String generateShifts(String selectedMonth,String selectedYear){
     	String response = "Generated ";
     	int shiftsGenerated = 0;
-    	Iterable<ClientRequest> requests = requestRepository.findAll();
-    	System.out.println("generating shifts for "+selectedMonth);
-    	for(ClientRequest request: requests) {
-    		try {
-				shiftsGenerated+=generateShiftsForRequest(request,selectedMonth,Integer.parseInt(selectedYear));
-			} catch (CorruptDataException e) {
-				e.printStackTrace();
-			} catch (ProccessingException e) {
-				e.printStackTrace();
-			}
-    	}
-    	System.out.println(response+shiftsGenerated);
     	
-    	ScheduleStatus status = scheduleStatusCrud.findOne(selectedMonth);
-    	
+    	ScheduleStatus status = assignmentManager.scheduleStatus(selectedMonth);
     	if(null==status) {
     		status= new ScheduleStatus();
     		status.setMonth(selectedMonth);
     	}
     	
-    	scheduleStatusRepository.deleteByMonth(selectedMonth);
-    	status.setGenerated(true);
-    	scheduleStatusCrud.save(status);
+    	if(!status.isGenerating() && !status.isGenerated() && !status.isAssigning() && !status.isAssigned() && !status.isStopped() && !status.isErrored()) {
+	    	scheduleStatusRepository.deleteByMonth(selectedMonth);
+	    	status.setGenerating(true);
+	    	scheduleStatusCrud.save(status);
+	        updateInfoManager.set(Constants.STATUS);
+
+	    	Iterable<ClientRequest> requests = requestRepository.findAll();
+	    	System.out.println("generating shifts for "+selectedMonth);
+	    	for(ClientRequest request: requests) {
+	    		try {
+					shiftsGenerated+=generateShiftsForRequest(request,selectedMonth,Integer.parseInt(selectedYear));
+				} catch (CorruptDataException e) {
+					e.printStackTrace();
+				} catch (ProccessingException e) {
+					e.printStackTrace();
+				}
+	    	}
+	    	System.out.println(response+shiftsGenerated);
+	    	status.setGenerating(false);
+	    	status.setGenerated(true);
+	    	scheduleStatusRepository.deleteByMonth(selectedMonth);
+	    	scheduleStatusCrud.save(status);
+	        updateInfoManager.set(Constants.STATUS);
+    	}
     	
     	return response+shiftsGenerated;
     }
@@ -315,149 +314,5 @@ public class ShiftGenerationManager {
     	shiftResponse+="~End Events~" + System.lineSeparator();
     	//TODO Set a flag saying shifts have been made for this event
     	return selectedMonth+shiftResponse;
-    }
-
-    public String generateRequestedShifts(String selectedMonth) throws CorruptDataException {
-    	String singleResponse = "";
-    	String recurringResponse = "";
-    	ScheduleStatus status = scheduleStatusCrud.findOne(selectedMonth);
-    	scheduleStatusRepository.deleteByMonth(selectedMonth);
-    	
-    	if(null==status) {
-    		status= new ScheduleStatus();
-    		status.setMonth(selectedMonth);
-    	}
-    	
-    	if(!status.isGenerated()) {
-    		status.setGenerated(true);
-        	scheduleStatusCrud.save(status);
-        	
-    		singleResponse = generateRequestedSingleShifts(selectedMonth);
-        	recurringResponse = generateRequestedRecurringShifts(selectedMonth);
-    	}
-    	
-    	return singleResponse+recurringResponse;
-    }
-    
-    public String generateRequestedSingleShifts(String selectedMonth) throws CorruptDataException {
-    	Iterable<ShiftRequest> requests = shiftRequestRepository.findAll();
-    	System.out.println("generating requested single shifts");
-    	ArrayList<Shift> shifts =new ArrayList<Shift>();  
-    	if(null!=requests && null!=selectedMonth){
-    		System.out.println(((ArrayList<ShiftRequest>)requests).size() + " single shift requests to consider for month "+selectedMonth);
-	    	for (ShiftRequest request : requests) {
-	    		//if(!request.isRequested()){
-	    			String startDate = null;
-		    		String month = null;
-		    		String year = null;
-		    		startDate = request.getStartDate();
-		    		if(null!=startDate){
-			    		String[] splitDate = startDate.split("-");
-			    		if(splitDate.length>1){
-			    			month = splitDate[1];
-			    			year=splitDate[0];
-			    		}
-			    		System.out.println("Checking if request is for this month" + year + " " + month + " " + request.toString());
-			    		if(Integer.parseInt(selectedMonth)==Integer.parseInt(month) ){//&& year.contains("2019")
-			    			System.out.println("Request confirmed to be for this month");
-			    			Shift shift = new Shift();
-			    			
-			    			shift.setEvent(false);
-			    			shift.setClientName(request.getClientName());
-			    			shift.setClientId(request.getClientId());
-			    			shift.setRequestedStaffId(request.getStaffId());
-			    			shift.setRequestedStaffName(request.getStaffName());
-			    			shift.setStartDate(request.getStartDate());
-			    			shift.setStartTime(request.getStartTime());
-			    			shift.setEndDate(request.getEndDate());
-			    			shift.setEndTime(request.getEndTime());
-			    			shift.setStartWeek(shift.getStartWeek());
-			    			shift.setStartMonth(Integer.parseInt(month));
-			    			shift.setStartYear(Integer.parseInt(splitDate[0]));
-			    			String creationReason = request.getClientName() + " requested a shift on ";
-			    			creationReason+= request.getStartDate() + " from "+request.getStartTime() + " to " +request.getEndTime();
-			    			shift.setCreationReason(creationReason);
-			    			shifts.add(shift);
-			    			
-//			    			request.setRequested(true);
-//			    			shiftRequestCrud.save(request);
-			    		}
-		    		}
-	    		//}
-	    	}
-    	}
-    	shiftCrud.save(shifts);
-    	return "Generated " + shifts.size() + " from single shift requests";
-    }
-    
-    public String generateRequestedRecurringShifts(String selectedMonth) throws CorruptDataException {
-    	Iterable<RecurringShiftNeed> requests = recurringShiftNeedRepository.findAll();
-    	ArrayList<Shift> shifts  =new ArrayList<Shift>();  
-    	if(null!=requests && null!=selectedMonth){
-	    	for (RecurringShiftNeed request : requests) {
-	    		logger.error("recurring shift requested for " + request.getClientName() + " on " + request.getStartDay() + ":" + request.getStartTime());
-	    		//TODO check if a shift has been generated for this request
-	    		//TODO check if a shift should be generated for this request
-	    		int startDay = Util.getDayInt(request.getStartDay());
-	    		int endDay = Util.getDayInt(request.getEndDay());
-	    		boolean overnight = startDay!=endDay;
-
-	    		LocalDate currentDay = LocalDate.of(2019, Integer.parseInt(selectedMonth), 01);
-	    		DayOfWeek monthStartDay = currentDay.getDayOfWeek();
-	    		
-	            TemporalAdjuster startAdj = TemporalAdjusters.next(DayOfWeek.of(startDay));
-	            TemporalAdjuster endAdj = TemporalAdjusters.next(DayOfWeek.of(endDay));
-	            
-	            ArrayList<LocalDate> startDates = new ArrayList<LocalDate>();
-	            ArrayList<LocalDate> endDates = new ArrayList<LocalDate>();
-	            if(monthStartDay ==DayOfWeek.of(startDay)){
-	            	startDates.add(currentDay);
-	            	if(!overnight){
-		            	endDates.add(currentDay);	            		
-	            	}
-	            	else{
-	            		endDates.add(currentDay.with(endAdj));
-	            	}
-	            }
-	            for(int i = 0; i< 5; i++){
-	            	currentDay = currentDay.with(startAdj);
-	            	if(currentDay.getMonth().getValue()==Integer.parseInt(selectedMonth)){
-	            		startDates.add(currentDay);
-	            		if(!overnight){
-			            	endDates.add(currentDay);	            		
-		            	}
-		            	else{
-		            		endDates.add(currentDay.with(endAdj));
-		            	}
-	            	}
-	            }
-
-	            logger.error(startDates.size() + " start dates for recurring shift");
-	            for(int i = 0; i < startDates.size();i++){
-	    			Shift shift = new Shift();
-	    			
-	    			shift.setRecurring(true);
-	    			shift.setClientName(request.getClientName());
-	    			shift.setClientId(request.getClientId());
-	    			shift.setRequestedStaffId(request.getStaffId());
-	    			shift.setRequestedStaffName(request.getStaffName());
-	    			shift.setStartDate(startDates.get(i).toString());
-	    			shift.setStartTime(request.getStartTime());
-	    			shift.setEndDate(endDates.get(i).toString());
-	    			shift.setEndTime(request.getEndTime());
-	    			shift.setStartWeek(shift.getStartWeek());
-	    			shift.setStartMonth(Integer.parseInt(selectedMonth));
-	    			shift.setStartYear(2019);//TODO update this to get the real value
-	    			String creationReason = request.getClientName() + " requested a reccurring shift every ";
-	    			creationReason+= request.getStartDay() + " from "+request.getStartTime() + " to " +request.getEndTime();
-	    			creationReason+= ". This is the #" + (i+1) + " shift for this request for month "+selectedMonth;
-	    			shift.setCreationReason(creationReason);
-	    			shifts.add(shift);
-	            }
-	    	}
-    	}
-    	shiftCrud.save(shifts);
-    	
-    	return " Generated " +shifts.size() + " from recurring shift requests";
     }
 }

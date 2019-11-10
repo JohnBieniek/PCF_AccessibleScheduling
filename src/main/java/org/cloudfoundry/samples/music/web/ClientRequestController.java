@@ -1,6 +1,7 @@
 package org.cloudfoundry.samples.music.web;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.security.sasl.AuthenticationException;
@@ -8,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.cloudfoundry.samples.music.managers.AccessibleSecurityManager;
+import org.cloudfoundry.samples.music.managers.UpdateInfoManager;
 import org.cloudfoundry.samples.music.repositories.mongodb.MongoClientRequestRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +28,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import accessiblesolutions.accessiblescheduling.constants.Constants;
-import accessiblesolutions.accessiblescheduling.domain.CallAuth;
 import accessiblesolutions.accessiblescheduling.domain.ClientRequest;
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
 
@@ -39,6 +40,9 @@ public class ClientRequestController {
     @Autowired
     private MongoClientRequestRepository mongoRepository;
 
+    @Autowired
+    private UpdateInfoManager updateInfoManager;
+    
 	@Autowired 
 	AccessibleSecurityManager securityManager;
 
@@ -49,10 +53,8 @@ public class ClientRequestController {
 
     @RequestMapping(method = RequestMethod.GET)
     public Iterable<ClientRequest> clientRequests(@RequestHeader(value="Authorization", required=false) String idToken) throws AuthenticationException {
-    	CallAuth auth = securityManager.authorize(idToken, Constants.MANAGER);
+    	securityManager.authorize(idToken, Constants.MANAGER);
 
-    	System.out.println(auth.toString());
-    	
     	return repository.findAll();
     }
     
@@ -82,9 +84,12 @@ public class ClientRequestController {
     public ClientRequest add(@RequestHeader(value="Authorization", required=false) String idToken, @RequestBody @Valid ClientRequest clientRequest) throws AuthenticationException {
     	securityManager.authorize(idToken, Constants.MANAGER);
     	logger.info("Adding clientRequest " + clientRequest.getId());
+    	clientRequest.setLastUpdatedToNow();
+        updateInfoManager.set("requests");
         return repository.save(clientRequest);
     }
 
+    //TODO put failed update in different http response
     @RequestMapping(method = RequestMethod.POST)
     public List<ClientRequest> update(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam String param) throws AuthenticationException {
     	securityManager.authorize(idToken, Constants.MANAGER);
@@ -94,7 +99,6 @@ public class ClientRequestController {
     	
     	try {
 			clientRequest = mapper.readValue(param, ClientRequest.class);
-			//clientRequest.generateDisplayValue();
 		} catch (JsonParseException e) {
 			e.printStackTrace();
 		} catch (JsonMappingException e) {
@@ -102,8 +106,13 @@ public class ClientRequestController {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-        repository.save(clientRequest);
-        
+    	
+    	if(clientRequest.isValid()) {
+    		clientRequest.setLastUpdatedToNow();
+	        repository.save(clientRequest);
+	        updateInfoManager.set("requests");
+    	}
+
         return mongoRepository.findByClientId(clientRequest.getClientId());
     }
 
@@ -117,7 +126,13 @@ public class ClientRequestController {
     @RequestMapping(value = "/set", method = RequestMethod.POST)
     public List<ClientRequest> set(@RequestHeader(value="Authorization", required=false) String idToken, @RequestBody List<ClientRequest> requests) throws AuthenticationException {
     	securityManager.authorize(idToken, Constants.ADMIN);
+    	
+    	for(ClientRequest request:requests) {
+    		request.setLastUpdatedToNow();
+    	}
+    	
     	repository.save(requests);
+    	updateInfoManager.set("requests");
     	
     	return requests;
     }

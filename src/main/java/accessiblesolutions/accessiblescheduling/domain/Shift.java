@@ -1,23 +1,22 @@
 package accessiblesolutions.accessiblescheduling.domain;
 
-import org.hibernate.annotations.GenericGenerator;
-import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-import accessiblesolutions.accessiblescheduling.domain.Employee;
-import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
-import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
-import accessiblesolutions.accessiblescheduling.util.Util;
-
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.temporal.TemporalAdjuster;
-import java.time.temporal.TemporalAdjusters;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+
+import org.hibernate.annotations.GenericGenerator;
+import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
+import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
+import accessiblesolutions.accessiblescheduling.util.Util;
 
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -57,6 +56,8 @@ public class Shift implements Comparable{
     private int startYear;
     
     private boolean weekend;
+    
+	private String lastUpdated;
     
     public Shift() {
     	assigned=false;
@@ -562,5 +563,23 @@ public class Shift implements Comparable{
 			e.printStackTrace();
 		}
 		return result;
+	}
+
+	public String getLastUpdated() {
+		return lastUpdated;
+	}
+
+	@JsonIgnore
+	public void setLastUpdatedToNow() {
+    	setLastUpdated(LocalDateTime.now().toString());
+    }
+	
+	@JsonIgnore
+	public LocalDateTime getLastUpdatedTime() {
+		return Util.getLocalDateTimeFromString(getLastUpdated());
+	}
+
+	public void setLastUpdated(String lastUpdated) {
+		this.lastUpdated = lastUpdated;
 	}
 }

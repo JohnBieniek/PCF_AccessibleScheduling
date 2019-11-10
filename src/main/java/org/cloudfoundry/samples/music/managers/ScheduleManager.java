@@ -1,6 +1,5 @@
 package org.cloudfoundry.samples.music.managers;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,19 +35,6 @@ public class ScheduleManager {
     		status.setMonth(month+"");
     		scheduleStatusCrud.save(status);
     	}
-    }
-    
-    public String generateShifts(String selectedMonth) throws CorruptDataException {
-    	String eventResponse = shiftGenerationManager.generateEventShifts(selectedMonth);
-    	String requestResponse = shiftGenerationManager.generateRequestedShifts(selectedMonth);
-    	
-    	return eventResponse + requestResponse;
-    }
-    
-    public String generateSingleShifts(String selectedMonth) throws CorruptDataException {
-    	String requestResponse = shiftGenerationManager.generateRequestedSingleShifts(selectedMonth);
-
-    	return requestResponse;
     }
     
     public Iterable<Shift> getEmployeeShiftsForWeek(String employeeId, String month, String day, String year) {

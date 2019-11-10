@@ -8,12 +8,14 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import accessiblesolutions.accessiblescheduling.util.Util;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
+import accessiblesolutions.accessiblescheduling.util.Util;
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ClientRequest {
@@ -39,11 +41,30 @@ public class ClientRequest {
     private String monthInterval;
     private String yearInterval;
     private String[] exceptions;
-
+    private String lastUpdated;
+    
     public ClientRequest() {
     }
 
-    
+
+	public String getLastUpdated() {
+		return lastUpdated;
+	}
+
+	@JsonIgnore
+	public void setLastUpdatedToNow() {
+    	setLastUpdated(LocalDateTime.now().toString());
+    }
+	
+	@JsonIgnore
+	public LocalDateTime getLastUpdatedTime() {
+		return Util.getLocalDateTimeFromString(getLastUpdated());
+	}
+
+	public void setLastUpdated(String lastUpdated) {
+		this.lastUpdated = lastUpdated;
+	}
+	
     public boolean isValid(){
     	boolean valid = true;
     	float duration = 0;
@@ -55,6 +76,9 @@ public class ClientRequest {
     	
     	try{
     		duration = getDuration();
+    		if(duration==0) {
+    			valid=false;
+    		}
     	}
     	catch(CorruptDataException e){
     		valid=false;
@@ -379,6 +403,8 @@ public class ClientRequest {
 				+ startDate + ", startTime=" + startTime + ", endDate=" + endDate + ", endTime=" + endTime
 				+ ", repeats=" + repeats + ", repeatsEvery=" + repeatsEvery + ", days=" + Arrays.toString(days)
 				+ ", interval=" + interval + ", monthInterval=" + monthInterval + ", yearInterval=" + yearInterval
-				+ ", exceptions=" + Arrays.toString(exceptions) + "]";
+				+ ", exceptions=" + Arrays.toString(exceptions) + ", lastUpdated=" + lastUpdated + "]";
 	}
+
+
 }

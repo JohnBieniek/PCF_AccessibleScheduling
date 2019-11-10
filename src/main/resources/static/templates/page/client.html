@@ -1,4 +1,4 @@
-<div ng-controller="MobileClientController" ng-init="listClients()">
+<div ng-controller="MobileClientController">
 	<div ng-if="user" style="display:inline-block;width:100%">
 	 	<div style="display:inline-block;width:25%">
 			<ul>
@@ -7,11 +7,11 @@
 			       		<p ng-click="newClient()"><span class="mycon glyphicon-plus"></span>&nbsp;New Client</p>
 			    	</div>
 		    	</div>
-				<div class="monthSelector" ng-init="init()">
-					<div ng-repeat="client in clients">
+				<div class="monthSelector">
+					<div ng-repeat="client in clients | orderBy: name">
 						<div class = "clientTab" ng-class="{ active: isClientSet(client) }">
 					    	<div>
-					       		<p ng-click="setClientAndInfo(client)">{{client.first}} {{client.initial}}</p>
+					       		<p ng-click="setClientAndInfo(client)">{{client.name}}</p>
 					    	</div>
 				    	</div>
 			    	</div>
@@ -37,7 +37,7 @@
 		    	</div>
 	    	</div>
 	    	<br>
-	    	<div ng-if="isSet('Schedule')" style="width:100%" ng-init="listShifts()">
+	    	<div ng-if="isSet('Schedule')" style="width:100%">
 	    		<div>
 	    			<div style="width:100%">
 	    				<div class="inline" style="margin-left:32%;width:40%;text-align: center;">
@@ -56,7 +56,10 @@
 		    		</div>
 		 			<div>
    						<div ng-repeat="day in displayDays">
-				    		<h4 class='weekDay rightAlign'>{{day}}</h4>
+							<h4 style="font-weight:700" class='weekDay rightAlign'>{{day}}</h4>
+				    		<div ng-if="noShiftDay(day)">
+				    			<span style="font-weight:400;margin-bottom: 15px;margin-top: -10px;" class='availableWeekDay rightAlign'>Unscheduled</span>
+				    		</div>
 				    		<div ng-repeat="shift in shifts">
 				    			<div ng-if="isDay(shift,day,displayWeek)" class = "shift">
 				    				<span ng-init="setShiftDisplay(shift)">{{shift.display}}</span>
@@ -68,21 +71,28 @@
    					</div>
 	    		</div>
 	    	</div>
-	    	<div ng-if="isSet('Requests')" ng-init="listRequests(client)">	    		
+	    	<div ng-if="isSet('Requests')">	    		
 			    <h2 class ="centered">Times this client needs help can be added and removed below.
-	  										Automated scheduling will generate shifts based on these requests monthly.<h2/>
- 	    		<h3 class ="inline" style="font-size:40px;font-weight:bold;margin-left:10px;color:#729fcf!important;"> Existing Requests</h3>
-	    		<button  class="inline rightAlign" style="font-size:30px;float:right; margin-right:20px;margin-top:20px;background-color:#6EB262;" ng-click="addRequest(client,employees)"><span class="glyphicon glyphicon-plus"></span>&nbsp;New Request</button>
-				<div ng-repeat="request in requests">
+	  										Automated scheduling will generate shifts based on these requests monthly.
+				</h2>
+				<br>
+	    		<button  class="inline rightAlign" style="font-size:30px;float:right; margin-right:20px;background-color:#6EB262;" ng-click="addRequest(client,employees)"><span class="glyphicon glyphicon-plus"></span>&nbsp;New Request</button>
+	    		<br>
+	    		<br>
+				<div ng-repeat="request in requests track by $index">
 					<div ng-init="setInitialDays(request)" class = "request">
-						<span ng-click="editRequest(request,client,employees)" style="display:inline-block;width:94%" ng-init="getDisplayValue(request)">{{request.displayValue}}</span>
+						<span ng-click="updateShiftRequest(client,request,employees)" style="display:inline-block;width:94%" ng-init="getDisplayValue(request)">{{request.displayValue}}</span>
 						<span ng-click="deleteShiftRequest(request)" style="display:inline-block;float:right" class="glyphicon inline red trash glyphicon-trash"></span>
 			    	</div>
 		    	</div>
 	    	</div>
 	    	<div ng-if="isSet('Details')" class = 'rightAlign'>
-	    		<form name="clientForm" ng-init="listCustomFields()" role="form" style="margin-right:3%">
+	    		<form name="clientForm" role="form" style="margin-right:3%">
 			        <div>
+			            <label for="first" class="inline" style="font-size:38px">Name</label>
+			            <input ng-change="setDetailsToChanged()" type="text" class="form-control inline input-large rightAlign nameInput" id="name" name="name" required ng-model="client.name">
+			        </div>
+<!-- 			        <div>
 			            <label for="first" class="inline" style="font-size:38px">First</label>
 			            <input ng-change="setDetailsToChanged()" type="text" class="form-control inline input-large rightAlign nameInput" id="first" name="first" required ng-model="client.first">
 			        </div>
@@ -91,7 +101,7 @@
 			            <label for="initial" class="inline" style="font-size:38px">Initial</label>
 			            <input ng-change="setDetailsToChanged()" type="text" class="inline form-control input-large rightAlign nameInput" id="initial" name="initial" ng-model="client.initial">
 			        </div>
-			        
+ -->			        
 			        <div>
 			            <label for="preferSigning" style="font-size:38px">Prefers Signing Staff</label>
 			            <input ng-change="setDetailsToChanged()" type="checkbox" id="preferSigning" name="preferSigning" style="height:20px;width:20px" ng-model="client.preferSigning">
@@ -126,9 +136,9 @@
 			            <input ng-change="setDetailsToChanged()"  type="checkbox" id="medPass" name="medPass" style="height:20px;width:20px" ng-model="client.medPass">
 			        </div>
 			        
-				    <div ng-if="customFieldDataEditing">
+				    <div ng-if="manager">
 				        <div ng-repeat="customField in customFields">
-			            	<div ng-init="getClientCustomFieldData(client,customField,$index)">
+			            	<div>
 			            		<label for="customField" style="font-size:38px">{{customField.clientVariable}}</label>
 			            		<input ng-change="setDetailsToChanged()" type="checkbox" id="customField" name="customField" style="height:20px;width:20px" ng-model="customValue[$index]">
 			            	</div>
@@ -144,10 +154,4 @@
 	    	</div>
 		 </div>
     </div>
-    
-    <script type="text/javascript" src="js/modal/ShiftModalController.js"></script>
-    <script type="text/javascript" src="js/modal/ClientModalController.js"></script>
-	<script type="text/javascript" src="js/modal/RequestModalController.js"></script>
-    <script type="text/javascript" src="js/component/shiftRequestTable.js"></script>
-    <script type="text/javascript" src="js/page/mobileClientPage.js"></script>
 </div>

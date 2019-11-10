@@ -9,7 +9,7 @@
 				<span ng-click="" style="display:inline-block">
 					Access requested: {{alert.name}}
 				</span>
-				<div ng-init="listEmployees()" style="float:right" class="inline rightAlign has-feedback" ng-class="{'has-warning': recurringShiftNeedForm.staffName.$invalid, 'has-success': recurringShiftNeedForm.staffName.$valid}">
+				<div style="float:right" class="inline rightAlign has-feedback" ng-class="{'has-warning': recurringShiftNeedForm.staffName.$invalid, 'has-success': recurringShiftNeedForm.staffName.$valid}">
 		            <label for="staffName" class="inline" style="font-size:25px">Staff Name</label>
 		            <select name="mySelect" 
 		                    id="mySelect"
@@ -17,20 +17,17 @@
 		                    style="font-size:23px"
 		                    ng-change="isValid(shift)"
 		                    ng-init = "selectedEmployee"
-		                    ng-options="employee.first for employee in employees | orderBy:'first' track by employee.id"
+		                    ng-options="employee.name for employee in employees | orderBy:'name' track by employee.id"
 		                    ng-model="selectedEmployee"
-		                    ng-value="{{employee.first}}">
-		                {{employee.first}}
+		                    ng-value="{{employee.name}}">
+		                {{employee.name}}
 		            </select>
 		            <span ng-click="assignSelectedEmployee(alert,selectedEmployee)" style="font-size:23px" class="inline green glyphicon glyphicon-ok"></span>                  
    		            <span ng-click="deleteAlert(alert)" style="font-size:23px;margin-left:10px" class="inline red glyphicon glyphicon-trash"></span>                    
 		            <input type="text" ng-hide="true" id="staffId" name="staffId" ng-model="shift.staffId" ng-value="shift.staffId=selectedEmployee.id">
-		            <input type="text" ng-hide="true" id="staffName" name="staffName" ng-model="shift.staffName" ng-value="shift.staffName=selectedEmployee.first">
+		            <input type="text" ng-hide="true" id="staffName" name="staffName" ng-model="shift.staffName" ng-value="shift.staffName=selectedEmployee.name">
 		        </div>
 			</div>
 		</div>
     </div>
-    
-    <script type="text/javascript" src="js/page/alertsPage.js"></script>
-    <script type="text/javascript" src="js/page/mobileEmployeePage.js"></script>
 </div>

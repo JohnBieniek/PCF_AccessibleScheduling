@@ -4,9 +4,10 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
-import accessiblesolutions.accessiblescheduling.domain.RecurringShiftNeed;
+import accessiblesolutions.accessiblescheduling.domain.Session;
 
 @Repository
 @Profile("mongodb")
-public interface MongoRecurringShiftNeedRepository extends MongoRepository<RecurringShiftNeed, String> {
+public interface MongoSessionRepository extends MongoRepository<Session, String> {
+	Session findByToken(String token);
 }
