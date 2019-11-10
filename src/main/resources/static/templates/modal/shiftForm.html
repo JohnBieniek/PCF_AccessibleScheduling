@@ -46,6 +46,11 @@
 	            <input style="font-size:23px" type="time"  ng-change="isValid(shift)" ng-model="shift.endTime" required>
 	        </div>
         </div>
+        
+        <div>
+        	<h3>Notes:</h3>
+        	<textarea ng-change="isValid(shift)" ng-model="shift.employeeNotes" rows="7" cols="75"/>
+        </div>
     </form>
 </div>
 <div class="modal-footer">

@@ -204,8 +204,10 @@ public class ScheduleController {
 	    			JSONObject updateRequest = (JSONObject)jsonObject.get(key);
 					
 				    UpdateInfo updateInfo = updateInfoRepository.findOne(key);//Get information about when this data was last updated on server
-				    
-				    System.out.println("key:"+key+" | server has tableLastUpdated:"+updateInfo.getTime().toString());
+			    	if(updateInfo==null || updateInfo.getTime()==null) {//Update if it doesn't exist. Required for first time setup
+			    		updateInfoManager.set(key);
+			    		updateInfo = updateInfoRepository.findOne(key);
+			    	}
 				    
 				    //Get information about when this data was last updated on the clients side
 				    if(updateRequest.has("tableLastUpdated")){
@@ -327,12 +329,6 @@ public class ScheduleController {
 				     	}
 				    }
 				    
-				    //TODO consider removing
-			    	if(updateInfo==null || updateInfo.getTime()==null) {
-			    		updateInfoManager.set(key);
-			    		updateInfo = updateInfoRepository.findOne(key);
-			    	}
-			    	
 				    if(tableLastUpdated == null || updateInfo.getTime().isAfter(tableLastUpdated)) {
 						switch(key)
 						{

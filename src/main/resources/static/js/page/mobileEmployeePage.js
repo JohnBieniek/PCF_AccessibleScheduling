@@ -472,6 +472,15 @@ function MobileEmployeeController($scope, $modal, $http) {
 		shift.displayValue+=" with "+shift.clientName;
 		 
 		 shift.displayValue+= ".";
+		 
+		 if(shift.employeeNotes){
+			 if(shift.employeeNotes.length>20){
+				 shift.displayValue+=shift.employeeNotes.substr(0,20)+"..."				 
+			 }
+			 else{
+				 shift.displayValue+=shift.employeeNotes;
+			 }
+		 }
     }
      
 	$scope.isSet = function(tabNum){
