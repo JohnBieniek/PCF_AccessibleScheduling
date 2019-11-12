@@ -431,6 +431,31 @@ function MobileEmployeeController($scope, $modal, $http) {
     }
      
      /**
+      * Shows/hides the note on a shift for a user. Does not function for admin/manager as they can see this in the edit screen.
+      */
+     $scope.toggleEmployeeNote = function(shift){
+    	 shift.displayEmployeeNote= shift.displayEmployeeNote?false:true;    		 
+    	 console.log("shift.displayEmployeeNote",shift.displayEmployeeNote);
+     }
+     
+     /**
+      * Sets the initial value to each note to hidden for every shift as the info is requested.
+      * Returns if we should show the note on screen for the current shift at this moment
+      */
+     $scope.displayEmployeeNote = function(shift){
+    	 if(typeof shift != "undefined"){
+    		 if(typeof shift.displayEmployeeNote == "undefined"){
+    			 shift.displayEmployeeNote=false;
+    		 }
+    		 
+        	 return shift.displayEmployeeNote;
+    	 }
+    	 else{
+    		 return false;
+    	 }
+     }
+     
+     /**
 		 * Updates the provided object with .displayValue containing a human
 		 * readable string of what this shift is for. Differs from the client
 		 * version in its description of who this is for.
@@ -473,9 +498,9 @@ function MobileEmployeeController($scope, $modal, $http) {
 		 
 		 shift.displayValue+= ".";
 		 
-		 if(shift.employeeNotes){
+		 if(shift.employeeNotes && ($scope.manager || $scope.admin)){
 			 if(shift.employeeNotes.length>20){
-				 shift.displayValue+=shift.employeeNotes.substr(0,20)+"..."				 
+				 shift.displayValue+=shift.employeeNotes.substr(0,20)+" ..."				 
 			 }
 			 else{
 				 shift.displayValue+=shift.employeeNotes;

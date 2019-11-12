@@ -76,8 +76,15 @@
 				    		</div>
 				    		<div ng-repeat="shift in shifts">
 				    			<div ng-if="isDay(shift,day,displayWeek)" class = "shift">
-				    				<span ng-init="setShiftDisplay(shift)">{{shift.display}}</span>
-									<span ng-click="editShift(shift,employee,clients)" style="display:inline-block;width:100%" ng-init="getShiftDisplayValue(shift)">
+									<span  ng-if="!admin && !manager && shift.employeeNotes" ng-click="toggleEmployeeNote(shift)" style="display:inline-block;float:left" class="glyphicon inline green trash glyphicon-pencil"></span>
+									<span ng-if="!admin && !manager"  ng-init="setShiftDisplay(shift)" ng-click="editShift(shift,employee,clients)" style="width:94%" ng-init="getShiftDisplayValue(shift)">
+										{{shift.displayValue}}
+									</span>
+									<span ng-if="displayEmployeeNote(shift)"  style="display:inline-block">
+										{{shift.employeeNotes}}
+									</span>
+									
+									<span ng-init="setShiftDisplay(shift)" ng-if="admin || manager" ng-click="editShift(shift,employee,clients)" style="display:inline-block;width:100%" ng-init="getShiftDisplayValue(shift)">
 										{{shift.displayValue}}
 									</span>
 								</div>
@@ -160,17 +167,6 @@
 			            <label for="first" class="inline employeeDetails" >Name</label>
 			            <input ng-change="setDetailsToChanged()" type="text" class="form-control inline input-large rightAlign nameInput" id="name" name="name" required ng-model="employee.name">
 			        </div>
-			        
-			        <!-- <div>
-			            <label for="first" class="inline employeeDetails" >First</label>
-			            <input ng-change="setDetailsToChanged()" type="text" class="form-control inline input-large rightAlign nameInput" id="first" name="first" required ng-model="employee.first">
-			        </div>
-			        
-			        <div>
-			            <label for="initial" class="inline employeeDetails">Initial</label>
-			            <input ng-change="setDetailsToChanged()" type="text" class="inline form-control input-large rightAlign nameInput" id="initial" name="initial"  ng-model="employee.initial">
-			        </div>
-			    --> 
   				     <div ng-if="admin">
 			        	<div style="display:inline-block">
 				        	<label for="gender" class="employeeDetails">Role:</label>
