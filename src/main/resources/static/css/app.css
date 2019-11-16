@@ -90,11 +90,17 @@ html,body
 	color: #6a0000;
 }
 .purple{
+	color: #794B6B;
+}
+.purpleBackground{
 	background-color: #794B6B;
 	border-color: #794B6B;
 }
 .green{
 	color: #6EB262;
+}
+.blue{
+	color: #729fcf;
 }
 .greenBackground{
 	background-color: #6EB262;

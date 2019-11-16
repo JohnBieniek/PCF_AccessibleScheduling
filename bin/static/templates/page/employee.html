@@ -76,13 +76,14 @@
 				    		</div>
 				    		<div ng-repeat="shift in shifts">
 				    			<div ng-if="isDay(shift,day,displayWeek)" class = "shift">
-									<span  ng-if="!admin && !manager && shift.employeeNotes" ng-click="toggleEmployeeNote(shift)" style="display:inline-block;float:left" class="glyphicon inline green trash glyphicon-pencil"></span>
+									<span  ng-if="!admin && !manager && shift.employeeNotes && !displayEmployeeNote(shift)" ng-click="toggleEmployeeNote(shift)" style="display:inline-block;float:left" class="glyphicon inline purple trash glyphicon-chevron-down"></span>
+									<span  ng-if="!admin && !manager && shift.employeeNotes && displayEmployeeNote(shift)" ng-click="toggleEmployeeNote(shift)" style="display:inline-block;float:left" class="glyphicon inline blue trash glyphicon-chevron-up"></span>
 									<span ng-if="!admin && !manager"  ng-init="setShiftDisplay(shift)" ng-click="editShift(shift,employee,clients)" style="width:94%" ng-init="getShiftDisplayValue(shift)">
 										{{shift.displayValue}}
 									</span>
-									<span ng-if="displayEmployeeNote(shift)"  style="display:inline-block">
+									<p ng-if="displayEmployeeNote(shift)">
 										{{shift.employeeNotes}}
-									</span>
+									</p>
 									
 									<span ng-init="setShiftDisplay(shift)" ng-if="admin || manager" ng-click="editShift(shift,employee,clients)" style="display:inline-block;width:100%" ng-init="getShiftDisplayValue(shift)">
 										{{shift.displayValue}}

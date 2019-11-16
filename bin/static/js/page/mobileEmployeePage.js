@@ -491,7 +491,12 @@ function MobileEmployeeController($scope, $modal, $http) {
 	 	if(endMinute<10){
 	 		endMinute="0"+endMinute
 	 	}
-        shift.displayValue = (startHour!=0?startHour:"12")+":"+startMinute+startModifier+"-";
+		if(shift.employeeNotes && !$scope.manager && !$scope.admin){//Add an extra space at front for users with note due to icon in front
+	        shift.displayValue = " "+(startHour!=0?startHour:"12")+":"+startMinute+startModifier+"-";
+		}
+		else{
+	        shift.displayValue = (startHour!=0?startHour:"12")+":"+startMinute+startModifier+"-";
+		}
         shift.displayValue += (endHour!=0?endHour:"12")+":"+endMinute+endModifier;
 		 
 		shift.displayValue+=" with "+shift.clientName;
