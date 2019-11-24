@@ -1,7 +1,7 @@
-package accessiblesolutions.accessiblescheduling.to;
+package accessiblescheduling.to;
 
-import accessiblesolutions.accessiblescheduling.domain.Shift;
-import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
+import accessiblescheduling.domain.Shift;
+import accessiblescheduling.exception.CorruptDataException;
 
 public class ShiftIssueTO {
     private Shift shift=null;    

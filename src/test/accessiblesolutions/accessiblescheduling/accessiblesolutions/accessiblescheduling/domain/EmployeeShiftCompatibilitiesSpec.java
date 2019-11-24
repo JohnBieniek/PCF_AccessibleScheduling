@@ -6,6 +6,11 @@ import static org.junit.Assert.assertNull;
 import java.util.ArrayList;
 
 import org.junit.Test;
+
+import accessiblescheduling.domain.Employee;
+import accessiblescheduling.domain.Shift;
+import accessiblescheduling.to.EmployeeShiftCompatibilities;
+import accessiblescheduling.to.EmployeeShiftCompatibility;
 public class EmployeeShiftCompatibilitiesSpec {
 	@Test
 	public void emptyConstructorInitializesNoVariables() {

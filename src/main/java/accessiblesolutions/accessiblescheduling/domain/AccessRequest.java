@@ -1,4 +1,4 @@
-package accessiblesolutions.accessiblescheduling.domain;
+package accessiblescheduling.domain;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;

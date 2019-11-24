@@ -1,4 +1,4 @@
-package accessiblesolutions.accessiblescheduling.domain;
+package accessiblescheduling.domain;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -22,10 +22,11 @@ import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.J
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
-import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
-import accessiblesolutions.accessiblescheduling.to.Availability;
-import accessiblesolutions.accessiblescheduling.util.Util;
+import accessiblescheduling.exception.CorruptDataException;
+import accessiblescheduling.exception.ProccessingException;
+import accessiblescheduling.to.Availability;
+import accessiblescheduling.to.Gender;
+import accessiblescheduling.util.Util;
 
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)

@@ -1,4 +1,4 @@
-package accessiblesolutions.accessiblescheduling.exception;
+package accessiblescheduling.exception;
 
 public class CorruptDataException extends Exception {
 	private static final long serialVersionUID = 1L;

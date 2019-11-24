@@ -1,4 +1,4 @@
-package accessiblesolutions.accessiblescheduling.to;
+package accessiblescheduling.to;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;

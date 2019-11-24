@@ -2,6 +2,8 @@ package accessiblesolutions.accessiblescheduling.domain;
 
 import org.junit.Test;
 
+import accessiblescheduling.domain.CustomFieldData;
+
 import static org.junit.Assert.*;
 public class CustomFieldDataSpec {
 	@Test

@@ -1,4 +1,4 @@
-package accessiblesolutions.accessiblescheduling.util;
+package accessiblescheduling.util;
 
 public @interface Failing {
 

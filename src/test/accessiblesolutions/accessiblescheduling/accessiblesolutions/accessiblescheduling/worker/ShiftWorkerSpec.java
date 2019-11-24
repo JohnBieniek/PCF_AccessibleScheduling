@@ -12,10 +12,11 @@ import java.util.HashMap;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import accessiblesolutions.accessiblescheduling.domain.Shift;
-import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
-import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
-import accessiblesolutions.accessiblescheduling.util.Util;
+import accessiblescheduling.domain.Shift;
+import accessiblescheduling.exception.CorruptDataException;
+import accessiblescheduling.exception.ProccessingException;
+import accessiblescheduling.util.Util;
+import accessiblescheduling.worker.ShiftWorker;
 
 public class ShiftWorkerSpec {
 	@Test

@@ -1,4 +1,4 @@
-package accessiblesolutions.accessiblescheduling.domain;
+package accessiblescheduling.domain;
 
 import java.time.LocalDateTime;
 

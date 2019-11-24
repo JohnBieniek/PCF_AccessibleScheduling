@@ -1,4 +1,4 @@
-package accessiblesolutions.accessiblescheduling.domain;
+package accessiblescheduling.domain;
 
 import java.time.LocalDateTime;
 
@@ -14,7 +14,7 @@ import org.hibernate.annotations.GenericGenerator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import accessiblesolutions.accessiblescheduling.util.Util;
+import accessiblescheduling.util.Util;
 @Entity
 @JsonIgnoreProperties
 public class Client implements Comparable<Client>{

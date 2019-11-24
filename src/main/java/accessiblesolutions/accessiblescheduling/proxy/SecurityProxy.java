@@ -1,4 +1,4 @@
-package accessiblesolutions.accessiblescheduling.proxy;
+package accessiblescheduling.proxy;
 
 import javax.security.sasl.AuthenticationException;
 
@@ -7,7 +7,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import accessiblesolutions.accessiblescheduling.domain.User;
+import accessiblescheduling.to.User;
 
 @Component
 public class SecurityProxy {

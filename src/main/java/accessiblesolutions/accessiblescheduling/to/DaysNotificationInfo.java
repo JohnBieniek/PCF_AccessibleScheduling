@@ -1,8 +1,8 @@
-package accessiblesolutions.accessiblescheduling.to;
+package accessiblescheduling.to;
 
 import java.time.LocalDate;
 
-import accessiblesolutions.accessiblescheduling.domain.Shift;
+import accessiblescheduling.domain.Shift;
 
 public class DaysNotificationInfo {
 	private LocalDate date;

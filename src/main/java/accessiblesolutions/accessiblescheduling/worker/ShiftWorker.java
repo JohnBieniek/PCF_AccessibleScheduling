@@ -1,14 +1,14 @@
-package accessiblesolutions.accessiblescheduling.worker;
+package accessiblescheduling.worker;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.springframework.stereotype.Component;
 
-import accessiblesolutions.accessiblescheduling.domain.Shift;
-import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
-import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
-import accessiblesolutions.accessiblescheduling.util.Util;
+import accessiblescheduling.domain.Shift;
+import accessiblescheduling.exception.CorruptDataException;
+import accessiblescheduling.exception.ProccessingException;
+import accessiblescheduling.util.Util;
 @Component
 public final class ShiftWorker {
     public static ArrayList<Shift> assignRequestedStaff(HashMap<String, ArrayList<Shift>> prestaffedShiftsPerEmployee) throws ProccessingException {

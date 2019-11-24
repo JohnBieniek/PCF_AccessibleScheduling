@@ -1,4 +1,4 @@
-package accessiblesolutions.accessiblescheduling.to;
+package accessiblescheduling.to;
 
 public class ScheduleOptions {
 	private String month;

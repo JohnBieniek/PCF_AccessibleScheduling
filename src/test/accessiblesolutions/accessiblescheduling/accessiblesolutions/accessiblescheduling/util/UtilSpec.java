@@ -14,10 +14,11 @@ import java.util.ArrayList;
 import org.json.JSONArray;
 import org.junit.Test;
 
-import accessiblesolutions.accessiblescheduling.domain.Client;
-import accessiblesolutions.accessiblescheduling.domain.Employee;
-import accessiblesolutions.accessiblescheduling.domain.Event;
-import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
+import accessiblescheduling.domain.Client;
+import accessiblescheduling.domain.Employee;
+import accessiblescheduling.domain.Event;
+import accessiblescheduling.exception.ProccessingException;
+import accessiblescheduling.util.Util;
 
 public class UtilSpec {
 	@Test

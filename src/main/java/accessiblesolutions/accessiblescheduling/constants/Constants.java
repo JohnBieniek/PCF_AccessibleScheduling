@@ -1,4 +1,4 @@
-package accessiblesolutions.accessiblescheduling.constants;
+package accessiblescheduling.constants;
 
 public abstract class Constants {
 	public static final String DATA_TYPE="dataType";

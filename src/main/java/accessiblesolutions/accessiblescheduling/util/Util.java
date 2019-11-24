@@ -1,4 +1,4 @@
-package accessiblesolutions.accessiblescheduling.util;
+package accessiblescheduling.util;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -9,10 +9,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import accessiblesolutions.accessiblescheduling.domain.Client;
-import accessiblesolutions.accessiblescheduling.domain.Employee;
-import accessiblesolutions.accessiblescheduling.domain.Event;
-import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
+import accessiblescheduling.domain.Client;
+import accessiblescheduling.domain.Employee;
+import accessiblescheduling.domain.Event;
+import accessiblescheduling.exception.ProccessingException;
 
 public abstract class Util {
 	//For use inside proccessingException throwing determination

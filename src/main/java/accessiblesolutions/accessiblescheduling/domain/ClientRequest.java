@@ -1,4 +1,4 @@
-package accessiblesolutions.accessiblescheduling.domain;
+package accessiblescheduling.domain;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -14,8 +14,8 @@ import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.J
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
-import accessiblesolutions.accessiblescheduling.util.Util;
+import accessiblescheduling.exception.CorruptDataException;
+import accessiblescheduling.util.Util;
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ClientRequest {

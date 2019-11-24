@@ -1,4 +1,4 @@
-package accessiblesolutions.accessiblescheduling.to;
+package accessiblescheduling.to;
 
 public class UpdateTO {
     private String id="default";    

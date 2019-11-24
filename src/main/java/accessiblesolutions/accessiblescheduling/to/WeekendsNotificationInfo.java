@@ -1,4 +1,4 @@
-package accessiblesolutions.accessiblescheduling.to;
+package accessiblescheduling.to;
 
 public class WeekendsNotificationInfo extends Weekend{
 	private String displayInfo ="what weekend this is";

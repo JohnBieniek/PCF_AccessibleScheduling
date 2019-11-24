@@ -1,8 +1,6 @@
 package accessiblesolutions.accessiblescheduling.managers;
 
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
@@ -11,38 +9,29 @@ import java.util.ArrayList;
 
 import javax.annotation.Resource;
 
-import org.cloudfoundry.samples.music.managers.CustomDataManager;
-import org.cloudfoundry.samples.music.managers.EmployeeClientCompatibilityManager;
-import org.cloudfoundry.samples.music.managers.EmployeeShiftCompatibilityManager;
-import org.cloudfoundry.samples.music.managers.EmployeeShiftManager;
-import org.cloudfoundry.samples.music.managers.EmployeeShiftMapManager;
-import org.cloudfoundry.samples.music.managers.ShiftGenerationManager;
-import org.cloudfoundry.samples.music.managers.ShiftManager;
-import org.cloudfoundry.samples.music.repositories.mongodb.MongoClientRepository;
-import org.cloudfoundry.samples.music.repositories.mongodb.MongoCustomFieldDataRepository;
-import org.cloudfoundry.samples.music.repositories.mongodb.MongoShiftRepository;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.repository.CrudRepository;
 
-import accessiblesolutions.accessiblescheduling.constants.Constants;
-import accessiblesolutions.accessiblescheduling.domain.Client;
-import accessiblesolutions.accessiblescheduling.domain.CustomField;
-import accessiblesolutions.accessiblescheduling.domain.CustomFieldData;
-import accessiblesolutions.accessiblescheduling.domain.Employee;
-import accessiblesolutions.accessiblescheduling.domain.EmployeeShiftCompatibilities;
-import accessiblesolutions.accessiblescheduling.domain.EmployeeShiftCompatibility;
-import accessiblesolutions.accessiblescheduling.domain.Gender;
-import accessiblesolutions.accessiblescheduling.domain.Shift;
-import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
-import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
+import accessiblescheduling.domain.Client;
+import accessiblescheduling.domain.CustomField;
+import accessiblescheduling.domain.CustomFieldData;
+import accessiblescheduling.domain.Employee;
+import accessiblescheduling.domain.Shift;
+import accessiblescheduling.exception.CorruptDataException;
+import accessiblescheduling.exception.ProccessingException;
+import accessiblescheduling.manager.CustomDataManager;
+import accessiblescheduling.manager.EmployeeShiftCompatibilityManager;
+import accessiblescheduling.manager.EmployeeShiftManager;
+import accessiblescheduling.manager.EmployeeShiftMapManager;
+import accessiblescheduling.manager.ShiftGenerationManager;
+import accessiblescheduling.manager.ShiftManager;
+import accessiblescheduling.repositories.mongodb.MongoCustomFieldDataRepository;
+import accessiblescheduling.repositories.mongodb.MongoShiftRepository;
 
 //@RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)

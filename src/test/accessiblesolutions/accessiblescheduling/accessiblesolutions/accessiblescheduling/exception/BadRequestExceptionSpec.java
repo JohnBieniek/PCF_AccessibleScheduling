@@ -1,10 +1,12 @@
 package accessiblesolutions.accessiblescheduling.exception;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
 
-import accessiblesolutions.accessiblescheduling.domain.Shift;
+import accessiblescheduling.domain.Shift;
+import accessiblescheduling.exception.BadRequestException;
 public class BadRequestExceptionSpec {
 	@Test
 	public void constructorInitializesNoVariables() {

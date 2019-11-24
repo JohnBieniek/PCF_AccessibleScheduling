@@ -109,7 +109,3 @@ jar {
     baseName = "spring-music"
     version = "" // omit the version from the war file name
 }
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '1.10'
-}

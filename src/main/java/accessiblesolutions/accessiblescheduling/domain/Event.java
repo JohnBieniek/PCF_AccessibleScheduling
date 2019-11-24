@@ -1,8 +1,8 @@
-package accessiblesolutions.accessiblescheduling.domain;
+package accessiblescheduling.domain;
 
 import org.hibernate.annotations.GenericGenerator;
 
-import accessiblesolutions.accessiblescheduling.domain.Employee;
+import accessiblescheduling.domain.Employee;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
