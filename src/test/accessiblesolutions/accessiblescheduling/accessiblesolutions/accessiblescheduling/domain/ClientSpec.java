@@ -13,8 +13,7 @@ public class ClientSpec {
 		
 		assertTrue(null==emptyClient.getId());
 		
-		assertTrue(null==emptyClient.getFirst());
-		assertTrue(null==emptyClient.getInitial());
+		assertTrue(""==emptyClient.getName());
 		
 		assertTrue(null==emptyClient.getFavoriteStaffId());
 		
@@ -32,30 +31,6 @@ public class ClientSpec {
 		assertFalse(emptyClient.getFixedSchedule());
 	}
 	
-	@Test
-	public void constructorInitializesVariables() {
-		Client client = new Client("Test","U");
-		
-		assertTrue(null==client.getId());
-		
-		assertTrue("Test"==client.getFirst());
-		assertTrue("U"==client.getInitial());
-		
-		assertTrue(null==client.getFavoriteStaffId());
-		
-		assertFalse(client.getOwnsCats());
-		assertFalse(client.getNoSmokers());
-		
-		assertFalse(client.getNoMaleStaff());
-		assertFalse(client.getNoFemaleStaff());
-		
-		assertFalse(client.getPreferSigning());
-		assertFalse(client.getSigningOnly());
-		
-		assertFalse(client.getMedPass());
-		
-		assertFalse(client.getFixedSchedule());
-	}
 	
 	@Test
 	public void setersUpdateVariables() {
@@ -66,14 +41,6 @@ public class ClientSpec {
 		assertTrue(null==client.getId());
 		client.setId(sampleString1);
 		assertTrue(sampleString1.equals(client.getId()));
-		
-		assertTrue(null==client.getFirst());
-		client.setFirst(sampleString1);
-		assertTrue(sampleString1.equals(client.getFirst()));
-		
-		assertTrue(null==client.getInitial());
-		client.setInitial(sampleString1);
-		assertTrue(sampleString1.equals(client.getInitial()));
 		
 		assertTrue(null==client.getFavoriteStaffId());
 		client.setFavoriteStaffId(sampleString1);

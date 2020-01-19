@@ -808,7 +808,7 @@ public class ScheduleController {
     	
     	Client client =new Client();
     	
-    	client.setFirst("A client");
+    	client.setName("A client");
     	
         clientRepository.save(client);
 

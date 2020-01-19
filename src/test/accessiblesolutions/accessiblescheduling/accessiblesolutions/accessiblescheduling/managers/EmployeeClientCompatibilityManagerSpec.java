@@ -225,7 +225,7 @@ public class EmployeeClientCompatibilityManagerSpec {
 		onAlwaysData.setOwnerId("onAlways");
 		onAlwaysData.setCustomFieldId("woodId");
 		
-		Client onAlwaysClient = new Client("On","AlwaysClient");
+		Client onAlwaysClient = new Client();
 		onAlwaysClient.setId("onAlwaysClient");
 		CustomFieldData onAlwaysClientData = new CustomFieldData();
 		onAlwaysClientData.setOwnerId("onAlwaysClient");
@@ -653,7 +653,7 @@ public class EmployeeClientCompatibilityManagerSpec {
 		
 		when(employeeCrud.findOne("onAlways")).thenReturn(onAlways);
 
-		Client onAlwaysClient = new Client("On","AlwaysClient");
+		Client onAlwaysClient = new Client();
 		onAlwaysClient.setId("onAlwaysClient");
 		CustomFieldData onAlwaysClientData = new CustomFieldData();
 		onAlwaysClientData.setOwnerId("onAlwaysClient");
@@ -706,7 +706,7 @@ public class EmployeeClientCompatibilityManagerSpec {
 		
 		when(employeeCrud.findOne("onAlways")).thenReturn(onAlways);
 
-		Client onAlwaysClient = new Client("On","AlwaysClient");
+		Client onAlwaysClient = new Client();
 		onAlwaysClient.setId("onAlwaysClient");
 		CustomFieldData onAlwaysClientData = new CustomFieldData();
 		onAlwaysClientData.setOwnerId("onAlwaysClient");
@@ -759,7 +759,7 @@ public class EmployeeClientCompatibilityManagerSpec {
 		
 		when(employeeCrud.findOne("onAlways")).thenReturn(onAlways);
 
-		Client onAlwaysClient = new Client("On","AlwaysClient");
+		Client onAlwaysClient = new Client();
 		onAlwaysClient.setId("onAlwaysClient");
 		CustomFieldData onAlwaysClientData = new CustomFieldData();
 		onAlwaysClientData.setOwnerId("onAlwaysClient");
@@ -812,7 +812,7 @@ public class EmployeeClientCompatibilityManagerSpec {
 		
 		when(employeeCrud.findOne("onAlways")).thenReturn(onAlways);
 
-		Client onAlwaysClient = new Client("On","AlwaysClient");
+		Client onAlwaysClient = new Client();
 		onAlwaysClient.setId("onAlwaysClient");
 		CustomFieldData onAlwaysClientData = new CustomFieldData();
 		onAlwaysClientData.setOwnerId("onAlwaysClient");

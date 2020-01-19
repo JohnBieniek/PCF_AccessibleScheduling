@@ -21,12 +21,10 @@ public class Client implements Comparable<Client>{
     @Id
     @Column(length=40)
     @GeneratedValue(generator="randomId")
-    @GenericGenerator(name="randomId", strategy="org.cloudfoundry.samples.music.domain.RandomIdGenerator")
+    @GenericGenerator(name="randomId", strategy="accessiblescheduling.util.RandomIdGenerator")
     private String id;
 
     private String name;
-    private String first;//Deprecated
-    private String initial;//Deprecated
     private String favoriteStaffId;
     private boolean ownsCats;
     private boolean noSmokers;
@@ -45,10 +43,6 @@ public class Client implements Comparable<Client>{
     	setLastUpdated(LocalDateTime.now().toString());
     }
 
-	public Client(String first, String initial) {
-        this.first = first;
-        this.initial = initial;
-    }
 	
 	@JsonIgnore
 	public LocalDateTime lastUpdatedTime() {
@@ -61,9 +55,6 @@ public class Client implements Comparable<Client>{
 		if(name!=null && name!="") {
 			json.put("name", this.name);
 		}
-		else {
-			json.put("name", this.first + " "+ this.initial);
-		}
 		json.put("id", id);
 		
 		return json;
@@ -71,7 +62,7 @@ public class Client implements Comparable<Client>{
 	
 	@Override
 	public int compareTo(Client client) {
-		return getFirst().toLowerCase().compareTo(client.getFirst().toLowerCase());
+		return getName().toLowerCase().compareTo(client.getName().toLowerCase());
 	}
 
 	public String getName() {
@@ -79,10 +70,6 @@ public class Client implements Comparable<Client>{
 		if(name!=null && name!="") {
 			employeeName=name;
 		}
-		else {
-			employeeName =  this.first + " "+ this.initial;
-		}
-		
 		return employeeName;
 	}
     public String getId() {
@@ -93,21 +80,6 @@ public class Client implements Comparable<Client>{
         this.id = id;
     }
 
-    public String getFirst() {
-        return first;
-    }
-
-    public void setFirst(String first) {
-        this.first = first;
-    }
-
-    public String getInitial() {
-        return initial;
-    }
-
-    public void setInitial(String initial) {
-        this.initial = initial;
-    }
     
     public void setFavoriteStaffId(String id){
     	this.favoriteStaffId=id;
@@ -191,10 +163,15 @@ public class Client implements Comparable<Client>{
 
 	@Override
 	public String toString() {
-		return "Client [id=" + id + ", first=" + first + ", initial=" + initial + ", favoriteStaffId=" + favoriteStaffId
+		return "Client [id=" + id + ", name="+name + ", favoriteStaffId=" + favoriteStaffId
 				+ ", ownsCats=" + ownsCats + ", noSmokers=" + noSmokers + ", noMaleStaff=" + noMaleStaff
 				+ ", noFemaleStaff=" + noFemaleStaff + ", preferSigning=" + preferSigning + ", signingOnly="
 				+ signingOnly + ", medPass=" + medPass + ", fixedSchedule=" + fixedSchedule + ", lastUpdated="
 				+ lastUpdated + "]";
+	}
+
+	public void setName(String string) {
+		this.name=string;
+		
 	}	
 }

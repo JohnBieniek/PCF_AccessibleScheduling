@@ -11,7 +11,6 @@ import org.json.JSONObject;
 
 import accessiblescheduling.domain.Client;
 import accessiblescheduling.domain.Employee;
-import accessiblescheduling.domain.Event;
 import accessiblescheduling.exception.ProccessingException;
 
 public abstract class Util {
@@ -58,27 +57,6 @@ public abstract class Util {
 		return dateTime;
 	}
 	
-	/**Returns if the event is present in the list
-	 * 
-	 * @param events an ArrayList<Event> of valid events
-	 * @param eventId the unique id of the event
-	 * @return boolean if the event is present in the list
-	 * @Tested
-	 */
-    public static boolean eventArrayListContainsEvent(ArrayList<Event> events, String eventId){
-    	boolean containsEvent = false;
-    	
-    	if(null!=events && !events.isEmpty() && null!=eventId){
-    		for(Event event: events){
-        		if(event.getId().equals(eventId)){
-        			containsEvent=true;
-        		}
-        	}
-    	}
-    	
-    	return containsEvent;
-    }
-    
     //TODO test
 	public static String getDateFromLocalDateTime(LocalDateTime time) throws ProccessingException{
 		if(null==time){

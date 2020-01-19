@@ -70,10 +70,11 @@ public class EmployeeController {
     }
 
     @RequestMapping(method = RequestMethod.PUT)
-    public Employee add(@RequestHeader(value="Authorization", required=false) String idToken,@RequestBody @Valid Employee employee) throws AuthenticationException {
+    public Employee add(@RequestHeader(value="Authorization", required=false) String idToken,@RequestBody @Valid Employee employee) throws AuthenticationException, ParseException {
     	securityManager.authorize(idToken, Constants.MANAGER);
     	logger.info("Adding employee " + employee.getId());
         updateInfoManager.set("employees");
+    	employee.sortCallOffs();
         employee.setLastUpdatedToNow();
         return repository.save(employee);
     }
@@ -89,6 +90,7 @@ public class EmployeeController {
     	}
 
     	employee.setRequestedOff(Arrays.asList(requestedOff.toArray()).toArray(new String[requestedOff.toArray().length]));
+    	employee.sortCallOffs();
         employee.setLastUpdatedToNow();
     	updateInfoManager.set("employees");
         return repository.save(employee);
@@ -110,6 +112,7 @@ public class EmployeeController {
     	}
 
     	employee.setRequestedOff(Arrays.asList(updatedRequestedOff.toArray()).toArray(new String[updatedRequestedOff.toArray().length]));
+    	employee.sortCallOffs();
         employee.setLastUpdatedToNow();
     	updateInfoManager.set("employees");
         return repository.save(employee);
@@ -197,6 +200,7 @@ public class EmployeeController {
 				
 				ObjectMapper objectMapper = new ObjectMapper();
 				Employee employee = objectMapper.readValue(jsonObject.toString(), Employee.class);
+		    	employee.sortCallOffs();
 				repository.save(employee);
 			}
 		} catch (JSONException e) {
@@ -209,6 +213,9 @@ public class EmployeeController {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

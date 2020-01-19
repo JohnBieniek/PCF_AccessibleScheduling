@@ -1,3 +1,4 @@
+package accessiblescheduling.util;
 //package accessiblesolutions.accessiblescheduling.util;
 //
 //import org.springframework.context.annotation.Bean;

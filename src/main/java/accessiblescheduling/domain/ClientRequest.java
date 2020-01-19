@@ -22,7 +22,7 @@ public class ClientRequest {
   	@Id
     @Column(length=40)
     @GeneratedValue(generator="randomId")
-    @GenericGenerator(name="randomId", strategy="org.cloudfoundry.samples.music.domain.RandomIdGenerator")
+    @GenericGenerator(name="randomId", strategy="accessiblescheduling.util.RandomIdGenerator")
     private String id;
 
     private String clientName;

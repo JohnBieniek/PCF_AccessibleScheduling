@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 
 import accessiblescheduling.constants.Constants;
 import accessiblescheduling.domain.ClientRequest;
-import accessiblescheduling.domain.Event;
 import accessiblescheduling.domain.ScheduleStatus;
 import accessiblescheduling.domain.Shift;
 import accessiblescheduling.exception.CorruptDataException;
@@ -20,9 +19,6 @@ import accessiblescheduling.util.Util;
 
 @Component
 public class ShiftGenerationManager {
-	@Autowired
-    private CrudRepository<Event, String> eventRepository;
-	
 	@Autowired
     private CrudRepository<Shift, String> shiftCrud;
     
@@ -55,7 +51,7 @@ public class ShiftGenerationManager {
     	}
     	
     	if(!status.isGenerating() && !status.isGenerated() && !status.isAssigning() && !status.isAssigned() && !status.isStopped() && !status.isErrored()) {
-	    	scheduleStatusRepository.deleteByMonthAndByYear(selectedMonth,selectedYear);
+	    	scheduleStatusRepository.deleteByMonthAndYear(selectedMonth,selectedYear);
 	    	status.setGenerating(true);
 	    	scheduleStatusCrud.save(status);
 	        updateInfoManager.set(Constants.STATUS);
@@ -267,52 +263,5 @@ public class ShiftGenerationManager {
     	
     	System.out.println(request.toString()+ " has generated " +times.size()+ " times"+times.toString());
     	return times;
-    }
-    public String generateEventShifts(String selectedMonth) throws CorruptDataException {
-    	String shiftResponse = "~Events~" + System.lineSeparator();
-    	Iterable<Event> events = eventRepository.findAll();
-    	ArrayList<Shift> shifts =new ArrayList<Shift>();
-		shiftResponse+="# of events found: ";    	
-    	if(null!=events){
-    		shiftResponse+=((ArrayList<Event>)events).size()+ System.lineSeparator();
-	    	for (Event event : events) {
-	    		shiftResponse+="Evaluated need for shift for " +event.getName()+ System.lineSeparator();
-	    		//TODO check to see if shifts have been made for this
-	        	String startDate = null;
-	    		String month = null;
-	    		startDate = event.getStartDate();
-	    		String[] splitDate = startDate.split("-");
-	    		if(splitDate.length>1){
-	    			month = splitDate[1];
-	    		}
-	    		shiftResponse+="Generating for month " +selectedMonth;
-	    		shiftResponse+="while this event is for month "+month+ System.lineSeparator();
-	    		if(month.equals(selectedMonth)||selectedMonth.equals("0"+month)){
-		    		shiftResponse+="This event needed shifts, so they were added "+System.lineSeparator();
-	    			for(int i=0; i < event.getRequestedStaff(); i++){
-		    			Shift shift = new Shift();
-		    			
-		    			shift.setEvent(true);
-		    			shift.setEventName(event.getName());
-		    			shift.setEventId(event.getId());
-		    			shift.setStartDate(event.getStartDate());
-		    			shift.setStartTime(event.getStartTime());
-		    			shift.setEndDate(event.getEndDate());
-		    			shift.setEndTime(event.getEndTime());
-		    			shift.setStartWeek(shift.getStartWeek());
-		    			shift.setStartMonth(Integer.parseInt(month));
-		    			shift.setStartYear(Integer.parseInt(splitDate[0]));
-		    			shifts.add(shift);
-	    			}
-	    		}
-	    	}
-    	}
-    	else{
-    		shiftResponse+="0"+ System.lineSeparator();
-    	}
-    	shiftCrud.save(shifts);
-    	shiftResponse+="~End Events~" + System.lineSeparator();
-    	//TODO Set a flag saying shifts have been made for this event
-    	return selectedMonth+shiftResponse;
     }
 }
