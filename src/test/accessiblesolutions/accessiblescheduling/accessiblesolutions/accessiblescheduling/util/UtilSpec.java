@@ -9,15 +9,14 @@ import static org.junit.Assert.assertTrue;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
 
 import org.json.JSONArray;
 import org.junit.Test;
 
-import accessiblesolutions.accessiblescheduling.domain.Client;
-import accessiblesolutions.accessiblescheduling.domain.Employee;
-import accessiblesolutions.accessiblescheduling.domain.Event;
-import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
+import accessiblescheduling.domain.Client;
+import accessiblescheduling.domain.Employee;
+import accessiblescheduling.exception.ProccessingException;
+import accessiblescheduling.util.Util;
 
 public class UtilSpec {
 	@Test
@@ -84,73 +83,6 @@ public class UtilSpec {
 		
 		assertFalse(errored);
 		assertTrue("employee".contentEquals(result));
-	}
-	
-	@Test
-	public void eventArrayListContainsEventReturnsTrueIfPresent() {
-		String targetId = "Something";
-		Event event1 = new Event();
-		event1.setId("Nothing");
-		
-		Event targetEvent = new Event();
-		targetEvent.setId(targetId);
-		
-		ArrayList<Event> events = new ArrayList<Event>();
-		events.add(event1);
-		events.add(targetEvent);
-		
-		assertTrue(Util.eventArrayListContainsEvent(events, targetId));
-	}
-	
-	@Test
-	public void eventArrayListContainsEventReturnsFalseIfAbsent() {
-		String targetId = "Something";
-		Event event1 = new Event();
-		event1.setId("Nothing");
-		
-		ArrayList<Event> events = new ArrayList<Event>();
-		events.add(event1);
-		
-		assertFalse(Util.eventArrayListContainsEvent(events, targetId));
-	}
-	
-	@Test
-	public void eventArrayListContainsEventReturnsFalseWithNullList() {
-		String targetId = "Something";
-		
-		assertFalse(Util.eventArrayListContainsEvent(null, targetId));
-	}
-	
-	@Test
-	public void eventArrayListContainsEventReturnsFalseIfTargetIdAbsent() {
-		Event event1 = new Event();
-		event1.setId("Nothing");
-		
-		ArrayList<Event> events = new ArrayList<Event>();
-		events.add(event1);
-		
-		assertFalse(Util.eventArrayListContainsEvent(events, null));
-	}
-	
-	@Test
-	public void eventArrayListContainsEventReturnsFalseIfEventListIsEmpty() {
-		String targetId = "Something";
-		
-		ArrayList<Event> events = new ArrayList<Event>();
-		
-		assertFalse(Util.eventArrayListContainsEvent(events, targetId));
-	}
-	
-	@Test
-	public void getDatesForMonthFailsForInvalidMonths1(){
-		boolean exception = false;
-		try {
-			Util.getDatesForMonth(2017,0);
-		} catch (ProccessingException e) {
-			exception=true;
-		}
-		
-		assertTrue(exception);
 	}
 	
 	@Test

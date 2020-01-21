@@ -1,12 +1,16 @@
 package accessiblesolutions.accessiblescheduling.domain;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.time.LocalDate;
 
 import org.junit.Test;
 
-import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
+import accessiblescheduling.domain.Shift;
+import accessiblescheduling.exception.CorruptDataException;
 
 //Up to date as of 11/4
 public class ShiftSpec {

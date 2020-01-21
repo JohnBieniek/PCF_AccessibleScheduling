@@ -1,8 +1,12 @@
 package accessiblesolutions.accessiblescheduling.domain;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import accessiblescheduling.domain.CustomField;
 public class CustomFieldSpec {
 	@Test
 	public void emptyConstructorInitializesVariables() {

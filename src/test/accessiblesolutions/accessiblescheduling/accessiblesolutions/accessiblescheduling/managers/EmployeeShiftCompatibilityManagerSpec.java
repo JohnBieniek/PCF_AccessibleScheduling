@@ -10,37 +10,35 @@ import java.util.ArrayList;
 
 import javax.annotation.Resource;
 
-import org.cloudfoundry.samples.music.managers.CustomDataManager;
-import org.cloudfoundry.samples.music.managers.EmployeeClientCompatibilityManager;
-import org.cloudfoundry.samples.music.managers.EmployeeShiftCompatibilityManager;
-import org.cloudfoundry.samples.music.managers.EmployeeShiftManager;
-import org.cloudfoundry.samples.music.managers.EmployeeShiftMapManager;
-import org.cloudfoundry.samples.music.managers.ShiftGenerationManager;
-import org.cloudfoundry.samples.music.managers.ShiftManager;
-import org.cloudfoundry.samples.music.repositories.mongodb.MongoClientRepository;
-import org.cloudfoundry.samples.music.repositories.mongodb.MongoCustomFieldRepository;
-import org.cloudfoundry.samples.music.repositories.mongodb.MongoShiftRepository;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.repository.CrudRepository;
 
-import accessiblesolutions.accessiblescheduling.domain.Client;
-import accessiblesolutions.accessiblescheduling.domain.CustomField;
-import accessiblesolutions.accessiblescheduling.domain.CustomFieldData;
-import accessiblesolutions.accessiblescheduling.domain.Employee;
-import accessiblesolutions.accessiblescheduling.domain.EmployeeShiftCompatibilities;
-import accessiblesolutions.accessiblescheduling.domain.EmployeeShiftCompatibility;
-import accessiblesolutions.accessiblescheduling.domain.Gender;
-import accessiblesolutions.accessiblescheduling.domain.Shift;
-import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
-import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
-import accessiblesolutions.accessiblescheduling.to.ScheduleOptions;
+import accessiblescheduling.domain.Client;
+import accessiblescheduling.domain.CustomField;
+import accessiblescheduling.domain.CustomFieldData;
+import accessiblescheduling.domain.Employee;
+import accessiblescheduling.domain.Shift;
+import accessiblescheduling.exception.CorruptDataException;
+import accessiblescheduling.exception.ProccessingException;
+import accessiblescheduling.manager.CustomDataManager;
+import accessiblescheduling.manager.EmployeeClientCompatibilityManager;
+import accessiblescheduling.manager.EmployeeShiftCompatibilityManager;
+import accessiblescheduling.manager.EmployeeShiftManager;
+import accessiblescheduling.manager.EmployeeShiftMapManager;
+import accessiblescheduling.manager.ShiftGenerationManager;
+import accessiblescheduling.manager.ShiftManager;
+import accessiblescheduling.repositories.mongodb.MongoCustomFieldRepository;
+import accessiblescheduling.repositories.mongodb.MongoShiftRepository;
+import accessiblescheduling.to.EmployeeShiftCompatibilities;
+import accessiblescheduling.to.EmployeeShiftCompatibility;
+import accessiblescheduling.to.Gender;
+import accessiblescheduling.to.ScheduleOptions;
 
 //@RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -159,7 +157,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	    mostTimeShift2.setClientId("generic");
 	    month4Shifts.add(mostTimeShift1);
 	    month4Shifts.add(mostTimeShift2);
-	    when(shiftRepository.findByStartMonth(4)).thenReturn(month4Shifts);
+	    when(shiftRepository.findByStartMonthAndStartYear(4,2018)).thenReturn(month4Shifts);
 	    when(employeeCrud.findOne("mostTime")).thenReturn(mostTime);
 	    when(employeeRepository.findOne("mostTime")).thenReturn(mostTime);
 	    
@@ -173,11 +171,11 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	    crossMonthShift1.setStartTime("20:00");
 	    crossMonthShift1.setEndTime("10:00");
 	    crossMonthShifts.add(crossMonthShift1);
-	    when(shiftRepository.findByStartMonth(5)).thenReturn(crossMonthShifts);
+	    when(shiftRepository.findByStartMonthAndStartYear(5,2018)).thenReturn(crossMonthShifts);
 	    when(employeeCrud.findOne("crossMonth")).thenReturn(crossMonthEmployee);
 	    when(employeeRepository.findOne("crossMonth")).thenReturn(crossMonthEmployee);
 	    employeeShiftManager.shiftRepository=shiftRepository;
-	    when(shiftRepository.findByStartMonth(6)).thenReturn(crossMonthShifts);
+	    when(shiftRepository.findByStartMonthAndStartYear(6,2018)).thenReturn(crossMonthShifts);
 	   
 	    Employee inOvertime = new Employee("In","Overtime");
 	    inOvertime.setMaxHours(1);
@@ -192,7 +190,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	    inOvertimeShift1.setStartMonth(7);
 	    ArrayList<Shift> inOvertimeShifts = new ArrayList<Shift>();
 		inOvertimeShifts.add(inOvertimeShift1);
-	    when(shiftRepository.findByStartMonth(7)).thenReturn(inOvertimeShifts);
+	    when(shiftRepository.findByStartMonthAndStartYear(7,2018)).thenReturn(inOvertimeShifts);
 	    
 	    ArrayList<Employee> employees = new ArrayList<Employee>();
 		employees.add(inOvertime);
@@ -249,14 +247,14 @@ public class EmployeeShiftCompatibilityManagerSpec {
 	    assignedFiveDayShifts.add(assignedFiveDayShift4);
 	    assignedFiveDayShifts.add(assignedFiveDayShift5);
 	    
-	    when(shiftRepository.findByStartMonth(2)).thenReturn(assignedFiveDayShifts);
+	    when(shiftRepository.findByStartMonthAndStartYear(2,2018)).thenReturn(assignedFiveDayShifts);
 	    when(employeeCrud.findOne("assignedFiveDay")).thenReturn(assignedFiveDay);
 	    when(employeeRepository.findOne("assignedFiveDay")).thenReturn(assignedFiveDay);
 	    
 	    CustomField woodField = new CustomField();
 		woodField.setClientRequirement(true);
 		woodField.setId("woodId");
-		Client onAlwaysClient = new Client("On","AlwaysClient");
+		Client onAlwaysClient = new Client();
 		onAlwaysClient.setId("onAlwaysClient");
 		onAlwaysClient.setOwnCats(true);
 		CustomFieldData onAlwaysClientData = new CustomFieldData();
@@ -2493,7 +2491,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		
 		when(employeeCrud.findOne("onAlways")).thenReturn(onAlways);
 
-		Client onAlwaysClient = new Client("On","AlwaysClient");
+		Client onAlwaysClient = new Client();
 		onAlwaysClient.setId("onAlwaysClient");
 		CustomFieldData onAlwaysClientData = new CustomFieldData();
 		onAlwaysClientData.setOwnerId("onAlwaysClient");
@@ -2555,7 +2553,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		
 		when(employeeCrud.findOne("onAlways")).thenReturn(onAlways);
 
-		Client onAlwaysClient = new Client("On","AlwaysClient");
+		Client onAlwaysClient = new Client();
 		onAlwaysClient.setId("onAlwaysClient");
 		CustomFieldData onAlwaysClientData = new CustomFieldData();
 		onAlwaysClientData.setOwnerId("onAlwaysClient");
@@ -2617,7 +2615,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		
 		when(employeeCrud.findOne("onAlways")).thenReturn(onAlways);
 
-		Client onAlwaysClient = new Client("On","AlwaysClient");
+		Client onAlwaysClient = new Client();
 		onAlwaysClient.setId("onAlwaysClient");
 		CustomFieldData onAlwaysClientData = new CustomFieldData();
 		onAlwaysClientData.setOwnerId("onAlwaysClient");
@@ -2679,7 +2677,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		
 		when(employeeCrud.findOne("onAlways")).thenReturn(onAlways);
 
-		Client onAlwaysClient = new Client("On","AlwaysClient");
+		Client onAlwaysClient = new Client();
 		onAlwaysClient.setId("onAlwaysClient");
 		CustomFieldData onAlwaysClientData = new CustomFieldData();
 		onAlwaysClientData.setOwnerId("onAlwaysClient");
@@ -3238,7 +3236,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		
 		when(employeeCrud.findOne("onAlways")).thenReturn(onAlways);
 
-		Client onAlwaysClient = new Client("On","AlwaysClient");
+		Client onAlwaysClient = new Client();
 		onAlwaysClient.setId("onAlwaysClient");
 		CustomFieldData onAlwaysClientData = new CustomFieldData();
 		onAlwaysClientData.setOwnerId("onAlwaysClient");
@@ -3301,7 +3299,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		
 		when(employeeCrud.findOne("onAlways")).thenReturn(onAlways);
 
-		Client onAlwaysClient = new Client("On","AlwaysClient");
+		Client onAlwaysClient = new Client();
 		onAlwaysClient.setId("onAlwaysClient");
 		CustomFieldData onAlwaysClientData = new CustomFieldData();
 		onAlwaysClientData.setOwnerId("onAlwaysClient");
@@ -3364,7 +3362,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		
 		when(employeeCrud.findOne("onAlways")).thenReturn(onAlways);
 
-		Client onAlwaysClient = new Client("On","AlwaysClient");
+		Client onAlwaysClient = new Client();
 		onAlwaysClient.setId("onAlwaysClient");
 		CustomFieldData onAlwaysClientData = new CustomFieldData();
 		onAlwaysClientData.setOwnerId("onAlwaysClient");
@@ -3427,7 +3425,7 @@ public class EmployeeShiftCompatibilityManagerSpec {
 		
 		when(employeeCrud.findOne("onAlways")).thenReturn(onAlways);
 
-		Client onAlwaysClient = new Client("On","AlwaysClient");
+		Client onAlwaysClient = new Client();
 		onAlwaysClient.setId("onAlwaysClient");
 		CustomFieldData onAlwaysClientData = new CustomFieldData();
 		onAlwaysClientData.setOwnerId("onAlwaysClient");

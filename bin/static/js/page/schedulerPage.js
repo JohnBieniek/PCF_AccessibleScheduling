@@ -214,7 +214,7 @@ function SchedulingController($scope, $modal, $http) {
 	            },
 	            params: {
 	                month: month,
-	                year: '2019',
+	                year: $scope.year,
 	                allowOvertime: allowOvertime,
 	                allowInactive: allowInactive,
 	                allowUnavailable: allowUnavailable,

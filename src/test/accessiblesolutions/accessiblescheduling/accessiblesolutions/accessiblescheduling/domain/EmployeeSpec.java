@@ -1,15 +1,15 @@
 package accessiblesolutions.accessiblescheduling.domain;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.time.DayOfWeek;
-
 import org.junit.Test;
 
-import accessiblesolutions.accessiblescheduling.exception.CorruptDataException;
-import accessiblesolutions.accessiblescheduling.exception.ProccessingException;
+import accessiblescheduling.domain.Employee;
+import accessiblescheduling.domain.Shift;
+import accessiblescheduling.exception.CorruptDataException;
+import accessiblescheduling.exception.ProccessingException;
+import accessiblescheduling.to.Gender;
 public class EmployeeSpec {
 	@Test
 	public void emptyConstructorInitializesVariables() {

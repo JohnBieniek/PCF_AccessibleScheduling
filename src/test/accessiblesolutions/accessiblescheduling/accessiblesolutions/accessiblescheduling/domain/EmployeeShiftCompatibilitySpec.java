@@ -1,8 +1,14 @@
 package accessiblesolutions.accessiblescheduling.domain;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import org.junit.Test;
+
+import accessiblescheduling.domain.Client;
+import accessiblescheduling.domain.Employee;
+import accessiblescheduling.domain.Shift;
+import accessiblescheduling.to.EmployeeShiftCompatibility;
 public class EmployeeShiftCompatibilitySpec {
 	@Test
 	public void emptyConstructorInitializesVariables() {
