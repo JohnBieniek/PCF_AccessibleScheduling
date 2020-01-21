@@ -11,7 +11,6 @@ import accessiblescheduling.domain.ScheduleStatus;
 @Repository
 @Profile("mongodb")
 public interface ScheduleStatusRepository extends MongoRepository<ScheduleStatus, String> {
-	void deleteByMonth(String month);
 	void deleteByMonthAndYear(String month,String year);
 	List<ScheduleStatus>  findByYear(String year);
 }

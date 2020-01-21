@@ -44,7 +44,7 @@ public class ShiftGenerationManager {
     	String response = "Generated ";
     	int shiftsGenerated = 0;
     	
-    	ScheduleStatus status = assignmentManager.scheduleStatus(selectedMonth);
+    	ScheduleStatus status = assignmentManager.scheduleStatus(selectedMonth,selectedYear);
     	if(null==status) {
     		status= new ScheduleStatus();
     		status.setMonth(selectedMonth);
@@ -70,7 +70,7 @@ public class ShiftGenerationManager {
 	    	System.out.println(response+shiftsGenerated);
 	    	status.setGenerating(false);
 	    	status.setGenerated(true);
-	    	scheduleStatusRepository.deleteByMonth(selectedMonth);
+	    	scheduleStatusRepository.deleteByMonthAndYear(selectedMonth,selectedYear);
 	    	scheduleStatusCrud.save(status);
 	        updateInfoManager.set(Constants.STATUS);
     	}

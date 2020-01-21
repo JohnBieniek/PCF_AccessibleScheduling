@@ -73,7 +73,7 @@ public class ShiftAssignmentManager {
     	int month = Integer.parseInt(options.getMonth());
     	int year = Integer.parseInt(options.getYear());
     	
-    	ScheduleStatus status = scheduleStatus(options.getMonth());
+    	ScheduleStatus status = scheduleStatus(options.getMonth(),options.getYear());
     	
     	if(null==status) {
     		status= new ScheduleStatus();
@@ -87,7 +87,7 @@ public class ShiftAssignmentManager {
     	status.setAssigned(false);
     	status.setErrored(false);
     	status.setLastUpdatedToNow();
-    	scheduleStatusRepository.deleteByMonth(options.getMonth());
+    	scheduleStatusRepository.deleteByMonthAndYear(options.getMonth(),options.getYear());
     	scheduleStatusCrud.save(status);
     	updateInfoManager.set(Constants.STATUS);
     	try {
@@ -105,7 +105,7 @@ public class ShiftAssignmentManager {
 	    	status.setAssigned(true);
 	    	
 	    	status.setLastUpdatedToNow();
-	    	scheduleStatusRepository.deleteByMonth(options.getMonth());
+	    	scheduleStatusRepository.deleteByMonthAndYear(options.getMonth(),options.getYear());
 	    	scheduleStatusCrud.save(status);
 	    	updateInfoManager.set(Constants.STATUS);
 		} catch (Exception e) {
@@ -115,7 +115,7 @@ public class ShiftAssignmentManager {
 	    	status.setStopping(false);
 	    	status.setErrored(true);
 	    	status.setLastUpdatedToNow();
-	    	scheduleStatusRepository.deleteByMonth(options.getMonth());
+	    	scheduleStatusRepository.deleteByMonthAndYear(options.getMonth(),options.getYear());
 	    	scheduleStatusCrud.save(status);
 	    	updateInfoManager.set(Constants.STATUS);
 	    	System.out.println("Failed to assign everything. "+e.getMessage());
@@ -149,7 +149,7 @@ public class ShiftAssignmentManager {
 	    
     	for(int i= 0;i< maxItterations;i++){
     		if(!stopped) {
-    			ScheduleStatus status = scheduleStatus(month+"");
+    			ScheduleStatus status = scheduleStatus(month+"",year+"");
 	        	if(status.getAssigningThreadId()!=Thread.currentThread().getId() || status.isStopping() || status.isStopped() || !status.isAssigning()) {
 	        		stopped=true;
 	        		i=maxItterations;
@@ -160,7 +160,7 @@ public class ShiftAssignmentManager {
 	            	status.setStopped(true);
 	        		status.setStopping(false);
 	        		status.setLastUpdatedToNow();
-	    	    	scheduleStatusRepository.deleteByMonth(options.getMonth());
+	    	    	scheduleStatusRepository.deleteByMonthAndYear(options.getMonth(),options.getYear());
 	    	    	scheduleStatusCrud.save(status);
 	    	    	updateInfoManager.set(Constants.STATUS);
 	        	}
@@ -480,11 +480,11 @@ public class ShiftAssignmentManager {
 		//System.out.println("assigned:"+shift.toString());
     }
     
-    public ScheduleStatus scheduleStatus(String month) {
+    public ScheduleStatus scheduleStatus(String month,String year) {
 	    Iterable<ScheduleStatus> statusList = scheduleStatusCrud.findAll();
 		ScheduleStatus status = null;
 		for(ScheduleStatus selectedStatus:statusList) {
-			if(selectedStatus.getMonth().equalsIgnoreCase(month)) {
+			if(selectedStatus.getMonth().equalsIgnoreCase(month) && selectedStatus.getYear().equalsIgnoreCase(year)) {
 				status=selectedStatus;
 			}
 		}

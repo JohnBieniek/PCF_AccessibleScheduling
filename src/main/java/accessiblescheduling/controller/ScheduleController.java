@@ -997,14 +997,14 @@ public class ScheduleController {
     }
 
     @RequestMapping(value = "/byMonth", method = RequestMethod.DELETE)
-    public Iterable<ScheduleStatus> deleteByMonth(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam("month") String  month, @RequestParam("month") String  year) throws AuthenticationException {
+    public Iterable<ScheduleStatus> deleteByMonthAndYear(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam("month") String  month, @RequestParam("month") String  year) throws AuthenticationException {
     	securityManager.authorize(idToken, Constants.ADMIN);
     	
     	ScheduleStatus status = new ScheduleStatus();
          
      	status.setMonth(month);
      	status.setDeleting(true);
-     	scheduleStatusRepository.deleteByMonth(month);
+     	scheduleStatusRepository.deleteByMonthAndYear(month,year);
      	status.setLastUpdatedToNow();
      	scheduleStatusCrud.save(status);
      	updateInfoManager.set(Constants.STATUS);
@@ -1015,7 +1015,7 @@ public class ScheduleController {
      	status.setAssigning(false);
      	status.setAssigned(false);
      	status.setGenerated(false);
-     	scheduleStatusRepository.deleteByMonth(month);
+     	scheduleStatusRepository.deleteByMonthAndYear(month,year);
      	status.setLastUpdatedToNow();
      	scheduleStatusCrud.save(status);
      	updateInfoManager.set(Constants.STATUS);
@@ -1042,18 +1042,19 @@ public class ScheduleController {
     	securityManager.authorize(idToken, Constants.ADMIN);
     	
     	System.out.println("Starting assignment");
-    	ScheduleStatus status = assignmentManager.scheduleStatus(month);
+    	ScheduleStatus status = assignmentManager.scheduleStatus(month,year);
     	if(null==status) {
         	System.out.println("Status for assignment:null");
     		status= new ScheduleStatus();
     		status.setMonth(month);
+    		status.setYear(year);
     	}
     	System.out.println("Status for assignment:"+status.toString());
     	if(status.isGenerated() && !status.isAssigning()) {
     		status.setAssigning(true);
     		status.setAssigningThreadId(Thread.currentThread().getId());
     		status.setLastUpdatedToNow();
-        	scheduleStatusRepository.deleteByMonth(month);
+        	scheduleStatusRepository.deleteByMonthAndYear(month,year);
         	scheduleStatusCrud.save(status);
             updateInfoManager.set(Constants.STATUS);
             
@@ -1076,10 +1077,10 @@ public class ScheduleController {
     }
     
     @RequestMapping(value = "/assigning", method = RequestMethod.GET)
-    public boolean assigning(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam("month") String month) throws AuthenticationException {
+    public boolean assigning(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam("month") String month, @RequestParam("year") String year) throws AuthenticationException {
     	securityManager.authorize(idToken, Constants.ADMIN);
     	
-    	return assignmentManager.scheduleStatus(month).isAssigning();
+    	return assignmentManager.scheduleStatus(month,year).isAssigning();
     }
     
     @RequestMapping(value = "/statusList", method = RequestMethod.GET)
@@ -1113,14 +1114,15 @@ public class ScheduleController {
     }
     
     @RequestMapping(value = "/finishAssignment", method = RequestMethod.GET)
-    public Iterable<ScheduleStatus> finishAssignment(@RequestHeader(value="Authorization", required=false) String idToken,@RequestParam("month") String month) throws CorruptDataException, AuthenticationException {
+    public Iterable<ScheduleStatus> finishAssignment(@RequestHeader(value="Authorization", required=false) String idToken,@RequestParam("month") String month, @RequestParam("year") String year) throws CorruptDataException, AuthenticationException {
     	securityManager.authorize(idToken, Constants.ADMIN);
     	
-    	ScheduleStatus status = assignmentManager.scheduleStatus(month);
+    	ScheduleStatus status = assignmentManager.scheduleStatus(month,year);
     	System.out.println("finishing assignment for "+month);
     	if(null==status) {
     		status= new ScheduleStatus();
     		status.setMonth(month);
+    		status.setYear(year);
     	}
     	
     	if(status.isAssigning()) {
@@ -1130,7 +1132,7 @@ public class ScheduleController {
     	if(status.isGenerated()) {
     		status.setAssigned(true);
     		status.setLastUpdatedToNow();
-    		scheduleStatusRepository.deleteByMonth(month);
+    		scheduleStatusRepository.deleteByMonthAndYear(month,year);
         	scheduleStatusCrud.save(status);
             updateInfoManager.set(Constants.STATUS);
     	}
@@ -1139,21 +1141,22 @@ public class ScheduleController {
     }
     
     @RequestMapping(value = "/stopAssignment", method = RequestMethod.GET)
-    public Iterable<ScheduleStatus> stopAssignment(@RequestHeader(value="Authorization", required=false) String idToken,@RequestParam("month") String month) throws CorruptDataException, InterruptedException, AuthenticationException {
+    public Iterable<ScheduleStatus> stopAssignment(@RequestHeader(value="Authorization", required=false) String idToken,@RequestParam("month") String month,@RequestParam("year") String year) throws CorruptDataException, InterruptedException, AuthenticationException {
     	securityManager.authorize(idToken, Constants.ADMIN);
     	
-    	ScheduleStatus status = assignmentManager.scheduleStatus(month);
+    	ScheduleStatus status = assignmentManager.scheduleStatus(month,year);
     	
     	if(null==status) {
     		status= new ScheduleStatus();
     		status.setMonth(month);
+    		status.setYear(year);
         	status.setGenerated(true);
 
     	}
     	
 		status.setStopping(true);
 		status.setLastUpdatedToNow();
-    	scheduleStatusRepository.deleteByMonth(month);
+    	scheduleStatusRepository.deleteByMonthAndYear(month,year);
     	scheduleStatusCrud.save(status);
         updateInfoManager.set(Constants.STATUS);
     	//Thread.sleep(5000);//Can this be deleted?
@@ -1164,7 +1167,7 @@ public class ScheduleController {
     @RequestMapping(value = "/generateShifts", method = RequestMethod.GET)
     public ResponseEntity<?> generateShifts(@RequestHeader(value="Authorization", required=false) String idToken,@RequestParam("month") String month,@RequestParam("year") String year) throws CorruptDataException, AuthenticationException {
     	securityManager.authorize(idToken, Constants.ADMIN);
-    	ScheduleStatus status = assignmentManager.scheduleStatus(month);
+    	ScheduleStatus status = assignmentManager.scheduleStatus(month,year);
     	if(null!=status) {
         	if(status.isGenerating()  || status.isGenerated()) {
         		return new ResponseEntity<String>("Already generated",HttpStatus.TOO_MANY_REQUESTS);
