@@ -11,6 +11,7 @@ public class AccessRequest {
     private String id;
   	private String name;
   	private String email;
+  	private String linkInfo;
 
     public AccessRequest() {
     }
@@ -43,9 +44,16 @@ public class AccessRequest {
 	public void setEmail(String email) {
 		this.email = email;
 	}
+	public String getLinkInfo() {
+		return linkInfo;
+	}
+
+	public void setLinkInfo(String linkInfo) {
+		this.linkInfo = linkInfo;
+	}
 
 	@Override
 	public String toString() {
-		return "AccessRequest [id=" + id + ", name=" + name + ", email=" + email + "]";
+		return "AccessRequest [id=" + id + ", name=" + name + ", email=" + email + ", linkInfo=" + linkInfo + "]";
 	}
 }

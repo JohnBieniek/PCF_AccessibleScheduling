@@ -13,6 +13,8 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.security.sasl.AuthenticationException;
 
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -29,6 +31,7 @@ import accessiblescheduling.repositories.mongodb.MongoEmployeeRepository;
 import accessiblescheduling.repositories.mongodb.MongoSessionRepository;
 import accessiblescheduling.to.CallAuth;
 import accessiblescheduling.to.User;
+import accessiblescheduling.util.RandomString;
 
 @Component
 public class AccessibleSecurityManager {
@@ -167,29 +170,6 @@ public class AccessibleSecurityManager {
     	return null;
     }
     
-	public void sendMail() throws AddressException, MessagingException, IOException {
-		   Properties props = new Properties();
-		   props.put("mail.smtp.auth", "true");
-		   props.put("mail.smtp.starttls.enable", "true");
-		   props.put("mail.smtp.host", "smtp.gmail.com");
-		   props.put("mail.smtp.port", "587");
-		   
-		   javax.mail.Session session = javax.mail.Session.getInstance(props, new javax.mail.Authenticator() {
-		      protected PasswordAuthentication getPasswordAuthentication() {
-		         return new PasswordAuthentication("accessiblescheduling@gmail.com", "initialPassword");
-		      }
-		   });		   
-		   Message msg = new MimeMessage(session);
-		   msg.setFrom(new InternetAddress("accessiblescheduling@gmail.com", false));
-
-		   msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse("shadowfox683@gmail.com"));
-		   msg.setSubject("AccessibleScheduling - Invitation to join");
-		   msg.setContent("Your schedule is waiting for you. Click the following link to sign up with your google account: ", "text/html");
-		   msg.setSentDate(new Date());
-
-		   Transport.send(msg);   
-		}
-    
     public boolean isAdmin(String idToken) throws AuthenticationException {
     	return getUserDetails(idToken).isAdmin();
     }
@@ -278,9 +258,65 @@ public class AccessibleSecurityManager {
     }
 
 
-	public String linkEmployee(String email, String employeeId) {
+	public String linkEmployee(String email, String employeeId) throws AddressException, MessagingException, IOException, JSONException {
+		String result = "FAILED";
+		AccessRequest request = accessCrud.findById(employeeId);
 		
+		if(null!=request) {
+			accessCrud.delete(request);
+			result= "OVERWRITTEN";
+		}
+		else {
+			result="LINKED";
+		}
 		
-		return "LINKED";
+		request=new AccessRequest();
+		request.setEmail(email);
+		request.setId(employeeId);
+		RandomString randomizer = new RandomString(40);
+		request.setLinkInfo(randomizer.nextString());
+		Employee employee = employeeCrud.findOne(employeeId);
+		request.setName(employee!=null?employee.getName():"New User");
+		accessCrud.save(request);
+		
+		sendSignupMail(request);
+
+		
+		return result;
+	}
+	
+	public void sendSignupMail(AccessRequest request) throws AddressException, MessagingException, IOException, JSONException {
+	   Properties props = new Properties();
+	   props.put("mail.smtp.auth", "true");
+	   props.put("mail.smtp.starttls.enable", "true");
+	   props.put("mail.smtp.host", "smtp.gmail.com");
+	   props.put("mail.smtp.port", "587");
+	   
+	   javax.mail.Session session = javax.mail.Session.getInstance(props, new javax.mail.Authenticator() {
+	      protected PasswordAuthentication getPasswordAuthentication() {
+	         return new PasswordAuthentication("accessiblescheduling@gmail.com", "initialPassword");
+	      }
+	   });
+	   
+	   String signupLink = null;
+	   JSONObject vcap =new JSONObject(System.getenv("VCAP_APPLICATION"));
+	   if(vcap.get("space_name")=="development") {
+		   signupLink="https://accessiblescheduling-dev.cfapps.io/";
+	   }
+	   else {
+		   signupLink="https://accessiblescheduling.cfapps.io/";
+	   }
+	   signupLink+="auth/code="+request.getLinkInfo();
+	   
+	   
+	   Message msg = new MimeMessage(session);
+	   msg.setFrom(new InternetAddress("accessiblescheduling@gmail.com", false));
+
+	   msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(request.getEmail()));
+	   msg.setSubject("AccessibleScheduling - Invitation to join");
+	   msg.setContent("Your schedule is waiting for you "+request.getName()+". Click the following link to sign up with your google account: "+signupLink, "text/html");
+	   msg.setSentDate(new Date());
+
+	   Transport.send(msg);   
 	}
 }

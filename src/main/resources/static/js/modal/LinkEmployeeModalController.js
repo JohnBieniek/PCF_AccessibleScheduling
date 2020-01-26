@@ -20,11 +20,11 @@ function LinkEmployeeModalController($scope, $modalInstance, $http, selectedEmpl
 	
 	$scope.setChanged = function(){
 		$scope.changed=true;
-	}
+	};
 
 	$scope.ok = function (){
 	   $http({
-            url: '/security/linkEmployee',
+            url: '/auth/linkEmployee',
             method: 'GET',
             headers: {
                 'Authorization': $scope.idToken,
@@ -38,7 +38,7 @@ function LinkEmployeeModalController($scope, $modalInstance, $http, selectedEmpl
         .then(function(response) {
             $modalInstance.close(response.data);
        });
-    }
+    };
 
     $scope.cancel = function () {
         $modalInstance.dismiss('cancel');

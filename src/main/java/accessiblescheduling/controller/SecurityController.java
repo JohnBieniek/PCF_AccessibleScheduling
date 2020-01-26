@@ -13,6 +13,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.security.sasl.AuthenticationException;
 
+import org.codehaus.jettison.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,12 +44,12 @@ public class SecurityController {
     }
 	
 	@RequestMapping(value = "/signup",method = RequestMethod.GET)
-    public String signUp2(@RequestParam String idtoken, @RequestParam String name) throws AuthenticationException {
-		return manager.signUp(idtoken,name).toString();
+    public String signUp2(@RequestParam String idtoken, @RequestParam String code) throws AuthenticationException {
+		return null;//manager.signUp(code).toString();
     }
 	
 	@RequestMapping(value = "/linkEmployee",method = RequestMethod.GET)
-    public String linkEmployee(@RequestParam String idtoken, @RequestParam String email, @RequestParam String employeeId) throws AuthenticationException {
+    public String linkEmployee(@RequestParam String idtoken, @RequestParam String email, @RequestParam String employeeId) throws AddressException, MessagingException, IOException, JSONException {
 		return manager.linkEmployee(email,employeeId).toString();
     }
 	

@@ -9,4 +9,5 @@ import accessiblescheduling.domain.AccessRequest;
 @Repository
 @Profile("mongodb")
 public interface MongoAccessRequestRepository extends MongoRepository<AccessRequest, String> {
+	AccessRequest findById(String id);
 }

@@ -23,7 +23,7 @@ angular.module('client', ['ngResource', 'ui.bootstrap']).
 
 function MobileEmployeeController($scope, $modal, $http) {
 	$scope.init = function(){
-		//The date in the selection box for calling off
+		// The date in the selection box for calling off
 		 $scope.newDate=$scope.week.getFullYear()+"-"+(($scope.week.getMonth()+1)<10?"0"+($scope.week.getMonth()+1):($scope.week.getMonth()+1))+"-"+$scope.week.getDate();
 
 		 $scope.getDisplayWeek();
@@ -39,7 +39,8 @@ function MobileEmployeeController($scope, $modal, $http) {
 	}
 	
 	/**
-	 * Open a modal to take in an e-mail address that will be used to send an invite to join
+	 * Open a modal to take in an e-mail address that will be used to send an
+	 * invite to join
 	 */
 	$scope.linkEmployee=function(){
        var updateModal = $modal.open({
@@ -49,7 +50,7 @@ function MobileEmployeeController($scope, $modal, $http) {
         	   idToken: function(){
         		   return $scope.clone($scope.idToken);
         	   },
-	           	employee:function(){
+	           	selectedEmployee:function(){
 	        		return $scope.clone($scope.employee);
 	        	},
                action: function() {
@@ -62,15 +63,16 @@ function MobileEmployeeController($scope, $modal, $http) {
 		   // ok
 			// was pressed
        }, function () {
-           // we canceled 
+           // we canceled
        });
 	}
 	
 	/**
-     * Checks to see if we have the latest info in this availability.
-     * If we don't we ask if they want to delete anyways or see what the changes are.
-     * If the choose to proceed or if we had the latest data we delete the availability.
-     */
+	 * Checks to see if we have the latest info in this availability. If we
+	 * don't we ask if they want to delete anyways or see what the changes are.
+	 * If the choose to proceed or if we had the latest data we delete the
+	 * availability.
+	 */
     $scope.deleteAvailability = function (availability) {
     	$scope.updateLastInteractionTime();
     	if(confirm("Are you sure you want to delete the selected availability for "+ $scope.employee.days[availability]+ "?")){
@@ -140,10 +142,11 @@ function MobileEmployeeController($scope, $modal, $http) {
      };
      
  	/**
-      * Checks to see if we have the latest info in this availability.
-      * If we don't we ask if they want to update anyways or see what the changes are.
-      * If the choose to proceed or if we had the latest data we update the availability.
-      */
+	 * Checks to see if we have the latest info in this availability. If we
+	 * don't we ask if they want to update anyways or see what the changes are.
+	 * If the choose to proceed or if we had the latest data we update the
+	 * availability.
+	 */
      $scope.updateAvailability = function (employee, availability) {
      	$scope.updateLastInteractionTime();
     	if(employee.availability){
@@ -206,9 +209,9 @@ function MobileEmployeeController($scope, $modal, $http) {
       };
 	
   	/**
-  	 * Updates the employee and its availability.
-  	 * Checks for updates to the employee list afterwards
-  	 */
+	 * Updates the employee and its availability. Checks for updates to the
+	 * employee list afterwards
+	 */
        $scope.saveAvailability = function saveAvailability(employee,availability) {
        	if(employee.availability){
   	     	for(var index = 0; index<employee.availability.length;index++){
@@ -275,7 +278,9 @@ function MobileEmployeeController($scope, $modal, $http) {
 		}
 	}
 	
-	/** Determines if the selected availability should be shown under this day of the week header
+	/**
+	 * Determines if the selected availability should be shown under this day of
+	 * the week header
 	 * 
 	 */
 	$scope.isAvailabilityDay= function(availability,day){
@@ -321,8 +326,8 @@ function MobileEmployeeController($scope, $modal, $http) {
 	}
 	
 	/**
-	 * Updates the employee and its availability.
-	 * Checks for updates to the employee list afterwards
+	 * Updates the employee and its availability. Checks for updates to the
+	 * employee list afterwards
 	 */
      $scope.removeAvailability = function saveAvailability(availability) {
     	var employee = $scope.employee;
@@ -392,11 +397,12 @@ function MobileEmployeeController($scope, $modal, $http) {
     	 var weeksStart = $scope.week.addDays($scope.week.getDay()-1);
     	 var weeksEnd = weeksStart.addDays(6);
     	 var nextWeeksStart = weeksEnd.addDays(1);
-    	 //if($scope.manager || $scope.admin || nextWeeksStart.getMonth()<$scope.maxMonth){
+    	 // if($scope.manager || $scope.admin ||
+			// nextWeeksStart.getMonth()<$scope.maxMonth){
     		 $scope.setWeek($scope.week.addDays(7));
 	    	 $scope.getDisplayWeek();
 	    	 $scope.listShifts();
-    	 //}
+    	 // }
      }
      
      $scope.saveEmployee = function saveEmployee(employee) {
@@ -459,17 +465,19 @@ function MobileEmployeeController($scope, $modal, $http) {
     }
      
      /**
-      * Shows/hides the note on a shift for a user. Does not function for admin/manager as they can see this in the edit screen.
-      */
+		 * Shows/hides the note on a shift for a user. Does not function for
+		 * admin/manager as they can see this in the edit screen.
+		 */
      $scope.toggleEmployeeNote = function(shift){
     	 shift.displayEmployeeNote= shift.displayEmployeeNote?false:true;    		 
     	 console.log("shift.displayEmployeeNote",shift.displayEmployeeNote);
      }
      
      /**
-      * Sets the initial value to each note to hidden for every shift as the info is requested.
-      * Returns if we should show the note on screen for the current shift at this moment
-      */
+		 * Sets the initial value to each note to hidden for every shift as the
+		 * info is requested. Returns if we should show the note on screen for
+		 * the current shift at this moment
+		 */
      $scope.displayEmployeeNote = function(shift){
     	 if(typeof shift != "undefined"){
     		 if(typeof shift.displayEmployeeNote == "undefined"){
@@ -519,7 +527,15 @@ function MobileEmployeeController($scope, $modal, $http) {
 	 	if(endMinute<10){
 	 		endMinute="0"+endMinute
 	 	}
-		if(shift.employeeNotes && !$scope.manager && !$scope.admin){//Add an extra space at front for users with note due to icon in front
+		if(shift.employeeNotes && !$scope.manager && !$scope.admin){// Add an
+																	// extra
+																	// space at
+																	// front for
+																	// users
+																	// with note
+																	// due to
+																	// icon in
+																	// front
 	        shift.displayValue = " "+(startHour!=0?startHour:"12")+":"+startMinute+startModifier+"-";
 		}
 		else{
