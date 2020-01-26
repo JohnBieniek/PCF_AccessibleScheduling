@@ -1,0 +1,28 @@
+<div class="modal-header">
+    <h3 ng-show="shiftRequestAction === 'link'">Link an Employee</h3>
+    <h3 ng-show="shiftRequestAction === 're-link'">Re-link an Employee</h3>
+</div>
+
+<div class="modal-body">
+    <form name="requestForm" role="form">
+   	    <labelstyle="font-size:31px">Below you can link a user to their schedule. Enter the e-mail address of the user below and
+   	    												click OK. The user will then receive an e-mail inviting them to view their schedule. You can
+   	    												return to this screen at any time to re-link a new e-mail address to their account</label>
+        <div>
+    	    <label style="font-size:25px">Employee Name:</label>
+    	    <label style="font-size:23px">{{selectedEmployee.name}}</label>
+        </div>
+        
+        <div>
+            <label for="staffName" style="font-size:25px">Staff Email</label>
+            <input type="text"  name="email" ng-model="selectedEmployee.email" ng-value="selectedEmployee.email">
+        </div>
+    </form>
+</div>
+
+<div class="modal-footer">
+	<div style="float:right" class="rightAlign">
+	    <button class="rightAlign inline okEmployeeButton" ng-click="ok()" >OK</button>
+	    <button class="rightAlign inline cancelEmployeeButton" style="margin-left:10px" ng-click="cancel()">Cancel</button>
+	</div>
+</div>

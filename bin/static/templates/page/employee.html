@@ -170,19 +170,25 @@
 			        </div>
   				     <div ng-if="admin">
 			        	<div style="display:inline-block">
-				        	<label for="gender" class="employeeDetails">Role:</label>
+				        	<label class="employeeDetails">Role:</label>
 			        	</div>
-				        <div style="display:inline-block">
-				        	<label style="font-size:20px">User</label>
-				        	<input ng-change="setDetailsToChanged()" name="role" type="radio" style="height:21px;width:21px" value="user" ng-model="employee.role"/>
+			        	<div ng-if="isLinked()">
+					        <div style="display:inline-block">
+					        	<label style="font-size:20px">User</label>
+					        	<input ng-change="setDetailsToChanged()" name="role" type="radio" style="height:21px;width:21px" value="user" ng-model="employee.role"/>
+					        </div>
+							<div style="display:inline-block">
+					        	<label style="font-size:20px">Manager</label>
+					        	<input ng-change="setDetailsToChanged()" name="role" type="radio" style="height:21px;width:21px" value="manager" ng-model="employee.role"/>
+					        </div>
+					        <div style="display:inline-block">
+					        	<label style="font-size:20px">Admin</label>
+					        	<input ng-change="setDetailsToChanged()" name="role" type="radio" style="height:21px;width:21px" value="admin" ng-model="employee.role"/>
+					        </div>
 				        </div>
-						<div style="display:inline-block">
-				        	<label style="font-size:20px">Manager</label>
-				        	<input ng-change="setDetailsToChanged()" name="role" type="radio" style="height:21px;width:21px" value="manager" ng-model="employee.role"/>
-				        </div>
-				        <div style="display:inline-block">
-				        	<label style="font-size:20px">Admin</label>
-				        	<input ng-change="setDetailsToChanged()" name="role" type="radio" style="height:21px;width:21px" value="admin" ng-model="employee.role"/>
+   			        	<div ng-if="!isLinked()">
+			        		<label style="font-size:20px">None</label>
+						    <button class="rightAlign inline okEmployeeButton" ng-click="linkEmployee()" >Link User</button>
 				        </div>
 				    </div>
 				     <div>

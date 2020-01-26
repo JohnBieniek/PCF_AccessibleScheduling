@@ -10,6 +10,7 @@ public class AccessRequest {
   	@Id
     private String id;
   	private String name;
+  	private String email;
 
     public AccessRequest() {
     }
@@ -35,8 +36,16 @@ public class AccessRequest {
 		this.name = name;
 	}
 
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
 	@Override
 	public String toString() {
-		return "AccessRequest [userId=" + id + ", name=" + name + "]";
+		return "AccessRequest [id=" + id + ", name=" + name + ", email=" + email + "]";
 	}
 }

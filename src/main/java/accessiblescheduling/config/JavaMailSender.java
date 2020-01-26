@@ -1,14 +1,14 @@
-package accessiblescheduling.config;
-
-import java.util.Properties;
-
-import org.springframework.context.annotation.Bean;
-
-public class JavaMailSender {
-
-	@Bean
-	public JavaMailSender getJavaMailSender() {
-	    JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+//package accessiblescheduling.config;
+//
+//import java.util.Properties;
+//
+//import org.springframework.context.annotation.Bean;
+//
+//public class JavaMailSender {
+//
+//	@Bean
+//	public JavaMailSender getJavaMailSender() {
+//	    JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
 //	    mailSender.setHost("smtp.gmail.com");
 //	    mailSender.setPort(587);
 //	     
@@ -21,6 +21,6 @@ public class JavaMailSender {
 //	    props.put("mail.smtp.starttls.enable", "true");
 //	    props.put("mail.debug", "true");
 //	     
-	    return mailSender;
-	}
-}
+//	    return mailSender;
+//	}
+//}

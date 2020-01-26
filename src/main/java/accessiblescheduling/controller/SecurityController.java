@@ -1,7 +1,21 @@
 package accessiblescheduling.controller;
+import java.io.IOException;
+import java.util.Date;
+import java.util.Properties;
+
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import javax.security.sasl.AuthenticationException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -32,6 +46,12 @@ public class SecurityController {
     public String signUp2(@RequestParam String idtoken, @RequestParam String name) throws AuthenticationException {
 		return manager.signUp(idtoken,name).toString();
     }
+	
+	@RequestMapping(value = "/linkEmployee",method = RequestMethod.GET)
+    public String linkEmployee(@RequestParam String idtoken, @RequestParam String email, @RequestParam String employeeId) throws AuthenticationException {
+		return manager.linkEmployee(email,employeeId).toString();
+    }
+	
 	
 	@RequestMapping(value = "/approve",method = RequestMethod.GET)
     public String approve(@RequestHeader(value="Authorization", required=false) String idToken, @RequestParam String userId,String employeeId) throws AuthenticationException {

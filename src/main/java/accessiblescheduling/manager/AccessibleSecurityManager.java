@@ -1,6 +1,16 @@
 package accessiblescheduling.manager;
+import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.Properties;
 
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Transport;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import javax.security.sasl.AuthenticationException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -157,6 +167,29 @@ public class AccessibleSecurityManager {
     	return null;
     }
     
+	public void sendMail() throws AddressException, MessagingException, IOException {
+		   Properties props = new Properties();
+		   props.put("mail.smtp.auth", "true");
+		   props.put("mail.smtp.starttls.enable", "true");
+		   props.put("mail.smtp.host", "smtp.gmail.com");
+		   props.put("mail.smtp.port", "587");
+		   
+		   javax.mail.Session session = javax.mail.Session.getInstance(props, new javax.mail.Authenticator() {
+		      protected PasswordAuthentication getPasswordAuthentication() {
+		         return new PasswordAuthentication("accessiblescheduling@gmail.com", "initialPassword");
+		      }
+		   });		   
+		   Message msg = new MimeMessage(session);
+		   msg.setFrom(new InternetAddress("accessiblescheduling@gmail.com", false));
+
+		   msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse("shadowfox683@gmail.com"));
+		   msg.setSubject("AccessibleScheduling - Invitation to join");
+		   msg.setContent("Your schedule is waiting for you. Click the following link to sign up with your google account: ", "text/html");
+		   msg.setSentDate(new Date());
+
+		   Transport.send(msg);   
+		}
+    
     public boolean isAdmin(String idToken) throws AuthenticationException {
     	return getUserDetails(idToken).isAdmin();
     }
@@ -243,4 +276,11 @@ public class AccessibleSecurityManager {
 		
     	return user;
     }
+
+
+	public String linkEmployee(String email, String employeeId) {
+		
+		
+		return "LINKED";
+	}
 }

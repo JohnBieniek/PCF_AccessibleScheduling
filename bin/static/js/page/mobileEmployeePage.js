@@ -39,6 +39,34 @@ function MobileEmployeeController($scope, $modal, $http) {
 	}
 	
 	/**
+	 * Open a modal to take in an e-mail address that will be used to send an invite to join
+	 */
+	$scope.linkEmployee=function(){
+       var updateModal = $modal.open({
+           templateUrl: 'templates/modal/linkEmployeeForm.html',
+           controller: LinkEmployeeModalController,
+           resolve: {
+        	   idToken: function(){
+        		   return $scope.clone($scope.idToken);
+        	   },
+	           	employee:function(){
+	        		return $scope.clone($scope.employee);
+	        	},
+               action: function() {
+                   return 'link';
+               }
+           }
+       });
+
+       updateModal.result.then(function (shift) {
+		   // ok
+			// was pressed
+       }, function () {
+           // we canceled 
+       });
+	}
+	
+	/**
      * Checks to see if we have the latest info in this availability.
      * If we don't we ask if they want to delete anyways or see what the changes are.
      * If the choose to proceed or if we had the latest data we delete the availability.
