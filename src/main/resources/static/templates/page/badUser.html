@@ -1,0 +1,14 @@
+<html>
+<body>
+    <h1 th:text="${param.message[0]}>Error Message</h1>
+    <a th:href="@{/registration.html}"
+      th:text="#{label.form.loginSignUp}">signup</a>
+      <input id="user" value="">    
+<script>
+    var url_string = window.location.href; //window.location.href
+    var url = new URL(url_string);
+    var c = url.searchParams.get("message");
+    document.getElementById("user").value = c;
+</script>
+</body>
+</html>
