@@ -155,17 +155,17 @@ public class AccessibleSecurityManager {
     	return false;
     }
     
-    public  AccessRequest signUp(String idToken, String name) throws AuthenticationException {
-    	User user = getUser(idToken);
-    	AccessRequest request = null;
-    	
-    	if(null!=user) {
-    		request = accessCrud.findOne(user.getUserId());
-    		if(null==request) {
-    			updateInfoManager.set("alerts");
-    			return accessCrud.insert(new AccessRequest(user.getUserId(),name));
-    		}
-    	};
+    public  AccessRequest signUp(String idToken, String invitation) throws AuthenticationException {
+//    	User user = getUser(idToken);
+//    	AccessRequest request = null;
+//    	
+//    	if(null!=user) {
+//    		request = accessCrud.findOne(user.getUserId());
+//    		if(null==request) {
+//    			updateInfoManager.set("alerts");
+//    			return accessCrud.insert(new AccessRequest(user.getUserId(),name));
+//    		}
+//    	};
     	
     	return null;
     }

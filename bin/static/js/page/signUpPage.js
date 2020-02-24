@@ -22,7 +22,19 @@ angular.module('signUp', ['ngResource', 'ui.bootstrap']).
     });
 
 function SignUpController($scope, $modal, $http) {
+	function onSignIn(googleUser) {
+	    // The ID token you need to pass to your backend:
+	    var idToken = googleUser.getAuthResponse().id_token;
+	    $scope.setIdToken(idToken);
+		$scope.updateLastInteractionTime();
+	}
+	window.onSignIn = onSignIn;
+	
 	$scope.requestSignUp = function requestSignUp() { 
+		console.log("$scope.profile:",$scope.profile);
+	    var url_string = window.location.href; //window.location.href
+	    var url = new URL(url_string);
+	    var invitation = url.searchParams.get("invitation");
     	$http({
             url: '/auth/signup',
             method: 'GET',
@@ -31,7 +43,7 @@ function SignUpController($scope, $modal, $http) {
             },
             params: {
             	idtoken:$scope.idToken,
-            	name:$scope.profile.name
+            	invitation:invitation
             }
         })
         .then(function(response) {
