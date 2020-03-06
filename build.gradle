@@ -41,7 +41,7 @@ sourceSets {
     }
 }
 dependencies {// https://mvnrepository.com/artifact/javax.persistence/persistence-api
-
+	compile 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-mail
 	compile group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: '1.2.0.RELEASE'
 

@@ -1,7 +1,6 @@
 package accessiblescheduling.controller;
 
 import java.io.IOException;
-import java.util.Locale;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
@@ -10,6 +9,7 @@ import javax.security.sasl.AuthenticationException;
 import org.codehaus.jettison.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -43,10 +43,15 @@ public class SecurityController {
 		RedirectView redirectView = new RedirectView();
 		String value1="DickButtMcGee";
 		redirectView.setAttributesCSV("invitation={"+value1+"}");
-		redirectView.setUrl("https://accessiblescheduling-dev.cfapps.io/signup");
+		redirectView.setUrl("https://accessiblescheduling-dev.cfapps.io");
 		return redirectView;
 	}
 
+	@GetMapping("/greeting")
+	public String greeting(@RequestParam(name="name", required=false, defaultValue="World") String name, Model model) {
+		model.addAttribute("name", name);
+		return "greeting";
+	}
 //	@RequestMapping(value = "/regitrationConfirm", method = RequestMethod.GET)
 //	public String confirmRegistration(WebRequest request, Model model, @RequestParam("token") String token) {
 //

@@ -22,6 +22,10 @@ angular.module('login', ['ngResource', 'ui.bootstrap']).
     });
 
 function LoginController($scope, $modal, $http) {
+    var url_string = window.location.href; //window.location.href
+    var url = new URL(url_string);
+    var invitation = url.searchParams.get("invitation");
+    
 	function onSignIn(googleUser) {
 	    // The ID token you need to pass to your backend:
 	    var idToken = googleUser.getAuthResponse().id_token;
