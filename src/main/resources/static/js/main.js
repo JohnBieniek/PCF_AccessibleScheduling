@@ -24,7 +24,7 @@ angular.module('mainNavigation', ['ngResource', 'ui.bootstrap']).
 function MainNavigationController($scope, $modal, $http) {
 	 $scope.init = function() {
 		$scope.lastInteraction=new Date();
-        $scope.setPage("login");
+        $scope.setPage("splash");
 		$scope.tab="Schedule";//client tab
 		$scope.employeeTab="Schedule";
         $scope.showToast=false;
@@ -1550,7 +1550,8 @@ function MainNavigationController($scope, $modal, $http) {
 	    
 		 var auth2 = gapi.auth2.getAuthInstance();
 	     auth2.signOut().then(function () {
-	    	 $scope.setPage("login");
+	    	 $scope.setPage("splash");
+	    	 window.location.reload(false);
 	     });
     }
     $scope.setIdToken = function (idToken) {
