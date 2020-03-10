@@ -1,10 +1,10 @@
 <div id="adminView" ng-init="init()">
  	<div class="head" style="margin-bottom:0px !important">
-	 	<div ng-if="user" style="display:inline-block;text-align:right">
-	          <p ng-if="user" style="display:inline-block"  class="titleText" ng-click="setPage('employee')">Accessible Scheduling</p>
+	 	<div style="display:inline-block;text-align:right">
+	          <p style="display:inline-block"  class="titleText" ng-click="setPage('employee')">Accessible Scheduling</p>
 	    </div>
-	    <div ng-if="!user" class="inline" style="width: 50%; margin-left: 25%;margin-bottom:10px"> 
-	          <p class="centered titleText">Accessible Scheduling</p>
+	    <div ng-if="!loggedIn()"  style="float:right;margin-right:20px;margin-top:15px;display:inline-block;margin-top: 15px;"> 
+	    		<div class="g-signin2" style="font-size:14px" data-onsuccess="onSignIn" data-theme="dark"></div>
 	    </div>
         <div style="display:inline-block;float:right;margin-top:7px!important;">
         	<div  ng-if="manager" class="navAllign" ng-click="setPage('client')">
@@ -32,7 +32,7 @@
        			<br>
        			<span class="centered">Settings</span>
           	</div>
-  			<div  ng-if="loggedIn()" class="navAllign" ng-click="signOut();setPage('login');">
+  			<div  ng-if="loggedIn()" class="navAllign" ng-click="signOut();setPage('splash');">
        			<i class="glyphicon glyphicon-log-out"/>
        			<br>
        			<span class="centered">Sign out</span>
@@ -48,4 +48,9 @@
     <div class="row multi-columns-row">
         <div ng-include src="page"></div>
     </div>
+    <meta name="google-signin-scope" content="profile email">
+    <meta name="google-signin-client_id" content="728962972693-5uudecgh1ir6if7imo2hb6cv9qa9nrk3.apps.googleusercontent.com">
+    <!--<meta name="google-signin-client_id" content="728962972693-5uudecgh1ir6if7imo2hb6cv9qa9nrk3.apps.googleusercontent.com">-->
+	<script src="https://apis.google.com/js/platform.js" async defer></script>
+    <script type="text/javascript" src="js/page/loginPage.js"></script>
 </div>
