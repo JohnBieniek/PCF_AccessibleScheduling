@@ -25,6 +25,13 @@ function MainNavigationController($scope, $modal, $http) {
 	 $scope.init = function() {
 		$scope.lastInteraction=new Date();
         $scope.setPage("splash");
+        $scope.firstLogin=false;
+        var url = new URL(url_string);
+        var invitation = url.searchParams.get("invitation");
+        if(null!=invitation&& invitation!=""){
+        	$scope.firstLogin=true;
+        }
+        
 		$scope.tab="Schedule";//client tab
 		$scope.employeeTab="Schedule";
         $scope.showToast=false;
@@ -1534,6 +1541,10 @@ function MainNavigationController($scope, $modal, $http) {
 		 else{
 			 return false;
 		 }
+	 }
+	
+	$scope.getFirstLogIn = function getFirstLogin() {
+		 return $scope.firstLogin;
 	 }
 	 
     $scope.signOut = function signOut() {

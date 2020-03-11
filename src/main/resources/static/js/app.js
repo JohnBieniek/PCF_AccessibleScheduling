@@ -4,7 +4,7 @@ angular.module('AccessibleScheduling', ['mainNavigation', 'info', 'ngRoute', 'ui
     	$routeProvider
         .otherwise({
         	 controller: 'MainNavigationController',
-             templateUrl: 'templates/page/home.html'
+             templateUrl: 'templates/userView.html'
         });
     }
 );
