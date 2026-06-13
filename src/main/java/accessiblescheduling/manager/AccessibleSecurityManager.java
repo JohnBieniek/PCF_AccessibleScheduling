@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import javax.security.sasl.AuthenticationException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -22,6 +23,10 @@ import accessiblescheduling.to.User;
 
 @Component
 public class AccessibleSecurityManager {
+	private static final String LOCAL_DEV_TOKEN = "local-dev-token";
+	private static final String LOCAL_DEV_USER_ID = "local-dev-user";
+	private static final String LOCAL_DEV_EMPLOYEE_ID = "local-dev-employee";
+
 	@Autowired
 	private MongoEmployeeRepository employeeCrud;
 
@@ -34,6 +39,9 @@ public class AccessibleSecurityManager {
 	
 	@Autowired
     private UpdateInfoManager updateInfoManager;
+
+	@Autowired
+	private Environment environment;
 	
 	RestTemplate restTemplate = new RestTemplate();
     
@@ -173,7 +181,15 @@ public class AccessibleSecurityManager {
     	return getUserDetails(getUser(idToken));
     }
     
-    public User getUserDetails(User user){
+	public User getUserDetails(User user){
+		if(isLocalDevUser(user)) {
+			user.setUser(true);
+			user.setManager(true);
+			user.setAdmin(true);
+			user.setEmployeeId(LOCAL_DEV_EMPLOYEE_ID);
+			return user;
+		}
+
     	Employee employee = employeeCrud.findByUserId(user.getUserId());
     	
     	if(null!=employee && employee.getId()!=null) {
@@ -230,6 +246,16 @@ public class AccessibleSecurityManager {
 	}
 	
 	public User getUser(String idToken) throws AuthenticationException{
+		if(isInMemoryProfile() && LOCAL_DEV_TOKEN.equals(idToken)) {
+			User user = new User();
+			user.setUserId(LOCAL_DEV_USER_ID);
+			user.setEmail("local-dev@example.com");
+			user.setVerifiedEmail(true);
+			user.setIssuer(Constants.TOKEN_ISSUER);
+			user.setExpiresIn(3600);
+			return user;
+		}
+
     	String tokenInfo = restTemplate.getForObject("https://www.googleapis.com/oauth2/v2/tokeninfo?id_token="+idToken, String.class);
     	
     	ObjectMapper mapper = new ObjectMapper();
@@ -243,4 +269,17 @@ public class AccessibleSecurityManager {
 		
     	return user;
     }
+
+	private boolean isLocalDevUser(User user) {
+		return isInMemoryProfile() && user != null && LOCAL_DEV_USER_ID.equals(user.getUserId());
+	}
+
+	private boolean isInMemoryProfile() {
+		for(String profile : environment.getActiveProfiles()) {
+			if("in-memory".equals(profile)) {
+				return true;
+			}
+		}
+		return false;
+	}
 }

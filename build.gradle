@@ -42,7 +42,7 @@ sourceSets {
 }
 dependencies {// https://mvnrepository.com/artifact/javax.persistence/persistence-api
 	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-cache
-	compile group: 'org.springframework.boot', name: 'spring-boot-starter-cache', version: '2.1.9.RELEASE'
+	compile 'org.springframework.boot:spring-boot-starter-cache'
 
 	// https://mvnrepository.com/artifact/io.springfox/springfox-swagger2
 	compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
@@ -55,8 +55,6 @@ dependencies {// https://mvnrepository.com/artifact/javax.persistence/persistenc
     compile 'com.google.api-client:google-api-client-android:1.22.0'
     compile 'com.google.apis:google-api-services-people:v1-rev139-1.22.0'
  
-compile group: 'javax.persistence', name: 'persistence-api', version: '1.0'
-
 compile group: 'org.codehaus.jackson', name: 'jackson-mapper-asl', version: '1.9.13'
 
 compile 'org.json:json:20151123'
@@ -79,7 +77,7 @@ compile 'org.json:json:20151123'
     compile "org.springframework.cloud:spring-cloud-cloudfoundry-connector:${springCloudConnectorsVersion}"
 
 // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-test
-testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '1.5.6.RELEASE'
+testCompile 'org.springframework.boot:spring-boot-starter-test'
 
     // JPA Persistence
     compile "commons-dbcp:commons-dbcp"

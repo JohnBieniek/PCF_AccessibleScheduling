@@ -31,8 +31,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
     	Map<String, String> env = System.getenv();
+    	String username = env.get("temp1") == null ? "admin" : env.get("temp1");
+    	String password = env.get("temp2") == null ? "password" : env.get("temp2");
         auth
             .inMemoryAuthentication()
-                .withUser(env.get("temp1")).password(env.get("temp2")).roles("USER");
+                .withUser(username).password(password).roles("USER");
     }
 }

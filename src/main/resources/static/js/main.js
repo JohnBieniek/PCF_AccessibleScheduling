@@ -1527,7 +1527,7 @@ function MainNavigationController($scope, $modal, $http) {
     /**
      * Check if the user has logged in through google based on the presence of the idToken google returns after auth
      */
-	$scope.loggedIn = function loggedIn() {
+	 $scope.loggedIn = function loggedIn() {
 		 if($scope.idToken!=null){
 			 return true;
 		 }
@@ -1535,6 +1535,55 @@ function MainNavigationController($scope, $modal, $http) {
 			 return false;
 		 }
 	 }
+
+	$scope.completeSignIn = function completeSignIn(idToken) {
+	    $scope.setIdToken(idToken);
+		$scope.updateLastInteractionTime();
+    	$http({
+            url: '/auth/tokensignin',
+            method: 'GET',
+            headers: {
+	            'Authorization': $scope.idToken,
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            params: {
+            }
+        })
+        .then(function(response) {
+	        $scope.setProfile(response.data);
+	        $scope.setUser($scope.profile.user);
+	        $scope.setManager($scope.profile.manager);
+	        $scope.setAdmin($scope.profile.admin);
+		    if($scope.profile.user){
+			    $scope.getEmployeeNames();
+		    	$scope.setPage('employee');
+		    }
+		    else{
+		    	$http({
+		            url: '/auth/signedup',
+		            method: 'GET',
+		            headers: {
+    		            'Authorization': $scope.idToken,
+		                'Content-Type': 'application/x-www-form-urlencoded'
+		            },
+		            params: {
+		            }
+		        })
+		        .then(function(response) {
+		        	if(response.data=="true"){
+		        		$scope.setPage('awaitingAccess');
+		        	}
+		        	else{
+					    $scope.setPage('signUp');
+		        	}
+		        });
+		    }
+	    });
+	}
+
+	$scope.localDevSignIn = function localDevSignIn() {
+		$scope.completeSignIn('local-dev-token');
+	}
 	 
     $scope.signOut = function signOut() {
    	 	 $scope.updateLastInteractionTime();
@@ -1548,11 +1597,17 @@ function MainNavigationController($scope, $modal, $http) {
 		 $scope.tab="Schedule";
 		 $scope.employeeTab="Schedule";
 	    
-		 var auth2 = gapi.auth2.getAuthInstance();
-	     auth2.signOut().then(function () {
+		 if(window.gapi && gapi.auth2 && gapi.auth2.getAuthInstance()) {
+			 var auth2 = gapi.auth2.getAuthInstance();
+		     auth2.signOut().then(function () {
+		    	 $scope.setPage("splash");
+		    	 window.location.reload(false);
+		     });
+		 }
+		 else {
 	    	 $scope.setPage("splash");
 	    	 window.location.reload(false);
-	     });
+		 }
     }
     $scope.setIdToken = function (idToken) {
         $scope.idToken = idToken;
