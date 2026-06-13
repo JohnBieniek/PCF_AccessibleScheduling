@@ -24,7 +24,6 @@ angular.module('mainNavigation', ['ngResource', 'ui.bootstrap']).
 function MainNavigationController($scope, $modal, $http) {
 	 $scope.init = function() {
 		$scope.lastInteraction=new Date();
-        $scope.setPage("splash");
 		$scope.tab="Schedule";//client tab
 		$scope.employeeTab="Schedule";
         $scope.showToast=false;
@@ -119,6 +118,7 @@ function MainNavigationController($scope, $modal, $http) {
 		}
 		
 		$scope.updateCycle=1;
+		$scope.localDevSignIn('scheduler');
 		setTimeout($scope.autoUpdateData,15000);
 	 };
 	 
@@ -489,8 +489,13 @@ function MainNavigationController($scope, $modal, $http) {
 	    			console.log("data.data.message==400 Bad Request",data.data.message=="400 Bad Request");
 	    			console.log("data.status==500",data.status==500);
 	    			if(data.status==500 && (data.data.message=="400 Bad Request" || data.data.message=="No message available")){
-	    				$scope.warn("Session has expired. Please re-authenticate.");
-	    				$scope.signOut();
+	    				if($scope.idToken=="local-dev-token"){
+	    					$scope.localDevSignIn('scheduler');
+	    				}
+	    				else{
+		    				$scope.warn("Session has expired. Please re-authenticate.");
+		    				$scope.signOut();
+	    				}
 	    			}
 	    			else{
 	    				$scope.warn("Failed to update schedule data");
@@ -1536,7 +1541,7 @@ function MainNavigationController($scope, $modal, $http) {
 		 }
 	 }
 
-	$scope.completeSignIn = function completeSignIn(idToken) {
+	$scope.completeSignIn = function completeSignIn(idToken, destinationPage) {
 	    $scope.setIdToken(idToken);
 		$scope.updateLastInteractionTime();
     	$http({
@@ -1556,7 +1561,7 @@ function MainNavigationController($scope, $modal, $http) {
 	        $scope.setAdmin($scope.profile.admin);
 		    if($scope.profile.user){
 			    $scope.getEmployeeNames();
-		    	$scope.setPage('employee');
+		    	$scope.setPage(destinationPage || 'employee');
 		    }
 		    else{
 		    	$http({
@@ -1581,8 +1586,8 @@ function MainNavigationController($scope, $modal, $http) {
 	    });
 	}
 
-	$scope.localDevSignIn = function localDevSignIn() {
-		$scope.completeSignIn('local-dev-token');
+	$scope.localDevSignIn = function localDevSignIn(destinationPage) {
+		$scope.completeSignIn('local-dev-token', destinationPage || 'scheduler');
 	}
 	 
     $scope.signOut = function signOut() {
