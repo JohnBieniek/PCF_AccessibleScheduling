@@ -3,7 +3,7 @@ Accessible Scheduling
 
 Accessible Scheduling is a dynamic and robust nurse scheduling tool used to help provide in-home care to patients in need. This tool improves the experience of administrators and nurses alike by providing a suite of options that improve how shifts are generated, assigned, and communicated.
 
-![Accessible Scheduling architecture showing users, the Angular front end, Spring Boot, scheduling rules, MongoDB, integrations, and Cloud Foundry deployment](https://johnbieniek.com/assets/projects/accessible-scheduling/architecture.png)
+[![Accessible Scheduling architecture](docs/architecture.svg)](docs/architecture.md)
 
 The tool can take in both common and uncommon information to allow for dynamic schedule generation and assignment. A client can request shifts on a daily, weekly, biweekly, every-X-weeks, monthly, or other recurring basis. They can also identify special needs, such as no smokers, no one with cat allergies, and more. This can include requirements such as ASL proficiency for deaf clients, special certifications for clients with disabilities, and other configurable needs.
 
@@ -38,8 +38,6 @@ With all these features, Accessible Scheduling has made staffing easier in areas
 With minute-accurate schedules and the tools needed to respond to changes as they occur, Accessible Scheduling has been a game changer for those working in the field of in-home nursing.
 
 This is an application using database services on [Cloud Foundry](http://cloudfoundry.org) with the [Spring Framework](http://spring.io).
-
-![Accessible Scheduling architecture showing users, the Angular front end, Spring Boot, scheduling rules, MongoDB, integrations, and Cloud Foundry deployment](https://johnbieniek.com/assets/projects/accessible-scheduling/architecture.png)
 
 This application has been built to store domain objects in a key-value stores. 
 
