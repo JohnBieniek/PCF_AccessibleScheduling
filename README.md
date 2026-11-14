@@ -3,6 +3,8 @@ Accessible Scheduling
 
 Accessible Scheduling is a dynamic and robust nurse scheduling tool used to help provide in-home care to patients in need. This tool improves the experience of administrators and nurses alike by providing a suite of options that improve how shifts are generated, assigned, and communicated.
 
+![Accessible Scheduling architecture showing users, the Angular front end, Spring Boot, scheduling rules, MongoDB, integrations, and Cloud Foundry deployment](https://johnbieniek.com/assets/projects/accessible-scheduling/architecture.png)
+
 The tool can take in both common and uncommon information to allow for dynamic schedule generation and assignment. A client can request shifts on a daily, weekly, biweekly, every-X-weeks, monthly, or other recurring basis. They can also identify special needs, such as no smokers, no one with cat allergies, and more. This can include requirements such as ASL proficiency for deaf clients, special certifications for clients with disabilities, and other configurable needs.
 
 Accessible Scheduling is built to accommodate the shifting regulatory landscape of the industry. Administrators can add any custom requirements they need for clients and any custom certifications for staff. This can allow them to request only staff from a certain area for a client, only allow staff with specific training to assist individuals with special needs, and add new requirements as they arise.
