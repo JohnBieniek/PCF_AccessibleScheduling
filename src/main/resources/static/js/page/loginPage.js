@@ -25,48 +25,7 @@ function LoginController($scope, $modal, $http) {
 	function onSignIn(googleUser) {
 	    // The ID token you need to pass to your backend:
 	    var idToken = googleUser.getAuthResponse().id_token;
-	    $scope.setIdToken(idToken);
-		$scope.updateLastInteractionTime();
-    	$http({
-            url: '/auth/tokensignin',
-            method: 'GET',
-            headers: {
-	            'Authorization': $scope.idToken,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            params: {
-            }
-        })
-        .then(function(response) {
-	        $scope.setProfile(response.data);
-	        $scope.setUser($scope.profile.user);
-	        $scope.setManager($scope.profile.manager);
-	        $scope.setAdmin($scope.profile.admin);
-		    if($scope.profile.user){
-			    $scope.getEmployeeNames();
-		    	$scope.setPage('employee');
-		    }
-		    else{
-		    	$http({
-		            url: '/auth/signedup',
-		            method: 'GET',
-		            headers: {
-    		            'Authorization': $scope.idToken,
-		                'Content-Type': 'application/x-www-form-urlencoded'
-		            },
-		            params: {
-		            }
-		        })
-		        .then(function(response) {
-		        	if(response.data=="true"){
-		        		$scope.setPage('awaitingAccess');
-		        	}
-		        	else{
-					    $scope.setPage('signUp');		        		
-		        	}
-		        });
-		    }
-	    });
+	    $scope.completeSignIn(idToken);
 	}
 	window.onSignIn = onSignIn;
 }

@@ -37,6 +37,8 @@ With minute-accurate schedules and the tools needed to respond to changes as the
 
 This is an application using database services on [Cloud Foundry](http://cloudfoundry.org) with the [Spring Framework](http://spring.io).
 
+![Accessible Scheduling architecture showing users, the Angular front end, Spring Boot, scheduling rules, MongoDB, integrations, and Cloud Foundry deployment](https://johnbieniek.com/assets/projects/accessible-scheduling/architecture.png)
+
 This application has been built to store domain objects in a key-value stores. 
 
 The application use Spring Java configuration and [bean profiles](https://spring.io/blog/2011/02/14/spring-3-1-m1-introducing-profile/) to configure the application and the connection objects needed to use the persistence stores. It also uses the [Spring Cloud Connectors](http://cloud.spring.io/spring-cloud-connectors/) library to inspect the environment when running on Cloud Foundry. See the [Cloud Foundry documentation](http://docs.cloudfoundry.org/buildpacks/java/spring-service-bindings.html) for details on configuring a Spring application for Cloud Foundry.

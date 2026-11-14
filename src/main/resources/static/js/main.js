@@ -24,7 +24,6 @@ angular.module('mainNavigation', ['ngResource', 'ui.bootstrap']).
 function MainNavigationController($scope, $modal, $http) {
 	 $scope.init = function() {
 		$scope.lastInteraction=new Date();
-        $scope.setPage("splash");
 		$scope.tab="Schedule";//client tab
 		$scope.employeeTab="Schedule";
         $scope.showToast=false;
@@ -119,6 +118,7 @@ function MainNavigationController($scope, $modal, $http) {
 		}
 		
 		$scope.updateCycle=1;
+		$scope.localDevSignIn('scheduler');
 		setTimeout($scope.autoUpdateData,15000);
 	 };
 	 
@@ -489,8 +489,13 @@ function MainNavigationController($scope, $modal, $http) {
 	    			console.log("data.data.message==400 Bad Request",data.data.message=="400 Bad Request");
 	    			console.log("data.status==500",data.status==500);
 	    			if(data.status==500 && (data.data.message=="400 Bad Request" || data.data.message=="No message available")){
-	    				$scope.warn("Session has expired. Please re-authenticate.");
-	    				$scope.signOut();
+	    				if($scope.idToken=="local-dev-token"){
+	    					$scope.localDevSignIn('scheduler');
+	    				}
+	    				else{
+		    				$scope.warn("Session has expired. Please re-authenticate.");
+		    				$scope.signOut();
+	    				}
 	    			}
 	    			else{
 	    				$scope.warn("Failed to update schedule data");
@@ -1527,7 +1532,7 @@ function MainNavigationController($scope, $modal, $http) {
     /**
      * Check if the user has logged in through google based on the presence of the idToken google returns after auth
      */
-	$scope.loggedIn = function loggedIn() {
+	 $scope.loggedIn = function loggedIn() {
 		 if($scope.idToken!=null){
 			 return true;
 		 }
@@ -1535,6 +1540,55 @@ function MainNavigationController($scope, $modal, $http) {
 			 return false;
 		 }
 	 }
+
+	$scope.completeSignIn = function completeSignIn(idToken, destinationPage) {
+	    $scope.setIdToken(idToken);
+		$scope.updateLastInteractionTime();
+    	$http({
+            url: '/auth/tokensignin',
+            method: 'GET',
+            headers: {
+	            'Authorization': $scope.idToken,
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            params: {
+            }
+        })
+        .then(function(response) {
+	        $scope.setProfile(response.data);
+	        $scope.setUser($scope.profile.user);
+	        $scope.setManager($scope.profile.manager);
+	        $scope.setAdmin($scope.profile.admin);
+		    if($scope.profile.user){
+			    $scope.getEmployeeNames();
+		    	$scope.setPage(destinationPage || 'employee');
+		    }
+		    else{
+		    	$http({
+		            url: '/auth/signedup',
+		            method: 'GET',
+		            headers: {
+    		            'Authorization': $scope.idToken,
+		                'Content-Type': 'application/x-www-form-urlencoded'
+		            },
+		            params: {
+		            }
+		        })
+		        .then(function(response) {
+		        	if(response.data=="true"){
+		        		$scope.setPage('awaitingAccess');
+		        	}
+		        	else{
+					    $scope.setPage('signUp');
+		        	}
+		        });
+		    }
+	    });
+	}
+
+	$scope.localDevSignIn = function localDevSignIn(destinationPage) {
+		$scope.completeSignIn('local-dev-token', destinationPage || 'scheduler');
+	}
 	 
     $scope.signOut = function signOut() {
    	 	 $scope.updateLastInteractionTime();
@@ -1548,11 +1602,17 @@ function MainNavigationController($scope, $modal, $http) {
 		 $scope.tab="Schedule";
 		 $scope.employeeTab="Schedule";
 	    
-		 var auth2 = gapi.auth2.getAuthInstance();
-	     auth2.signOut().then(function () {
+		 if(window.gapi && gapi.auth2 && gapi.auth2.getAuthInstance()) {
+			 var auth2 = gapi.auth2.getAuthInstance();
+		     auth2.signOut().then(function () {
+		    	 $scope.setPage("splash");
+		    	 window.location.reload(false);
+		     });
+		 }
+		 else {
 	    	 $scope.setPage("splash");
 	    	 window.location.reload(false);
-	     });
+		 }
     }
     $scope.setIdToken = function (idToken) {
         $scope.idToken = idToken;

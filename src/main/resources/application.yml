@@ -1,5 +1,14 @@
 
 ---
 spring:
+  profiles:
+    active: in-memory
   jpa:
     generate-ddl: true
+---
+spring:
+  profiles: in-memory
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration
