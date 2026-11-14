@@ -3,7 +3,7 @@ Accessible Scheduling
 
 This is an application using database services on [Cloud Foundry](http://cloudfoundry.org) with the [Spring Framework](http://spring.io).
 
-![Accessible Scheduling architecture showing users, the Angular front end, Spring Boot, scheduling rules, MongoDB, integrations, and Cloud Foundry deployment](https://johnbieniek.com/assets/projects/accessible-scheduling/architecture.png)
+[![Accessible Scheduling architecture](docs/architecture.svg)](docs/architecture.md)
 
 This application has been built to store domain objects in a key-value stores. 
 
